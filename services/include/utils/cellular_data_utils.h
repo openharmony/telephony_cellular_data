@@ -19,6 +19,8 @@
 #include <vector>
 #include <utility>
 
+#include "parameter.h"
+
 #include "cellular_data_constant.h"
 #include "cellular_data_state_machine.h"
 
@@ -29,8 +31,13 @@ public:
     static std::vector<AddressInfo> ParseIpAddr(const std::string &address);
     static std::vector<AddressInfo> ParseNormalIpAddr(const std::string &address);
     static std::vector<RouteInfo> ParseRoute(const std::string &address);
+    static bool ParseDotIpData(const std::string &address, AddressInfo &ipInfo);
     static std::vector<std::string> Split(const std::string &input, const std::string &flag);
     static bool IsDigit(const std::string &data);
+    static int32_t GetPrefixLen(const std::string &netmask, const std::string& flag);
+    static int32_t GetPrefixLen(const std::vector<std::string> &netmask, const size_t start);
+    static int GetDefaultMobileMtuConfig();
+    static bool GetDefaultPreferApnConfig();
 
 private:
     CellularDataUtils() = default;

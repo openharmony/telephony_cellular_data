@@ -46,6 +46,12 @@ private:
     bool ProcessDataConnectionRoamOff(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessBwRefreshResponse(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessDataConnectionVoiceCallStartedOrEnded(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessGetBandwidthsFromRil(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessNrStateChanged(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessNrFrequencyChanged(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessDataConnectionComplete(const AppExecFwk::InnerEvent::Pointer &event);
+    void RefreshConnectionBandwidths();
+    void RefreshTcpBufferSizes();
 
 private:
     using Fun = bool (Active::*)(const AppExecFwk::InnerEvent::Pointer &data);
@@ -58,7 +64,11 @@ private:
         {CellularDataEventCode::MSG_SM_DATA_ROAM_OFF, &Active::ProcessDataConnectionRoamOff},
         {CellularDataEventCode::MSG_SM_BW_REFRESH_RESPONSE, &Active::ProcessBwRefreshResponse},
         {CellularDataEventCode::MSG_SM_VOICE_CALL_STARTED, &Active::ProcessDataConnectionVoiceCallStartedOrEnded},
-        {CellularDataEventCode::MSG_SM_VOICE_CALL_ENDED, &Active::ProcessDataConnectionVoiceCallStartedOrEnded}
+        {CellularDataEventCode::MSG_SM_VOICE_CALL_ENDED, &Active::ProcessDataConnectionVoiceCallStartedOrEnded},
+        {ObserverHandler::ObserverHandlerId::RADIO_NR_STATE_CHANGED, &Active::ProcessNrStateChanged},
+        {ObserverHandler::ObserverHandlerId::RADIO_NR_FREQUENCY_CHANGED, &Active::ProcessNrFrequencyChanged},
+        {CellularDataEventCode::MSG_GET_RIL_BANDWIDTH, &Active::ProcessGetBandwidthsFromRil},
+        {ObserverHandler::RADIO_RIL_SETUP_DATA_CALL, &Active::ProcessDataConnectionComplete},
     };
     std::weak_ptr<CellularDataStateMachine> stateMachine_;
 };

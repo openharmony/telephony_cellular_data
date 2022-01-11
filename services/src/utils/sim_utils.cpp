@@ -15,15 +15,15 @@
 
 #include "sim_utils.h"
 
-#include "telephony_errors.h"
-
 #include "cellular_data_constant.h"
+#include "telephony_errors.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
 int32_t SimUtils::GetSimState(int32_t slotId)
 {
-    auto core = CoreManager::GetInstance().getCore(slotId);
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
     if (core != nullptr) {
         return core->GetSimState(slotId);
     } else {
@@ -34,7 +34,7 @@ int32_t SimUtils::GetSimState(int32_t slotId)
 
 std::u16string SimUtils::GetSimIccId(const int32_t slotId)
 {
-    auto core = CoreManager::GetInstance().getCore(slotId);
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
     if (core != nullptr) {
         return core->GetSimIccId(slotId);
     } else {
@@ -45,7 +45,7 @@ std::u16string SimUtils::GetSimIccId(const int32_t slotId)
 
 int32_t SimUtils::GetDefaultCellularDataSlotId()
 {
-    auto core = CoreManager::GetInstance().getCore(CoreManager::DEFAULT_SLOT_ID);
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(CoreManager::DEFAULT_SLOT_ID);
     if (core != nullptr) {
         return core->GetDefaultCellularDataSlotId();
     } else {
@@ -56,7 +56,7 @@ int32_t SimUtils::GetDefaultCellularDataSlotId()
 
 int32_t SimUtils::SetDefaultCellularDataSlotId(int32_t slotId)
 {
-    auto core = CoreManager::GetInstance().getCore(CoreManager::DEFAULT_SLOT_ID);
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(CoreManager::DEFAULT_SLOT_ID);
     if (core != nullptr) {
         bool result = core->SetDefaultCellularDataSlotId(slotId);
         if (result) {
@@ -72,7 +72,7 @@ int32_t SimUtils::SetDefaultCellularDataSlotId(int32_t slotId)
 
 int32_t SimUtils::GetSimNum()
 {
-    auto core = CoreManager::GetInstance().getCore(CoreManager::DEFAULT_SLOT_ID);
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(CoreManager::DEFAULT_SLOT_ID);
     if (core != nullptr) {
         int32_t cardNumber = core->GetMaxSimCount();
         if (cardNumber < 0) {

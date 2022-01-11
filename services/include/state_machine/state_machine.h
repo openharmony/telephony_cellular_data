@@ -64,13 +64,13 @@ public:
 
     virtual void SetOriginalState(sptr<State> &originalState)
     {
-        this->originalState_ = originalState;
+        originalState_ = originalState;
     }
 
     virtual void TransitionTo(sptr<State> &destState)
     {
         TELEPHONY_LOGI("State machine transition to %{public}s", destState->name_.c_str());
-        this->destState_ = destState;
+        destState_ = destState;
     }
 
     virtual void Quit()
@@ -128,7 +128,7 @@ public:
         }
         if (event->GetInnerEventId() == CMD_STATE_MACHINE_INIT) {
             destState_ = originalState_;
-            InitCmdEnter(this->originalState_);
+            InitCmdEnter(originalState_);
         }
         ProcessMsg(event);
         ProcessTransitions(event);
@@ -169,7 +169,7 @@ private:
             return;
         }
         for (size_t i = 0; i < deferEvents_.size(); ++i) {
-            auto event = std::move(deferEvents_[i]);
+            AppExecFwk::InnerEvent::Pointer event = std::move(deferEvents_[i]);
             SendImmediateEvent(event);
         }
         deferEvents_.clear();
@@ -199,7 +199,8 @@ public:
 
     void Quit()
     {
-        auto event = AppExecFwk::InnerEvent::Get(StateMachineEventHandler::CMD_STATE_MACHINE_QUIT);
+        AppExecFwk::InnerEvent::Pointer event =
+            AppExecFwk::InnerEvent::Get(StateMachineEventHandler::CMD_STATE_MACHINE_QUIT);
         if (stateMachineEventHandler_ == nullptr) {
             TELEPHONY_LOGE("stateMachineEventHandler_ is null");
             return;
@@ -213,7 +214,8 @@ public:
             TELEPHONY_LOGE("stateMachineEventHandler_ is null");
             return;
         }
-        auto event = AppExecFwk::InnerEvent::Get(StateMachineEventHandler::CMD_STATE_MACHINE_INIT);
+        AppExecFwk::InnerEvent::Pointer event =
+            AppExecFwk::InnerEvent::Get(StateMachineEventHandler::CMD_STATE_MACHINE_INIT);
         stateMachineEventHandler_->SendImmediateEvent(event);
     }
 

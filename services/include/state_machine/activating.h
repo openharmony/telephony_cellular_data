@@ -37,8 +37,10 @@ public:
     virtual bool StateProcess(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
+    DisConnectionReason DataCallPdpError(int32_t reason);
     bool RilActivatePdpContextDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool RilErrorResponse(const AppExecFwk::InnerEvent::Pointer &event);
+    void ProcessConnectTimeout(const AppExecFwk::InnerEvent::Pointer &event);
     std::weak_ptr<CellularDataStateMachine> stateMachine_;
 };
 } // namespace Telephony

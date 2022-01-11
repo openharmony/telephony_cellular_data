@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
-#include "sim_switcher.h"
+#ifndef NETWORK_SEARCH_CALLBACK_H
+#define NETWORK_SEARCH_CALLBACK_H
+
+#include <string>
+
+#include "network_search_callback_base.h"
 
 namespace OHOS {
 namespace Telephony {
-SIMSwitcher::SIMSwitcher() = default;
-
-SIMSwitcher::~SIMSwitcher() = default;
-
-void SIMSwitcher::Activate() {}
-
-void SIMSwitcher::DeActivate() {}
-
-void SIMSwitcher::ProcessDefaultDataChanged() {}
-
-void SIMSwitcher::OnActiveSimSwitch() {}
+class NetworkSearchCallback : public NetworkSearchCallBackBase {
+public:
+    bool HasInternetCapability(int32_t slotId, int32_t cId);
+    void ClearCellularDataConnections(int32_t slotId);
+};
 } // namespace Telephony
 } // namespace OHOS
+#endif // NETWORK_SEARCH_CALLBACK_H

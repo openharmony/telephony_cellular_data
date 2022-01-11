@@ -14,9 +14,11 @@
  */
 
 #include "cellular_data_setting_observer.h"
-#include "cellular_data_constant.h"
 
 #include "telephony_log_wrapper.h"
+
+#include "cellular_data_constant.h"
+#include "cellular_data_settings_rdb_helper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -26,12 +28,17 @@ CellularDataSettingObserver::CellularDataSettingObserver(std::shared_ptr<Cellula
 
 CellularDataSettingObserver::~CellularDataSettingObserver() = default;
 
-void CellularDataSettingObserver::OnChange(NativePreferences::Preferences &preferences, const std::string &key)
+void CellularDataSettingObserver::OnChange()
 {
-    auto util = DelayedSingleton<Telephony::TelProfileUtil>::GetInstance();
-    if (util == nullptr) {
-        TELEPHONY_LOGE("util is null");
+    std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
+    if (settingHelper == nullptr) {
         return;
+    }
+    Uri uri(CELLULAR_DATA_SETTING_DATA_ENABLE_URI);
+    int value = settingHelper->GetValue(uri, CELLULAR_DATA_COLUMN_ENABLE);
+    TELEPHONY_LOGI("cellular data switch is %{public}d", value);
+    if (cellularDataHandler_ != nullptr) {
+        cellularDataHandler_->SendEvent(CellularDataEventCode::MSG_DB_SETTING_ENABLE_CHANGED, value, 0);
     }
 }
 } // namespace Telephony

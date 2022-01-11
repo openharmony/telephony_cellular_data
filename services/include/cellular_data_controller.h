@@ -21,6 +21,7 @@
 #include "cellular_data_constant.h"
 #include "cellular_data_handler.h"
 #include "cellular_data_rdb_observer.h"
+#include "cellular_data_roaming_observer.h"
 #include "cellular_data_setting_observer.h"
 
 namespace OHOS {
@@ -38,6 +39,7 @@ public:
     ApnProfileState GetCellularDataState(const std::string &apnType) const;
     bool IsCellularDataRoamingEnabled() const;
     void SendRegisterNetManagerEvent();
+    void SendRegisterPolicyEvent();
     void AsynchronousRegister();
     int32_t HandleApnChanged(const std::string &apns);
     int32_t GetCellularDataFlowType();
@@ -47,6 +49,8 @@ public:
     int32_t SetPolicyDataOn(bool enable);
     bool IsRestrictedMode() const;
     int32_t GetDisConnectionReason();
+    bool HasInternetCapability(const int32_t cid) const;
+    bool ClearAllConnections() const;
 
 private:
     void RegisterEvents();
@@ -56,7 +60,8 @@ private:
 
 private:
     std::shared_ptr<CellularDataHandler> cellularDataHandler_;
-    std::shared_ptr<CellularDataSettingObserver> settingObserver_;
+    sptr<CellularDataSettingObserver> settingObserver_;
+    sptr<CellularDataRoamingObserver> roamingObserver_;
     sptr<CellularDataRdbObserver> cellularDataRdbObserver_;
     const int32_t slotId_;
 };

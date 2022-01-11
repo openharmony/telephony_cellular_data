@@ -37,6 +37,9 @@ public:
     virtual bool StateProcess(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
+    void ProcessDisconnectTimeout(const AppExecFwk::InnerEvent::Pointer &event);
+
+private:
     std::weak_ptr<CellularDataStateMachine> stateMachine_;
 };
 } // namespace Telephony

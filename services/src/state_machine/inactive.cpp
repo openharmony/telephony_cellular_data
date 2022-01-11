@@ -25,25 +25,27 @@ namespace Telephony {
 void Inactive::StateBegin()
 {
     TELEPHONY_LOGI("Enter inactive state");
-    auto shareStateMachine = stateMachine_.lock();
-    if (shareStateMachine == nullptr) {
-        TELEPHONY_LOGE("shareStateMachine is null");
+    std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
+    if (stateMachine == nullptr) {
+        TELEPHONY_LOGE("stateMachine is null");
         return;
     }
+    stateMachine->connectId_++;
     isActive_ = true;
     if (deActiveApnTypeId_ != ERROR_APN_ID) {
         std::string apnType = ApnManager::FindApnNameByApnId(deActiveApnTypeId_);
         std::unique_ptr<DataDisconnectParams> object = std::make_unique<DataDisconnectParams>(apnType, reason_);
-        auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_DISCONNECT_DATA_COMPLETE, object);
-        if (shareStateMachine->cellularDataHandler_ != nullptr) {
-            shareStateMachine->cellularDataHandler_->SendEvent(event);
+        AppExecFwk::InnerEvent::Pointer event =
+            AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_DISCONNECT_DATA_COMPLETE, object);
+        if (stateMachine->cellularDataHandler_ != nullptr) {
+            stateMachine->cellularDataHandler_->SendEvent(event);
         }
         deActiveApnTypeId_ = ERROR_APN_ID;
         reason_ = REASON_RETRY_CONNECTION;
     }
-    shareStateMachine->SetCurrentState(sptr<State>(this));
-    if (shareStateMachine->cdConnectionManager_ != nullptr) {
-        shareStateMachine->cdConnectionManager_->RemoveActiveConnectionByCid(shareStateMachine->GetCid());
+    stateMachine->SetCurrentState(sptr<State>(this));
+    if (stateMachine->cdConnectionManager_ != nullptr) {
+        stateMachine->cdConnectionManager_->RemoveActiveConnectionByCid(stateMachine->GetCid());
     }
 }
 
@@ -59,9 +61,9 @@ bool Inactive::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGE("event is null");
         return false;
     }
-    auto shareStateMachine = stateMachine_.lock();
-    if (shareStateMachine == nullptr) {
-        TELEPHONY_LOGE("shareStateMachine is null");
+    std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
+    if (stateMachine == nullptr) {
+        TELEPHONY_LOGE("stateMachine is null");
         return false;
     }
     bool retVal = false;
@@ -69,8 +71,8 @@ bool Inactive::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
     switch (eventCode) {
         case CellularDataEventCode::MSG_SM_CONNECT: {
             TELEPHONY_LOGI("Inactive::MSG_SM_CONNECT");
-            shareStateMachine->DoConnect(*(event->GetUniqueObject<DataConnectionParams>()));
-            shareStateMachine->TransitionTo(shareStateMachine->activatingState_);
+            stateMachine->DoConnect(*(event->GetUniqueObject<DataConnectionParams>()));
+            stateMachine->TransitionTo(stateMachine->activatingState_);
             retVal = PROCESSED;
             break;
         }

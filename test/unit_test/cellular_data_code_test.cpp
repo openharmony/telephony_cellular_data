@@ -20,7 +20,6 @@
 
 #include "core_manager.h"
 
-#include "cellular_data_constant.h"
 #include "cellular_data_client.h"
 
 namespace OHOS {
@@ -101,39 +100,13 @@ public:
         std::cout << "Remote GetOperatorName " << enable << " result [" << result << "]" << std::endl;
     }
 
-    static void RequestNetworkTest()
-    {
-        int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
-        uint64_t capability = 0;
-        std::cout << "please input parameter int slotId" << std::endl;
-        std::cin >> slotId;
-        std::cout << "please input parameter capability" << std::endl;
-        std::cin >> capability;
-        int32_t result =
-            CellularDataClient::GetInstance().RequestNet(IDENT_PREFIX + std::to_string(slotId), capability);
-        std::cout << "TelephonyTestService Remote result [" << result << "]" << std::endl;
-    }
-
-    static void ReleaseNetworkTest()
-    {
-        int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
-        uint64_t capability = 0;
-        std::cout << "please input parameter int slotId" << std::endl;
-        std::cin >> slotId;
-        std::cout << "please input parameter capability" << std::endl;
-        std::cin >> capability;
-        int32_t result =
-            CellularDataClient::GetInstance().ReleaseNet(IDENT_PREFIX + std::to_string(slotId), capability);
-        std::cout << "TelephonyTestService Remote result [" << result << "]" << std::endl;
-    }
-
     static void HandleApnChangedTest()
     {
         int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
         std::string apns;
         std::cout << "please input parameter apn" << std::endl;
         std::cin >> apns;
-        auto proxy = CellularDataClient::GetInstance().GetProxy();
+        sptr<ICellularDataManager> proxy = CellularDataClient::GetInstance().GetProxy();
         if (proxy != nullptr) {
             int32_t result = proxy->HandleApnChanged(slotId, apns);
             std::cout << "TelephonyTestService Remote result [" << result << "]" << std::endl;
@@ -144,7 +117,7 @@ public:
 
     static void GetDefaultSlotId()
     {
-        auto proxy = CellularDataClient::GetInstance().GetProxy();
+        sptr<ICellularDataManager> proxy = CellularDataClient::GetInstance().GetProxy();
         if (proxy != nullptr) {
             int32_t result = proxy->GetDefaultCellularDataSlotId();
             std::cout << "get default slot id is := " << result << std::endl;
@@ -158,9 +131,9 @@ public:
         int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
         std::cout << "please input parameter int slot" << std::endl;
         std::cin >> slotId;
-        auto proxy = CellularDataClient::GetInstance().GetProxy();
+        sptr<ICellularDataManager> proxy = CellularDataClient::GetInstance().GetProxy();
         if (proxy != nullptr) {
-            int32_t  result = proxy->SetDefaultCellularDataSlotId(slotId);
+            int32_t result = proxy->SetDefaultCellularDataSlotId(slotId);
             std::cout << "TelephonyTestService SetDefaultSlotId is " << result << std::endl;
         } else {
             std::cout << "TelephonyTestService SetDefaultSlotId is null" << std::endl;
@@ -169,7 +142,7 @@ public:
 
     static void GetDataFlowType()
     {
-        auto proxy = CellularDataClient::GetInstance().GetProxy();
+        sptr<ICellularDataManager> proxy = CellularDataClient::GetInstance().GetProxy();
         if (proxy != nullptr) {
             int32_t result = proxy->GetCellularDataFlowType();
             std::cout << "get CellDataFlowType is := " << result << std::endl;
@@ -222,7 +195,7 @@ public:
             {TEST_DATA_PACKAGE_UP_DOWN, &CellularDataCodeTest::TestDataPackageUpDown},
 
         };
-        auto it = testFunMap.find(testId);
+        std::map<int32_t, Fun>::iterator it = testFunMap.find(testId);
         if (it != testFunMap.end()) {
             (*(it->second))();
         } else if (TEST_DATA_PACKAGE_EXIT == testId) {
@@ -236,14 +209,14 @@ public:
 
     static void TouchOrRmDataPackage()
     {
-        int32_t  input = 0;
+        int32_t input = 0;
         while (true) {
             std::cout << "\n-----------start--------------\nusage:please input a cmd num:\n"
-                         "0:testDataPackageUp\n"
-                         "1:testDataPackageDown\n"
-                         "2:testDataPackageUpDown\n"
-                         "100:exit\n"
-                      << std::endl;
+                "0:testDataPackageUp\n"
+                "1:testDataPackageDown\n"
+                "2:testDataPackageUpDown\n"
+                "100:exit\n"
+            << std::endl;
             std::cin >> input;
             std::cout << "inputCMD is [" << input << "]" << std::endl;
             if (!DataPackageTest(input)) {
@@ -260,15 +233,13 @@ public:
             {GET_CELLULAR_DATA_STATE_TEST, &GetCellularDataStateTest},
             {IS_DATA_ROAMING_ENABLED_TEST, &IsCellularDataRoamingEnabledTest},
             {ENABLE_DATA_ROAMING_TEST, &EnableCellularDataRoamingTest},
-            {REQUEST_NETWORK_TEST, &RequestNetworkTest},
-            {RELEASE_NETWORK_TEST, &ReleaseNetworkTest},
             {APN_CHANGED_TEST, &HandleApnChangedTest},
             {GET_DEFAULT_SLOT_ID, &GetDefaultSlotId},
             {SET_DEFAULT_SLOT_ID, &SetDefaultSlotId},
             {GET_DATA_FLOW_TYPE, &GetDataFlowType},
             {TOUCH_OR_RM_DATA_PACKAGE, &TouchOrRmDataPackage},
         };
-        auto it = testFunMap.find(testId);
+        std::map<int32_t, Fun>::iterator it = testFunMap.find(testId);
         if (it != testFunMap.end()) {
             (*(it->second))();
         } else if (EXIT_CELLULAR_DATA_TEST == testId) {
@@ -286,13 +257,11 @@ private:
     const int32_t GET_CELLULAR_DATA_STATE_TEST = 2;
     const int32_t IS_DATA_ROAMING_ENABLED_TEST = 3;
     const int32_t ENABLE_DATA_ROAMING_TEST = 4;
-    const int32_t REQUEST_NETWORK_TEST = 5;
-    const int32_t RELEASE_NETWORK_TEST = 6;
-    const int32_t APN_CHANGED_TEST = 7;
-    const int32_t GET_DEFAULT_SLOT_ID = 8;
-    const int32_t SET_DEFAULT_SLOT_ID = 9;
-    const int32_t GET_DATA_FLOW_TYPE = 10;
-    const int32_t TOUCH_OR_RM_DATA_PACKAGE = 11;
+    const int32_t APN_CHANGED_TEST = 5;
+    const int32_t GET_DEFAULT_SLOT_ID = 6;
+    const int32_t SET_DEFAULT_SLOT_ID = 7;
+    const int32_t GET_DATA_FLOW_TYPE = 8;
+    const int32_t TOUCH_OR_RM_DATA_PACKAGE = 9;
     const int32_t EXIT_CELLULAR_DATA_TEST = 1000;
     static const int32_t TEST_DATA_PACKAGE_UP = 0;
     static const int32_t TEST_DATA_PACKAGE_DOWN = 1;
@@ -304,7 +273,7 @@ private:
 
 int main()
 {
-    auto &cellularDataClient = OHOS::Telephony::CellularDataClient::GetInstance();
+    OHOS::Telephony::CellularDataClient &cellularDataClient = OHOS::Telephony::CellularDataClient::GetInstance();
     if (cellularDataClient.GetProxy() == nullptr) {
         std::cout << "\n--- telephonyService == nullptr\n" << std::endl;
         return 0;
@@ -313,20 +282,18 @@ int main()
     OHOS::Telephony::CellularDataCodeTest cellularDataCodeTest;
     while (true) {
         std::cout << "\n-----------start--------------\nusage:please input a cmd num:\n"
-             "0:IsCellularDataEnabledTest\n"
-             "1:EnableCellularDataTest\n"
-             "2:GetCellularDataStateTest\n"
-             "3:IsCellularDataRoamingEnabledTest\n"
-             "4:EnableCellularDataRoamingTest\n"
-             "5:RequestNetwork\n"
-             "6:ReleaseNetwork\n"
-             "7:ApnChangedTest\n"
-             "8:GetDefaultSlotId\n"
-             "9:SetDefaultSlotId\n"
-             "10:GetCellularDataFlowType\n"
-             "11:TouchOrRmDataPackage\n"
-             "1000:exit\n"
-             << std::endl;
+            "0:IsCellularDataEnabledTest\n"
+            "1:EnableCellularDataTest\n"
+            "2:GetCellularDataStateTest\n"
+            "3:IsCellularDataRoamingEnabledTest\n"
+            "4:EnableCellularDataRoamingTest\n"
+            "5:ApnChangedTest\n"
+            "6:GetDefaultSlotId\n"
+            "7:SetDefaultSlotId\n"
+            "8:GetCellularDataFlowType\n"
+            "9:TouchOrRmDataPackage\n"
+            "1000:exit\n"
+            << std::endl;
         std::cin >> inputCMD;
         std::cout << "inputCMD is [" << inputCMD << "]" << std::endl;
         if (!cellularDataCodeTest.UnitTest(inputCMD)) {

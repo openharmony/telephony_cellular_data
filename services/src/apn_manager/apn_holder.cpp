@@ -26,7 +26,7 @@ const std::map<std::string, int32_t> ApnHolder::apnTypeDataProfileMap_ {
     {DATA_CONTEXT_ROLE_MMS,     DATA_PROFILE_MMS}
 };
 
-ApnHolder::ApnHolder() : priority_(0) {}
+ApnHolder::ApnHolder(const int32_t priority) : priority_(priority) {}
 
 ApnHolder::~ApnHolder() = default;
 
@@ -103,7 +103,8 @@ void ApnHolder::ReleaseDataConnection()
         TELEPHONY_LOGE("ClearConnection fail, object is null");
         return;
     }
-    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT, object);
+    AppExecFwk::InnerEvent::Pointer event =
+        AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT, object);
     cellularDataStateMachine_->SendEvent(event);
     apnState_ = PROFILE_STATE_IDLE;
     cellularDataStateMachine_ = nullptr;
@@ -111,7 +112,7 @@ void ApnHolder::ReleaseDataConnection()
 
 int32_t ApnHolder::GetProfileId(const std::string &apnType) const
 {
-    const auto it = apnTypeDataProfileMap_.find(apnType);
+    std::map<std::string, int32_t>::const_iterator it = apnTypeDataProfileMap_.find(apnType);
     if (it != apnTypeDataProfileMap_.end()) {
         return it->second;
     }
@@ -134,14 +135,14 @@ uint32_t ApnHolder::GetCapability() const
     return capability_;
 }
 
-uint32_t ApnHolder::GetPriority() const
+int32_t ApnHolder::GetPriority() const
 {
     return priority_;
 }
 
 void ApnHolder::RequestCellularData(const NetRequest &netRequest)
 {
-    for (const auto &request : netRequests_) {
+    for (const NetRequest &request : netRequests_) {
         if ((netRequest.capability == request.capability) && (netRequest.ident == request.ident)) {
             return;
         }
@@ -153,7 +154,7 @@ void ApnHolder::RequestCellularData(const NetRequest &netRequest)
 
 void ApnHolder::ReleaseCellularData(const NetRequest &netRequest)
 {
-    for (auto it = netRequests_.begin(); it != netRequests_.end(); it++) {
+    for (std::vector<NetRequest>::const_iterator it = netRequests_.begin(); it != netRequests_.end(); it++) {
         if ((netRequest.capability == it->capability) && (netRequest.ident == it->ident)) {
             netRequests_.erase(it);
             if (netRequests_.empty()) {
@@ -167,6 +168,11 @@ void ApnHolder::ReleaseCellularData(const NetRequest &netRequest)
 bool ApnHolder::IsEmergencyType() const
 {
     return apnType_ == DATA_CONTEXT_ROLE_EMERGENCY;
+}
+
+void ApnHolder::InitialApnRetryCount()
+{
+    retryPolicy_.InitialRetryCountValue();
 }
 } // namespace Telephony
 } // namespace OHOS

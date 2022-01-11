@@ -16,12 +16,6 @@
 #ifndef STATE_NOTIFICATION_H
 #define STATE_NOTIFICATION_H
 
-#include <mutex>
-
-#include "refbase.h"
-
-#include "i_telephony_state_notify.h"
-
 #include "cellular_data_constant.h"
 
 namespace OHOS {
@@ -33,29 +27,11 @@ public:
     void OnUpDataFlowtype(int32_t slotId, CellDataFlowType flowType);
 
 private:
-    class RegisterServiceDeathRecipient : public IRemoteObject::DeathRecipient {
-    public:
-        explicit RegisterServiceDeathRecipient(StateNotification &client) : client_(client) {}
-        ~RegisterServiceDeathRecipient() override = default;
-        void OnRemoteDied(const wptr<IRemoteObject> &remote) override
-        {
-            client_.OnRemoteDied(remote);
-        }
-
-    private:
-        StateNotification &client_;
-    };
-
     StateNotification() = default;
     ~StateNotification() = default;
-    void OnRemoteDied(const wptr<IRemoteObject> &remote);
-    sptr<ITelephonyStateNotify> GetProxy();
 
 private:
     static StateNotification stateNotification_;
-    std::mutex mutexProxy_;
-    sptr<ITelephonyStateNotify> proxy_ {nullptr};
-    sptr<IRemoteObject::DeathRecipient> deathRecipient_ {nullptr};
 };
 } // namespace Telephony
 } // namespace OHOS

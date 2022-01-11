@@ -31,12 +31,12 @@ CellularDataRdbHelper::~CellularDataRdbHelper() = default;
 std::shared_ptr<AppExecFwk::DataAbilityHelper> CellularDataRdbHelper::CreateDataAbilityHelper()
 {
     TELEPHONY_LOGI("Create data ability helper");
-    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<ISystemAbilityManager> saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (saManager == nullptr) {
         TELEPHONY_LOGE("CellularDataRdbHelper GetSystemAbilityManager failed.");
         return nullptr;
     }
-    auto remoteObj = saManager->GetSystemAbility(TELEPHONY_CELLULAR_DATA_SYS_ABILITY_ID);
+    sptr<IRemoteObject> remoteObj = saManager->GetSystemAbility(TELEPHONY_CELLULAR_DATA_SYS_ABILITY_ID);
     if (remoteObj == nullptr) {
         TELEPHONY_LOGE("CellularDataRdbHelper GetSystemAbility Service Failed.");
         return nullptr;
@@ -52,7 +52,7 @@ int CellularDataRdbHelper::Update(
         return NULL_POINTER_EXCEPTION;
     }
     TELEPHONY_LOGI("Cellular data RDB helper update");
-    int32_t result =  helper_->Update(cellularDataUri_, value, predicates);
+    int32_t result = helper_->Update(cellularDataUri_, value, predicates);
     helper_->NotifyChange(cellularDataUri_);
     return result;
 }
@@ -64,7 +64,7 @@ int CellularDataRdbHelper::Insert(const NativeRdb::ValuesBucket &values)
         return NULL_POINTER_EXCEPTION;
     }
     TELEPHONY_LOGI("Cellular data RDB helper insert");
-    int32_t result =  helper_->Insert(cellularDataUri_, values);
+    int32_t result = helper_->Insert(cellularDataUri_, values);
     helper_->NotifyChange(cellularDataUri_);
     return result;
 }

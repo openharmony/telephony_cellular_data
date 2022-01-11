@@ -23,7 +23,6 @@
 #include "event_handler.h"
 #include "inner_event.h"
 
-#include "call_manager_inner_type.h"
 #include "hril_data_parcel.h"
 #include "tel_profile_util.h"
 
@@ -64,6 +63,7 @@ public:
     void SetPolicyDataOn(bool enable);
     bool IsRestrictedMode() const;
     int32_t GetDisConnectionReason();
+    bool HasInternetCapability(const int32_t cid) const;
 
 private:
     std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect();
@@ -87,6 +87,19 @@ private:
     void HandleSimStateOrRecordsChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleRadioStateChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void PsDataRatChanged(const AppExecFwk::InnerEvent::Pointer &event);
+    void SetRilAttachApn();
+    void SetRilAttachApnResponse(const AppExecFwk::InnerEvent::Pointer &event);
+    bool HasAnyHigherPriorityConnection(const sptr<ApnHolder> &apnHolder);
+    void GetConfigurationFor5G();
+    void GetDefaultConfiguration();
+    bool ParseOperatorConfig(const std::u16string &configName);
+    void HandleRadioNrStateChanged(const AppExecFwk::InnerEvent::Pointer &event);
+    void HandleRadioNrFrequencyChanged(const AppExecFwk::InnerEvent::Pointer &event);
+    void GetDefaultUpLinkThresholdsConfig();
+    void GetDefaultDownLinkThresholdsConfig();
+    void SetRilLinkBandwidths();
+    void HandleDBSettingEnableChanged(const AppExecFwk::InnerEvent::Pointer &event);
+    void HandleDBSettingRoamingChanged(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     std::vector<std::shared_ptr<CellularDataStateMachine>> intStateMachineMap_;
@@ -98,6 +111,22 @@ private:
     const int32_t slotId_;
     int32_t disconnectionReason_ = REASON_NORMAL;
     std::shared_ptr<AppExecFwk::EventRunner> stateMachineEventLoop_;
+    bool unMeteredAllNsaConfig_ = false;
+    bool unMeteredNrNsaMmwaveConfig_ = false;
+    bool unMeteredNrNsaSub6Config_ = false;
+    bool unMeteredAllNrsaConfig_ = false;
+    bool unMeteredNrsaMmwaveConfig_ = false;
+    bool unMeteredNrsaSub6Config_ = false;
+    bool unMeteredRoamingConfig_ = false;
+    std::string defaultTcpBufferConfig_;
+    std::string defaultBandwidthConfig_;
+    int defaultMobileMtuConfig_ = 0;
+    bool defaultPreferApn_ = true;
+    std::string defaultUpLinkConfig_;
+    std::string defaultDownLinkConfig_;
+    bool physicalConnectionActiveState_ = false;
+    std::vector<std::string> upLinkThresholds_;
+    std::vector<std::string> downLinkThresholds_;
 
     using Fun = void (CellularDataHandler::*)(const AppExecFwk::InnerEvent::Pointer &event);
     std::map<uint32_t, Fun> eventIdMap_ {
@@ -107,6 +136,10 @@ private:
             &CellularDataHandler::RadioPsConnectionDetached},
         {ObserverHandler::ObserverHandlerId::RADIO_PS_ROAMING_OPEN, &CellularDataHandler::RoamingStateOn},
         {ObserverHandler::ObserverHandlerId::RADIO_PS_ROAMING_CLOSE, &CellularDataHandler::RoamingStateOff},
+        {ObserverHandler::ObserverHandlerId::RADIO_EMERGENCY_STATE_OPEN,
+            &CellularDataHandler::PsRadioEmergencyStateOpen},
+        {ObserverHandler::ObserverHandlerId::RADIO_EMERGENCY_STATE_CLOSE,
+            &CellularDataHandler::PsRadioEmergencyStateClose},
         {CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION_COMPLETE,
             &CellularDataHandler::EstablishDataConnectionComplete},
         {CellularDataEventCode::MSG_DISCONNECT_DATA_COMPLETE, &CellularDataHandler::DisconnectDataComplete},
@@ -120,7 +153,13 @@ private:
             &CellularDataHandler::HandleSimStateOrRecordsChanged},
         {ObserverHandler::ObserverHandlerId::RADIO_PS_RAT_CHANGED, &CellularDataHandler::PsDataRatChanged},
         {CellularDataEventCode::MSG_APN_CHANGED, &CellularDataHandler::HandleApnChanged},
-        {ObserverHandler::ObserverHandlerId::RADIO_CALL_STATUS_INFO, &CellularDataHandler::HandleCallStateUpdate}
+        {ObserverHandler::ObserverHandlerId::RADIO_CALL_STATUS_INFO, &CellularDataHandler::HandleCallStateUpdate},
+        {CellularDataEventCode::MSG_SET_RIL_ATTACH_APN, &CellularDataHandler::SetRilAttachApnResponse},
+        {ObserverHandler::ObserverHandlerId::RADIO_NR_STATE_CHANGED, &CellularDataHandler::HandleRadioNrStateChanged},
+        {ObserverHandler::ObserverHandlerId::RADIO_NR_FREQUENCY_CHANGED,
+            &CellularDataHandler::HandleRadioNrFrequencyChanged},
+        {CellularDataEventCode::MSG_DB_SETTING_ENABLE_CHANGED, &CellularDataHandler::HandleDBSettingEnableChanged},
+        {CellularDataEventCode::MSG_DB_SETTING_ROAMING_CHANGED, &CellularDataHandler::HandleDBSettingRoamingChanged},
     };
 };
 } // namespace Telephony

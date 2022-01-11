@@ -33,7 +33,7 @@ sptr<ApnItem> ConnectionRetryPolicy::GetNextRetryApnItem() const
         currentApnIndex_ = 0;
         return matchedApns_[currentApnIndex_];
     }
-    auto apnItem = matchedApns_[currentApnIndex_];
+    sptr<ApnItem> apnItem = matchedApns_[currentApnIndex_];
     tryCount_++;
     if ((apnItem != nullptr && apnItem->IsBadApn()) || tryCount_ > maxCount_) {
         tryCount_ = 0;
@@ -67,6 +67,12 @@ void ConnectionRetryPolicy::MarkBadApn(ApnItem &apn)
 int64_t ConnectionRetryPolicy::GetNextRetryDelay() const
 {
     return DEFAULT_DELAY_FOR_NEXT_APN;
+}
+
+void ConnectionRetryPolicy::InitialRetryCountValue()
+{
+    tryCount_ = 0;
+    TELEPHONY_LOGI("tryCount_ is %{public}d", tryCount_);
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -25,7 +25,7 @@ namespace OHOS {
 namespace Telephony {
 bool NetworkSearchUtils::GetRoamingState(int32_t slotId)
 {
-    auto core = CoreManager::GetInstance().getCore(slotId);
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
     if (core != nullptr) {
         int32_t result = core->GetPsRoamingState(slotId);
         if (result > 0) {
@@ -39,7 +39,7 @@ bool NetworkSearchUtils::GetRoamingState(int32_t slotId)
 
 bool NetworkSearchUtils::GetAttachedState(int32_t slotId)
 {
-    auto core = CoreManager::GetInstance().getCore(slotId);
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
     if (core == nullptr) {
         TELEPHONY_LOGE("network search core is null");
         return false;
@@ -53,7 +53,7 @@ bool NetworkSearchUtils::GetAttachedState(int32_t slotId)
 
 int32_t NetworkSearchUtils::GetPsRadioTech(int32_t slotId)
 {
-    auto core = CoreManager::GetInstance().getCore(slotId);
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
     if (core != nullptr) {
         return core->GetPsRadioTech(slotId);
     } else {
@@ -65,7 +65,7 @@ int32_t NetworkSearchUtils::GetPsRadioTech(int32_t slotId)
 void NetworkSearchUtils::SetRadioState(
     int32_t slotId, int fun, int rst, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    auto core = CoreManager::GetInstance().getCore(slotId);
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
     if (core != nullptr) {
         core->SetRadioState(fun, rst, response);
     } else {
@@ -75,7 +75,7 @@ void NetworkSearchUtils::SetRadioState(
 
 std::string NetworkSearchUtils::GetOperatorNumeric(int32_t slotId)
 {
-    auto core = CoreManager::GetInstance().getCore(slotId);
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
     if (core != nullptr) {
         std::u16string numeric = core->GetSimOperatorNumeric(slotId);
         return Str16ToStr8(numeric);
@@ -83,6 +83,65 @@ std::string NetworkSearchUtils::GetOperatorNumeric(int32_t slotId)
         TELEPHONY_LOGE("core is null slotId:%{public}d", slotId);
         return "";
     }
+}
+
+void NetworkSearchUtils::DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive)
+{
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
+    if (core != nullptr) {
+        core->DcPhysicalLinkActiveUpdate(slotId, isActive);
+    } else {
+        TELEPHONY_LOGE("core is null slotId:%{public}d", slotId);
+    }
+}
+
+std::string NetworkSearchUtils::ConvertRadioTechToRadioName(const int32_t radioTech)
+{
+    std::string radioName = "unknown";
+    switch (radioTech) {
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_UNKNOWN):
+            radioName = "unknown";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_GSM):
+            radioName = "EDGE";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_1XRTT):
+            radioName = "1xRTT";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_WCDMA):
+            radioName = "UMTS";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_HSPA):
+            radioName = "HSPA";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_HSPAP):
+            radioName = "HSPAP";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_TD_SCDMA):
+            radioName = "TD-SCDMA";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_EVDO):
+            radioName = "EVDO";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_EHRPD):
+            radioName = "eHRPD";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_LTE):
+            radioName = "LTE";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_LTE_CA):
+            radioName = "LTE_CA";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_IWLAN):
+            radioName = "IWAN";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_NR):
+            radioName = "NR";
+            break;
+        default:
+            break;
+    }
+    return radioName;
 }
 } // namespace Telephony
 } // namespace OHOS

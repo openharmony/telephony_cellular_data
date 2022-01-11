@@ -27,6 +27,8 @@
 #include "system_ability_definition.h"
 
 #include "cellular_data_constant.h"
+#include "net_manager_call_back.h"
+#include "net_manager_tactics_call_back.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -45,6 +47,9 @@ public:
      * Cancel the registration information to the network management
      */
     void UnregisterNetSupplier();
+
+    bool RegisterPolicyCallback();
+    void UnregisterPolicyCallback();
 
     /**
      * Update network information
@@ -93,6 +98,8 @@ public:
 
 private:
     std::vector<NetSupplier> netSuppliers_;
+    sptr<NetManagerCallBack> callBack_;
+    sptr<NetManagerTacticsCallBack> tacticsCallBack_;
 };
 } // namespace Telephony
 } // namespace OHOS

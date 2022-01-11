@@ -27,9 +27,10 @@ namespace Telephony {
 class DataConnectionParams {
 public:
     DataConnectionParams(
-        sptr<ApnHolder> apnHolder, int32_t profileId, int32_t radioTechnology, bool nonTrafficUseOnly)
-        : apnHolder_(std::move(apnHolder)), profileId_(profileId), rat_(radioTechnology),
-          nonTrafficUseOnly_(nonTrafficUseOnly)
+        sptr<ApnHolder> apnHolder, int32_t profileId, int32_t radioTechnology, bool nonTrafficUseOnly,
+        bool roamingState, bool userDataRoaming)
+        : apnHolder_(std::move(apnHolder)), profileId_(profileId), rat_(radioTechnology), roamingState_(roamingState),
+        userRoaming_(userDataRoaming), nonTrafficUseOnly_(nonTrafficUseOnly)
     {}
 
     ~DataConnectionParams() = default;
@@ -74,6 +75,25 @@ public:
         nonTrafficUseOnly_ = nonTrafficUseOnly;
     }
 
+    bool GetRoamingState() const
+    {
+        return roamingState_;
+    }
+
+    void SetRoamingState(bool roamingState)
+    {
+        roamingState_ = roamingState;
+    }
+
+    bool GetUserDataRoaming() const
+    {
+        return userRoaming_;
+    }
+
+    void GetUserDataRoaming(bool userDataRoaming)
+    {
+        userRoaming_ = userDataRoaming;
+    }
 private:
     DataConnectionParams(const DataConnectionParams &dataConnectionParams) = default;
     DataConnectionParams &operator=(const DataConnectionParams &dataConnectionParams) = default;
@@ -82,6 +102,8 @@ private:
     sptr<ApnHolder> apnHolder_;
     int32_t profileId_;
     int32_t rat_;
+    bool roamingState_;
+    bool userRoaming_;
     bool nonTrafficUseOnly_;
 };
 } // namespace Telephony

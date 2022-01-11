@@ -16,19 +16,17 @@
 #ifndef CELLULAR_DATA_SETTING_OBSERVER_H
 #define CELLULAR_DATA_SETTING_OBSERVER_H
 
-#include "preferences_observer.h"
-
-#include "tel_profile_util.h"
+#include "data_ability_observer_stub.h"
 
 #include "cellular_data_handler.h"
 
 namespace OHOS {
 namespace Telephony {
-class CellularDataSettingObserver : public NativePreferences::PreferencesObserver {
+class CellularDataSettingObserver : public AAFwk::DataAbilityObserverStub {
 public:
     CellularDataSettingObserver(std::shared_ptr<CellularDataHandler> &cellularDataHandler);
     ~CellularDataSettingObserver();
-    void OnChange(NativePreferences::Preferences &preferences, const std::string &key) override;
+    void OnChange() override;
 
 private:
     std::shared_ptr<CellularDataHandler> cellularDataHandler_;

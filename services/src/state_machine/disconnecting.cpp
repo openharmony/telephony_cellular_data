@@ -26,13 +26,13 @@ namespace Telephony {
 void Disconnecting::StateBegin()
 {
     TELEPHONY_LOGI("Enter disconnecting state");
-    auto shareStateMachine = stateMachine_.lock();
-    if (shareStateMachine == nullptr) {
-        TELEPHONY_LOGE("shareStateMachine is null");
+    std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
+    if (stateMachine == nullptr) {
+        TELEPHONY_LOGE("stateMachine is null");
         return;
     }
     isActive_ = true;
-    shareStateMachine->SetCurrentState(sptr<State>(this));
+    stateMachine->SetCurrentState(sptr<State>(this));
 }
 
 void Disconnecting::StateEnd()
@@ -41,15 +41,37 @@ void Disconnecting::StateEnd()
     isActive_ = false;
 }
 
+void Disconnecting::ProcessDisconnectTimeout(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is null");
+        return;
+    }
+    int32_t connectId = event->GetParam();
+    std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
+    if (stateMachine == nullptr) {
+        TELEPHONY_LOGE("stateMachine is null");
+        return;
+    }
+    if (connectId != stateMachine->connectId_) {
+        return;
+    }
+    Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+    inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
+    inActive->SetReason(REASON_RETRY_CONNECTION);
+    stateMachine->TransitionTo(stateMachine->inActiveState_);
+    TELEPHONY_LOGI("ProcessDisconnectTimeout");
+}
+
 bool Disconnecting::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
         TELEPHONY_LOGE("event is null");
         return false;
     }
-    auto shareStateMachine = stateMachine_.lock();
-    if (shareStateMachine == nullptr) {
-        TELEPHONY_LOGE("shareStateMachine is null");
+    std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
+    if (stateMachine == nullptr) {
+        TELEPHONY_LOGE("stateMachine is null");
         return false;
     }
     bool retVal = false;
@@ -57,30 +79,36 @@ bool Disconnecting::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
     switch (eventCode) {
         case CellularDataEventCode::MSG_SM_CONNECT:
             TELEPHONY_LOGI("Disconnecting::MSG_SM_CONNECT");
-            shareStateMachine->DeferEvent(std::move(event));
+            stateMachine->DeferEvent(std::move(event));
             retVal = PROCESSED;
             break;
         case ObserverHandler::RADIO_RIL_DEACTIVATE_DATA_CALL: {
-            auto resultInfo = event->GetSharedObject<SetupDataCallResultInfo>();
-            if (resultInfo == nullptr) {
-                auto rilInfo = event->GetSharedObject<HRilRadioResponseInfo>();
-                if (rilInfo == nullptr) {
-                    TELEPHONY_LOGE("SetupDataCallResultInfo and HRilRadioResponseInfo is null");
-                    retVal = PROCESSED;
-                    break;
-                }
-                auto *inActive = static_cast<Inactive *>(shareStateMachine->inActiveState_.GetRefPtr());
-                inActive->SetDeActiveApnTypeId(rilInfo->flag);
-                shareStateMachine->TransitionTo(shareStateMachine->inActiveState_);
+            Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+            std::shared_ptr<HRilRadioResponseInfo> rilInfo = event->GetSharedObject<HRilRadioResponseInfo>();
+            if (rilInfo == nullptr) {
+                TELEPHONY_LOGE("SetupDataCallResultInfo and HRilRadioResponseInfo is null");
+                stateMachine->stateMachineEventHandler_->RemoveEvent(CellularDataEventCode::MSG_CONNECT_TIMEOUT_CHECK);
+                inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
+                stateMachine->TransitionTo(stateMachine->inActiveState_);
                 retVal = PROCESSED;
                 break;
             }
-            auto *inActive = static_cast<Inactive *>(shareStateMachine->inActiveState_.GetRefPtr());
-            inActive->SetDeActiveApnTypeId(resultInfo->flag);
-            shareStateMachine->TransitionTo(shareStateMachine->inActiveState_);
+            if (stateMachine->connectId_ != rilInfo->flag) {
+                TELEPHONY_LOGE("connectId is %{public}d, flag is %{public}d", stateMachine->connectId_, rilInfo->flag);
+                retVal = PROCESSED;
+                break;
+            }
+            TELEPHONY_LOGI("HRilRadioResponseInfo error is %{public}d", static_cast<int32_t>(rilInfo->error));
+            stateMachine->stateMachineEventHandler_->RemoveEvent(CellularDataEventCode::MSG_CONNECT_TIMEOUT_CHECK);
+            inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
+            stateMachine->TransitionTo(stateMachine->inActiveState_);
             retVal = PROCESSED;
             break;
         }
+        case CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK:
+            ProcessDisconnectTimeout(event);
+            retVal = PROCESSED;
+            break;
         default:
             TELEPHONY_LOGE("disconnecting StateProcess do nothing!");
             break;

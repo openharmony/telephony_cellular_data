@@ -22,6 +22,8 @@
 #include "cellular_data_event_code.h"
 #include "cellular_data_handler.h"
 #include "cellular_data_state_machine.h"
+#include "cellular_data_utils.h"
+#include "network_search_utils.h"
 #include "ril_adapter_utils.h"
 
 namespace OHOS {
@@ -32,7 +34,7 @@ DataConnectionManager::DataConnectionManager(const std::shared_ptr<AppExecFwk::E
     connectionMonitor_ = std::make_shared<DataConnectionMonitor>(runner, slotId);
     ccmDefaultState_ = std::make_unique<CcmDefaultState>(*this, "CcmDefaultState").release();
     if (connectionMonitor_ == nullptr || ccmDefaultState_ == nullptr) {
-        TELEPHONY_LOGE("connectionMonitor_ or ccmDefaultState_ is null");
+        TELEPHONY_LOGE("connectionMonitor_ or ccmDefaultState is null");
         return;
     }
     StateMachine::SetOriginalState(ccmDefaultState_);
@@ -54,7 +56,8 @@ void DataConnectionManager::RemoveConnectionStateMachine(const std::shared_ptr<C
         TELEPHONY_LOGE("stateMachine is null");
         return;
     }
-    for (auto iter = stateMachines_.begin(); iter != stateMachines_.end(); iter++) {
+    for (std::vector<std::shared_ptr<CellularDataStateMachine>>::const_iterator iter =
+        stateMachines_.begin(); iter != stateMachines_.end(); iter++) {
         if (*iter.base() == stateMachine) {
             stateMachines_.erase(iter);
             break;
@@ -62,14 +65,21 @@ void DataConnectionManager::RemoveConnectionStateMachine(const std::shared_ptr<C
     }
 }
 
+std::vector<std::shared_ptr<CellularDataStateMachine>> DataConnectionManager::GetAllConnectionMachine()
+{
+    return stateMachines_;
+}
+
 void DataConnectionManager::AddActiveConnectionByCid(const std::shared_ptr<CellularDataStateMachine> &stateMachine)
 {
-    cidActiveConnectionMap_[stateMachine->GetCid()] = stateMachine;
+    if (stateMachine != nullptr) {
+        cidActiveConnectionMap_[stateMachine->GetCid()] = stateMachine;
+    }
 }
 
 std::shared_ptr<CellularDataStateMachine> DataConnectionManager::GetActiveConnectionByCid(int32_t cid) const
 {
-    auto it = cidActiveConnectionMap_.find(cid);
+    std::map<int32_t, std::shared_ptr<CellularDataStateMachine>>::const_iterator it = cidActiveConnectionMap_.find(cid);
     if (it != cidActiveConnectionMap_.end()) {
         return it->second;
     }
@@ -79,6 +89,14 @@ std::shared_ptr<CellularDataStateMachine> DataConnectionManager::GetActiveConnec
 std::map<int32_t, std::shared_ptr<CellularDataStateMachine>> DataConnectionManager::GetActiveConnection() const
 {
     return cidActiveConnectionMap_;
+}
+
+bool DataConnectionManager::isNoActiveConnection() const
+{
+    if (cidActiveConnectionMap_.empty()) {
+        return true;
+    }
+    return false;
 }
 
 void DataConnectionManager::RemoveActiveConnectionByCid(int32_t cid)
@@ -149,7 +167,7 @@ bool CcmDefaultState::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
 
 void CcmDefaultState::RadioDataCallListChanged(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    auto infos = event->GetSharedObject<DataCallResultList>();
+    std::shared_ptr<DataCallResultList> infos = event->GetSharedObject<DataCallResultList>();
     if (infos == nullptr) {
         TELEPHONY_LOGE("setupDataCallResultInfo is null");
         return;
@@ -158,7 +176,7 @@ void CcmDefaultState::RadioDataCallListChanged(const AppExecFwk::InnerEvent::Poi
     std::vector<std::shared_ptr<CellularDataStateMachine>> retryDataConnection;
     std::map<int32_t, std::shared_ptr<CellularDataStateMachine>> idActiveConnectionMap =
         connectManager_.GetActiveConnection();
-    for (const auto &it : idActiveConnectionMap) {
+    for (const std::pair<const int32_t, std::shared_ptr<CellularDataStateMachine>>& it : idActiveConnectionMap) {
         bool isPush = true;
         if (it.second == nullptr) {
             TELEPHONY_LOGI("The activation item is null(%{public}d)", it.first);
@@ -176,25 +194,26 @@ void CcmDefaultState::RadioDataCallListChanged(const AppExecFwk::InnerEvent::Poi
             retryDataConnection.push_back(it.second);
         }
     }
-    for (auto &it : retryDataConnection) {
+    for (std::shared_ptr<CellularDataStateMachine> &it : retryDataConnection) {
         if (it == nullptr) {
             TELEPHONY_LOGI(" retryDataConnection is null");
             continue;
         }
-        auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_LOST_CONNECTION);
+        AppExecFwk::InnerEvent::Pointer event =
+            AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_LOST_CONNECTION);
         it->SendEvent(event);
     }
 }
 
 void CcmDefaultState::UpdateNetworkInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    auto infos = event->GetSharedObject<DataCallResultList>();
+    std::shared_ptr<DataCallResultList> infos = event->GetSharedObject<DataCallResultList>();
     if (infos == nullptr) {
         TELEPHONY_LOGE("dataCallResultList is null");
         return;
     }
-    for (auto &it : infos->dcList) {
-        auto dataConnect = connectManager_.GetActiveConnectionByCid(it.cid);
+    for (SetupDataCallResultInfo &it : infos->dcList) {
+        std::shared_ptr<CellularDataStateMachine> dataConnect = connectManager_.GetActiveConnectionByCid(it.cid);
         if (dataConnect == nullptr) {
             TELEPHONY_LOGE("get active connection by cid is :=  %{public}d flag:=  %{public}d ", it.cid, it.flag);
             continue;
@@ -230,6 +249,108 @@ int32_t DataConnectionManager::GetDataFlowType()
     }
     CellDataFlowType flowType = connectionMonitor_->GetDataFlowType();
     return static_cast<int>(flowType);
+}
+
+void DataConnectionManager::SetDataFlowType(CellDataFlowType dataFlowType)
+{
+    if (connectionMonitor_ == nullptr) {
+        TELEPHONY_LOGE("connection monitor is null");
+        return;
+    }
+    connectionMonitor_->SetDataFlowType(dataFlowType);
+}
+
+std::string DataConnectionManager::GetDefaultBandWidthsConfig()
+{
+    bandwidthConfigMap_.clear();
+    char bandWidthBuffer[MAX_BUFFER_SIZE] = {0};
+    GetParameter(CONFIG_BANDWIDTH.c_str(), DEFAULT_BANDWIDTH_CONFIG.c_str(), bandWidthBuffer, MAX_BUFFER_SIZE);
+    std::vector<std::string> linkBandwidthVec = CellularDataUtils::Split(bandWidthBuffer, ";");
+    for (std::string temp : linkBandwidthVec) {
+        std::vector<std::string> linkBandwidths = CellularDataUtils::Split(temp, ":");
+        if (linkBandwidths.size() == VALID_VECTOR_SIZE) {
+            std::string key = linkBandwidths.front();
+            std::string linkUpDownBandwidth = linkBandwidths.back();
+            std::vector<std::string> upDownBandwidthValue = CellularDataUtils::Split(linkUpDownBandwidth, ",");
+            if (upDownBandwidthValue.size() == VALID_VECTOR_SIZE) {
+                LinkBandwidthInfo linkBandwidthInfo;
+                linkBandwidthInfo.upBandwidth = (atoi)(upDownBandwidthValue.front().c_str());
+                linkBandwidthInfo.downBandwidth = (atoi)(upDownBandwidthValue.back().c_str());
+                bandwidthConfigMap_.emplace(key, linkBandwidthInfo);
+            }
+        }
+    }
+    TELEPHONY_LOGI("BANDWIDTH_CONFIG_MAP size is %{public}zu", bandwidthConfigMap_.size());
+    return "bandWidth";
+}
+
+std::string DataConnectionManager::GetDefaultTcpBufferConfig()
+{
+    tcpBufferConfigMap_.clear();
+    char tcpBufferConfig[MAX_BUFFER_SIZE] = {0};
+    GetParameter(CONFIG_TCP_BUFFER.c_str(), DEFAULT_TCP_BUFFER_CONFIG.c_str(), tcpBufferConfig, MAX_BUFFER_SIZE);
+    std::vector<std::string> tcpBufferVec = CellularDataUtils::Split(tcpBufferConfig, ";");
+    for (std::string tcpBuffer : tcpBufferVec) {
+        std::vector<std::string> str = CellularDataUtils::Split(tcpBuffer, ":");
+        TELEPHONY_LOGI("key = %{public}s, value = %{public}s", str.front().c_str(), str.back().c_str());
+        tcpBufferConfigMap_.emplace(str.front(), str.back());
+    }
+    TELEPHONY_LOGI("TCP_BUFFER_CONFIG_MAP size is %{public}zu", tcpBufferConfigMap_.size());
+    return tcpBufferConfig;
+}
+
+LinkBandwidthInfo DataConnectionManager::GetBandwidthsByRadioTech(const int32_t radioTech)
+{
+    LinkBandwidthInfo linkBandwidthInfo;
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId_);
+    if (core == nullptr) {
+        TELEPHONY_LOGE("core is null slotId:%{public}d", slotId_);
+        return linkBandwidthInfo;
+    }
+    NrState nrState = core->GetNrState(slotId_);
+    FrequencyType frequencyType = core->GetFrequencyType(slotId_);
+    std::string radioTechName = NetworkSearchUtils::ConvertRadioTechToRadioName(radioTech);
+    if (radioTech == (int32_t)RadioTech::RADIO_TECHNOLOGY_LTE &&
+        (nrState == NrState::NR_NSA_STATE_DUAL_CONNECTED || nrState == NrState::NR_NSA_STATE_CONNECTED_DETECT)) {
+        if (frequencyType == FrequencyType::FREQ_TYPE_MMWAVE) {
+            radioTechName = "NR_NSA_MMWAVE";
+        } else {
+            radioTechName = "NR_NSA";
+        }
+    }
+    if (radioTechName == "NR") {
+        radioTechName = "NR_SA";
+    }
+    TELEPHONY_LOGI("accessRadioName is %{public}s", radioTechName.c_str());
+    std::map<std::string, LinkBandwidthInfo>::iterator iter = bandwidthConfigMap_.find(radioTechName);
+    if (iter != bandwidthConfigMap_.end()) {
+        linkBandwidthInfo = iter->second;
+        TELEPHONY_LOGI("name is %{public}s upBandwidth = %{public}u downBandwidth = %{public}u",
+            iter->first.c_str(), linkBandwidthInfo.upBandwidth, linkBandwidthInfo.downBandwidth);
+    }
+    return linkBandwidthInfo;
+}
+
+std::string DataConnectionManager::GetTcpBufferByRadioTech(const int32_t radioTech)
+{
+    std::string tcpBuffer = "";
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(0);
+    if (core == nullptr) {
+        TELEPHONY_LOGE("core is null slotId:%{public}d", 0);
+        return tcpBuffer;
+    }
+    NrState nrState = core->GetNrState(0);
+    std::string radioTechName = NetworkSearchUtils::ConvertRadioTechToRadioName(radioTech);
+    if ((radioTech == (int32_t)RadioTech::RADIO_TECHNOLOGY_LTE ||
+        radioTech == (int32_t)RadioTech::RADIO_TECHNOLOGY_LTE_CA) &&
+        (nrState == NrState::NR_NSA_STATE_DUAL_CONNECTED || nrState == NrState::NR_NSA_STATE_CONNECTED_DETECT)) {
+        radioTechName = "NR";
+    }
+    std::map<std::string, std::string>::iterator iter = tcpBufferConfigMap_.find(radioTechName);
+    if (iter != tcpBufferConfigMap_.end()) {
+        tcpBuffer = iter->second;
+    }
+    return tcpBuffer;
 }
 } // namespace Telephony
 } // namespace OHOS

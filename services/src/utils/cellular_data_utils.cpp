@@ -17,6 +17,7 @@
 
 #include "inet_addr.h"
 
+#include "network_search_utils.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -26,44 +27,80 @@ std::vector<AddressInfo> CellularDataUtils::ParseIpAddr(const std::string &addre
 {
     std::vector<AddressInfo> ipInfoArray;
     std::vector<std::string> ipArray = Split(address, " ");
+    bool bMaskAddr = false;
     for (std::string &ipItem: ipArray) {
         AddressInfo ipInfo;
-        if (ipItem.find(':') == std::string::npos) {
-            ipInfo.type = INetAddr::IpType::IPV4;
-        } else {
-            ipInfo.type = INetAddr::IpType::IPV6;
+        std::string flag = (ipItem.find('.') == std::string::npos) ? ":" : ".";
+        if (bMaskAddr) {
+            bMaskAddr = false;
+            if (ipInfoArray.size() > 0) {
+                ipInfoArray[ipInfoArray.size()-1].netMask = ipItem;
+                ipInfoArray[ipInfoArray.size()-1].prefixLen = GetPrefixLen(ipItem, flag);
+            }
+            continue;
         }
         std::vector<std::string> ipData = Split(ipItem, "/");
         ipInfo.ip = ipData[0];
-        int prefixLen = 0;
-        if (ipData.size() == VALID_IP_SIZE) {
-            ipInfo.ip = ipData[0];
-            prefixLen = atoi(ipData[1].c_str());
-        } else if (ipInfo.type == INetAddr::IpType::IPV4) {
-            size_t dotIndex = 0;
-            const int ipv4DotLimit = 4;
-            for (int i = 0; i < ipv4DotLimit; i++) {
-                dotIndex = ipInfo.ip.find('.', dotIndex+1);
-                if (dotIndex == std::string::npos) {
-                    break;
-                }
-            }
-            if (dotIndex != std::string::npos) {
-                ipInfo.netMask = ipInfo.ip.substr(dotIndex + 1);
-                ipInfo.ip = ipInfo.ip.substr(0, dotIndex);
-            }
-        }
-        if (prefixLen == 0) {
-            if (ipInfo.type == INetAddr::IpType::IPV4) {
-                prefixLen = IPV4_BIT;
+        if (ipData.size() >= VALID_IP_SIZE) {
+            ipInfo.prefixLen = atoi(ipData[1].c_str());
+            if (flag == ".") {
+                std::vector<std::string> ipSubData = Split(ipInfo.ip, flag);
+                ipInfo.type = (ipSubData.size() > MAX_IPV4_ITEM) ? INetAddr::IpType::IPV6 : INetAddr::IpType::IPV4;
             } else {
-                prefixLen = IPV6_BIT;
+                ipInfo.type = INetAddr::IpType::IPV6;
+            }
+        } else {
+            ipInfo.prefixLen = 0;
+            if (flag == ".") {
+                if (ParseDotIpData(ipItem, ipInfo)) {
+                    bMaskAddr = true;
+                }
+            } else {
+                bMaskAddr = true;
+                ipInfo.type = INetAddr::IpType::IPV6;
             }
         }
-        ipInfo.prefixLen = prefixLen;
         ipInfoArray.push_back(ipInfo);
     }
     return ipInfoArray;
+}
+
+bool CellularDataUtils::ParseDotIpData(const std::string &address, AddressInfo &ipInfo)
+{
+    bool bOnlyAddress = false;
+    int prefixLen = 0;
+    std::vector<std::string> ipSubData = Split(ipInfo.ip, ".");
+    if (ipSubData.size() > MIN_IPV6_ITEM) {
+        ipInfo.type = INetAddr::IpType::IPV6;
+        ipInfo.ip = ipSubData[0];
+        for (int32_t i = 1; i < MIN_IPV6_ITEM; ++i) {
+            ipInfo.ip += "." + ipSubData[i];
+        }
+        ipInfo.netMask = ipSubData[MIN_IPV6_ITEM];
+        for (size_t j = MIN_IPV6_ITEM; j < ipSubData.size(); ++j) {
+            ipInfo.netMask += "." + ipSubData[j];
+        }
+        prefixLen = GetPrefixLen(ipSubData, MIN_IPV6_ITEM);
+    } else if (ipSubData.size() > MAX_IPV4_ITEM) {
+        ipInfo.type = INetAddr::IpType::IPV6;
+        bOnlyAddress = true;
+    } else if (ipSubData.size() > MIN_IPV4_ITEM) {
+        ipInfo.type = INetAddr::IpType::IPV4;
+        ipInfo.ip = ipSubData[0];
+        for (int32_t i = 1; i < MIN_IPV4_ITEM; ++i) {
+            ipInfo.ip += "." + ipSubData[i];
+        }
+        ipInfo.netMask = ipSubData[MIN_IPV4_ITEM];
+        for (size_t j = MIN_IPV4_ITEM; j < ipSubData.size(); ++j) {
+            ipInfo.netMask += "." + ipSubData[j];
+        }
+        prefixLen = GetPrefixLen(ipSubData, MIN_IPV4_ITEM);
+    } else {
+        ipInfo.type = INetAddr::IpType::IPV4;
+        bOnlyAddress = true;
+    }
+    ipInfo.prefixLen = prefixLen;
+    return bOnlyAddress;
 }
 
 std::vector<AddressInfo> CellularDataUtils::ParseNormalIpAddr(const std::string &address)
@@ -139,6 +176,47 @@ bool CellularDataUtils::IsDigit(const std::string &data)
         }
     }
     return true;
+}
+
+int32_t CellularDataUtils::GetPrefixLen(const std::string &netmask, const std::string& flag)
+{
+    std::vector<std::string> mask = Split(netmask, flag);
+    return GetPrefixLen(mask, 0);
+}
+
+int32_t CellularDataUtils::GetPrefixLen(const std::vector<std::string> &netmask, const size_t start)
+{
+    int32_t prefixLen = 0;
+    for (size_t i = start; i < netmask.size(); ++i) {
+        int32_t maskValue = (atoi(netmask[i].c_str()) & 0x00FF);
+        if (maskValue == 0) {
+            break;
+        }
+        while ((maskValue & 0x80) != 0) {
+            prefixLen++;
+            maskValue = (maskValue << 1);
+        }
+        if ((prefixLen % MASK_BYTE_BIT) != 0) {
+            break;
+        }
+    }
+    return prefixLen;
+}
+
+int CellularDataUtils::GetDefaultMobileMtuConfig()
+{
+    char mobile_mtu[MIN_BUFFER_SIZE];
+    GetParameter(CONFIG_MOBILE_MTU.c_str(), DEFAULT_MOBILE_MTU.c_str(),
+        mobile_mtu, MIN_BUFFER_SIZE);
+    return std::atoi(mobile_mtu);
+}
+
+bool CellularDataUtils::GetDefaultPreferApnConfig()
+{
+    char preferApn[MIN_BUFFER_SIZE];
+    GetParameter(CONFIG_PREFERAPN.c_str(), DEFAULT_PREFER_APN.c_str(),
+        preferApn, MIN_BUFFER_SIZE);
+    return std::atoi(preferApn);
 }
 } // namespace Telephony
 } // namespace OHOS

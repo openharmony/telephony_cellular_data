@@ -15,10 +15,14 @@
 
 #include "traffic_management.h"
 
+#include "data_flow_statistics.h"
+
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
+using namespace NetManagerStandard;
+
 TrafficManagement::TrafficManagement() = default;
 
 TrafficManagement::~TrafficManagement() = default;
@@ -31,7 +35,10 @@ void TrafficManagement::GetPacketData(int64_t &sendPackets, int64_t &recvPackets
 
 void TrafficManagement::UpdatePacketData()
 {
-    TELEPHONY_LOGI("call DataFlowStatistics getCellularRxBytes");
+    DataFlowStatistics dataState;
+    const std::string interfaceName = "usb0";
+    sendPackets_ = dataState.GetIfaceTxPackets(interfaceName);
+    recvPackets_ = dataState.GetIfaceRxPackets(interfaceName);
 }
 } // namespace Telephony
 } // namespace OHOS

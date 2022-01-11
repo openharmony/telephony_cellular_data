@@ -37,38 +37,20 @@ int32_t CellularDataServiceStub::OnRemoteRequest(
     std::u16string myDescriptor = CellularDataServiceStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     // NetManager has no transport description
-    if ((code != (uint32_t)ICellularDataManager::FuncCode::REQUEST_CELLULAR_DATA) &&
-        (code != (uint32_t)ICellularDataManager::FuncCode::RELEASE_CELLULAR_DATA) &&
-        (code != (uint32_t)ICellularDataManager::FuncCode::STRATEGY_SWITCH) && (myDescriptor != remoteDescriptor)) {
+    if (myDescriptor != remoteDescriptor) {
         TELEPHONY_LOGE("descriptor check fail!");
         return TELEPHONY_ERR_DESCRIPTOR_MISMATCH;
     }
-    auto it = eventIdFunMap_.find(code);
+    std::map<uint32_t, Fun>::iterator it = eventIdFunMap_.find(code);
     if (it != eventIdFunMap_.end()) {
         return (this->*(it->second))(data, reply);
     } else {
         TELEPHONY_LOGE("event code is not exist");
     }
-    if (code == (uint32_t)ICellularDataManager::FuncCode::ADD_CELLULAR_DATA_OBSERVER ||
-        code == (uint32_t)ICellularDataManager::FuncCode::REMOVE_CELLULAR_DATA_OBSERVER) {
-        ProcessSmsRespOrNotify(code, data, reply, option);
-    }
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
-void CellularDataServiceStub::ProcessSmsRespOrNotify(
-    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
-{
-    auto itFunc = DataObserverIdMap_.find(code);
-    if (itFunc != DataObserverIdMap_.end()) {
-        auto memberFunc = itFunc->second;
-        if (memberFunc != nullptr) {
-            (this->*memberFunc)(code, data, reply, option);
-        }
-    }
-}
-
-int32_t CellularDataServiceStub::OnIsCellularDataEnabledInner(MessageParcel &data, MessageParcel &reply)
+int32_t CellularDataServiceStub::OnIsCellularDataEnabled(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = IsCellularDataEnabled();
     if (!reply.WriteInt32(result)) {
@@ -78,7 +60,7 @@ int32_t CellularDataServiceStub::OnIsCellularDataEnabledInner(MessageParcel &dat
     return result;
 }
 
-int32_t CellularDataServiceStub::OnEnableCellularDataInner(MessageParcel &data, MessageParcel &reply)
+int32_t CellularDataServiceStub::OnEnableCellularData(MessageParcel &data, MessageParcel &reply)
 {
     bool enable = data.ReadBool();
     int32_t result = EnableCellularData(enable);
@@ -89,9 +71,9 @@ int32_t CellularDataServiceStub::OnEnableCellularDataInner(MessageParcel &data, 
     return result;
 }
 
-int32_t CellularDataServiceStub::OnGetCellularDataStateInner(MessageParcel &data, MessageParcel &reply)
+int32_t CellularDataServiceStub::OnGetCellularDataState(MessageParcel &data, MessageParcel &reply)
 {
-    auto result = GetCellularDataState();
+    int32_t result = GetCellularDataState();
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
@@ -99,7 +81,7 @@ int32_t CellularDataServiceStub::OnGetCellularDataStateInner(MessageParcel &data
     return result;
 }
 
-int32_t CellularDataServiceStub::OnIsCellularDataRoamingEnabledInner(MessageParcel &data, MessageParcel &reply)
+int32_t CellularDataServiceStub::OnIsCellularDataRoamingEnabled(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
     int32_t result = IsCellularDataRoamingEnabled(slotId);
@@ -110,7 +92,7 @@ int32_t CellularDataServiceStub::OnIsCellularDataRoamingEnabledInner(MessageParc
     return (int32_t)result;
 }
 
-int32_t CellularDataServiceStub::OnEnableCellularDataRoamingInner(MessageParcel &data, MessageParcel &reply)
+int32_t CellularDataServiceStub::OnEnableCellularDataRoaming(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
     bool enable = data.ReadBool();
@@ -122,43 +104,7 @@ int32_t CellularDataServiceStub::OnEnableCellularDataRoamingInner(MessageParcel 
     return result;
 }
 
-int32_t CellularDataServiceStub::OnAddCellularDataObserverInner(
-    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
-{
-    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
-}
-
-int32_t CellularDataServiceStub::OnRemoveCellularDataObserverInner(
-    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &opt)
-{
-    return IPCObjectStub::OnRemoteRequest(code, data, reply, opt);
-}
-
-int32_t CellularDataServiceStub::OnReleaseNetInner(MessageParcel &data, MessageParcel &reply)
-{
-    std::string ident = data.ReadString();
-    uint64_t capability = data.ReadUint64();
-    int32_t result = ReleaseNet(ident, capability);
-    if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("fail to write parcel");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return result;
-}
-
-int32_t CellularDataServiceStub::OnRequestNetInner(MessageParcel &data, MessageParcel &reply)
-{
-    std::string ident = data.ReadString();
-    uint64_t capability = data.ReadUint64();
-    int32_t result = RequestNet(ident, capability);
-    if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("fail to write parcel");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return result;
-}
-
-int32_t CellularDataServiceStub::OnHandleApnChangedInner(MessageParcel &data, MessageParcel &reply)
+int32_t CellularDataServiceStub::OnHandleApnChanged(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
     std::string apn = data.ReadString();
@@ -170,7 +116,7 @@ int32_t CellularDataServiceStub::OnHandleApnChangedInner(MessageParcel &data, Me
     return result;
 }
 
-int32_t CellularDataServiceStub::OnGetDefaultCellularDataSlotIdInner(MessageParcel &data, MessageParcel &reply)
+int32_t CellularDataServiceStub::OnGetDefaultCellularDataSlotId(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = GetDefaultCellularDataSlotId();
     if (!reply.WriteInt32(result)) {
@@ -180,7 +126,7 @@ int32_t CellularDataServiceStub::OnGetDefaultCellularDataSlotIdInner(MessageParc
     return result;
 }
 
-int32_t CellularDataServiceStub::OnSetDefaultCellularDataSlotIdInner(MessageParcel &data, MessageParcel &reply)
+int32_t CellularDataServiceStub::OnSetDefaultCellularDataSlotId(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
     int32_t result = SetDefaultCellularDataSlotId(slotId);
@@ -191,7 +137,7 @@ int32_t CellularDataServiceStub::OnSetDefaultCellularDataSlotIdInner(MessageParc
     return result;
 }
 
-int32_t CellularDataServiceStub::OnGetCellularDataFlowTypeInner(MessageParcel &data, MessageParcel &reply)
+int32_t CellularDataServiceStub::OnGetCellularDataFlowType(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = GetCellularDataFlowType();
     if (!reply.WriteInt32(result)) {
@@ -201,11 +147,23 @@ int32_t CellularDataServiceStub::OnGetCellularDataFlowTypeInner(MessageParcel &d
     return result;
 }
 
-int32_t CellularDataServiceStub::OnStrategySwitchInner(MessageParcel &data, MessageParcel &reply)
+int32_t CellularDataServiceStub::OnHasInternetCapability(MessageParcel &data, MessageParcel &reply)
 {
-    bool enable = data.ReadBool();
-    int32_t result = StrategySwitch(enable);
-    if (!reply.WriteBool(result)) {
+    int32_t slotId = data.ReadInt32();
+    int32_t cid = data.ReadInt32();
+    int32_t result = HasInternetCapability(slotId, cid);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CellularDataServiceStub::OnClearCellularDataConnections(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t result = ClearCellularDataConnections(slotId);
+    if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }

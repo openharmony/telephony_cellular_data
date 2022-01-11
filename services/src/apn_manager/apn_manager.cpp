@@ -24,14 +24,14 @@
 namespace OHOS {
 namespace Telephony {
 const std::map<std::string, int32_t> ApnManager::apnIdApnNameMap_ {
-        {DATA_CONTEXT_ROLE_ALL,       DATA_CONTEXT_ROLE_ALL_ID},
-        {DATA_CONTEXT_ROLE_DEFAULT,   DATA_CONTEXT_ROLE_DEFAULT_ID},
-        {DATA_CONTEXT_ROLE_MMS,       DATA_CONTEXT_ROLE_MMS_ID},
-        {DATA_CONTEXT_ROLE_SUPL,      DATA_CONTEXT_ROLE_SUPL_ID},
-        {DATA_CONTEXT_ROLE_DUN,       DATA_CONTEXT_ROLE_DUN_ID},
-        {DATA_CONTEXT_ROLE_IMS,       DATA_CONTEXT_ROLE_IMS_ID},
-        {DATA_CONTEXT_ROLE_IA,        DATA_CONTEXT_ROLE_IA_ID},
-        {DATA_CONTEXT_ROLE_EMERGENCY, DATA_CONTEXT_ROLE_EMERGENCY_ID}
+    {DATA_CONTEXT_ROLE_ALL,       DATA_CONTEXT_ROLE_ALL_ID},
+    {DATA_CONTEXT_ROLE_DEFAULT,   DATA_CONTEXT_ROLE_DEFAULT_ID},
+    {DATA_CONTEXT_ROLE_MMS,       DATA_CONTEXT_ROLE_MMS_ID},
+    {DATA_CONTEXT_ROLE_SUPL,      DATA_CONTEXT_ROLE_SUPL_ID},
+    {DATA_CONTEXT_ROLE_DUN,       DATA_CONTEXT_ROLE_DUN_ID},
+    {DATA_CONTEXT_ROLE_IMS,       DATA_CONTEXT_ROLE_IMS_ID},
+    {DATA_CONTEXT_ROLE_IA,        DATA_CONTEXT_ROLE_IA_ID},
+    {DATA_CONTEXT_ROLE_EMERGENCY, DATA_CONTEXT_ROLE_EMERGENCY_ID}
 };
 
 ApnManager::ApnManager() = default;
@@ -40,8 +40,8 @@ ApnManager::~ApnManager() = default;
 
 void ApnManager::InitApnHolders()
 {
-    AddApnHolder(DATA_CONTEXT_ROLE_DEFAULT);
-    AddApnHolder(DATA_CONTEXT_ROLE_MMS);
+    AddApnHolder(DATA_CONTEXT_ROLE_DEFAULT, static_cast<int32_t>(DataContextPriority::PRIORITY_LOW));
+    AddApnHolder(DATA_CONTEXT_ROLE_MMS, static_cast<int32_t>(DataContextPriority::PRIORITY_NORMAL));
 }
 
 sptr<ApnHolder> ApnManager::FindApnHolderById(const int32_t id) const
@@ -55,7 +55,7 @@ sptr<ApnHolder> ApnManager::FindApnHolderById(const int32_t id) const
         TELEPHONY_LOGE("find a invalid capability!");
         return nullptr;
     }
-    auto it = apnIdApnHolderMap_.find(apnId);
+    std::map<int32_t, sptr<ApnHolder>>::const_iterator it = apnIdApnHolderMap_.find(apnId);
     if (it != apnIdApnHolderMap_.end()) {
         return it->second;
     }
@@ -64,7 +64,7 @@ sptr<ApnHolder> ApnManager::FindApnHolderById(const int32_t id) const
 
 int32_t ApnManager::FindApnIdByApnName(const std::string &type)
 {
-    const auto it = apnIdApnNameMap_.find(type);
+    std::map<std::string, int32_t>::const_iterator it = apnIdApnNameMap_.find(type);
     if (it != apnIdApnNameMap_.end()) {
         return it->second;
     }
@@ -74,7 +74,7 @@ int32_t ApnManager::FindApnIdByApnName(const std::string &type)
 
 std::string ApnManager::FindApnNameByApnId(const int32_t id)
 {
-    for (const auto &it :apnIdApnNameMap_) {
+    for (std::pair<const std::string, int32_t> it : apnIdApnNameMap_) {
         if (it.second == id) {
             return it.first;
         }
@@ -95,14 +95,14 @@ int32_t ApnManager::FindApnIdByCapability(const uint64_t capability)
     }
 }
 
-void ApnManager::AddApnHolder(const std::string &apnType)
+void ApnManager::AddApnHolder(const std::string &apnType, const int32_t priority)
 {
     int32_t apnId = FindApnIdByApnName(apnType);
     if (apnId == DATA_CONTEXT_ROLE_INVALID_ID) {
         TELEPHONY_LOGE("APN INVALID ID");
         return;
     }
-    sptr<ApnHolder> apnHolder = std::make_unique<ApnHolder>().release();
+    sptr<ApnHolder> apnHolder = std::make_unique<ApnHolder>(priority).release();
     if (apnHolder == nullptr) {
         TELEPHONY_LOGE("apnHolder is null, type: %{public}s", apnType.c_str());
         return;
@@ -110,7 +110,7 @@ void ApnManager::AddApnHolder(const std::string &apnType)
     apnHolder->SetApnType(apnType);
     apnHolder->SetApnState(PROFILE_STATE_IDLE);
     apnHolders_.push_back(apnHolder);
-    apnIdApnHolderMap_.insert(std::pair<int, sptr<ApnHolder>>(apnId, apnHolder));
+    apnIdApnHolderMap_.insert(std::pair<int32_t, sptr<ApnHolder>>(apnId, apnHolder));
     sortedApnHolders_.emplace_back(apnHolder);
     sort(sortedApnHolders_.begin(), sortedApnHolders_.end(),
         [](const sptr<ApnHolder> &c1, const sptr<ApnHolder> &c2) {
@@ -126,7 +126,7 @@ sptr<ApnHolder> ApnManager::GetApnHolder(const std::string &apnType) const
         TELEPHONY_LOGE("APN INVALID ID");
         return nullptr;
     }
-    auto it = apnIdApnHolderMap_.find(apnId);
+    std::map<int32_t, sptr<ApnHolder>>::const_iterator it = apnIdApnHolderMap_.find(apnId);
     if (it != apnIdApnHolderMap_.end()) {
         return it->second;
     }
@@ -195,7 +195,7 @@ int32_t ApnManager::CreateAllApnItemByDatabase(const std::string &numeric)
         TELEPHONY_LOGE("query apns from data ability fail");
         return count;
     }
-    for (auto apnData : apnVec) {
+    for (PdpProfile apnData : apnVec) {
         TELEPHONY_LOGI("profileId = %{public}d, profileName = %{public}s",
             apnData.profileId, apnData.profileName.c_str());
         sptr<ApnItem> apnItem = ApnItem::MakeApn(apnData);
@@ -215,7 +215,7 @@ void ApnManager::ClearAllApnItem()
 std::vector<sptr<ApnItem>> ApnManager::FilterMatchedApns(
     const std::string &requestedApnType, const int32_t &radioTech) const
 {
-    auto apnList = std::vector<sptr<ApnItem>>();
+    std::vector<sptr<ApnItem>> apnList = std::vector<sptr<ApnItem>>();
     size_t size = allApnItem_.size();
     for (size_t i = 0; i < size; ++i) {
         if (allApnItem_[i]->CanDealWithType(requestedApnType)) {
@@ -232,7 +232,7 @@ bool ApnManager::IsDataConnectionNotUsed(const std::shared_ptr<CellularDataState
         TELEPHONY_LOGE("CellularDataHandler:stateMachine is null");
         return false;
     }
-    for (const auto &apnHolder : apnHolders_) {
+    for (const sptr<ApnHolder> &apnHolder : apnHolders_) {
         if (apnHolder == nullptr) {
             TELEPHONY_LOGE("apn holder is null");
             continue;
@@ -249,7 +249,7 @@ bool ApnManager::IsDataConnectionNotUsed(const std::shared_ptr<CellularDataState
 
 bool ApnManager::HasAnyConnectedState() const
 {
-    for (const auto &apnHolder : apnHolders_) {
+    for (const sptr<ApnHolder> &apnHolder : apnHolders_) {
         if (apnHolder == nullptr) {
             TELEPHONY_LOGE("apn holder is null");
             continue;
@@ -273,7 +273,7 @@ ApnProfileState ApnManager::GetOverallApnState() const
         return ApnProfileState::PROFILE_STATE_CONNECTED;
     }
     bool failState = false;
-    for (const auto &apnHolder : apnHolders_) {
+    for (const sptr<ApnHolder> &apnHolder : apnHolders_) {
         if (apnHolder == nullptr) {
             continue;
         }
@@ -291,6 +291,28 @@ ApnProfileState ApnManager::GetOverallApnState() const
     }
     TELEPHONY_LOGI("apn overall state is STATE_FAILED");
     return ApnProfileState::PROFILE_STATE_FAILED;
+}
+
+sptr<ApnItem> ApnManager::GetRilAttachApn() const
+{
+    if (allApnItem_.empty()) {
+        TELEPHONY_LOGE("apn item is null");
+        return nullptr;
+    }
+    sptr<ApnItem> attachApn = nullptr;
+    for (const sptr<ApnItem> &apnItem : allApnItem_) {
+        if (apnItem->CanDealWithType(DATA_CONTEXT_ROLE_IA)) {
+            attachApn = apnItem;
+            break;
+        }
+        if (attachApn == nullptr && apnItem->CanDealWithType(DATA_CONTEXT_ROLE_DEFAULT)) {
+            attachApn = apnItem;
+        }
+    }
+    if (attachApn == nullptr) {
+        attachApn = allApnItem_[0];
+    }
+    return attachApn;
 }
 } // namespace Telephony
 } // namespace OHOS

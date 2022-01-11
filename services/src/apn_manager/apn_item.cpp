@@ -54,7 +54,7 @@ bool ApnItem::IsTrafficUse(const ApnItem &item) const
 
 bool ApnItem::CanDealWithType(const std::string &type) const
 {
-    for (auto apnType : apnTypes_) {
+    for (std::string apnType : apnTypes_) {
         transform(apnType.begin(), apnType.end(), apnType.begin(), ::tolower);
         if (type == apnType) {
             return true;

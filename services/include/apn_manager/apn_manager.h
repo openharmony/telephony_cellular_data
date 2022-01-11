@@ -46,16 +46,17 @@ public:
     int32_t CreateAllApnItemByDatabase(const std::string &numeric);
     bool HasAnyConnectedState() const;
     ApnProfileState GetOverallApnState() const;
+    sptr<ApnItem> GetRilAttachApn() const;
 
 private:
     sptr<ApnItem> GetFirstApnByType(const std::string &apnType) const;
-    void AddApnHolder(const std::string &apnType);
+    void AddApnHolder(const std::string &apnType, const int32_t priority);
 
 private:
     static const std::map<std::string, int32_t> apnIdApnNameMap_;
     std::vector<sptr<ApnItem>> allApnItem_;
     std::vector<sptr<ApnHolder>> apnHolders_;
-    std::map<int, sptr<ApnHolder>> apnIdApnHolderMap_;
+    std::map<int32_t, sptr<ApnHolder>> apnIdApnHolderMap_;
     std::vector<sptr<ApnHolder>> sortedApnHolders_;
 };
 } // namespace Telephony

@@ -28,7 +28,7 @@ class CellularDataStateMachine;
 
 class ApnHolder : public RefBase {
 public:
-    ApnHolder();
+    ApnHolder(const int32_t priority);
     ~ApnHolder();
     sptr<ApnItem> GetNextRetryApn() const;
     void SetAllMatchedApns(std::vector<sptr<ApnItem>> &matchedApns);
@@ -46,10 +46,11 @@ public:
     void SetCellularDataStateMachine(const std::shared_ptr<CellularDataStateMachine> &stateMachine);
     std::shared_ptr<CellularDataStateMachine> GetCellularDataStateMachine() const;
     uint32_t GetCapability() const;
-    uint32_t GetPriority() const;
+    int32_t GetPriority() const;
     void RequestCellularData(const NetRequest &netRequest);
     void ReleaseCellularData(const NetRequest &netRequest);
     bool IsEmergencyType() const;
+    void InitialApnRetryCount();
 
 private:
     ApnHolder(ApnHolder &apnHolder) = default;

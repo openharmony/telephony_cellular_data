@@ -36,6 +36,7 @@ public:
     void RemoveConnectionStateMachine(const std::shared_ptr<CellularDataStateMachine> &stateMachine);
     void AddActiveConnectionByCid(const std::shared_ptr<CellularDataStateMachine> &stateMachine);
     std::shared_ptr<CellularDataStateMachine> GetActiveConnectionByCid(int32_t cid) const;
+    bool isNoActiveConnection() const;
     std::map<int32_t, std::shared_ptr<CellularDataStateMachine>> GetActiveConnection() const;
     void RemoveActiveConnectionByCid(int32_t cid);
     void StartStallDetectionTimer(std::shared_ptr<AppExecFwk::EventHandler> cellularDataHandler);
@@ -45,7 +46,13 @@ public:
     void BeginNetStatistics();
     void EndNetStatistics();
     int32_t GetDataFlowType();
+    void SetDataFlowType(CellDataFlowType dataFlowType);
     int32_t GetSlotId() const;
+    std::vector<std::shared_ptr<CellularDataStateMachine>> GetAllConnectionMachine();
+    std::string GetDefaultBandWidthsConfig();
+    std::string GetDefaultTcpBufferConfig();
+    LinkBandwidthInfo GetBandwidthsByRadioTech(const int32_t radioTech);
+    std::string GetTcpBufferByRadioTech(const int32_t radioTech);
 
 private:
     std::shared_ptr<DataConnectionMonitor> connectionMonitor_;
@@ -53,6 +60,8 @@ private:
     std::map<int32_t, std::shared_ptr<CellularDataStateMachine>> cidActiveConnectionMap_;
     sptr<State> ccmDefaultState_;
     const int32_t slotId_;
+    std::map<std::string, LinkBandwidthInfo> bandwidthConfigMap_;
+    std::map<std::string, std::string> tcpBufferConfigMap_;
 };
 
 class CcmDefaultState : public State {

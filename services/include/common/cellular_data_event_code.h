@@ -21,7 +21,7 @@ namespace Telephony {
 class CellularDataEventCode {
 public:
     /**
-     *  The event code that drives the state transition
+     * The event code that drives the state transition
      */
     static const int32_t BASE = 0x00040000;
     static const int32_t MSG_SM_CONNECT = BASE + 0;
@@ -48,6 +48,14 @@ public:
     static const uint32_t MSG_STALL_DETECTION_EVENT_ID = BASE + 21;
     static const uint32_t MSG_REQUEST_NETWORK = BASE + 22;
     static const uint32_t MSG_APN_CHANGED = BASE + 23;
+    static const uint32_t MSG_SET_RIL_ATTACH_APN = BASE + 24;
+    static const uint32_t MSG_GET_RIL_BANDWIDTH = BASE + 25;
+    static const uint32_t MSG_SET_RIL_BANDWIDTH = BASE + 26;
+    static const uint32_t MSG_CONNECT_TIMEOUT_CHECK = BASE + 27;
+    static const uint32_t MSG_DISCONNECT_TIMEOUT_CHECK = BASE + 28;
+    static const uint32_t MSG_DB_SETTING_ENABLE_CHANGED = BASE + 29;
+    static const uint32_t MSG_DB_SETTING_ROAMING_CHANGED = BASE + 30;
+    static const uint32_t MSG_REG_POLICY_CALL_BACK = BASE + 31;
 };
 } // namespace Telephony
 } // namespace OHOS

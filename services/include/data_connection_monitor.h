@@ -94,6 +94,8 @@ public:
 
     CellDataFlowType GetDataFlowType();
 
+    void SetDataFlowType(CellDataFlowType dataFlowType);
+
     /**
      * Set the preferred network
      *

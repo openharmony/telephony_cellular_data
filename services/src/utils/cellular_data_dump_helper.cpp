@@ -62,6 +62,10 @@ void CellularDataDumpHelper::ShowCellularDataInfo(std::string &result) const
     result.append(",    Ohos cellular_call bind time:  ");
     result.append(DelayedSingleton<CellularDataService>::GetInstance()->GetBindTime());
     result.append("\n");
+    result.append("Ohos cellular_call service: ");
+    result.append(",    Ohos cellular_call end time:  ");
+    result.append(DelayedSingleton<CellularDataService>::GetInstance()->GetEndTime());
+    result.append("\n");
     result.append("Ohos cellular_data server:  ");
     result.append(" ,  Ohos cellular_data default slot id:  ");
     result.append(DelayedSingleton<CellularDataService>::GetInstance()->GetCellularDataSlotIdDump());

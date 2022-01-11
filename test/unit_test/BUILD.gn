@@ -17,7 +17,6 @@ ohos_executable("tel_cellular_data_ui_test") {
 
   include_dirs = [
     "//base/telephony/core_service/common/core",
-    "//base/telephony/core_service/common/cellular_data",
     "//base/telephony/core_service/interfaces/innerkits/network_search",
     "//base/telephony/cellular_data/interfaces/innerkits",
     "//base/telephony/cellular_data/interfaces/kits/native",
@@ -37,7 +36,7 @@ ohos_executable("tel_cellular_data_ui_test") {
 
   external_deps = [
     "appexecfwk_standard:libeventhandler",
-    "core_service:tel_cellular_data_api",
+    "cellular_data:tel_cellular_data_api",
   ]
 
   defines = [

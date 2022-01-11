@@ -13,26 +13,24 @@
  * limitations under the License.
  */
 
-#ifndef SIM_SWITCHER_H
-#define SIM_SWITCHER_H
+#ifndef CELLULAR_DATA_ROAMING_OBSERVER_H
+#define CELLULAR_DATA_ROAMING_OBSERVER_H
 
-#include <memory>
+#include "data_ability_observer_stub.h"
 
-#include "cellular_data_controller.h"
+#include "cellular_data_handler.h"
 
 namespace OHOS {
 namespace Telephony {
-class SIMSwitcher {
+class CellularDataRoamingObserver : public AAFwk::DataAbilityObserverStub {
 public:
-    SIMSwitcher();
-    ~SIMSwitcher();
-    void Activate();
-    void DeActivate();
+    CellularDataRoamingObserver(std::shared_ptr<CellularDataHandler> &cellularDataHandler);
+    ~CellularDataRoamingObserver();
+    void OnChange() override;
 
 private:
-    void ProcessDefaultDataChanged();
-    void OnActiveSimSwitch();
+    std::shared_ptr<CellularDataHandler> cellularDataHandler_;
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // SIM_SWITCHER_H
+#endif // CELLULAR_DATA_ROAMING_OBSERVER_H

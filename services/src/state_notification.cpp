@@ -15,10 +15,8 @@
 
 #include "state_notification.h"
 
-#include "iservice_registry.h"
-#include "system_ability_definition.h"
-
 #include "telephony_log_wrapper.h"
+#include "telephony_state_registry_client.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -30,71 +28,15 @@ StateNotification &StateNotification::GetInstance()
 
 void StateNotification::UpdateCellularDataConnectState(int32_t slotId, ApnProfileState dataState, int32_t networkType)
 {
-    sptr<ITelephonyStateNotify> proxy = GetProxy();
-    if (proxy != nullptr) {
-        proxy->UpdateCellularDataConnectState(slotId, CellularDataStateAdapter(dataState), networkType);
-    }
+    int32_t state = CellularDataStateAdapter(dataState);
+    TELEPHONY_LOGI("UpdateCellularDataConnectState= %{public}d, %{public}d, %{public}d", slotId, state, networkType);
+    TelephonyStateRegistryClient::GetInstance().UpdateCellularDataConnectState(slotId, state, networkType);
 }
 
 void StateNotification::OnUpDataFlowtype(int32_t slotId, CellDataFlowType flowType)
 {
-    sptr<ITelephonyStateNotify> proxy = GetProxy();
-    if (proxy != nullptr) {
-        TELEPHONY_LOGI("call ITelephonyStateNotify UpdateCellularDataFlow");
-    } else {
-        TELEPHONY_LOGE("UpdateCellularDataFlow proxy is null");
-    }
-}
-
-void StateNotification::OnRemoteDied(const wptr<IRemoteObject> &remote)
-{
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("OnRemoteDied failed, remote is nullptr");
-        return;
-    }
-    std::lock_guard<std::mutex> lock(mutexProxy_);
-    if (proxy_ == nullptr) {
-        TELEPHONY_LOGE("OnRemoteDied proxy_ is nullptr");
-        return;
-    }
-    auto serviceRemote = proxy_->AsObject();
-    if ((serviceRemote != nullptr) && (serviceRemote == remote.promote())) {
-        serviceRemote->RemoveDeathRecipient(deathRecipient_);
-        proxy_ = nullptr;
-    }
-}
-
-sptr<ITelephonyStateNotify> StateNotification::GetProxy()
-{
-    std::lock_guard<std::mutex> lock(mutexProxy_);
-    if (proxy_ != nullptr) {
-        return proxy_;
-    }
-    sptr<ISystemAbilityManager> sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (sam == nullptr) {
-        TELEPHONY_LOGE("Failed to get system ability manager");
-        return nullptr;
-    }
-    sptr<IRemoteObject> obj = sam->CheckSystemAbility(TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID);
-    if (obj == nullptr) {
-        TELEPHONY_LOGE("Failed to get state register service");
-        return nullptr;
-    }
-    std::unique_ptr<RegisterServiceDeathRecipient> recipient =
-        std::make_unique<RegisterServiceDeathRecipient>(*this);
-    if (recipient == nullptr) {
-        TELEPHONY_LOGE("recipient is null");
-        return nullptr;
-    }
-    sptr<IRemoteObject::DeathRecipient> dr(recipient.release());
-    if ((obj->IsProxyObject()) && (!obj->AddDeathRecipient(dr))) {
-        TELEPHONY_LOGE("Failed to add death recipient");
-        return nullptr;
-    }
-    proxy_ = iface_cast<ITelephonyStateNotify>(obj);
-    deathRecipient_ = dr;
-    TELEPHONY_LOGI("Succeed to connect state register service %{public}d", proxy_ == nullptr);
-    return proxy_;
+    TELEPHONY_LOGI("UpdateCellularDataFlow= %{public}d, %{public}d", slotId, flowType);
+    TelephonyStateRegistryClient::GetInstance().UpdateCellularDataFlow(slotId, flowType);
 }
 } // namespace Telephony
 } // namespace OHOS

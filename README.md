@@ -22,27 +22,31 @@ The cellular data module is a tailorable component of the Telephony subsystem. I
 ```
 base/telephony/cellular_data/
 ├── figures
-├── frameworks                            # js head and source files
-│   └── js
-│       └── napi
-├── interfaces
+├── frameworks
+│   ├── js
+│   │   └── napi
+│   │       ├── include                  #  js head files
+│   │       └── src                      #  js source files
+│   └── native
+├── interfaces                           # externally exposed interface
+│   ├── innerkits
 │   └── kits
-│       └── js                            # js head and source files
-│           ├── declaration               # external JS API interfaces
-│           └── napi
-├── sa_profile                            # SA profiles
+│       └── js
+│           └── declaration              # external JS API interfaces
+├── sa_profile                           # SA profiles
 ├── services
-│   ├── include                           # head files
+│   ├── include                          # head files
 │   │   ├── apn_manager
 │   │   ├── common
 │   │   ├── state_machine
 │   │   └── utils
-│   └── src                               # source files
+│   └── src                              # source files
 │       ├── apn_manager
 │       ├── state_machine
 │       └── utils
 └── test
-    └── unit_test                         # unit test code
+    └── unit_test                        # unit test code
+
 ```
 
 ## Constraints<a name="section125mcpsimp"></a>

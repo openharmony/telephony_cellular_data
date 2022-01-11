@@ -16,7 +16,9 @@
 #ifndef CELLULAR_DATA_CONSTANT_H
 #define CELLULAR_DATA_CONSTANT_H
 
+#include <array>
 #include <string>
+#include <vector>
 
 #include "cellular_data_types.h"
 
@@ -69,6 +71,12 @@ struct ActivateInfo {
     bool allowRoaming;
 };
 
+static const uint32_t DEFAULT_BANDWIDTH = 14;
+struct LinkBandwidthInfo {
+    uint32_t upBandwidth = DEFAULT_BANDWIDTH;
+    uint32_t downBandwidth = DEFAULT_BANDWIDTH;
+};
+
 constexpr int32_t CellularDataStateAdapter(ApnProfileState state)
 {
     switch (state) {
@@ -99,6 +107,12 @@ enum DataContextRolesId {
     DATA_CONTEXT_ROLE_IMS_ID = 5,
     DATA_CONTEXT_ROLE_IA_ID = 6,
     DATA_CONTEXT_ROLE_EMERGENCY_ID = 7
+};
+
+enum DataContextPriority {
+    PRIORITY_LOW,
+    PRIORITY_NORMAL,
+    PRIORITY_HIGH
 };
 
 enum TelCallStatus {
@@ -141,8 +155,12 @@ static const uint8_t DEFAULT_STRENGTH = 20;
 static const uint32_t DEFAULT_FREQUENCY = 50;
 static const int64_t REG_NET_MANAGER_DELAY_TIME = 2000;
 static const int64_t CORE_INIT_DELAY_TIME = 1000;
+static const int32_t MASK_BYTE_BIT = 8;
 static const int32_t IPV4_BIT = 32;
 static const int32_t IPV6_BIT = 128;
+static const int32_t MIN_IPV6_ITEM = 16;
+static const int32_t MAX_IPV4_ITEM = 8;
+static const int32_t MIN_IPV4_ITEM = 4;
 static const int32_t SIM_STATE_UNKNOWN = 0;
 static const int32_t MIN_SIM = 1;
 static const std::string DEFAULT_OPERATOR_NUMERIC = "46001";
@@ -154,9 +172,14 @@ static const std::string IDENT_PREFIX = "slotId";
 static const std::string DEFAULT_HOSTNAME = "os_hostname";
 static const std::string DEFAULT_MASK = "";
 static const std::string CELLULAR_DATA_RDB_URI = "dataability:///com.ohos.pdpprofileability/net/pdp_profile";
+static const std::string CELLULAR_DATA_SETTING_DATA_ENABLE_URI =
+    "dataability:///com.ohos.settingability/cellular_data_enable";
+static const std::string CELLULAR_DATA_SETTING_DATA_ROAMING_URI =
+    "dataability:///com.ohos.settingability/cellular_data_roaming_enable";
 static const int32_t DEFAULT_NET_STATISTICS_PERIOD = 3 * 1000;
 static const int32_t DEFAULT_STALL_DETECTION_PERIOD = 10 * 1000;
 static const int32_t ESTABLISH_DATA_CONNECTION_DELAY = 1 * 1000;
+static const int32_t CONNECTION_DISCONNECTION_TIMEOUT = 60 * 1000;
 static const int32_t RECOVERY_TRIGGER_PACKET = 10;
 static const int32_t ERROR_APN_ID = -1;
 static const int32_t VALID_IP_SIZE = 2;
@@ -167,6 +190,45 @@ static const int32_t DEFAULT_MCC_SIZE = 3;
 static const int32_t NULL_POINTER_EXCEPTION = -1;
 static const std::string ROUTED_IPV4 = "0.0.0.0";
 static const std::string ROUTED_IPV6 = "::";
+static const std::string CONFIG_DOWNLINK_THRESHOLDS = "persist.sys.data.downlink";
+static const std::string CONFIG_UPLINK_THRESHOLDS = "persist.sys.data.uplink";
+static const std::string CONFIG_TCP_BUFFER = "persist.sys.data.tcpbuffer";
+static const std::string CONFIG_BANDWIDTH = "persist.sys.data.bandwidth";
+static const std::string CONFIG_PREFERAPN = "persist.sys.data.preferapn";
+static const std::string CONFIG_MOBILE_MTU = "persist.sys.data.mobilemtu";
+static const std::string CAPACITY_THRESHOLDS_FOR_DOWNLINK = "100,500,1000,5000,10000,20000,50000,75000,"
+    "100000,200000,500000,1000000,1500000,2000000";
+static const std::string CAPACITY_THRESHOLDS_FOR_UPLINK = "100,500,1000,5000,10000,20000,50000,75000,"
+    "100000,200000,500000";
+static const std::string DEFAULT_TCP_BUFFER_CONFIG =
+    "UMTS:58254,349525,1048576,58254,349525,1048576;"
+    "HSPA:40778,244668,734003,16777,100663,301990;"
+    "HSUPA:131072,262144,2441216,4096,16384,399360;"
+    "HSDPA:61167,367002,1101005,8738,52429,262114;"
+    "HSPAP:122334,734003,2202010,32040,192239,576717;"
+    "EDGE:4093,26280,70800,4096,16384,70800;"
+    "eHRPD:131072,262144,1048576,4096,16384,524288;"
+    "1xRTT:16384,32768,131072,4096,16384,102400;"
+    "GPRS:4092,8760,48000,4096,8760,48000;"
+    "EVDO:4094,87380,262144,4096,16384,262144;"
+    "LTE:524288,1048576,2097152,262144,524288,1048576;"
+    "NR:2097152,6291456,16777216,512000,2097152,8388608;"
+    "LTE_CA:4096,6291456,12582912,4096,1048576,2097152";
+const std::string DEFAULT_BANDWIDTH_CONFIG = "GPRS:24,24;EDGE:70,18;UMTS:115,115;CDMA-IS95A:14,14;"
+    "CDMA-IS95B:14,14;1xRTT:30,30;EvDo-rev.0:750,48;EvDo-rev.A:950,550;HSDPA:4300,620;"
+    "HSUPA:4300,1800;HSPA:4300,1800;EvDo-rev.B:1500,550;eHRPD:750,48;HSPAP:13000,3400;"
+    "TD-SCDMA:115,115;LTE:30000,15000;NR_NSA:47000,18000;NR_NSA_MMWAVE:145000,60000;"
+    "NR_SA:145000,60000";
+static const std::string DEFAULT_PREFER_APN = "1";
+static const std::string DEFAULT_MOBILE_MTU = "1500";
+static const int MAX_BUFFER_SIZE = 1024;
+static const int MIN_BUFFER_SIZE = 5;
+static const int UP_DOWN_LINK_SIZE = 100;
+static const int32_t VALID_VECTOR_SIZE = 2;
+static const int32_t DELAY_SET_RIL_BANDWIDTH_MS = 3000;
+static const int32_t DELAY_SET_RIL_UP_DOWN_BANDWIDTH_MS = 50;
+static const std::string CELLULAR_DATA_COLUMN_ENABLE = "cellular_data_enable";
+static const std::string CELLULAR_DATA_COLUMN_ROAMING = "cellular_data_roaming_enable";
 } // namespace Telephony
 } // namespace OHOS
 #endif // CELLULAR_DATA_CONSTANT_H

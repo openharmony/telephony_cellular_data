@@ -19,12 +19,12 @@ ohos_shared_library("data") {
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi",
     "$SUBSYSTEM_DIR/core_service/utils/log/include",
     "$SUBSYSTEM_DIR/cellular_data/include/utils",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/cellular_data",
-    "$SUBSYSTEM_DIR/cellular_data/interfaces/kits/js/napi",
+    "$SUBSYSTEM_DIR/core_service/frameworks/js/cellular_data",
+    "$SUBSYSTEM_DIR/cellular_data/frameworks/js/napi/include",
   ]
 
   sources = [
-    "$SUBSYSTEM_DIR/cellular_data/frameworks/js/napi/napi_cellular_data.cpp",
+    "$SUBSYSTEM_DIR/cellular_data/frameworks/js/napi/src/napi_cellular_data.cpp",
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/napi_util.cpp",
   ]
 
@@ -36,7 +36,7 @@ ohos_shared_library("data") {
   external_deps = [
     "aafwk_standard:want",
     "appexecfwk_standard:libeventhandler",
-    "core_service:tel_cellular_data_api",
+    "cellular_data:tel_cellular_data_api",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",

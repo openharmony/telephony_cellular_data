@@ -27,10 +27,6 @@ namespace OHOS {
 namespace Telephony {
 class RilAdapterUtils {
 public:
-    static void ActivatePdpContext(ActivateInfo ap, int32_t radioTechnology,
-        ITelRilManager::CellularDataProfile &dataProfile, const AppExecFwk::InnerEvent::Pointer &response);
-    static void DeactivatePdpContext(
-        int32_t slotId, int32_t cid, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response);
     static void GetPdpContextList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response);
     static void RegisterRilConnected(
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what, void *obj);
@@ -41,6 +37,7 @@ public:
     static void GetPreferredNetworkPara(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response);
     static void SetPreferredNetworkPara(
         int32_t slotId, int32_t preferredNetworkType, const AppExecFwk::InnerEvent::Pointer &response);
+    static void GetLinkBandwidthInfo(int32_t slotId, int32_t cid, const AppExecFwk::InnerEvent::Pointer &response);
 
 private:
     RilAdapterUtils() = default;

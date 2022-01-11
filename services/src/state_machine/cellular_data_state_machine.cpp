@@ -76,7 +76,7 @@ void CellularDataStateMachine::DoConnect(const DataConnectionParams &connectionP
         return;
     }
     apnId_ = ApnManager::FindApnIdByApnName(connectionParams.GetApnHolder()->GetApnType());
-    auto apn = connectionParams.GetApnHolder()->GetCurrentApn();
+    sptr<ApnItem> apn = connectionParams.GetApnHolder()->GetCurrentApn();
     apnItem_ = apn;
     if (apnItem_ == nullptr) {
         TELEPHONY_LOGE("apnItem is null");
@@ -85,14 +85,14 @@ void CellularDataStateMachine::DoConnect(const DataConnectionParams &connectionP
     ActivateInfo activeInfo;
     const int32_t slotId = GetSlotId();
     activeInfo.slotId = slotId;
-    activeInfo.allowRoaming = true;
-    activeInfo.isRoaming = false;
+    activeInfo.allowRoaming = connectionParams.GetRoamingState();
+    activeInfo.isRoaming = connectionParams.GetUserDataRoaming();
     ITelRilManager::CellularDataProfile dataProfile(apn->attr_.profileId_, std::string(apn->attr_.apn_),
         std::string(apn->attr_.protocol_), apn->attr_.authType_, std::string(apn->attr_.user_),
         std::string(apn->attr_.password_), std::string(apn->attr_.roamingProtocol_));
     int32_t radioTech = NetworkSearchUtils::GetPsRadioTech(slotId);
-    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_RIL_SETUP_DATA_CALL,
-        ApnManager::FindApnIdByApnName(connectionParams.GetApnHolder()->GetApnType()));
+    AppExecFwk::InnerEvent::Pointer event =
+        AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_RIL_SETUP_DATA_CALL, connectId_);
     if (event == nullptr) {
         TELEPHONY_LOGE("event is null");
         return;
@@ -100,7 +100,15 @@ void CellularDataStateMachine::DoConnect(const DataConnectionParams &connectionP
     event->SetOwner(stateMachineEventHandler_);
     TELEPHONY_LOGI("Activate PDP context (%{public}d, %{public}s, %{public}s)", apn->attr_.profileId_,
         apn->attr_.apn_, apn->attr_.protocol_);
-    RilAdapterUtils::ActivatePdpContext(activeInfo, radioTech, dataProfile, event);
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
+    if (core != nullptr) {
+        core->ActivatePdpContext(radioTech, std::move(dataProfile),
+            activeInfo.isRoaming, activeInfo.allowRoaming, event);
+        stateMachineEventHandler_->SendEvent(CellularDataEventCode::MSG_CONNECT_TIMEOUT_CHECK, connectId_,
+            CONNECTION_DISCONNECTION_TIMEOUT);
+    } else {
+        TELEPHONY_LOGE("core is null slotId:%{public}d", slotId);
+    }
 }
 
 void CellularDataStateMachine::FreeConnection(const DataDisconnectParams &params)
@@ -109,13 +117,21 @@ void CellularDataStateMachine::FreeConnection(const DataDisconnectParams &params
     int32_t apnId = ApnManager::FindApnIdByApnName(params.GetApnType());
     TELEPHONY_LOGI("Deactivate PDP context cid:%{public}d type:%{public}s id:%{public}d slot:%{public}d",
         cid_, params.GetApnType().c_str(), apnId, slotId);
-    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_RIL_DEACTIVATE_DATA_CALL, apnId);
+    AppExecFwk::InnerEvent::Pointer event =
+        AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_RIL_DEACTIVATE_DATA_CALL, connectId_);
     if (event == nullptr) {
         TELEPHONY_LOGE("get event is null");
         return;
     }
     event->SetOwner(stateMachineEventHandler_);
-    RilAdapterUtils::DeactivatePdpContext(slotId, cid_, DEACTIVATE_REASON_NONE, event);
+    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
+    if (core != nullptr) {
+        core->DeactivatePdpContext(cid_, DEACTIVATE_REASON_NONE, event);
+        stateMachineEventHandler_->SendEvent(CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK, connectId_,
+            CONNECTION_DISCONNECTION_TIMEOUT);
+    } else {
+        TELEPHONY_LOGE("core is null slotId:%{public}d", slotId);
+    }
 }
 
 bool CellularDataStateMachine::operator==(const CellularDataStateMachine &stateMachine) const
@@ -181,12 +197,27 @@ void CellularDataStateMachine::UpdateNetworkInfo(const SetupDataCallResultInfo &
     }
     netLinkInfo_->ifaceName_ = dataCallInfo.netPortName;
     netLinkInfo_->mtu_ = (dataCallInfo.maxTransferUnit == 0) ? DEFAULT_MTU : dataCallInfo.maxTransferUnit;
+    netLinkInfo_->tcpBufferSizes_ = tcpBuffer_;
     ResolveIp(ipInfoArray);
     ResolveDns(dnsInfoArray);
     ResolveRoute(routeInfoArray, dataCallInfo.netPortName);
     netSupplierInfo_->isAvailable_ = (dataCallInfo.active > 0);
     netSupplierInfo_->isRoaming_ = NetworkSearchUtils::GetRoamingState(slotId);
+    netSupplierInfo_->linkUpBandwidthKbps_ = upBandwidth_;
+    netSupplierInfo_->linkDownBandwidthKbps_ = downBandwidth_;
     CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
+    int32_t supplierId = netAgent.GetSupplierId(slotId, capability_);
+    netAgent.UpdateNetSupplierInfo(supplierId, netSupplierInfo_);
+    netAgent.UpdateNetLinkInfo(supplierId, netLinkInfo_);
+}
+
+void CellularDataStateMachine::UpdateNetworkInfo()
+{
+    int32_t slotId = GetSlotId();
+    CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
+    netLinkInfo_->tcpBufferSizes_ = tcpBuffer_;
+    netSupplierInfo_->linkUpBandwidthKbps_ = upBandwidth_;
+    netSupplierInfo_->linkDownBandwidthKbps_ = downBandwidth_;
     int32_t supplierId = netAgent.GetSupplierId(slotId, capability_);
     netAgent.UpdateNetSupplierInfo(supplierId, netSupplierInfo_);
     netAgent.UpdateNetLinkInfo(supplierId, netLinkInfo_);
@@ -194,11 +225,12 @@ void CellularDataStateMachine::UpdateNetworkInfo(const SetupDataCallResultInfo &
 
 void CellularDataStateMachine::ResolveIp(std::vector<AddressInfo> &ipInfoArray)
 {
-    TELEPHONY_LOGI("Resolve Ip ifaceName_: %{public}s, domain_: %{public}s, mtu_: %{public}d, isAvailable_: %{public}d,"
-        "isRoaming_:%{public}d", netLinkInfo_->ifaceName_.c_str(), netLinkInfo_->domain_.c_str(), netLinkInfo_->mtu_,
+    TELEPHONY_LOGI("Resolve Ip ifaceName_: %{public}s, domain_: %{public}s, mtu_: %{public}d, isAvailable_:"
+        " %{public}d, isRoaming_:%{public}d", netLinkInfo_->ifaceName_.c_str(),
+        netLinkInfo_->domain_.c_str(), netLinkInfo_->mtu_,
         netSupplierInfo_->isAvailable_, netSupplierInfo_->isRoaming_);
     netLinkInfo_->netAddrList_.clear();
-    for (auto ipInfo : ipInfoArray) {
+    for (AddressInfo ipInfo : ipInfoArray) {
         INetAddr netAddr;
         netAddr.address_ = ipInfo.ip;
         netAddr.family_ = ipInfo.type;
@@ -213,7 +245,7 @@ void CellularDataStateMachine::ResolveIp(std::vector<AddressInfo> &ipInfoArray)
 void CellularDataStateMachine::ResolveDns(std::vector<AddressInfo> &dnsInfoArray)
 {
     netLinkInfo_->dnsList_.clear();
-    for (auto dnsInfo : dnsInfoArray) {
+    for (AddressInfo dnsInfo : dnsInfoArray) {
         INetAddr dnsAddr;
         dnsAddr.address_ = dnsInfo.ip;
         dnsAddr.family_ = dnsInfo.type;
@@ -228,7 +260,7 @@ void CellularDataStateMachine::ResolveDns(std::vector<AddressInfo> &dnsInfoArray
 void CellularDataStateMachine::ResolveRoute(std::vector<AddressInfo> &routeInfoArray, const std::string &name)
 {
     netLinkInfo_->routeList_.clear();
-    for (auto routeInfo : routeInfoArray) {
+    for (AddressInfo routeInfo : routeInfoArray) {
         NetManagerStandard::Route route;
         route.iface_ = name;
         route.gateway_.address_ = routeInfo.ip;
@@ -245,6 +277,17 @@ void CellularDataStateMachine::ResolveRoute(std::vector<AddressInfo> &routeInfoA
         route.destination_.prefixlen_ = routeInfo.prefixLen;
         netLinkInfo_->routeList_.push_back(route);
     }
+}
+
+void CellularDataStateMachine::SetConnectionBandwidth(const uint32_t upBandwidth, const uint32_t downBandwidth)
+{
+    upBandwidth_ = upBandwidth;
+    downBandwidth_ = downBandwidth;
+}
+
+void CellularDataStateMachine::SetConnectionTcpBuffer(const std::string &tcpBuffer)
+{
+    tcpBuffer_ = tcpBuffer;
 }
 } // namespace Telephony
 } // namespace OHOS

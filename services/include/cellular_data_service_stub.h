@@ -31,59 +31,45 @@ public:
     ~CellularDataServiceStub();
     int32_t OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
-    void ProcessSmsRespOrNotify(
-        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
 
 private:
-    int32_t OnIsCellularDataEnabledInner(MessageParcel &data, MessageParcel &reply);
-    int32_t OnEnableCellularDataInner(MessageParcel &data, MessageParcel &reply);
-    int32_t OnGetCellularDataStateInner(MessageParcel &data, MessageParcel &reply);
-    int32_t OnIsCellularDataRoamingEnabledInner(MessageParcel &data, MessageParcel &reply);
-    int32_t OnEnableCellularDataRoamingInner(MessageParcel &data, MessageParcel &reply);
-    int32_t OnReleaseNetInner(MessageParcel &data, MessageParcel &reply);
-    int32_t OnRequestNetInner(MessageParcel &data, MessageParcel &reply);
-    int32_t OnHandleApnChangedInner(MessageParcel &data, MessageParcel &reply);
-    int32_t OnGetDefaultCellularDataSlotIdInner(MessageParcel &data, MessageParcel &reply);
-    int32_t OnSetDefaultCellularDataSlotIdInner(MessageParcel &data, MessageParcel &reply);
-    int32_t OnGetCellularDataFlowTypeInner(MessageParcel &data, MessageParcel &reply);
-    int32_t OnStrategySwitchInner(MessageParcel &data, MessageParcel &reply);
-    int32_t OnAddCellularDataObserverInner(
-          uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
-    int32_t OnRemoveCellularDataObserverInner(
-          uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    int32_t OnIsCellularDataEnabled(MessageParcel &data, MessageParcel &reply);
+    int32_t OnEnableCellularData(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetCellularDataState(MessageParcel &data, MessageParcel &reply);
+    int32_t OnIsCellularDataRoamingEnabled(MessageParcel &data, MessageParcel &reply);
+    int32_t OnEnableCellularDataRoaming(MessageParcel &data, MessageParcel &reply);
+    int32_t OnHandleApnChanged(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetDefaultCellularDataSlotId(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetDefaultCellularDataSlotId(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetCellularDataFlowType(MessageParcel &data, MessageParcel &reply);
+    int32_t OnHasInternetCapability(MessageParcel &data, MessageParcel &reply);
+    int32_t OnClearCellularDataConnections(MessageParcel &data, MessageParcel &reply);
 
 private:
     using Fun = int32_t (CellularDataServiceStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, Fun> eventIdFunMap_ {
         {(uint32_t)ICellularDataManager::FuncCode::IS_CELLULAR_DATA_ENABLED,
-             &CellularDataServiceStub::OnIsCellularDataEnabledInner},
+             &CellularDataServiceStub::OnIsCellularDataEnabled},
         {(uint32_t)ICellularDataManager::FuncCode::ENABLE_CELLULAR_DATA,
-             &CellularDataServiceStub::OnEnableCellularDataInner},
+             &CellularDataServiceStub::OnEnableCellularData},
         {(uint32_t)ICellularDataManager::FuncCode::GET_CELLULAR_DATA_STATE,
-             &CellularDataServiceStub::OnGetCellularDataStateInner},
+             &CellularDataServiceStub::OnGetCellularDataState},
         {(uint32_t)ICellularDataManager::FuncCode::IS_DATA_ROAMING_ENABLED,
-             &CellularDataServiceStub::OnIsCellularDataRoamingEnabledInner},
+             &CellularDataServiceStub::OnIsCellularDataRoamingEnabled},
         {(uint32_t)ICellularDataManager::FuncCode::ENABLE_DATA_ROAMING,
-             &CellularDataServiceStub::OnEnableCellularDataRoamingInner},
-        {(uint32_t)ICellularDataManager::FuncCode::REQUEST_CELLULAR_DATA, &CellularDataServiceStub::OnRequestNetInner},
-        {(uint32_t)ICellularDataManager::FuncCode::RELEASE_CELLULAR_DATA, &CellularDataServiceStub::OnReleaseNetInner},
-        {(uint32_t)ICellularDataManager::FuncCode::STRATEGY_SWITCH, &CellularDataServiceStub::OnStrategySwitchInner},
+             &CellularDataServiceStub::OnEnableCellularDataRoaming},
         {(uint32_t)ICellularDataManager::FuncCode::APN_DATA_CHANGED,
-             &CellularDataServiceStub::OnHandleApnChangedInner},
+             &CellularDataServiceStub::OnHandleApnChanged},
         {(uint32_t)ICellularDataManager::FuncCode::GET_DEFAULT_SLOT_ID,
-             &CellularDataServiceStub::OnGetDefaultCellularDataSlotIdInner},
+             &CellularDataServiceStub::OnGetDefaultCellularDataSlotId},
         {(uint32_t)ICellularDataManager::FuncCode::SET_DEFAULT_SLOT_ID,
-             &CellularDataServiceStub::OnSetDefaultCellularDataSlotIdInner},
+             &CellularDataServiceStub::OnSetDefaultCellularDataSlotId},
         {(uint32_t)ICellularDataManager::FuncCode::GET_FLOW_TYPE_ID,
-             &CellularDataServiceStub::OnGetCellularDataFlowTypeInner},
-    };
-    using DataObserver = int32_t (CellularDataServiceStub::*)(
-        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
-    std::map<uint32_t, DataObserver> DataObserverIdMap_ {
-        {(uint32_t)ICellularDataManager::FuncCode::ADD_CELLULAR_DATA_OBSERVER,
-             &CellularDataServiceStub::OnAddCellularDataObserverInner},
-        {(uint32_t)ICellularDataManager::FuncCode::REMOVE_CELLULAR_DATA_OBSERVER,
-            &CellularDataServiceStub::OnRemoveCellularDataObserverInner},
+             &CellularDataServiceStub::OnGetCellularDataFlowType},
+        {(uint32_t)ICellularDataManager::FuncCode::HAS_CAPABILITY,
+             &CellularDataServiceStub::OnHasInternetCapability},
+        {(uint32_t)ICellularDataManager::FuncCode::CLEAR_ALL_CONNECTIONS,
+             &CellularDataServiceStub::OnClearCellularDataConnections}
     };
 };
 } // namespace Telephony

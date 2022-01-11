@@ -37,14 +37,14 @@ bool Default::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGE("event is null");
         return false;
     }
-    auto shareStateMachine = stateMachine_.lock();
-    if (shareStateMachine == nullptr) {
-        TELEPHONY_LOGE("shareStateMachine is null");
+    std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
+    if (stateMachine == nullptr) {
+        TELEPHONY_LOGE("stateMachine is null");
         return false;
     }
     bool retVal = false;
-    auto eventCode = event->GetInnerEventId();
-    auto it = eventIdFunMap_.find(eventCode);
+    uint32_t eventCode = event->GetInnerEventId();
+    std::map<uint32_t, Fun>::iterator it = eventIdFunMap_.find(eventCode);
     if (it != eventIdFunMap_.end()) {
         return (this->*(it->second))(event);
     }
@@ -67,13 +67,13 @@ bool Default::ProcessDisconnectDone(const AppExecFwk::InnerEvent::Pointer &event
         TELEPHONY_LOGE("event is null");
         return false;
     }
-    auto shareStateMachine = stateMachine_.lock();
-    if (shareStateMachine == nullptr) {
+    std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
+    if (stateMachine == nullptr) {
         TELEPHONY_LOGE("The state machine pointer is null");
         return false;
     }
     TELEPHONY_LOGI("The data connection is disconnected by default");
-    shareStateMachine->DeferEvent(std::move(event));
+    stateMachine->DeferEvent(std::move(event));
     return true;
 }
 
@@ -83,13 +83,13 @@ bool Default::ProcessDisconnectAllDone(const AppExecFwk::InnerEvent::Pointer &ev
         TELEPHONY_LOGE("event is null");
         return false;
     }
-    auto shareStateMachine = stateMachine_.lock();
-    if (shareStateMachine == nullptr) {
+    std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
+    if (stateMachine == nullptr) {
         TELEPHONY_LOGE("The state machine pointer is null");
         return false;
     }
     TELEPHONY_LOGI("All data connections are disconnected by default");
-    shareStateMachine->DeferEvent(std::move(event));
+    stateMachine->DeferEvent(std::move(event));
     return true;
 }
 
@@ -99,16 +99,16 @@ bool Default::ProcessDataConnectionDrsOrRatChanged(const AppExecFwk::InnerEvent:
         TELEPHONY_LOGE("event is null");
         return false;
     }
-    auto shareStateMachine = stateMachine_.lock();
-    if (shareStateMachine == nullptr) {
-        TELEPHONY_LOGE("shareStateMachine is null");
+    std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
+    if (stateMachine == nullptr) {
+        TELEPHONY_LOGE("stateMachine is null");
         return false;
     }
     TELEPHONY_LOGI("The RAT changes by default");
     CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
-    int32_t supplierId = netAgent.GetSupplierId(shareStateMachine->GetSlotId(), shareStateMachine->GetCapability());
-    netAgent.UpdateNetSupplierInfo(supplierId, shareStateMachine->netSupplierInfo_);
-    netAgent.UpdateNetLinkInfo(supplierId, shareStateMachine->netLinkInfo_);
+    int32_t supplierId = netAgent.GetSupplierId(stateMachine->GetSlotId(), stateMachine->GetCapability());
+    netAgent.UpdateNetSupplierInfo(supplierId, stateMachine->netSupplierInfo_);
+    netAgent.UpdateNetLinkInfo(supplierId, stateMachine->netLinkInfo_);
     return false;
 }
 

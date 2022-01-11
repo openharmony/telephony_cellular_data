@@ -46,7 +46,8 @@ void DataConnectionMonitor::StartStallDetectionTimer(std::shared_ptr<AppExecFwk:
     TELEPHONY_LOGI("start stall detection");
     stallDetectionEnabled = true;
     if (!HasInnerEvent(CellularDataEventCode::MSG_STALL_DETECTION_EVENT_ID) && stallDetectionEnabled) {
-        auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_STALL_DETECTION_EVENT_ID);
+        AppExecFwk::InnerEvent::Pointer event =
+            AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_STALL_DETECTION_EVENT_ID);
         SendEvent(event, DEFAULT_STALL_DETECTION_PERIOD, Priority::LOW);
     }
 }
@@ -60,7 +61,8 @@ void DataConnectionMonitor::OnStallDetectionTimer()
         noRecvPackets_ = 0;
     }
     if (!HasInnerEvent(CellularDataEventCode::MSG_STALL_DETECTION_EVENT_ID) && stallDetectionEnabled) {
-        auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_STALL_DETECTION_EVENT_ID);
+        AppExecFwk::InnerEvent::Pointer event =
+            AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_STALL_DETECTION_EVENT_ID);
         SendEvent(event, DEFAULT_STALL_DETECTION_PERIOD, Priority::LOW);
     }
 }
@@ -99,7 +101,7 @@ void DataConnectionMonitor::UpdateFlowInfo()
 
 void DataConnectionMonitor::HandleRecovery()
 {
-    auto cellularDataHandler = cellularDataHandler_.lock();
+    std::shared_ptr<CellularDataHandler> cellularDataHandler = cellularDataHandler_.lock();
     if (cellularDataHandler == nullptr) {
         TELEPHONY_LOGE("cellularDataHandler is null");
         return;
@@ -126,7 +128,7 @@ void DataConnectionMonitor::HandleRecovery()
             TELEPHONY_LOGI("Handle Recovery: radio restart");
             dataRecoveryState_ = RecoveryState::STATE_REQUEST_CONTEXT_LIST;
             cellularDataHandler->ClearAllConnections(REASON_RETRY_CONNECTION);
-            SetRadioState(static_cast<int32_t>(ModemPowerState::CORE_SERVICE_POWER_OFF), ObserverHandler::RADIO_OFF);
+            SetRadioState(CORE_SERVICE_POWER_OFF, ObserverHandler::RADIO_OFF);
             break;
         default:
             TELEPHONY_LOGE("Handle Recovery is falsie");
@@ -151,14 +153,16 @@ void DataConnectionMonitor::UpdateNetTrafficState()
 {
     if (!HasInnerEvent(CellularDataEventCode::MSG_RUN_MONITOR_TASK) && updateNetStat_) {
         UpdateDataFlowType();
-        auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_RUN_MONITOR_TASK);
+        AppExecFwk::InnerEvent::Pointer event =
+            AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_RUN_MONITOR_TASK);
         SendEvent(event, DEFAULT_NET_STATISTICS_PERIOD);
     }
 }
 
 void DataConnectionMonitor::GetPdpContextList()
 {
-    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_DATA_CALL_LIST_CHANGED);
+    AppExecFwk::InnerEvent::Pointer event =
+        AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_DATA_CALL_LIST_CHANGED);
     if (event == nullptr) {
         TELEPHONY_LOGE("event is null");
         return;
@@ -169,7 +173,7 @@ void DataConnectionMonitor::GetPdpContextList()
 
 void DataConnectionMonitor::SetRadioState(const int32_t &radioState, const int32_t &eventCode)
 {
-    auto event = AppExecFwk::InnerEvent::Get(eventCode);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventCode);
     if (event == nullptr) {
         TELEPHONY_LOGE("event is null");
         return;
@@ -180,7 +184,8 @@ void DataConnectionMonitor::SetRadioState(const int32_t &radioState, const int32
 
 void DataConnectionMonitor::GetPreferredNetworkPara()
 {
-    auto event = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_PREFERRED_NETWORK_MODE);
+    AppExecFwk::InnerEvent::Pointer event =
+        AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_PREFERRED_NETWORK_MODE);
     if (event == nullptr) {
         TELEPHONY_LOGE("event is null");
         return;
@@ -191,9 +196,10 @@ void DataConnectionMonitor::GetPreferredNetworkPara()
 
 void DataConnectionMonitor::SetPreferredNetworkPara(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    auto preferredNetworkInfo = event->GetSharedObject<PreferredNetworkTypeInfo>();
+    std::shared_ptr<PreferredNetworkTypeInfo> preferredNetworkInfo = event->GetSharedObject<PreferredNetworkTypeInfo>();
     int32_t networkType = preferredNetworkInfo->preferredNetworkType;
-    auto responseEvent = AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SET_PREFERRED_NETWORK_MODE);
+    AppExecFwk::InnerEvent::Pointer responseEvent =
+        AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SET_PREFERRED_NETWORK_MODE);
     if (responseEvent == nullptr) {
         TELEPHONY_LOGE("event is null");
         return;
@@ -220,7 +226,7 @@ void DataConnectionMonitor::UpdateDataFlowType()
     CellDataFlowType previousDataFlowType = dataFlowType_;
     if (previousSentPackets != 0 || previousRecvPackets != 0) {
         if (sentPackets > 0 && recvPackets == 0) {
-            dataFlowType_ =  CellDataFlowType::DATA_FLOW_TYPE_UP;
+            dataFlowType_ = CellDataFlowType::DATA_FLOW_TYPE_UP;
         } else if (sentPackets == 0 && recvPackets > 0) {
             dataFlowType_ = CellDataFlowType::DATA_FLOW_TYPE_DOWN;
         } else if (sentPackets > 0 && recvPackets > 0) {
@@ -239,13 +245,21 @@ CellDataFlowType DataConnectionMonitor::GetDataFlowType()
     return dataFlowType_;
 }
 
+void DataConnectionMonitor::SetDataFlowType(CellDataFlowType dataFlowType)
+{
+    if (dataFlowType_ != dataFlowType) {
+        dataFlowType_ = dataFlowType;
+        StateNotification::GetInstance().OnUpDataFlowtype(slotId_, dataFlowType_);
+    }
+}
+
 void DataConnectionMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
         TELEPHONY_LOGE("event is null");
         return;
     }
-    auto eventID = event->GetInnerEventId();
+    uint32_t eventID = event->GetInnerEventId();
     switch (eventID) {
         case CellularDataEventCode::MSG_RUN_MONITOR_TASK: {
             UpdateNetTrafficState();
@@ -264,7 +278,7 @@ void DataConnectionMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &
             TELEPHONY_LOGI("set preferred network mode complete");
             break;
         case ObserverHandler::RADIO_OFF:
-            SetRadioState(static_cast<int32_t>(ModemPowerState::CORE_SERVICE_POWER_ON), ObserverHandler::RADIO_ON);
+            SetRadioState(CORE_SERVICE_POWER_ON, ObserverHandler::RADIO_ON);
             break;
         case ObserverHandler::RADIO_ON:
             TELEPHONY_LOGI("set radio state on complete");

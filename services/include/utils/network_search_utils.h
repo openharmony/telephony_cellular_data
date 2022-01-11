@@ -69,6 +69,16 @@ public:
      */
     static std::string GetOperatorNumeric(int32_t slotId);
 
+    static void DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive);
+
+    /**
+     * Conversion corresponding access point name according to the access point technology
+     *
+     * @param radioTech Access point technology
+     * @return access technology name
+     */
+    static std::string ConvertRadioTechToRadioName(const int32_t radioTech);
+
 private:
     NetworkSearchUtils() = default;
 

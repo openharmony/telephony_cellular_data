@@ -30,11 +30,11 @@ CellularDataRdbObserver::~CellularDataRdbObserver() = default;
 
 void CellularDataRdbObserver::OnChange()
 {
-    TELEPHONY_LOGE("CellularDataRdbObserver: Onchange()");
     if (cellularDataHandler_ == nullptr) {
         TELEPHONY_LOGE("cellularDataHandler_ is null");
+        return;
     }
-    auto event = InnerEvent::Get(CellularDataEventCode::MSG_APN_CHANGED);
+    InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_APN_CHANGED);
     cellularDataHandler_->SendEvent(event);
 }
 } // namespace Telephony

@@ -25,7 +25,6 @@
 #include "cellular_data_constant.h"
 #include "cellular_data_controller.h"
 #include "traffic_management.h"
-#include "sim_switcher.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -49,6 +48,7 @@ public:
     void OnStop() override;
     int32_t Dump(std::int32_t fd, const std::vector<std::u16string>& args) override;
     std::string GetBindTime();
+    std::string GetEndTime();
     std::string GetCellularDataSlotIdDump();
     std::string GetStateMachineCurrentStatusDump();
     std::string GetFlowDataInfoDump();
@@ -57,15 +57,17 @@ public:
     int32_t GetCellularDataState() override;
     int32_t IsCellularDataRoamingEnabled(const int32_t slotId) override;
     int32_t EnableCellularDataRoaming(const int32_t slotId, bool enable) override;
-    int32_t ReleaseNet(const std::string ident, const uint64_t capability) override;
-    int32_t RequestNet(const std::string ident, const uint64_t capability) override;
     int32_t HandleApnChanged(const int32_t slotId, std::string apns) override;
     int32_t GetDefaultCellularDataSlotId() override;
     int32_t SetDefaultCellularDataSlotId(const int32_t slotId) override;
     int32_t GetCellularDataFlowType() override;
     void RegisterAllNetSpecifier();
     void DispatchEvent(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
-    int32_t StrategySwitch(bool enable) override;
+    int32_t HasInternetCapability(const int32_t slotId, const int32_t cid) override;
+    int32_t ClearCellularDataConnections(const int32_t slotId) override;
+    int32_t StrategySwitch(int32_t slotId, bool enable);
+    int32_t RequestNet(const NetRequest &request);
+    int32_t ReleaseNet(const NetRequest &request);
 
 private:
     void WaitCoreServiceToInit();
@@ -76,10 +78,10 @@ private:
 
 private:
     std::map<int32_t, std::shared_ptr<CellularDataController>> cellularDataControllers_;
-    std::unique_ptr<SIMSwitcher> simSwitcher_;
     std::shared_ptr<AppExecFwk::EventRunner> eventLoop_;
     bool registerToService_;
     int64_t bindTime_ = 0L;
+    int64_t endTime_ = 0L;
     ServiceRunningState state_;
     static constexpr HiviewDFX::HiLogLabel LOG_LABEL = {LOG_CORE, LOG_DOMAIN, "CellularDataService"};
     constexpr static uint32_t CONNECT_MAX_TRY_COUNT = 120;

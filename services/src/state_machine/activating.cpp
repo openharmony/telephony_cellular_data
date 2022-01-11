@@ -19,7 +19,9 @@
 #include "telephony_log_wrapper.h"
 
 #include "cellular_data_event_code.h"
+#include "cellular_data_utils.h"
 #include "inactive.h"
+#include "network_search_utils.h"
 #include "ril_adapter_utils.h"
 
 namespace OHOS {
@@ -27,13 +29,13 @@ namespace Telephony {
 void Activating::StateBegin()
 {
     TELEPHONY_LOGI("Enter activating state");
-    auto shareStateMachine = stateMachine_.lock();
-    if (shareStateMachine == nullptr) {
-        TELEPHONY_LOGE("shareStateMachine is null");
+    std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
+    if (stateMachine == nullptr) {
+        TELEPHONY_LOGE("stateMachine is null");
         return;
     }
     isActive_ = true;
-    shareStateMachine->SetCurrentState(sptr<State>(this));
+    stateMachine->SetCurrentState(sptr<State>(this));
 }
 
 void Activating::StateEnd()
@@ -48,75 +50,147 @@ bool Activating::RilActivatePdpContextDone(const AppExecFwk::InnerEvent::Pointer
         TELEPHONY_LOGE("event is null");
         return false;
     }
-    auto shareStateMachine = stateMachine_.lock();
-    if (shareStateMachine == nullptr) {
-        TELEPHONY_LOGE("shareStateMachine is null");
+    std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
+    if (stateMachine == nullptr) {
+        TELEPHONY_LOGE("stateMachine is null");
         return false;
     }
-    auto resultInfo = event->GetSharedObject<SetupDataCallResultInfo>();
+    std::shared_ptr<SetupDataCallResultInfo> resultInfo = event->GetSharedObject<SetupDataCallResultInfo>();
     if (resultInfo == nullptr) {
         TELEPHONY_LOGE("result info is null");
         return RilErrorResponse(event);
     }
-    TELEPHONY_LOGI("callDone active: %{public}d flag: %{public}d, cid: %{public}d", resultInfo->active,
-        resultInfo->flag, resultInfo->cid);
-    if (resultInfo->active == 0) {
-        auto *inActive = static_cast<Inactive *>(shareStateMachine->inActiveState_.GetRefPtr());
-        inActive->SetDeActiveApnTypeId(shareStateMachine->apnId_);
-        shareStateMachine->TransitionTo(shareStateMachine->inActiveState_);
+    TELEPHONY_LOGI("callDone active: %{public}d flag: %{public}d, cid: %{public}d, reason: %{public}d",
+        resultInfo->active, resultInfo->flag, resultInfo->cid, resultInfo->reason);
+    if (stateMachine->connectId_ != resultInfo->flag) {
+        TELEPHONY_LOGE("connectId is %{public}d, flag is %{public}d", stateMachine->connectId_, resultInfo->flag);
+        return false;
+    }
+    if (resultInfo->reason != 0) {
+        Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+        DisConnectionReason disReason = DataCallPdpError(resultInfo->reason);
+        inActive->SetReason(disReason);
+        inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
+        stateMachine->TransitionTo(stateMachine->inActiveState_);
         return true;
     }
-    shareStateMachine->SetCid(resultInfo->cid);
-    if (shareStateMachine->cdConnectionManager_ != nullptr) {
-        shareStateMachine->cdConnectionManager_->AddActiveConnectionByCid(stateMachine_.lock());
+    if (resultInfo->active == 0) {
+        Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+        inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
+        inActive->SetReason(REASON_RETRY_CONNECTION);
+        stateMachine->TransitionTo(stateMachine->inActiveState_);
+        return true;
+    }
+    stateMachine->SetCid(resultInfo->cid);
+    if (stateMachine->cdConnectionManager_ != nullptr) {
+        stateMachine->cdConnectionManager_->AddActiveConnectionByCid(stateMachine_.lock());
     } else {
         TELEPHONY_LOGE("cdConnectionManager is null");
     }
-    if (shareStateMachine->cellularDataHandler_ != nullptr) {
-        shareStateMachine->cellularDataHandler_->SendEvent(
-            CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION_COMPLETE, resultInfo);
-    } else {
-        TELEPHONY_LOGE("cellularDataHandler is null");
-    }
-    shareStateMachine->TransitionTo(shareStateMachine->activeState_);
+    stateMachine->DeferEvent(std::move(event));
+    stateMachine->TransitionTo(stateMachine->activeState_);
     return true;
+}
+
+DisConnectionReason Activating::DataCallPdpError(int32_t reason)
+{
+    switch (reason) {
+        case HRilPdpErrorReason::HRIL_PDP_ERR_SHORTAGE_RESOURCES:
+        case HRilPdpErrorReason::HRIL_PDP_ERR_ACTIVATION_REJECTED_UNSPECIFIED:
+        case HRilPdpErrorReason::HRIL_PDP_ERR_SERVICE_OPTION_TEMPORARILY_OUT_OF_ORDER:
+        case HRilPdpErrorReason::HRIL_PDP_ERR_APN_NOT_SUPPORTED_IN_CURRENT_RAT_PLMN:
+        case HRilPdpErrorReason::HRIL_PDP_ERR_APN_RESTRICTION_VALUE_INCOMPATIBLE: {
+            TELEPHONY_LOGE("DataCall: The connection failed, try again");
+            return REASON_RETRY_CONNECTION;
+        }
+        case HRilPdpErrorReason::HRIL_PDP_ERR_MULT_ACCESSES_PDN_NOT_ALLOWED:
+        case HRilPdpErrorReason::HRIL_PDP_ERR_OPERATOR_DETERMINED_BARRING:
+        case HRilPdpErrorReason::HRIL_PDP_ERR_MISSING_OR_UNKNOWN_APN:
+        case HRilPdpErrorReason::HRIL_PDP_ERR_UNKNOWN_PDP_ADDR_OR_TYPE:
+        case HRilPdpErrorReason::HRIL_PDP_ERR_USER_VERIFICATION:
+        case HRilPdpErrorReason::HRIL_PDP_ERR_ACTIVATION_REJECTED_GGSN:
+        case HRilPdpErrorReason::HRIL_PDP_ERR_SERVICE_OPTION_NOT_SUPPORTED:
+        case HRilPdpErrorReason::HRIL_PDP_ERR_REQUESTED_SERVICE_OPTION_NOT_SUBSCRIBED:
+        case HRilPdpErrorReason::HRIL_PDP_ERR_NSAPI_ALREADY_USED:
+        case HRilPdpErrorReason::HRIL_PDP_ERR_IPV4_ONLY_ALLOWED:
+        case HRilPdpErrorReason::HRIL_PDP_ERR_IPV6_ONLY_ALLOWED:
+        case HRilPdpErrorReason::HRIL_PDP_ERR_IPV4V6_ONLY_ALLOWED:
+        case HRilPdpErrorReason::HRIL_PDP_ERR_NON_IP_ONLY_ALLOWED:
+        case HRilPdpErrorReason::HRIL_PDP_ERR_MAX_NUM_OF_PDP_CONTEXTS:
+        case HRilPdpErrorReason::HRIL_PDP_ERR_PROTOCOL_ERRORS:
+        case HRilPdpErrorReason::HRIL_PDP_ERR_UNKNOWN: {
+            TELEPHONY_LOGE("DataCall: The connection failed, not try again");
+            return REASON_CLEAR_CONNECTION;
+        }
+        default:
+            break;
+    }
+    TELEPHONY_LOGE("DataCall: Connection failed for an unsupported reason, not try again");
+    return REASON_CLEAR_CONNECTION;
 }
 
 bool Activating::RilErrorResponse(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    auto shareStateMachine = stateMachine_.lock();
-    if (shareStateMachine == nullptr) {
-        TELEPHONY_LOGE("shareStateMachine is null");
+    std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
+    if (stateMachine == nullptr) {
+        TELEPHONY_LOGE("stateMachine is null");
         return false;
     }
-    auto rilInfo = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<HRilRadioResponseInfo> rilInfo = event->GetSharedObject<HRilRadioResponseInfo>();
     if (rilInfo == nullptr) {
         TELEPHONY_LOGE("SetupDataCallResultInfo and HRilRadioResponseInfo is null");
         return false;
     }
+    if (stateMachine->connectId_ != rilInfo->flag) {
+        TELEPHONY_LOGE("connectId is %{public}d, flag is %{public}d", stateMachine->connectId_, rilInfo->flag);
+        return false;
+    }
     TELEPHONY_LOGI("HRilRadioResponseInfo flag:%{public}d error:%{public}d", rilInfo->flag, rilInfo->error);
-    Inactive *inActive = static_cast<Inactive *>(shareStateMachine->inActiveState_.GetRefPtr());
+    Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
     switch (rilInfo->error) {
         case HRilErrType::HRIL_ERR_GENERIC_FAILURE:
         case HRilErrType::HRIL_ERR_CMD_SEND_FAILURE:
+        case HRilErrType::HRIL_ERR_NULL_POINT:
             inActive->SetReason(REASON_RETRY_CONNECTION);
             TELEPHONY_LOGI("Handle supported error responses and retry the connection.");
             break;
         case HRilErrType::HRIL_ERR_INVALID_RESPONSE:
-        case HRilErrType::HRIL_ERR_INVALID_PARAMETER:
-        case HRilErrType::HRIL_ERR_MEMORY_FULL:
         case HRilErrType::HRIL_ERR_CMD_NO_CARRIER:
+        case HRilErrType::HRIL_ERR_HDF_IPC_FAILURE:
             inActive->SetReason(REASON_CLEAR_CONNECTION);
             TELEPHONY_LOGI("Handle the supported error response and clear the connection.");
             break;
         default: {
+            inActive->SetReason(REASON_CLEAR_CONNECTION);
             TELEPHONY_LOGE("Handle the unsupported error response");
             break;
         }
     }
-    inActive->SetDeActiveApnTypeId(shareStateMachine->apnId_);
-    shareStateMachine->TransitionTo(shareStateMachine->inActiveState_);
+    inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
+    stateMachine->TransitionTo(stateMachine->inActiveState_);
     return true;
+}
+
+void Activating::ProcessConnectTimeout(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is null");
+        return;
+    }
+    int32_t connectId = event->GetParam();
+    std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
+    if (stateMachine == nullptr) {
+        TELEPHONY_LOGE("stateMachine is null");
+        return;
+    }
+    if (connectId != stateMachine->connectId_) {
+        return;
+    }
+    Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+    inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
+    inActive->SetReason(REASON_RETRY_CONNECTION);
+    stateMachine->TransitionTo(stateMachine->inActiveState_);
+    TELEPHONY_LOGI("ProcessConnectTimeout");
 }
 
 bool Activating::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
@@ -125,19 +199,19 @@ bool Activating::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGE("event is null");
         return false;
     }
-    auto shareStateMachine = stateMachine_.lock();
-    if (shareStateMachine == nullptr) {
-        TELEPHONY_LOGE("shareStateMachine is null");
+    std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
+    if (stateMachine == nullptr) {
+        TELEPHONY_LOGE("stateMachine is null");
         return false;
     }
     bool retVal = false;
-    auto eventCode = event->GetInnerEventId();
+    uint32_t eventCode = event->GetInnerEventId();
     switch (eventCode) {
         case CellularDataEventCode::MSG_SM_DRS_OR_RAT_CHANGED:
             [[fallthrough]];
         case CellularDataEventCode::MSG_SM_CONNECT:
             TELEPHONY_LOGI("Activating::MSG_SM_CONNECT");
-            shareStateMachine->DeferEvent(std::move(event));
+            stateMachine->DeferEvent(std::move(event));
             retVal = PROCESSED;
             break;
         case ObserverHandler::RADIO_RIL_SETUP_DATA_CALL: {
@@ -145,7 +219,14 @@ bool Activating::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
             break;
         }
         case CellularDataEventCode::MSG_SM_GET_LAST_FAIL_DONE:
-            shareStateMachine->TransitionTo(shareStateMachine->inActiveState_);
+            stateMachine->TransitionTo(stateMachine->inActiveState_);
+            retVal = PROCESSED;
+            break;
+        case CellularDataEventCode::MSG_GET_RIL_BANDWIDTH:
+            stateMachine->DeferEvent(std::move(event));
+            break;
+        case CellularDataEventCode::MSG_CONNECT_TIMEOUT_CHECK:
+            ProcessConnectTimeout(event);
             retVal = PROCESSED;
             break;
         default:

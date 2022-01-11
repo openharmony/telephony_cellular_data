@@ -34,6 +34,7 @@ public:
     void ClearRetryApns();
     void MarkBadApn(ApnItem &apn);
     int64_t GetNextRetryDelay() const;
+    void InitialRetryCountValue();
 
 private:
     constexpr static const int64_t DEFAULT_DELAY_FOR_NEXT_APN = 2 * 1000;

@@ -34,10 +34,6 @@
 namespace OHOS {
 namespace Telephony {
 class DataConnectionManager;
-static std::map<RadioTech, std::pair<int32_t, int32_t>> radioTypeRateMap_ {
-    {RadioTech::RADIO_TECHNOLOGY_LTE, {100, 100}},
-};
-
 class CellularDataStateMachine : public StateMachine,
     public std::enable_shared_from_this<CellularDataStateMachine> {
 public:
@@ -45,8 +41,8 @@ public:
         std::shared_ptr<AppExecFwk::EventHandler> &&cellularDataHandler,
         const std::shared_ptr<AppExecFwk::EventRunner> &runner)
         : StateMachine(runner), cdConnectionManager_(cdConnectionManager),
-          cellularDataHandler_(std::move(cellularDataHandler)), cid_(0), capability_(0),
-          rilRat_(RadioTech::RADIO_TECHNOLOGY_UNKNOWN), apnId_(0)
+        cellularDataHandler_(std::move(cellularDataHandler)), cid_(0), capability_(0),
+        rilRat_(RadioTech::RADIO_TECHNOLOGY_UNKNOWN), apnId_(0)
     {}
     ~CellularDataStateMachine() = default;
     bool operator==(const CellularDataStateMachine &stateMachine) const;
@@ -59,6 +55,9 @@ public:
     sptr<ApnItem> GetApnItem() const;
     void Init();
     void UpdateNetworkInfo(const SetupDataCallResultInfo &dataCallInfo);
+    void UpdateNetworkInfo();
+    void SetConnectionBandwidth(const uint32_t upBandwidth, const uint32_t downBandwidth);
+    void SetConnectionTcpBuffer(const std::string &tcpBuffer);
 
 protected:
     sptr<State> activeState_;
@@ -94,6 +93,10 @@ private:
     int32_t apnId_;
     std::mutex mtx_;
     static const int32_t DEACTIVATE_REASON_NONE = 0;
+    uint32_t upBandwidth_ = 0;
+    uint32_t downBandwidth_ = 0;
+    std::string tcpBuffer_;
+    int32_t connectId_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -22,27 +22,30 @@
 ```
 base/telephony/cellular_data/
 ├── figures
-├── frameworks                            # js头文件
-│   └── js
-│       └── napi
-├── interfaces
+├── frameworks
+│   ├── js
+│   │   └── napi
+│   │       ├── include                  # js头文件
+│   │       └── src                      # js源文件
+│   └── native
+├── interfaces                           # 对外暴露的接口
+│   ├── innerkits
 │   └── kits
-│       └── js                            # js源文件
-│           ├── declaration               # 对外提供的js接口
-│           └── napi
-├── sa_profile                            # SA配置
+│       └── js
+│           └── declaration              # 外部 JS API 接口
+├── sa_profile                           # SA配置
 ├── services
-│   ├── include                           # 头文件
+│   ├── include                          # 头文件
 │   │   ├── apn_manager
 │   │   ├── common
 │   │   ├── state_machine
 │   │   └── utils
-│   └── src                               # 源文件
+│   └── src                              # 源文件
 │       ├── apn_manager
 │       ├── state_machine
 │       └── utils
 └── test
-    └── unit_test                         # 单元测试相关代码
+    └── unit_test                        # 单元测试相关代码
 ```
 
 ## 约束<a name="section125mcpsimp"></a>

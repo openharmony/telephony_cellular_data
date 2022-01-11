@@ -13,15 +13,16 @@
 * limitations under the License.
 */
 
-import { AsyncCallback } from "./basic";
+import {AsyncCallback} from "./basic";
 
 /**
  * Provides methods related to cellular data services.
  *
- * @since 6
+ * @since 7
+ * @sysCap SystemCapability.Telephony.Telephony
+ * @devices phone, tablet, wearable
  */
 declare namespace data {
-
   /**
    * Checks whether cellular data services are enabled.
    *
@@ -43,6 +44,14 @@ declare namespace data {
    */
   function setDefaultCellularDataSlotId(slotId: number, callback: AsyncCallback<void>): void;
   function setDefaultCellularDataSlotId(slotId: number): Promise<void>;
+
+  /**
+   * Indicates that there is no uplink or downlink data.
+   *
+   * <p>It is a return value of service state query of cellular data services.
+   */
+  function getCellularDataFlowType(callback: AsyncCallback<DataFlowType>): void;
+  function getCellularDataFlowType(): Promise<DataFlowType>;
 
   /**
    * Obtains the connection state of the PS domain.
@@ -67,7 +76,7 @@ declare namespace data {
    * <p>Requires Permission: {@code ohos.permission.GET_NETWORK_INFO}.
    *
    * @param callback Returns {@code true} if cellular data services are enabled; returns {@code false} otherwise.
-   */O
+   */
   function isCellularDataEnabled(callback: AsyncCallback<boolean>): void;
   function isCellularDataEnabled(): Promise<boolean>;
 
@@ -88,6 +97,19 @@ declare namespace data {
    */
   function disableCellularData(callback: AsyncCallback<void>): void;
   function disableCellularData(): Promise<void>;
+
+  /**
+   * Checks whether roaming is enabled for cellular data services.
+   *
+   * <p>Requires Permission: {@code ohos.permission.GET_NETWORK_INFO}.
+   *
+   * @param slotId Indicates the ID of a card slot.
+   *      The value {@code 0} indicates card 1, and the value {@code 1} indicates card 2.
+   * @param callback Returns {@code true} if roaming is enabled for cellular data services; returns {@code false} otherwise.
+   * @permission ohos.permission.GET_NETWORK_INFO
+   */
+  function isCellularDataRoamingEnabled(slotId: number, callback: AsyncCallback<boolean>): void;
+  function isCellularDataRoamingEnabled(slotId: number): Promise<boolean>;
 
   /**
    * Enables cellular data roaming.
@@ -112,31 +134,37 @@ declare namespace data {
   function disableCellularDataRoaming(slotId: number): Promise<void>;
 
   /**
-   * Checks whether roaming is enabled for cellular data services.
-   *
-   * <p>Requires Permission: {@code ohos.permission.GET_NETWORK_INFO}.
-   *
-   * @param slotId Indicates the ID of a card slot.
-   *      The value {@code 0} indicates card 1, and the value {@code 1} indicates card 2.
-   * @param callback Returns {@code true} if roaming is enabled for cellular data services; returns {@code false} otherwise.
-   * @permission ohos.permission.GET_NETWORK_INFO
+   * Describes the cellular data flow type.
    */
-  function isCellularDataRoamingEnabled(slotId: number, callback: AsyncCallback<boolean>): void;
-  function isCellularDataRoamingEnabled(slotId: number): Promise<boolean>;
+  export enum DataFlowType {
+    /**
+     * Indicates that there is no uplink or downlink data.
+     */
+    DATA_FLOW_TYPE_NONE = 0,
 
-  /**
-   * Indicates that there is no uplink or downlink data.
-   *
-   * <p>It is a return value of service state query of cellular data services.
-   */
-  function getCellularDataFlowType(callback: AsyncCallback<DataFlowType>): void;
-  function getCellularDataFlowType(): Promise<DataFlowType>;
+    /**
+     * Indicates that there is only downlink data.
+     */
+    DATA_FLOW_TYPE_DOWN = 1,
+
+    /**
+     * Indicates that there is only uplink data.
+     */
+    DATA_FLOW_TYPE_UP = 2,
+
+    /**
+     * Indicates that there is uplink and downlink data.
+     */
+    DATA_FLOW_TYPE_UP_DOWN = 3,
+
+    /**
+     * Indicates that there is no uplink or downlink data, and the bottom-layer link is in the dormant state.
+     */
+    DATA_FLOW_TYPE_DORMANT = 4
+  }
 
   /**
    * Describes the cellular data link connection state.
-   *
-   * @devices phone, tablet
-   * @version 5
    */
   export enum DataConnectState {
     /**
@@ -163,33 +191,6 @@ declare namespace data {
      * Indicates that a cellular data link is suspended.
      */
     DATA_STATE_SUSPENDED = 3
-  }
-
-  export enum DataFlowType {
-    /**
-     * Indicates that there is no uplink or downlink data.
-     */
-    DATA_FLOW_TYPE_NONE = 0,
-
-    /**
-     * Indicates that there is only downlink data.
-     */
-    DATA_FLOW_TYPE_DOWN = 1,
-
-    /**
-     * Indicates that there is only uplink data.
-     */
-    DATA_FLOW_TYPE_UP = 2,
-
-    /**
-     * Indicates that there is uplink and downlink data.
-     */
-    DATA_FLOW_TYPE_UP_DOWN = 3,
-
-    /**
-     * Indicates that there is no uplink or downlink data, and the bottom-layer link is in the dormant state.
-     */
-    DATA_FLOW_TYPE_DORMANT = 4
   }
 }
 

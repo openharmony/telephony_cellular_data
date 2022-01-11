@@ -12,7 +12,7 @@
 # limitations under the License.
 import("//build/test.gni")
 
-SOURCE_DIR = "//base/telephony/cellular_data/services"
+SOURCE_DIR = "//base/telephony/cellular_data"
 
 ohos_unittest("tel_cellular_data_test") {
   subsystem_name = "telephony"
@@ -21,25 +21,26 @@ ohos_unittest("tel_cellular_data_test") {
   module_out_path = part_name + "/" + test_module
 
   sources = [
+    "//base/telephony/cellular_data/frameworks/native/cellular_data_service_proxy.cpp",
     "//base/telephony/cellular_data/test/cellular_data_test.cpp",
-    "//base/telephony/core_service/interfaces/innerkits/cellular_data/cellular_data_service_proxy.cpp",
   ]
 
   include_dirs = [
-    "$SOURCE_DIR/include",
+    "$SOURCE_DIR/services/include",
+    "//base/telephony/cellular_data/interfaces/innerkits",
+    "//base/telephony/cellular_data/frameworks/native",
     "//base/telephony/core_service/common/core",
     "//base/telephony/core_service/common/api",
-    "//base/telephony/core_service/common/cellular_data",
+    "//base/telephony/core_service/interfaces/innerkits/cellular_data",
     "//base/telephony/core_service/interfaces/innerkits/network_search",
-    "//base/telephony/cellular_data/interfaces/innerkits",
     "//base/telephony/core_service/common/network_search",
     "//base/telephony/core_service/interfaces/innerkits/sim",
     "//base/telephony/core_service/interfaces/innerkits/core",
     "//base/telephony/core_service/common/sim",
     "//base/telephony/ril_adapter/interfaces/innerkits/include",
     "//base/telephony/core_service/utils/log/include",
-    "$SOURCE_DIR/interfaces/kits/include",
-    "$SOURCE_DIR/include/common",
+    "$SOURCE_DIR/services//interfaces/kits/include",
+    "$SOURCE_DIR/services//include/common",
   ]
 
   deps = [
@@ -49,7 +50,7 @@ ohos_unittest("tel_cellular_data_test") {
 
   external_deps = [
     "appexecfwk_standard:libeventhandler",
-    "core_service:tel_cellular_data_api",
+    "core_service:tel_core_service_api",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
