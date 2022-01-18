@@ -26,7 +26,7 @@ const std::map<std::string, int32_t> ApnHolder::apnTypeDataProfileMap_ {
     {DATA_CONTEXT_ROLE_MMS,     DATA_PROFILE_MMS}
 };
 
-ApnHolder::ApnHolder(const int32_t priority) : priority_(priority) {}
+ApnHolder::ApnHolder(const std::string &apnType, const int32_t priority) : apnType_(apnType), priority_(priority) {}
 
 ApnHolder::~ApnHolder() = default;
 
@@ -86,11 +86,6 @@ std::string ApnHolder::GetApnType() const
     return apnType_;
 }
 
-void ApnHolder::SetApnType(const std::string &type)
-{
-    apnType_ = type;
-}
-
 void ApnHolder::ReleaseDataConnection()
 {
     if (cellularDataStateMachine_ == nullptr) {
@@ -98,7 +93,7 @@ void ApnHolder::ReleaseDataConnection()
         return;
     }
     std::unique_ptr<DataDisconnectParams> object =
-        std::make_unique<DataDisconnectParams>(apnType_, REASON_CLEAR_CONNECTION);
+        std::make_unique<DataDisconnectParams>(apnType_, DisConnectionReason::REASON_CLEAR_CONNECTION);
     if (object == nullptr) {
         TELEPHONY_LOGE("ClearConnection fail, object is null");
         return;

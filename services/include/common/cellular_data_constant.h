@@ -33,7 +33,7 @@ enum ApnProfileState {
     PROFILE_STATE_RETRYING
 };
 
-enum RecoveryState {
+enum class RecoveryState : int32_t {
     STATE_REQUEST_CONTEXT_LIST,
     STATE_CLEANUP_CONNECTIONS,
     STATE_REREGISTER_NETWORK,
@@ -54,21 +54,14 @@ struct RouteInfo {
 };
 
 struct NetSupplier {
-    int32_t supplierId;
-    uint32_t netType;
-    uint64_t capabilities;
+    uint32_t supplierId;
+    uint64_t capability;
     int32_t slotId;
 };
 
 struct NetRequest {
     uint64_t capability;
     std::string ident;
-};
-
-struct ActivateInfo {
-    int32_t slotId;
-    bool isRoaming;
-    bool allowRoaming;
 };
 
 static const uint32_t DEFAULT_BANDWIDTH = 14;
@@ -109,7 +102,7 @@ enum DataContextRolesId {
     DATA_CONTEXT_ROLE_EMERGENCY_ID = 7
 };
 
-enum DataContextPriority {
+enum class DataContextPriority : int32_t {
     PRIORITY_LOW,
     PRIORITY_NORMAL,
     PRIORITY_HIGH
@@ -128,11 +121,12 @@ enum TelCallStatus {
     CALL_STATE_RETRIEVE = 8,
 };
 
-enum DisConnectionReason {
+enum class DisConnectionReason : int32_t {
     REASON_NORMAL,
     REASON_GSM_AND_CALLING_ONLY,
     REASON_RETRY_CONNECTION,
-    REASON_CLEAR_CONNECTION
+    REASON_CLEAR_CONNECTION,
+    REASON_CHANGE_CONNECTION
 };
 
 static const std::string DATA_CONTEXT_ROLE_ALL = "*";
@@ -149,7 +143,7 @@ static const int32_t DATA_PROFILE_MMS = 1;
 static const int32_t DEFAULT_SIM_NUM = 1;
 static const int32_t CMCC_MCC_MNC = 46002;
 static const int32_t DEFAULT_RAT = 2;
-static const int32_t DEFAULT_AUTH_TYPE = -1;
+static const int32_t DEFAULT_AUTH_TYPE = 0;
 static const int32_t DEFAULT_MTU = 1500;
 static const uint8_t DEFAULT_STRENGTH = 20;
 static const uint32_t DEFAULT_FREQUENCY = 50;

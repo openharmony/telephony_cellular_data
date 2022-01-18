@@ -47,34 +47,24 @@ ohos_shared_library("tel_cellular_data") {
     "$SOURCE_DIR/services/src/utils/net_manager_call_back.cpp",
     "$SOURCE_DIR/services/src/utils/net_manager_tactics_call_back.cpp",
     "$SOURCE_DIR/services/src/utils/network_search_callback.cpp",
-    "$SOURCE_DIR/services/src/utils/network_search_utils.cpp",
-    "$SOURCE_DIR/services/src/utils/ril_adapter_utils.cpp",
-    "$SOURCE_DIR/services/src/utils/sim_utils.cpp",
   ]
 
   include_dirs = [
     "$SOURCE_DIR/services/include",
-    "//base/telephony/core_service/interfaces/innerkits/cellular_data",
-    "//base/telephony/core_service/interfaces/innerkits/core",
-    "//base/telephony/core_service/interfaces/innerkits/network_search",
-    "//base/telephony/core_service/interfaces/innerkits/sim",
-    "//base/telephony/core_service/utils/common/include",
-    "//base/telephony/core_service/utils/preferences/include",
     "$SOURCE_DIR/services/include/common",
     "$SOURCE_DIR/services/include/external",
     "$SOURCE_DIR/services/include/state_machine",
     "$SOURCE_DIR/services/include/utils",
     "$SOURCE_DIR/services/include/apn_manager",
     "$SOURCE_DIR/interfaces/innerkits",
-    "//base/telephony/ril_adapter/interfaces/innerkits/include",
     "//base/telephony/data_storage/pdp_profile/include",
     "//foundation/aafwk/standard/interfaces/innerkits/dataobs_manager/include",
   ]
 
   deps = [
     "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
-    "//base/telephony/core_service:tel_core_service",
-    "//base/telephony/core_service/utils:libtelephony_common",
+    "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
+    "//base/telephony/core_service/utils:libtel_common",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/aafwk/standard/interfaces/innerkits/dataobs_manager:dataobs_manager",
     "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
@@ -89,14 +79,15 @@ ohos_shared_library("tel_cellular_data") {
     "ipc:ipc_core",
     "native_appdatamgr:native_dataability",
     "native_appdatamgr:native_rdb",
-    "netmanager_standard:net_conn_manager_if",
-    "netmanager_standard:net_policy_manager_if",
-    "netmanager_standard:net_stats_manager_if",
+    "netmanager_base:net_conn_manager_if",
+    "netmanager_base:net_policy_manager_if",
+    "netmanager_base:net_stats_manager_if",
+    "ril_adapter:hril_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
     "state_registry:tel_state_registry_notify",
   ]
-  defines = [
+  defines += [
     "TELEPHONY_LOG_TAG = \"CELLULAR_DATA\"",
     "LOG_DOMAIN = 0xD002B01",
   ]

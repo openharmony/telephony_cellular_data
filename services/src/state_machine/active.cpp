@@ -19,8 +19,7 @@
 
 #include "cellular_data_utils.h"
 #include "inactive.h"
-#include "network_search_utils.h"
-#include "ril_adapter_utils.h"
+#include "core_manager_inner.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -41,18 +40,6 @@ void Active::StateBegin()
 void Active::StateEnd()
 {
     TELEPHONY_LOGI("Exit active state");
-    std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
-    if (stateMachine == nullptr) {
-        TELEPHONY_LOGE("stateMachine is null");
-        return;
-    }
-    isActive_ = false;
-    CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
-    int32_t supplierId = netAgent.GetSupplierId(stateMachine->GetSlotId(), stateMachine->GetCapability());
-    if (stateMachine->netSupplierInfo_ != nullptr) {
-        stateMachine->netSupplierInfo_->isAvailable_ = false;
-        netAgent.UpdateNetSupplierInfo(supplierId, stateMachine->netSupplierInfo_);
-    }
 }
 
 bool Active::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
@@ -120,7 +107,7 @@ bool Active::ProcessLostConnection(const AppExecFwk::InnerEvent::Pointer &event)
     }
     Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
     inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
-    inActive->SetReason(REASON_RETRY_CONNECTION);
+    inActive->SetReason(DisConnectionReason::REASON_RETRY_CONNECTION);
     stateMachine->TransitionTo(stateMachine->inActiveState_);
     return PROCESSED;
 }
@@ -150,12 +137,6 @@ bool Active::ProcessDataConnectionRoamOff(const AppExecFwk::InnerEvent::Pointer 
     CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
     int32_t supplierId = netAgent.GetSupplierId(stateMachine->GetSlotId(), stateMachine->GetCapability());
     netAgent.UpdateNetSupplierInfo(supplierId, stateMachine->netSupplierInfo_);
-    return PROCESSED;
-}
-
-bool Active::ProcessBwRefreshResponse(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    TELEPHONY_LOGI("Active::EVENT_BW_REFRESH_RESPONSE");
     return PROCESSED;
 }
 
@@ -258,7 +239,7 @@ void Active::RefreshTcpBufferSizes()
         return;
     }
     int32_t slotId = shareStateMachine->GetSlotId();
-    int32_t radioTech = NetworkSearchUtils::GetPsRadioTech(slotId);
+    int32_t radioTech = CoreManagerInner::GetInstance().GetPsRadioTech(slotId);
     std::string tcpBuffer = shareStateMachine->cdConnectionManager_->GetTcpBufferByRadioTech(radioTech);
     TELEPHONY_LOGI("tcpBuffer is %{public}s", tcpBuffer.c_str());
     shareStateMachine->SetConnectionTcpBuffer(tcpBuffer);
@@ -272,7 +253,7 @@ void Active::RefreshConnectionBandwidths()
         return;
     }
     int32_t slotId = shareStateMachine->GetSlotId();
-    int32_t radioTech = NetworkSearchUtils::GetPsRadioTech(slotId);
+    int32_t radioTech = CoreManagerInner::GetInstance().GetPsRadioTech(slotId);
     LinkBandwidthInfo linkBandwidthInfo = shareStateMachine->cdConnectionManager_->GetBandwidthsByRadioTech(radioTech);
     TELEPHONY_LOGI("upBandwidth is %{public}u, downBandwidth is %{public}u", linkBandwidthInfo.upBandwidth,
         linkBandwidthInfo.downBandwidth);

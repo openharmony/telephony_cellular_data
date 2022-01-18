@@ -34,7 +34,7 @@ enum class ServiceRunningState {
 };
 
 class CellularDataService : public SystemAbility, public CellularDataServiceStub {
-    DECLARE_DELAYED_SINGLETON(CellularDataService)
+    DECLARE_DELAYED_REF_SINGLETON(CellularDataService)
     DECLARE_SYSTEM_ABILITY(CellularDataService)
 
 public:
@@ -57,7 +57,7 @@ public:
     int32_t GetCellularDataState() override;
     int32_t IsCellularDataRoamingEnabled(const int32_t slotId) override;
     int32_t EnableCellularDataRoaming(const int32_t slotId, bool enable) override;
-    int32_t HandleApnChanged(const int32_t slotId, std::string apns) override;
+    int32_t HandleApnChanged(const int32_t slotId) override;
     int32_t GetDefaultCellularDataSlotId() override;
     int32_t SetDefaultCellularDataSlotId(const int32_t slotId) override;
     int32_t GetCellularDataFlowType() override;
@@ -70,7 +70,6 @@ public:
     int32_t ReleaseNet(const NetRequest &request);
 
 private:
-    void WaitCoreServiceToInit();
     bool Init();
     void InitModule();
     bool CheckParamValid(const int32_t slotId);

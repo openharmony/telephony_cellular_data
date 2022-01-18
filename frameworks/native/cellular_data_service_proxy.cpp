@@ -121,14 +121,13 @@ int32_t CellularDataServiceProxy::EnableCellularDataRoaming(int32_t slotId, bool
     return result;
 }
 
-int32_t CellularDataServiceProxy::HandleApnChanged(int32_t slotId, std::string apns)
+int32_t CellularDataServiceProxy::HandleApnChanged(int32_t slotId)
 {
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
     data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor());
     data.WriteInt32(slotId);
-    data.WriteString(apns);
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;

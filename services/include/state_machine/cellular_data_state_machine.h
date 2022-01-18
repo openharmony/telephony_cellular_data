@@ -92,7 +92,6 @@ private:
     sptr<ApnItem> apnItem_;
     int32_t apnId_;
     std::mutex mtx_;
-    static const int32_t DEACTIVATE_REASON_NONE = 0;
     uint32_t upBandwidth_ = 0;
     uint32_t downBandwidth_ = 0;
     std::string tcpBuffer_;

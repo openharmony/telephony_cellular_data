@@ -15,9 +15,6 @@
 
 #include "cellular_data_utils.h"
 
-#include "inet_addr.h"
-
-#include "network_search_utils.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -52,6 +49,10 @@ std::vector<AddressInfo> CellularDataUtils::ParseIpAddr(const std::string &addre
         } else {
             ipInfo.prefixLen = 0;
             if (flag == ".") {
+                // a1.a2.a3.a4 only address
+                // a1.a2.a3.a4.m1.m2.m3.m4
+                // a1.a2.a3...a15.a16 only address
+                // a1.a2.a3...a15.a16.m1.m2.m3...m15.m16
                 if (ParseDotIpData(ipItem, ipInfo)) {
                     bMaskAddr = true;
                 }
@@ -69,6 +70,8 @@ bool CellularDataUtils::ParseDotIpData(const std::string &address, AddressInfo &
 {
     bool bOnlyAddress = false;
     int prefixLen = 0;
+    // a1.a2.a3.a4.m1.m2.m3.m4
+    // a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11.a12.a13.a14.a15.a16.m1.m2.m3.m4.m5.m6.m7.m8.m9.m10.m11.m12.m13.m14.m15.m16
     std::vector<std::string> ipSubData = Split(ipInfo.ip, ".");
     if (ipSubData.size() > MIN_IPV6_ITEM) {
         ipInfo.type = INetAddr::IpType::IPV6;
@@ -205,18 +208,65 @@ int32_t CellularDataUtils::GetPrefixLen(const std::vector<std::string> &netmask,
 
 int CellularDataUtils::GetDefaultMobileMtuConfig()
 {
-    char mobile_mtu[MIN_BUFFER_SIZE];
-    GetParameter(CONFIG_MOBILE_MTU.c_str(), DEFAULT_MOBILE_MTU.c_str(),
-        mobile_mtu, MIN_BUFFER_SIZE);
+    char mobile_mtu[MIN_BUFFER_SIZE] = {0};
+    GetParameter(CONFIG_MOBILE_MTU.c_str(), DEFAULT_MOBILE_MTU.c_str(), mobile_mtu, MIN_BUFFER_SIZE);
     return std::atoi(mobile_mtu);
 }
 
 bool CellularDataUtils::GetDefaultPreferApnConfig()
 {
-    char preferApn[MIN_BUFFER_SIZE];
-    GetParameter(CONFIG_PREFERAPN.c_str(), DEFAULT_PREFER_APN.c_str(),
-        preferApn, MIN_BUFFER_SIZE);
+    char preferApn[MIN_BUFFER_SIZE] = {0};
+    GetParameter(CONFIG_PREFERAPN.c_str(), DEFAULT_PREFER_APN.c_str(), preferApn, MIN_BUFFER_SIZE);
     return std::atoi(preferApn);
+}
+
+std::string CellularDataUtils::ConvertRadioTechToRadioName(const int32_t radioTech)
+{
+    std::string radioName = "unknown";
+    switch (radioTech) {
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_UNKNOWN):
+            radioName = "unknown";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_GSM):
+            radioName = "EDGE";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_1XRTT):
+            radioName = "1xRTT";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_WCDMA):
+            radioName = "UMTS";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_HSPA):
+            radioName = "HSPA";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_HSPAP):
+            radioName = "HSPAP";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_TD_SCDMA):
+            radioName = "TD-SCDMA";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_EVDO):
+            radioName = "EVDO";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_EHRPD):
+            radioName = "eHRPD";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_LTE):
+            radioName = "LTE";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_LTE_CA):
+            radioName = "LTE_CA";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_IWLAN):
+            radioName = "IWAN";
+            break;
+        case static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_NR):
+            radioName = "NR";
+            break;
+        default:
+            break;
+    }
+    return radioName;
 }
 } // namespace Telephony
 } // namespace OHOS

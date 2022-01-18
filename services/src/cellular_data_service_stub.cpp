@@ -107,8 +107,7 @@ int32_t CellularDataServiceStub::OnEnableCellularDataRoaming(MessageParcel &data
 int32_t CellularDataServiceStub::OnHandleApnChanged(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    std::string apn = data.ReadString();
-    int32_t result = HandleApnChanged(slotId, apn);
+    int32_t result = HandleApnChanged(slotId);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

@@ -13,10 +13,8 @@
 * limitations under the License.
  */
 
-#ifndef CELLULAR_DATA_NET_MANAGER_TACTICS_CALL_BACK_H
-#define CELLULAR_DATA_NET_MANAGER_TACTICS_CALL_BACK_H
-
-#include "iremote_stub.h"
+#ifndef NET_MANAGER_TACTICS_CALL_BACK_H
+#define NET_MANAGER_TACTICS_CALL_BACK_H
 
 #include "net_policy_callback_stub.h"
 
@@ -24,8 +22,8 @@ namespace OHOS {
 namespace Telephony {
 using namespace NetManagerStandard;
 class NetManagerTacticsCallBack : public NetPolicyCallbackStub {
-    int32_t NetStrategySwitch(const std::string &subscriberId, bool enable) override;
+    int32_t NetStrategySwitch(int32_t slotId, bool enable) override;
 };
 } // Telephony
 } // OHOS
-#endif // CELLULAR_DATA_NET_MANAGER_TACTICS_CALL_BACK_H
+#endif // NET_MANAGER_TACTICS_CALL_BACK_H

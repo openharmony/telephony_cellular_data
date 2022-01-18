@@ -13,29 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef SIM_UTILS_H
-#define SIM_UTILS_H
+#ifndef CELLULAR_DATA_ERROR_H
+#define CELLULAR_DATA_ERROR_H
 
-#include "event_handler.h"
-#include "inner_event.h"
-#include "i_net_conn_service.h"
-
-#include "core_manager.h"
+#include "telephony_errors.h"
 
 namespace OHOS {
 namespace Telephony {
-class SimUtils {
-public:
-    static int32_t GetSimState(int32_t slotId);
-    static std::u16string GetSimIccId(const int32_t slotId);
-    static int32_t GetDefaultCellularDataSlotId();
-    static int32_t SetDefaultCellularDataSlotId(int32_t slotId);
-    static int32_t GetSimNum();
-
-private:
-    SimUtils() = default;
-    ~SimUtils() = default;
+enum {
+    CELLULAR_DATA_INVALID_PARAM = CELLULAR_DATA_ERR_OFFSET,
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // SIM_UTILS_H
+#endif // CELLULAR_DATA_ERROR_H
