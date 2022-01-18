@@ -34,7 +34,7 @@ ohos_shared_library("data") {
   ]
 
   external_deps = [
-    "aafwk_standard:want",
+    "ability_runtime:want",
     "appexecfwk_standard:libeventhandler",
     "cellular_data:tel_cellular_data_api",
     "ipc:ipc_core",
