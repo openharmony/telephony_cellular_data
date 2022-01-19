@@ -10,36 +10,31 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//base/telephony/core_service/telephony.gni")
 import("//build/ohos.gni")
-SOURCE_DIR = "//base/telephony/cellular_data/services"
+
+SOURCE_DIR = "//base/telephony/cellular_data"
 ohos_executable("tel_cellular_data_ui_test") {
   sources = [ "cellular_data_code_test.cpp" ]
 
   include_dirs = [
-    "//base/telephony/core_service/common/core",
-    "//base/telephony/core_service/interfaces/innerkits/network_search",
-    "//base/telephony/cellular_data/interfaces/innerkits",
-    "//base/telephony/cellular_data/interfaces/kits/native",
-    "//base/telephony/core_service/common/network_search",
-    "//base/telephony/core_service/interfaces/innerkits/sim",
-    "//base/telephony/core_service/interfaces/innerkits/core",
-    "//base/telephony/ril_adapter/interfaces/innerkits/include",
-    "//base/telephony/core_service/common/sim",
-    "$SOURCE_DIR/include/common",
+    "$SOURCE_DIR/interfaces/innerkits",
+    "$SOURCE_DIR/interfaces/kits/native",
+    "$SOURCE_DIR/services/include/common",
   ]
 
   deps = [
-    "//base/telephony/core_service:tel_core_service",
-    "//base/telephony/core_service/utils:libtelephony_common",
+    "//base/telephony/core_service/utils:libtel_common",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
   ]
 
   external_deps = [
     "appexecfwk_standard:libeventhandler",
     "cellular_data:tel_cellular_data_api",
+    "core_service:tel_core_service_api",
   ]
 
-  defines = [
+  defines += [
     "TELEPHONY_LOG_TAG = \"CelllularDataTest\"",
     "LOG_DOMAIN = 0xD002B01",
   ]

@@ -16,14 +16,14 @@
 #include "cellular_data_controller.h"
 
 #include "common_event_manager.h"
+#include "core_manager_inner.h"
 #include "uri.h"
-
-#include "core_manager.h"
-#include "telephony_log_wrapper.h"
 
 #include "cellular_data_constant.h"
 #include "cellular_data_settings_rdb_helper.h"
 #include "network_search_callback.h"
+#include "radio_event.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -73,13 +73,22 @@ bool CellularDataController::IsCellularDataEnabled() const
     return cellularDataHandler_->IsCellularDataEnabled();
 }
 
-ApnProfileState CellularDataController::GetCellularDataState(const std::string &apnType) const
+ApnProfileState CellularDataController::GetCellularDataState() const
 {
     if (cellularDataHandler_ == nullptr) {
         TELEPHONY_LOGE("GetCellularDataState cellularDataHandler_ is null");
         return ApnProfileState::PROFILE_STATE_FAILED;
     }
     return cellularDataHandler_->GetCellularDataState();
+}
+
+ApnProfileState CellularDataController::GetCellularDataState(const std::string &apnType) const
+{
+    if (cellularDataHandler_ == nullptr) {
+        TELEPHONY_LOGE("GetCellularDataState cellularDataHandler_ is null");
+        return ApnProfileState::PROFILE_STATE_FAILED;
+    }
+    return cellularDataHandler_->GetCellularDataState(apnType);
 }
 
 bool CellularDataController::IsCellularDataRoamingEnabled() const
@@ -130,8 +139,7 @@ void CellularDataController::SendRegisterPolicyEvent()
 
 void CellularDataController::AsynchronousRegister()
 {
-    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId_);
-    if (core != nullptr && core->IsInitCore()) {
+    if (CoreManagerInner::GetInstance().IsInitFinished()) {
         TELEPHONY_LOGI("core inited %{public}d", slotId_);
         Init();
         RegisterEvents();
@@ -156,7 +164,7 @@ void CellularDataController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer 
             break;
         }
         case CellularDataEventCode::MSG_REG_POLICY_CALL_BACK: {
-            if (CellularDataNetAgent::GetInstance().RegisterPolicyCallback() != 0) {
+            if (!CellularDataNetAgent::GetInstance().RegisterPolicyCallback()) {
                 SendRegisterPolicyEvent();
             }
             break;
@@ -176,29 +184,28 @@ void CellularDataController::RegisterEvents()
         TELEPHONY_LOGE("core is null or cellularDataHandler is null");
         return;
     }
-    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId_);
-    if (core != nullptr) {
-        core->RegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_SIM_STATE_CHANGE, nullptr);
-        core->RegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_SIM_RECORDS_LOADED, nullptr);
-        core->RegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_PS_CONNECTION_ATTACHED, nullptr);
-        core->RegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_PS_CONNECTION_DETACHED, nullptr);
-        core->RegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_PS_ROAMING_OPEN, nullptr);
-        core->RegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_PS_ROAMING_CLOSE, nullptr);
-        core->RegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_STATE_CHANGED, nullptr);
-        core->RegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_PS_RAT_CHANGED, nullptr);
-        core->RegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_CALL_STATUS_INFO, nullptr);
-        core->RegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_EMERGENCY_STATE_OPEN, nullptr);
-        core->RegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_EMERGENCY_STATE_CLOSE, nullptr);
-        core->RegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_NR_STATE_CHANGED, nullptr);
-        core->RegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_NR_FREQUENCY_CHANGED, nullptr);
+    TELEPHONY_LOGI("RegisterEvents start");
+    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
+    coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_SIM_STATE_CHANGE, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_SIM_RECORDS_LOADED, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_CONNECTION_ATTACHED, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_CONNECTION_DETACHED, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_ROAMING_OPEN, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_ROAMING_CLOSE, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_STATE_CHANGED, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_RAT_CHANGED, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_CALL_STATUS_INFO, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_EMERGENCY_STATE_OPEN, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_EMERGENCY_STATE_CLOSE, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_NR_STATE_CHANGED, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_NR_FREQUENCY_CHANGED, nullptr);
+    if (slotId_ == 0) {
         sptr<NetworkSearchCallback> networkSearchCallback = std::make_unique<NetworkSearchCallback>().release();
-        if (networkSearchCallback == nullptr) {
+        if (networkSearchCallback != nullptr) {
+            coreInner.RegisterCellularDataObject(networkSearchCallback);
+        } else {
             TELEPHONY_LOGE("networkSearchCallback is null");
-            return;
         }
-        core->RegisterCellularDataObject(networkSearchCallback);
-    } else {
-        TELEPHONY_LOGE("core is null slotId:%{public}d", slotId_);
     }
 }
 
@@ -208,25 +215,22 @@ void CellularDataController::UnRegisterEvents()
         TELEPHONY_LOGE("UnRegisterEvents cellularDataHandler_ is null");
         return;
     }
-    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId_);
-    if (core != nullptr) {
-        core->UnRegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_SIM_STATE_CHANGE);
-        core->UnRegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_SIM_RECORDS_LOADED);
-        core->UnRegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_PS_CONNECTION_ATTACHED);
-        core->UnRegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_PS_CONNECTION_DETACHED);
-        core->UnRegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_PS_ROAMING_OPEN);
-        core->UnRegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_PS_ROAMING_CLOSE);
-        core->UnRegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_STATE_CHANGED);
-        core->UnRegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_PS_RAT_CHANGED);
-        core->UnRegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_CALL_STATUS_INFO);
-        core->UnRegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_EMERGENCY_STATE_OPEN);
-        core->UnRegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_EMERGENCY_STATE_CLOSE);
-        core->UnRegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_NR_STATE_CHANGED);
-        core->UnRegisterCoreNotify(cellularDataHandler_, ObserverHandler::RADIO_NR_FREQUENCY_CHANGED);
-        core->UnRegisterCellularDataObject(nullptr);
-    } else {
-        TELEPHONY_LOGE("core is null slotId:%{public}d", slotId_);
-    }
+    TELEPHONY_LOGI("UnRegisterEvents start");
+    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
+    coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_SIM_STATE_CHANGE);
+    coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_SIM_RECORDS_LOADED);
+    coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_CONNECTION_ATTACHED);
+    coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_CONNECTION_DETACHED);
+    coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_ROAMING_OPEN);
+    coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_ROAMING_CLOSE);
+    coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_STATE_CHANGED);
+    coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_RAT_CHANGED);
+    coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_CALL_STATUS_INFO);
+    coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_EMERGENCY_STATE_OPEN);
+    coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_EMERGENCY_STATE_CLOSE);
+    coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_NR_STATE_CHANGED);
+    coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_NR_FREQUENCY_CHANGED);
+    TELEPHONY_LOGI("UnRegisterEvents end");
 }
 
 void CellularDataController::UnRegisterDataObserver()
@@ -251,13 +255,13 @@ void CellularDataController::RegisterDatabaseObserver()
     cellularDataDbHelper->RegisterObserver(cellularDataRdbObserver_);
 }
 
-int32_t CellularDataController::HandleApnChanged(const std::string &apns)
+bool CellularDataController::HandleApnChanged()
 {
     if (cellularDataHandler_ == nullptr) {
         TELEPHONY_LOGE("ApnChanged cellularDataHandler_ is null");
         return static_cast<int32_t>(DataRespondCode::SET_FAILED);
     }
-    return cellularDataHandler_->HandleApnChanged(apns);
+    return cellularDataHandler_->HandleApnChanged();
 }
 
 int32_t CellularDataController::GetCellularDataFlowType()
@@ -267,13 +271,6 @@ int32_t CellularDataController::GetCellularDataFlowType()
         return static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_NONE);
     }
     return cellularDataHandler_->GetCellularDataFlowType();
-}
-
-void CellularDataController::ClearAllConnectionsFormerSlot()
-{
-    if (cellularDataHandler_ != nullptr) {
-        cellularDataHandler_->ClearAllConnectionsFormerSlot();
-    }
 }
 
 void CellularDataController::ConnectDataNetWork()
@@ -299,12 +296,12 @@ bool CellularDataController::IsRestrictedMode() const
     return false;
 }
 
-int32_t CellularDataController::GetDisConnectionReason()
+DisConnectionReason CellularDataController::GetDisConnectionReason()
 {
     if (cellularDataHandler_ != nullptr) {
         return cellularDataHandler_->GetDisConnectionReason();
     }
-    return REASON_NORMAL;
+    return DisConnectionReason::REASON_NORMAL;
 }
 
 bool CellularDataController::HasInternetCapability(const int32_t cid) const

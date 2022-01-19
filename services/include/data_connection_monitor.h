@@ -110,7 +110,7 @@ private:
     bool updateNetStat_ = false;
     bool stallDetectionEnabled = false;
     int64_t noRecvPackets_ = 0;
-    uint32_t dataRecoveryState_ = RecoveryState::STATE_REQUEST_CONTEXT_LIST;
+    RecoveryState dataRecoveryState_ = RecoveryState::STATE_REQUEST_CONTEXT_LIST;
     CellDataFlowType dataFlowType_ = CellDataFlowType::DATA_FLOW_TYPE_NONE;
     const int32_t slotId_;
 };

@@ -42,21 +42,16 @@ bool Default::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGE("stateMachine is null");
         return false;
     }
-    bool retVal = false;
     uint32_t eventCode = event->GetInnerEventId();
     std::map<uint32_t, Fun>::iterator it = eventIdFunMap_.find(eventCode);
     if (it != eventIdFunMap_.end()) {
         return (this->*(it->second))(event);
     }
-    return retVal;
+    return false;
 }
 
 bool Default::ProcessConnectDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr) {
-        TELEPHONY_LOGE("event is null");
-        return false;
-    }
     TELEPHONY_LOGI("Default::MSG_SM_CONNECT");
     return false;
 }
@@ -114,20 +109,12 @@ bool Default::ProcessDataConnectionDrsOrRatChanged(const AppExecFwk::InnerEvent:
 
 bool Default::ProcessDataConnectionRoamOn(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr) {
-        TELEPHONY_LOGE("event is null");
-        return false;
-    }
     TELEPHONY_LOGI("Default::EVENT_DATA_CONNECTION_ROAM_ON");
     return false;
 }
 
 bool Default::ProcessDataConnectionRoamOff(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr) {
-        TELEPHONY_LOGE("event is null");
-        return false;
-    }
     TELEPHONY_LOGI("Default::EVENT_DATA_CONNECTION_ROAM_OFF");
     return false;
 }

@@ -694,12 +694,22 @@ napi_value RegistCellularData(napi_env env, napi_value exports)
     napi_value dataStateConnecting = nullptr;
     napi_value dataStateConnected = nullptr;
     napi_value dataStateSuspended = nullptr;
+    napi_value dataflowtypenone = nullptr;
+    napi_value dataflowtypedown = nullptr;
+    napi_value dataflowtypeup = nullptr;
+    napi_value dataflowtypeupdown = nullptr;
+    napi_value dataflowtypedormant = nullptr;
     napi_create_int32(env, static_cast<int32_t>(DataConnectionState::DATA_STATE_UNKNOWN), &dataStateUnknown);
     napi_create_int32(
         env, static_cast<int32_t>(DataConnectionState::DATA_STATE_DISCONNECTED), &dataStateDisconnected);
     napi_create_int32(env, static_cast<int32_t>(DataConnectionState::DATA_STATE_CONNECTING), &dataStateConnecting);
     napi_create_int32(env, static_cast<int32_t>(DataConnectionState::DATA_STATE_CONNECTED), &dataStateConnected);
     napi_create_int32(env, static_cast<int32_t>(DataConnectionState::DATA_STATE_SUSPENDED), &dataStateSuspended);
+    napi_create_int32(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_NONE), &dataflowtypenone);
+    napi_create_int32(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_DOWN), &dataflowtypedown);
+    napi_create_int32(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_UP), &dataflowtypeup);
+    napi_create_int32(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_UP_DOWN), &dataflowtypeupdown);
+    napi_create_int32(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_DORMANT), &dataflowtypedormant);
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("getCellularDataState", GetCellularDataState),
         DECLARE_NAPI_FUNCTION("isCellularDataEnabled", IsCellularDataEnabled),
@@ -716,6 +726,11 @@ napi_value RegistCellularData(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY("DATA_STATE_CONNECTING", dataStateConnecting),
         DECLARE_NAPI_STATIC_PROPERTY("DATA_STATE_CONNECTED", dataStateConnected),
         DECLARE_NAPI_STATIC_PROPERTY("DATA_STATE_SUSPENDED", dataStateSuspended),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_NONE", dataflowtypenone),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_DOWN", dataflowtypedown),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_UP", dataflowtypeup),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_UP_DOWN", dataflowtypeupdown),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_DORMANT", dataflowtypedormant),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;

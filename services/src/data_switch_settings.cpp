@@ -79,10 +79,9 @@ void DataSwitchSettings::SetCarrierDataOn(bool carrierDataOn)
 bool DataSwitchSettings::IsAllowActiveData() const
 {
     if (userDataOn_ && policyDataOn_) {
-        TELEPHONY_LOGI("enable is success");
         return true;
     } else {
-        TELEPHONY_LOGE("enable is fail");
+        TELEPHONY_LOGE("Activation not allowed[user:%{public}d policy:%{public}d]", userDataOn_, policyDataOn_);
         return false;
     }
 }

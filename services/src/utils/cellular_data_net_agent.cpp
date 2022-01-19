@@ -43,12 +43,18 @@ bool CellularDataNetAgent::RegisterNetSupplier()
             TELEPHONY_LOGE("NetConnClient is null");
             return false;
         }
-        int32_t result = netManager->RegisterNetSupplier(
-            netSupplier.netType, IDENT_PREFIX + std::to_string(netSupplier.slotId), netSupplier.capabilities);
-        if (IPC_PROXY_ERR != result && result > 0) {
+        if (netSupplier.capability > NetCap::NET_CAPABILITY_INTERNAL_DEFAULT) {
+            TELEPHONY_LOGE("capabilities(%{public}" PRIu64 ") not support", netSupplier.capability);
+            continue;
+        }
+        std::set<NetCap> netCap {static_cast<NetCap>(netSupplier.capability)};
+        uint32_t supplierId = 0;
+        int32_t result = netManager->RegisterNetSupplier(NetBearType::BEARER_CELLULAR,
+            IDENT_PREFIX + std::to_string(netSupplier.slotId), netCap, supplierId);
+        if (result == 0) {
             TELEPHONY_LOGI("Register network successful");
             flag = true;
-            netSupplier.supplierId = result;
+            netSupplier.supplierId = supplierId;
             int32_t regCallback = netManager->RegisterNetSupplierCallback(netSupplier.supplierId, callBack_);
             TELEPHONY_LOGI("Register supplier callback(%{public}d)", regCallback);
         }
@@ -78,8 +84,11 @@ bool CellularDataNetAgent::RegisterPolicyCallback()
         return false;
     }
     int32_t registerResult = netPolicy->RegisterNetPolicyCallback(tacticsCallBack_);
-    TELEPHONY_LOGI("Register NetPolicy Callback is :%{public}d", registerResult);
-    return registerResult;
+    if (registerResult == 0) {
+        TELEPHONY_LOGI("Register NetPolicy Callback successful");
+        return true;
+    }
+    return false;
 }
 
 void CellularDataNetAgent::UnregisterPolicyCallback()
@@ -129,39 +138,13 @@ void CellularDataNetAgent::ClearNetSupplier()
 int32_t CellularDataNetAgent::GetSupplierId(const int32_t slotId, uint64_t capability) const
 {
     for (const NetSupplier &netSupplier : netSuppliers_) {
-        if (netSupplier.slotId == slotId && ((netSupplier.capabilities & capability) != 0)) {
+        if (netSupplier.slotId == slotId && netSupplier.capability == capability) {
             TELEPHONY_LOGI(
                 "find supplierId %{public}d capability:%{public}" PRIu64"", netSupplier.supplierId, capability);
             return netSupplier.supplierId;
         }
     }
     return 0;
-}
-
-void CellularDataNetAgent::UpdateNetCapabilities(const int32_t slotId, uint64_t capability)
-{
-    for (NetSupplier &netSupplier : netSuppliers_) {
-        if (netSupplier.slotId == slotId) {
-            if (netSupplier.supplierId > 0) {
-                std::shared_ptr<NetManagerStandard::NetConnClient> netManager =
-                    DelayedSingleton<NetConnClient>::GetInstance();
-                if (netManager == nullptr) {
-                    TELEPHONY_LOGE("NetConnClient is null");
-                    return;
-                }
-                int32_t result = netManager->UpdateNetCapabilities(netSupplier.supplierId, capability);
-                if (IPC_PROXY_ERR != result) {
-                    netSupplier.capabilities = capability;
-                }
-                TELEPHONY_LOGI("update %{public}d capability:%{public}" PRIu64" result:%{public}d",
-                    netSupplier.supplierId, capability, result);
-            } else {
-                TELEPHONY_LOGE("update %{public}d slot:%{public}d not register", netSupplier.supplierId, slotId);
-            }
-            return;
-        }
-    }
-    TELEPHONY_LOGE("update slot:%{public}d capabilities not find", slotId);
 }
 } // namespace Telephony
 } // namespace OHOS

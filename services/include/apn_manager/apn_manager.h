@@ -32,24 +32,20 @@ public:
     sptr<ApnHolder> GetApnHolder(const std::string &apnType) const;
     std::vector<sptr<ApnHolder>> GetAllApnHolder() const;
     std::vector<sptr<ApnHolder>> GetSortApnHolder() const;
-    bool IsAnyDataEnabled() const;
     void CreateAllApnItem();
-    std::vector<sptr<ApnItem>> FilterMatchedApns(
-        const std::string &requestedApnType, const int32_t &radioTech) const;
+    std::vector<sptr<ApnItem>> FilterMatchedApns(const std::string &requestApnType) const;
     void InitApnHolders();
     sptr<ApnHolder> FindApnHolderById(const int32_t id) const;
     static int32_t FindApnIdByApnName(const std::string &type);
     static std::string FindApnNameByApnId(const int32_t id);
     static int32_t FindApnIdByCapability(const uint64_t capability);
     bool IsDataConnectionNotUsed(const std::shared_ptr<CellularDataStateMachine> &stateMachine) const;
-    void ClearAllApnItem();
     int32_t CreateAllApnItemByDatabase(const std::string &numeric);
     bool HasAnyConnectedState() const;
     ApnProfileState GetOverallApnState() const;
     sptr<ApnItem> GetRilAttachApn() const;
 
 private:
-    sptr<ApnItem> GetFirstApnByType(const std::string &apnType) const;
     void AddApnHolder(const std::string &apnType, const int32_t priority);
 
 private:
