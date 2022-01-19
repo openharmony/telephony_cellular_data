@@ -13,13 +13,9 @@
 import("//build/ohos.gni")
 
 SUBSYSTEM_DIR = "//base/telephony/cellular_data"
-TELEPHONY_CORE_SERVICE_ROOT = "//base/telephony/core_service"
 config("cellular_data_util_config") {
   # header file path
-  include_dirs = [
-    "$SUBSYSTEM_DIR/interfaces/innerkits",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/cellular_data",
-  ]
+  include_dirs = [ "$SUBSYSTEM_DIR/interfaces/innerkits" ]
 
   cflags = []
   if (is_double_framework) {
@@ -42,16 +38,15 @@ ohos_shared_library("tel_cellular_data_api") {
     "$SUBSYSTEM_DIR/frameworks/native/cellular_data_service_proxy.cpp",
   ]
 
-  include_dirs = [
-    "//third_party/node/src",
-    "$SUBSYSTEM_DIR/interfaces/innerkits",
-    "$TELEPHONY_CORE_SERVICE_ROOT/interfaces/innerkits/core",
-    "$TELEPHONY_CORE_SERVICE_ROOT/utils/log/include",
-  ]
+  include_dirs =
+      [ "//base/telephony/core_service/interfaces/innerkits/include" ]
 
   public_configs = [ ":cellular_data_util_config" ]
 
-  deps = [ "//utils/native/base:utils" ]
+  deps = [
+    "//base/telephony/core_service/utils:libtel_common",
+    "//utils/native/base:utils",
+  ]
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",

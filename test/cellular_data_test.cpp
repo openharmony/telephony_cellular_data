@@ -15,15 +15,14 @@
 
 #include <string>
 
-#include "cellular_data_error.h"
-
-#include "cellular_data_types.h"
-#include "core_manager.h"
-#include "core_service_client.h"
 #include "gtest/gtest.h"
 #include "iservice_registry.h"
-#include "i_cellular_data_manager.h"
 #include "system_ability_definition.h"
+
+#include "cellular_data_error.h"
+#include "cellular_data_types.h"
+#include "core_service_client.h"
+#include "i_cellular_data_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -44,34 +43,39 @@ public:
     static int32_t SetDefaultCellularDataSlotIdTest(int32_t slotId);
     static int32_t GetCellularDataFlowTypeTest();
     static void WaitTestTimeout(const int32_t status);
-    static bool HasSimCard()
-    {
-        return DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(CoreManager::DEFAULT_SLOT_ID);
-    }
     static sptr<ICellularDataManager> GetProxy();
 
 public:
     static sptr<ICellularDataManager> proxy_;
-    static const int SLEEP_TIME = 1;
+    static const int32_t SLEEP_TIME = 1;
+    static const int32_t DATA_SLOT_ID_INVALID = DEFAULT_SIM_SLOT_ID + 10;
 };
 
 sptr<ICellularDataManager> CellularDataTest::proxy_;
 
-void CellularDataTest::TearDownTestCase() {}
+void CellularDataTest::TearDownTestCase()
+{}
 
-void CellularDataTest::SetUp() {}
+void CellularDataTest::SetUp()
+{}
 
-void CellularDataTest::TearDown() {}
+void CellularDataTest::TearDown()
+{}
 
 void CellularDataTest::SetUpTestCase()
 {
+    if (CoreServiceClient::GetInstance().GetProxy() == nullptr) {
+        std::cout << "connect coreService server failed!" << std::endl;
+        return;
+    }
+
     proxy_ = GetProxy();
     ASSERT_TRUE(proxy_ != nullptr);
-    if (!HasSimCard()) {
+    if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
     // Set the default slot
-    int32_t result = proxy_->SetDefaultCellularDataSlotId(CoreManager::DEFAULT_SLOT_ID);
+    int32_t result = proxy_->SetDefaultCellularDataSlotId(DEFAULT_SIM_SLOT_ID);
     if (result != static_cast<int32_t>(DataRespondCode::SET_SUCCESS)) {
         return;
     }
@@ -193,25 +197,25 @@ HWTEST_F(CellularDataTest, IsCellularDataEnabled_Test, TestSize.Level1)
 
 HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test, TestSize.Level2)
 {
-    if (!HasSimCard()) {
+    if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
     int32_t result = CellularDataTest::GetDefaultCellularDataSlotIdTest();
-    ASSERT_TRUE(result >= 0 && result <= CoreManager::SLOT_ID1);
-    result = CellularDataTest::SetDefaultCellularDataSlotIdTest(CoreManager::DEFAULT_SLOT_ID);
+    if (result < DEFAULT_SIM_SLOT_ID) {
+        return;
+    }
+    result = CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
     ASSERT_TRUE(result == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
     // Multiple cards will need to be optimized again
-    result = CellularDataTest::SetDefaultCellularDataSlotIdTest(CoreManager::SLOT_ID1);
+    result = CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID - 1);
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
-    result = CellularDataTest::SetDefaultCellularDataSlotIdTest(CoreManager::DEFAULT_SLOT_ID - 1);
-    ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
-    result = CellularDataTest::SetDefaultCellularDataSlotIdTest(CoreManager::SLOT_ID1 + 1);
+    result = CellularDataTest::SetDefaultCellularDataSlotIdTest(DATA_SLOT_ID_INVALID);
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
 }
 
 HWTEST_F(CellularDataTest, EnableCellularData_Test, TestSize.Level2)
 {
-    if (!HasSimCard()) {
+    if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
     int32_t enabled = CellularDataTest::IsCellularDataEnabledTest();
@@ -230,72 +234,72 @@ HWTEST_F(CellularDataTest, EnableCellularData_Test, TestSize.Level2)
 
 HWTEST_F(CellularDataTest, DataRoamingState_ValidSlot_Test_01, TestSize.Level3)
 {
-    if (!HasSimCard()) {
+    if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    CellularDataTest::SetDefaultCellularDataSlotIdTest(CoreManager::DEFAULT_SLOT_ID);
+    CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
     int32_t disabled = CellularDataTest::EnableCellularDataTest(false);
     ASSERT_TRUE(disabled == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED));
 
     // slot1 enable data roaming
-    int32_t enabled = CellularDataTest::EnableCellularDataRoamingTest(CoreManager::DEFAULT_SLOT_ID, true);
+    int32_t enabled = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID, true);
     ASSERT_TRUE(enabled == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
-    int32_t result = CellularDataTest::IsCellularDataRoamingEnabledTest(CoreManager::DEFAULT_SLOT_ID);
+    int32_t result = CellularDataTest::IsCellularDataRoamingEnabledTest(DEFAULT_SIM_SLOT_ID);
     ASSERT_TRUE(result == static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_ENABLED));
     // slot1 close
-    int32_t enable = CellularDataTest::EnableCellularDataRoamingTest(CoreManager::DEFAULT_SLOT_ID, false);
+    int32_t enable = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID, false);
     ASSERT_TRUE(enable == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
-    result = CellularDataTest::IsCellularDataRoamingEnabledTest(CoreManager::DEFAULT_SLOT_ID);
+    result = CellularDataTest::IsCellularDataRoamingEnabledTest(DEFAULT_SIM_SLOT_ID);
     ASSERT_TRUE(result == static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_DISABLED));
 
     // At present, multiple card problems, the subsequent need to continue to deal with
-    enable = CellularDataTest::EnableCellularDataRoamingTest(CoreManager::SLOT_ID1, true);
+    enable = CellularDataTest::EnableCellularDataRoamingTest(DATA_SLOT_ID_INVALID, true);
     ASSERT_TRUE(enable == CELLULAR_DATA_INVALID_PARAM);
-    result = CellularDataTest::IsCellularDataRoamingEnabledTest(CoreManager::SLOT_ID1);
+    result = CellularDataTest::IsCellularDataRoamingEnabledTest(DATA_SLOT_ID_INVALID);
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
-    enable = CellularDataTest::EnableCellularDataRoamingTest(CoreManager::SLOT_ID1, false);
+    enable = CellularDataTest::EnableCellularDataRoamingTest(DATA_SLOT_ID_INVALID, false);
     // At present, multiple card problems, the subsequent need to continue to deal with
     ASSERT_TRUE(enable == CELLULAR_DATA_INVALID_PARAM);
-    result = CellularDataTest::IsCellularDataRoamingEnabledTest(CoreManager::SLOT_ID1);
+    result = CellularDataTest::IsCellularDataRoamingEnabledTest(DATA_SLOT_ID_INVALID);
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
 }
 
 HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_01, TestSize.Level3)
 {
-    if (!HasSimCard()) {
+    if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    CellularDataTest::SetDefaultCellularDataSlotIdTest(CoreManager::DEFAULT_SLOT_ID);
+    CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
     int32_t disabled = CellularDataTest::EnableCellularDataTest(false);
     ASSERT_TRUE(disabled == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED));
 
-    int32_t isDataRoaming = CellularDataTest::IsCellularDataRoamingEnabledTest(CoreManager::DEFAULT_SLOT_ID);
+    int32_t isDataRoaming = CellularDataTest::IsCellularDataRoamingEnabledTest(DEFAULT_SIM_SLOT_ID);
     if (isDataRoaming == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED)) {
-        int32_t result = CellularDataTest::EnableCellularDataRoamingTest(CoreManager::DEFAULT_SLOT_ID, false);
+        int32_t result = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID, false);
         ASSERT_TRUE(result == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
     } else {
-        int32_t result = CellularDataTest::EnableCellularDataRoamingTest(CoreManager::DEFAULT_SLOT_ID, true);
+        int32_t result = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID, true);
         ASSERT_TRUE(result == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
     }
     // At present, multiple card problems, the subsequent need to continue to deal with
-    isDataRoaming = CellularDataTest::IsCellularDataRoamingEnabledTest(CoreManager::SLOT_ID1);
+    isDataRoaming = CellularDataTest::IsCellularDataRoamingEnabledTest(DEFAULT_SIM_SLOT_ID);
     if (isDataRoaming == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED)) {
-        int32_t result = CellularDataTest::EnableCellularDataRoamingTest(CoreManager::SLOT_ID1, false);
+        int32_t result = CellularDataTest::EnableCellularDataRoamingTest(DATA_SLOT_ID_INVALID, false);
         ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
     } else {
-        int32_t result = CellularDataTest::EnableCellularDataRoamingTest(CoreManager::SLOT_ID1, true);
+        int32_t result = CellularDataTest::EnableCellularDataRoamingTest(DATA_SLOT_ID_INVALID, true);
         ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
     }
 }
 
 HWTEST_F(CellularDataTest, GetCellularDataState_ValidityTest_01, TestSize.Level3)
 {
-    if (!HasSimCard()) {
+    if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    CellularDataTest::SetDefaultCellularDataSlotIdTest(CoreManager::DEFAULT_SLOT_ID);
+    CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
     int32_t enabled = CellularDataTest::IsCellularDataEnabledTest();
     if (enabled == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED)) {
         CellularDataTest::EnableCellularDataTest(false);
@@ -320,35 +324,35 @@ HWTEST_F(CellularDataTest, GetCellularDataState_ValidityTest_01, TestSize.Level3
 
 HWTEST_F(CellularDataTest, DataRoamingState_InValidSlot_Test_01, TestSize.Level3)
 {
-    if (!HasSimCard()) {
+    if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
     // invalid slot turn on data roaming
-    int32_t enable = CellularDataTest::EnableCellularDataRoamingTest(CoreManager::DEFAULT_SLOT_ID - 1, true);
+    int32_t enable = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID -1, true);
     ASSERT_TRUE(enable == CELLULAR_DATA_INVALID_PARAM);
-    int32_t result = CellularDataTest::IsCellularDataRoamingEnabledTest(CoreManager::DEFAULT_SLOT_ID - 1);
+    int32_t result = CellularDataTest::IsCellularDataRoamingEnabledTest(DEFAULT_SIM_SLOT_ID -1);
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
-    enable = CellularDataTest::EnableCellularDataRoamingTest(CoreManager::SLOT_ID1 + 1, true);
+    enable = CellularDataTest::EnableCellularDataRoamingTest(DATA_SLOT_ID_INVALID, true);
     ASSERT_TRUE(enable == CELLULAR_DATA_INVALID_PARAM);
-    result = CellularDataTest::IsCellularDataRoamingEnabledTest(CoreManager::SLOT_ID1 + 1);
+    result = CellularDataTest::IsCellularDataRoamingEnabledTest(DATA_SLOT_ID_INVALID);
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
     // invalid slot disable roaming
-    enable = CellularDataTest::EnableCellularDataRoamingTest(CoreManager::DEFAULT_SLOT_ID - 1, false);
+    enable = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID -1, false);
     ASSERT_TRUE(enable == CELLULAR_DATA_INVALID_PARAM);
-    result = CellularDataTest::IsCellularDataRoamingEnabledTest(CoreManager::DEFAULT_SLOT_ID - 1);
+    result = CellularDataTest::IsCellularDataRoamingEnabledTest(DEFAULT_SIM_SLOT_ID -1);
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
-    enable = CellularDataTest::EnableCellularDataRoamingTest(CoreManager::SLOT_ID1 + 1, false);
+    enable = CellularDataTest::EnableCellularDataRoamingTest(DATA_SLOT_ID_INVALID, false);
     ASSERT_TRUE(enable == CELLULAR_DATA_INVALID_PARAM);
-    result = CellularDataTest::IsCellularDataRoamingEnabledTest(CoreManager::SLOT_ID1 + 1);
+    result = CellularDataTest::IsCellularDataRoamingEnabledTest(DATA_SLOT_ID_INVALID);
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
 }
 
 HWTEST_F(CellularDataTest, DataFlowType_Test_01, TestSize.Level3)
 {
-    if (!HasSimCard()) {
+    if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    CellularDataTest::SetDefaultCellularDataSlotIdTest(CoreManager::DEFAULT_SLOT_ID);
+    CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
     CellularDataTest::EnableCellularDataTest(false);
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED));
     sleep(SLEEP_TIME);

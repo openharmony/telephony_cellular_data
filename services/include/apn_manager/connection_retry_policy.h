@@ -29,7 +29,6 @@ public:
     ConnectionRetryPolicy();
     ~ConnectionRetryPolicy();
     sptr<ApnItem> GetNextRetryApnItem() const;
-    std::vector<sptr<ApnItem>> GetRetryApns() const;
     void SetMatchedApns(std::vector<sptr<ApnItem>> &apns);
     void ClearRetryApns();
     void MarkBadApn(ApnItem &apn);

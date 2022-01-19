@@ -36,19 +36,19 @@ public:
     bool SetCellularDataEnable(bool userDataEnabled);
     bool IsCellularDataEnabled() const;
     bool SetCellularDataRoamingEnabled(bool dataRoamingEnabled);
+    ApnProfileState GetCellularDataState() const;
     ApnProfileState GetCellularDataState(const std::string &apnType) const;
     bool IsCellularDataRoamingEnabled() const;
     void SendRegisterNetManagerEvent();
     void SendRegisterPolicyEvent();
     void AsynchronousRegister();
-    int32_t HandleApnChanged(const std::string &apns);
+    bool HandleApnChanged();
     int32_t GetCellularDataFlowType();
-    void ClearAllConnectionsFormerSlot();
     void ConnectDataNetWork();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t SetPolicyDataOn(bool enable);
     bool IsRestrictedMode() const;
-    int32_t GetDisConnectionReason();
+    DisConnectionReason GetDisConnectionReason();
     bool HasInternetCapability(const int32_t cid) const;
     bool ClearAllConnections() const;
 

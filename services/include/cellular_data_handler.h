@@ -31,6 +31,7 @@
 #include "cellular_data_state_machine.h"
 #include "data_switch_settings.h"
 #include "state_notification.h"
+#include "radio_event.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -49,20 +50,19 @@ public:
     bool IsCellularDataRoamingEnabled() const;
     bool SetCellularDataRoamingEnabled(bool dataRoamingEnabled);
     ApnProfileState GetCellularDataState() const;
-    void ClearConnection(sptr<ApnHolder> &apnHolder, DisConnectionReason reason);
+    ApnProfileState GetCellularDataState(const std::string &apnType) const;
+    void ClearConnection(const sptr<ApnHolder> &apnHolder, DisConnectionReason reason);
     void EstablishAllApnsIfConnectable();
     void ClearAllConnections(DisConnectionReason reason);
-    sptr<ApnManager> GetApnManager() const;
     int32_t GetSlotId() const;
-    int32_t HandleApnChanged(const std::string &apns);
+    bool HandleApnChanged();
     void HandleApnChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleCallStateUpdate(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t GetCellularDataFlowType();
-    void ClearAllConnectionsFormerSlot();
     void ConnectDataNeWork();
     void SetPolicyDataOn(bool enable);
     bool IsRestrictedMode() const;
-    int32_t GetDisConnectionReason();
+    DisConnectionReason GetDisConnectionReason();
     bool HasInternetCapability(const int32_t cid) const;
 
 private:
@@ -80,8 +80,7 @@ private:
     void DisconnectDataComplete(const AppExecFwk::InnerEvent::Pointer &event);
     void MsgEstablishDataConnection(const AppExecFwk::InnerEvent::Pointer &event);
     void MsgRequestNetwork(const AppExecFwk::InnerEvent::Pointer &event);
-    void CheckAndUpdateNetInfo(
-        sptr<ApnHolder> &apnHolder, std::shared_ptr<SetupDataCallResultInfo> &infos) const;
+    void CheckAndUpdateNetInfo(sptr<ApnHolder> &apnHolder, std::shared_ptr<SetupDataCallResultInfo> &infos) const;
     void HandleSettingSwitchChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleVoiceCallChanged(int32_t state);
     void HandleSimStateOrRecordsChanged(const AppExecFwk::InnerEvent::Pointer &event);
@@ -100,16 +99,16 @@ private:
     void SetRilLinkBandwidths();
     void HandleDBSettingEnableChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleDBSettingRoamingChanged(const AppExecFwk::InnerEvent::Pointer &event);
+    void HandleSortConnection();
 
 private:
-    std::vector<std::shared_ptr<CellularDataStateMachine>> intStateMachineMap_;
     sptr<ApnManager> apnManager_;
     std::unique_ptr<DataSwitchSettings> dataSwitchSettings_;
     sptr<DataConnectionManager> connectionManager_;
     std::u16string lastIccID_;
     int32_t lastCallState_ = (int32_t)TelCallStatus::CALL_STATE_RELEASED;
     const int32_t slotId_;
-    int32_t disconnectionReason_ = REASON_NORMAL;
+    DisConnectionReason disconnectionReason_ = DisConnectionReason::REASON_NORMAL;
     std::shared_ptr<AppExecFwk::EventRunner> stateMachineEventLoop_;
     bool unMeteredAllNsaConfig_ = false;
     bool unMeteredNrNsaMmwaveConfig_ = false;
@@ -118,46 +117,35 @@ private:
     bool unMeteredNrsaMmwaveConfig_ = false;
     bool unMeteredNrsaSub6Config_ = false;
     bool unMeteredRoamingConfig_ = false;
-    std::string defaultTcpBufferConfig_;
-    std::string defaultBandwidthConfig_;
     int defaultMobileMtuConfig_ = 0;
     bool defaultPreferApn_ = true;
-    std::string defaultUpLinkConfig_;
-    std::string defaultDownLinkConfig_;
     bool physicalConnectionActiveState_ = false;
     std::vector<std::string> upLinkThresholds_;
     std::vector<std::string> downLinkThresholds_;
 
     using Fun = void (CellularDataHandler::*)(const AppExecFwk::InnerEvent::Pointer &event);
     std::map<uint32_t, Fun> eventIdMap_ {
-        {ObserverHandler::ObserverHandlerId::RADIO_PS_CONNECTION_ATTACHED,
-            &CellularDataHandler::RadioPsConnectionAttached},
-        {ObserverHandler::ObserverHandlerId::RADIO_PS_CONNECTION_DETACHED,
-            &CellularDataHandler::RadioPsConnectionDetached},
-        {ObserverHandler::ObserverHandlerId::RADIO_PS_ROAMING_OPEN, &CellularDataHandler::RoamingStateOn},
-        {ObserverHandler::ObserverHandlerId::RADIO_PS_ROAMING_CLOSE, &CellularDataHandler::RoamingStateOff},
-        {ObserverHandler::ObserverHandlerId::RADIO_EMERGENCY_STATE_OPEN,
-            &CellularDataHandler::PsRadioEmergencyStateOpen},
-        {ObserverHandler::ObserverHandlerId::RADIO_EMERGENCY_STATE_CLOSE,
-            &CellularDataHandler::PsRadioEmergencyStateClose},
+        {RadioEvent::RADIO_PS_CONNECTION_ATTACHED, &CellularDataHandler::RadioPsConnectionAttached},
+        {RadioEvent::RADIO_PS_CONNECTION_DETACHED, &CellularDataHandler::RadioPsConnectionDetached},
+        {RadioEvent::RADIO_PS_ROAMING_OPEN, &CellularDataHandler::RoamingStateOn},
+        {RadioEvent::RADIO_PS_ROAMING_CLOSE, &CellularDataHandler::RoamingStateOff},
+        {RadioEvent::RADIO_EMERGENCY_STATE_OPEN, &CellularDataHandler::PsRadioEmergencyStateOpen},
+        {RadioEvent::RADIO_EMERGENCY_STATE_CLOSE, &CellularDataHandler::PsRadioEmergencyStateClose},
         {CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION_COMPLETE,
             &CellularDataHandler::EstablishDataConnectionComplete},
         {CellularDataEventCode::MSG_DISCONNECT_DATA_COMPLETE, &CellularDataHandler::DisconnectDataComplete},
         {CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, &CellularDataHandler::MsgEstablishDataConnection},
         {CellularDataEventCode::MSG_SETTING_SWITCH, &CellularDataHandler::HandleSettingSwitchChanged},
         {CellularDataEventCode::MSG_REQUEST_NETWORK, &CellularDataHandler::MsgRequestNetwork},
-        {ObserverHandler::ObserverHandlerId::RADIO_STATE_CHANGED, &CellularDataHandler::HandleRadioStateChanged},
-        {ObserverHandler::ObserverHandler::RADIO_SIM_STATE_CHANGE,
-            &CellularDataHandler::HandleSimStateOrRecordsChanged},
-        {ObserverHandler::ObserverHandler::RADIO_SIM_RECORDS_LOADED,
-            &CellularDataHandler::HandleSimStateOrRecordsChanged},
-        {ObserverHandler::ObserverHandlerId::RADIO_PS_RAT_CHANGED, &CellularDataHandler::PsDataRatChanged},
+        {RadioEvent::RADIO_STATE_CHANGED, &CellularDataHandler::HandleRadioStateChanged},
+        {RadioEvent::RADIO_SIM_STATE_CHANGE, &CellularDataHandler::HandleSimStateOrRecordsChanged},
+        {RadioEvent::RADIO_SIM_RECORDS_LOADED, &CellularDataHandler::HandleSimStateOrRecordsChanged},
+        {RadioEvent::RADIO_PS_RAT_CHANGED, &CellularDataHandler::PsDataRatChanged},
         {CellularDataEventCode::MSG_APN_CHANGED, &CellularDataHandler::HandleApnChanged},
-        {ObserverHandler::ObserverHandlerId::RADIO_CALL_STATUS_INFO, &CellularDataHandler::HandleCallStateUpdate},
+        {RadioEvent::RADIO_CALL_STATUS_INFO, &CellularDataHandler::HandleCallStateUpdate},
         {CellularDataEventCode::MSG_SET_RIL_ATTACH_APN, &CellularDataHandler::SetRilAttachApnResponse},
-        {ObserverHandler::ObserverHandlerId::RADIO_NR_STATE_CHANGED, &CellularDataHandler::HandleRadioNrStateChanged},
-        {ObserverHandler::ObserverHandlerId::RADIO_NR_FREQUENCY_CHANGED,
-            &CellularDataHandler::HandleRadioNrFrequencyChanged},
+        {RadioEvent::RADIO_NR_STATE_CHANGED, &CellularDataHandler::HandleRadioNrStateChanged},
+        {RadioEvent::RADIO_NR_FREQUENCY_CHANGED, &CellularDataHandler::HandleRadioNrFrequencyChanged},
         {CellularDataEventCode::MSG_DB_SETTING_ENABLE_CHANGED, &CellularDataHandler::HandleDBSettingEnableChanged},
         {CellularDataEventCode::MSG_DB_SETTING_ROAMING_CHANGED, &CellularDataHandler::HandleDBSettingRoamingChanged},
     };

@@ -10,8 +10,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//base/telephony/core_service/telephony.gni")
 import("//build/test.gni")
-
 SOURCE_DIR = "//base/telephony/cellular_data"
 
 ohos_unittest("tel_cellular_data_test") {
@@ -21,35 +21,24 @@ ohos_unittest("tel_cellular_data_test") {
   module_out_path = part_name + "/" + test_module
 
   sources = [
-    "//base/telephony/cellular_data/frameworks/native/cellular_data_service_proxy.cpp",
-    "//base/telephony/cellular_data/test/cellular_data_test.cpp",
+    "$SOURCE_DIR/frameworks/native/cellular_data_service_proxy.cpp",
+    "$SOURCE_DIR/test/cellular_data_test.cpp",
   ]
 
   include_dirs = [
     "$SOURCE_DIR/services/include",
-    "//base/telephony/cellular_data/interfaces/innerkits",
-    "//base/telephony/cellular_data/frameworks/native",
-    "//base/telephony/core_service/common/core",
-    "//base/telephony/core_service/common/api",
-    "//base/telephony/core_service/interfaces/innerkits/cellular_data",
-    "//base/telephony/core_service/interfaces/innerkits/network_search",
-    "//base/telephony/core_service/common/network_search",
-    "//base/telephony/core_service/interfaces/innerkits/sim",
-    "//base/telephony/core_service/interfaces/innerkits/core",
-    "//base/telephony/core_service/common/sim",
-    "//base/telephony/ril_adapter/interfaces/innerkits/include",
-    "//base/telephony/core_service/utils/log/include",
-    "$SOURCE_DIR/services//interfaces/kits/include",
-    "$SOURCE_DIR/services//include/common",
+    "$SOURCE_DIR/interfaces/innerkits",
+    "$SOURCE_DIR/frameworks/native",
   ]
 
   deps = [
-    "//base/telephony/core_service:tel_core_service",
+    "//base/telephony/core_service/utils:libtel_common",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
     "appexecfwk_standard:libeventhandler",
+    "cellular_data:tel_cellular_data_api",
     "core_service:tel_core_service_api",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

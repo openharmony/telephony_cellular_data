@@ -36,7 +36,7 @@ void StateNotification::UpdateCellularDataConnectState(int32_t slotId, ApnProfil
 void StateNotification::OnUpDataFlowtype(int32_t slotId, CellDataFlowType flowType)
 {
     TELEPHONY_LOGI("UpdateCellularDataFlow= %{public}d, %{public}d", slotId, flowType);
-    TelephonyStateRegistryClient::GetInstance().UpdateCellularDataFlow(slotId, flowType);
+    TelephonyStateRegistryClient::GetInstance().UpdateCellularDataFlow(slotId, static_cast<int32_t>(flowType));
 }
 } // namespace Telephony
 } // namespace OHOS

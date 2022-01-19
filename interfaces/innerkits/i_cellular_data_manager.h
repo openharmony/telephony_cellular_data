@@ -28,8 +28,6 @@ public:
         GET_CELLULAR_DATA_STATE,
         IS_DATA_ROAMING_ENABLED,
         ENABLE_DATA_ROAMING,
-        ADD_CELLULAR_DATA_OBSERVER,
-        REMOVE_CELLULAR_DATA_OBSERVER,
         GET_DEFAULT_SLOT_ID,
         SET_DEFAULT_SLOT_ID,
         GET_FLOW_TYPE_ID,
@@ -88,7 +86,7 @@ public:
      * @param apns changed apns
      * @return the number of apns created else 84082688 invalid parameter
      */
-    virtual int32_t HandleApnChanged(int32_t slotId, std::string apns) = 0;
+    virtual int32_t HandleApnChanged(int32_t slotId) = 0;
 
     /**
      * Get the slotId that uses the data traffic by default

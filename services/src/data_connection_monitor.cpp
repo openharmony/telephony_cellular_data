@@ -15,14 +15,13 @@
 
 #include "data_connection_monitor.h"
 
-#include "cellular_data_types.h"
-#include "hril_network_parcel.h"
+#include "core_manager_inner.h"
+#include "radio_event.h"
 #include "telephony_log_wrapper.h"
 
 #include "cellular_data_event_code.h"
 #include "cellular_data_handler.h"
-#include "network_search_utils.h"
-#include "ril_adapter_utils.h"
+#include "cellular_data_types.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -117,7 +116,7 @@ void DataConnectionMonitor::HandleRecovery()
         case RecoveryState::STATE_CLEANUP_CONNECTIONS:
             TELEPHONY_LOGI("Handle Recovery: cleanup connections");
             dataRecoveryState_ = RecoveryState::STATE_REREGISTER_NETWORK;
-            cellularDataHandler->ClearAllConnections(REASON_RETRY_CONNECTION);
+            cellularDataHandler->ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
             break;
         case RecoveryState::STATE_REREGISTER_NETWORK:
             TELEPHONY_LOGI("Handle Recovery: re-register network");
@@ -127,8 +126,8 @@ void DataConnectionMonitor::HandleRecovery()
         case RecoveryState::STATE_RADIO_STATUS_RESTART:
             TELEPHONY_LOGI("Handle Recovery: radio restart");
             dataRecoveryState_ = RecoveryState::STATE_REQUEST_CONTEXT_LIST;
-            cellularDataHandler->ClearAllConnections(REASON_RETRY_CONNECTION);
-            SetRadioState(CORE_SERVICE_POWER_OFF, ObserverHandler::RADIO_OFF);
+            cellularDataHandler->ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
+            SetRadioState(CORE_SERVICE_POWER_OFF, RadioEvent::RADIO_OFF);
             break;
         default:
             TELEPHONY_LOGE("Handle Recovery is falsie");
@@ -161,51 +160,27 @@ void DataConnectionMonitor::UpdateNetTrafficState()
 
 void DataConnectionMonitor::GetPdpContextList()
 {
-    AppExecFwk::InnerEvent::Pointer event =
-        AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_DATA_CALL_LIST_CHANGED);
-    if (event == nullptr) {
-        TELEPHONY_LOGE("event is null");
-        return;
-    }
-    event->SetOwner(shared_from_this());
-    RilAdapterUtils::GetPdpContextList(slotId_, event);
+    CoreManagerInner::GetInstance().GetPdpContextList(slotId_,
+        RadioEvent::RADIO_DATA_CALL_LIST_CHANGED, shared_from_this());
 }
 
 void DataConnectionMonitor::SetRadioState(const int32_t &radioState, const int32_t &eventCode)
 {
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventCode);
-    if (event == nullptr) {
-        TELEPHONY_LOGE("event is null");
-        return;
-    }
-    event->SetOwner(shared_from_this());
-    NetworkSearchUtils::SetRadioState(slotId_, radioState, 0, event);
+    CoreManagerInner::GetInstance().SetRadioState(slotId_, eventCode, radioState, 0, shared_from_this());
 }
 
 void DataConnectionMonitor::GetPreferredNetworkPara()
 {
-    AppExecFwk::InnerEvent::Pointer event =
-        AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_GET_PREFERRED_NETWORK_MODE);
-    if (event == nullptr) {
-        TELEPHONY_LOGE("event is null");
-        return;
-    }
-    event->SetOwner(shared_from_this());
-    RilAdapterUtils::GetPreferredNetworkPara(slotId_, event);
+    CoreManagerInner::GetInstance().GetPreferredNetworkPara(slotId_,
+        RadioEvent::RADIO_GET_PREFERRED_NETWORK_MODE, shared_from_this());
 }
 
 void DataConnectionMonitor::SetPreferredNetworkPara(const AppExecFwk::InnerEvent::Pointer &event)
 {
     std::shared_ptr<PreferredNetworkTypeInfo> preferredNetworkInfo = event->GetSharedObject<PreferredNetworkTypeInfo>();
     int32_t networkType = preferredNetworkInfo->preferredNetworkType;
-    AppExecFwk::InnerEvent::Pointer responseEvent =
-        AppExecFwk::InnerEvent::Get(ObserverHandler::RADIO_SET_PREFERRED_NETWORK_MODE);
-    if (responseEvent == nullptr) {
-        TELEPHONY_LOGE("event is null");
-        return;
-    }
-    responseEvent->SetOwner(shared_from_this());
-    RilAdapterUtils::SetPreferredNetworkPara(slotId_, networkType, responseEvent);
+    CoreManagerInner::GetInstance().SetPreferredNetworkPara(slotId_,
+        RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, networkType, shared_from_this());
 }
 
 void DataConnectionMonitor::UpdateDataFlowType()
@@ -268,19 +243,19 @@ void DataConnectionMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &
         case CellularDataEventCode::MSG_STALL_DETECTION_EVENT_ID:
             OnStallDetectionTimer();
             break;
-        case ObserverHandler::RADIO_DATA_CALL_LIST_CHANGED:
+        case RadioEvent::RADIO_DATA_CALL_LIST_CHANGED:
             TELEPHONY_LOGI("radio call list changed complete");
             break;
-        case ObserverHandler::RADIO_GET_PREFERRED_NETWORK_MODE:
+        case RadioEvent::RADIO_GET_PREFERRED_NETWORK_MODE:
             SetPreferredNetworkPara(event);
             break;
-        case ObserverHandler::RADIO_SET_PREFERRED_NETWORK_MODE:
+        case RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE:
             TELEPHONY_LOGI("set preferred network mode complete");
             break;
-        case ObserverHandler::RADIO_OFF:
-            SetRadioState(CORE_SERVICE_POWER_ON, ObserverHandler::RADIO_ON);
+        case RadioEvent::RADIO_OFF:
+            SetRadioState(CORE_SERVICE_POWER_ON, RadioEvent::RADIO_ON);
             break;
-        case ObserverHandler::RADIO_ON:
+        case RadioEvent::RADIO_ON:
             TELEPHONY_LOGI("set radio state on complete");
             break;
         default:

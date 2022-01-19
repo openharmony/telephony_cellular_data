@@ -23,20 +23,19 @@ namespace OHOS {
 namespace Telephony {
 bool NetworkSearchCallback::HasInternetCapability(int32_t slotId, int32_t cId)
 {
-    TELEPHONY_LOGI("NetworkSearchCallback::HasInternetCapability");
-    int32_t result = DelayedSingleton<CellularDataService>::GetInstance()->HasInternetCapability(slotId, cId);
+    int32_t result = DelayedRefSingleton<CellularDataService>::GetInstance().HasInternetCapability(slotId, cId);
     if (result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)) {
         return true;
     }
+    TELEPHONY_LOGE("HasInternetCapability slot:%{public}d cid:%{public}d failed %{public}d", slotId, cId, result);
     return false;
 }
 
 void NetworkSearchCallback::ClearCellularDataConnections(int32_t slotId)
 {
-    TELEPHONY_LOGI("NetworkSearchCallback::ClearCellularDataConnections");
-    int32_t result = DelayedSingleton<CellularDataService>::GetInstance()->ClearCellularDataConnections(slotId);
-    if (result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)) {
-        return;
+    int32_t result = DelayedRefSingleton<CellularDataService>::GetInstance().ClearCellularDataConnections(slotId);
+    if (result != static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)) {
+        TELEPHONY_LOGE("ClearCellularDataConnections slot:%{public}d failed %{public}d", slotId, result);
     }
 }
 } // namespace Telephony

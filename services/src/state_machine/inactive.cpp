@@ -33,6 +33,14 @@ void Inactive::StateBegin()
     stateMachine->connectId_++;
     isActive_ = true;
     if (deActiveApnTypeId_ != ERROR_APN_ID) {
+        // set net manager connection false
+        CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
+        int32_t supplierId = netAgent.GetSupplierId(stateMachine->GetSlotId(), stateMachine->GetCapability());
+        if (stateMachine->netSupplierInfo_ != nullptr) {
+            stateMachine->netSupplierInfo_->isAvailable_ = false;
+            netAgent.UpdateNetSupplierInfo(supplierId, stateMachine->netSupplierInfo_);
+        }
+        // send MSG_DISCONNECT_DATA_COMPLETE to CellularDataHandler
         std::string apnType = ApnManager::FindApnNameByApnId(deActiveApnTypeId_);
         std::unique_ptr<DataDisconnectParams> object = std::make_unique<DataDisconnectParams>(apnType, reason_);
         AppExecFwk::InnerEvent::Pointer event =
@@ -41,7 +49,7 @@ void Inactive::StateBegin()
             stateMachine->cellularDataHandler_->SendEvent(event);
         }
         deActiveApnTypeId_ = ERROR_APN_ID;
-        reason_ = REASON_RETRY_CONNECTION;
+        reason_ = DisConnectionReason::REASON_RETRY_CONNECTION;
     }
     stateMachine->SetCurrentState(sptr<State>(this));
     if (stateMachine->cdConnectionManager_ != nullptr) {
@@ -93,19 +101,9 @@ bool Inactive::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
     return retVal;
 }
 
-const std::weak_ptr<CellularDataStateMachine> &Inactive::GetStateMachine() const
-{
-    return stateMachine_;
-}
-
 void Inactive::SetStateMachine(const std::weak_ptr<CellularDataStateMachine> &stateMachine)
 {
     stateMachine_ = stateMachine;
-}
-
-int32_t Inactive::GetDeActiveApnTypeId() const
-{
-    return deActiveApnTypeId_;
 }
 
 void Inactive::SetDeActiveApnTypeId(int32_t deActiveApnTypeId)

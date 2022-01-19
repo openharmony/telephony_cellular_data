@@ -21,6 +21,7 @@
 
 #include "event_handler.h"
 #include "inner_event.h"
+#include "radio_event.h"
 
 #include "cellular_data_event_code.h"
 #include "cellular_data_state_machine.h"
@@ -44,7 +45,6 @@ private:
     bool ProcessLostConnection(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessDataConnectionRoamOn(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessDataConnectionRoamOff(const AppExecFwk::InnerEvent::Pointer &event);
-    bool ProcessBwRefreshResponse(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessDataConnectionVoiceCallStartedOrEnded(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessGetBandwidthsFromRil(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessNrStateChanged(const AppExecFwk::InnerEvent::Pointer &event);
@@ -62,13 +62,12 @@ private:
         {CellularDataEventCode::MSG_SM_LOST_CONNECTION, &Active::ProcessLostConnection},
         {CellularDataEventCode::MSG_SM_DATA_ROAM_ON, &Active::ProcessDataConnectionRoamOn},
         {CellularDataEventCode::MSG_SM_DATA_ROAM_OFF, &Active::ProcessDataConnectionRoamOff},
-        {CellularDataEventCode::MSG_SM_BW_REFRESH_RESPONSE, &Active::ProcessBwRefreshResponse},
         {CellularDataEventCode::MSG_SM_VOICE_CALL_STARTED, &Active::ProcessDataConnectionVoiceCallStartedOrEnded},
         {CellularDataEventCode::MSG_SM_VOICE_CALL_ENDED, &Active::ProcessDataConnectionVoiceCallStartedOrEnded},
-        {ObserverHandler::ObserverHandlerId::RADIO_NR_STATE_CHANGED, &Active::ProcessNrStateChanged},
-        {ObserverHandler::ObserverHandlerId::RADIO_NR_FREQUENCY_CHANGED, &Active::ProcessNrFrequencyChanged},
+        {RadioEvent::RADIO_NR_STATE_CHANGED, &Active::ProcessNrStateChanged},
+        {RadioEvent::RADIO_NR_FREQUENCY_CHANGED, &Active::ProcessNrFrequencyChanged},
         {CellularDataEventCode::MSG_GET_RIL_BANDWIDTH, &Active::ProcessGetBandwidthsFromRil},
-        {ObserverHandler::RADIO_RIL_SETUP_DATA_CALL, &Active::ProcessDataConnectionComplete},
+        {RadioEvent::RADIO_RIL_SETUP_DATA_CALL, &Active::ProcessDataConnectionComplete},
     };
     std::weak_ptr<CellularDataStateMachine> stateMachine_;
 };

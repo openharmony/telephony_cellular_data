@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef TELEPHONY_CELLULAR_DATA_SETTINGS_RDB_HELPER_H
-#define TELEPHONY_CELLULAR_DATA_SETTINGS_RDB_HELPER_H
+#ifndef CELLULAR_DATA_SETTINGS_RDB_HELPER_H
+#define CELLULAR_DATA_SETTINGS_RDB_HELPER_H
 
 #include <memory>
 #include <singleton.h>
@@ -65,4 +65,4 @@ private:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // TELEPHONY_CELLULAR_DATA_SETTINGS_RDB_HELPER_H
+#endif // CELLULAR_DATA_SETTINGS_RDB_HELPER_H

@@ -13,8 +13,8 @@
 * limitations under the License.
 */
 
-#ifndef CELLULAR_DATA_NET_MANAGER_CALL_BACK_H
-#define CELLULAR_DATA_NET_MANAGER_CALL_BACK_H
+#ifndef NET_MANAGER_CALL_BACK_H
+#define NET_MANAGER_CALL_BACK_H
 
 #include "net_supplier_callback_base.h"
 
@@ -23,9 +23,9 @@ namespace Telephony {
 using namespace NetManagerStandard;
 class NetManagerCallBack : public NetSupplierCallbackBase {
 public:
-    int32_t RequestNetwork(const std::string &ident, uint64_t netCapability) override;
-    int32_t ReleaseNetwork(const std::string &ident, uint64_t netCapability) override;
+    int32_t RequestNetwork(const std::string &ident, const std::set<NetCap> &netCaps) override;
+    int32_t ReleaseNetwork(const std::string &ident, const std::set<NetCap> &netCaps) override;
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // CELLULAR_DATA_NET_MANAGER_CALL_BACK_H
+#endif // NET_MANAGER_CALL_BACK_H
