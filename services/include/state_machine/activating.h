@@ -45,4 +45,4 @@ private:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // CELLULAR_DATA_ACTIVATING_H
+#endif // ACTIVATING_H

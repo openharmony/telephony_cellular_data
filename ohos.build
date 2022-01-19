@@ -14,7 +14,7 @@
                     "name": "//base/telephony/cellular_data/frameworks/native:tel_cellular_data_api",
                     "header": {
                         "header_files": [
-                            "../../../core_service/interfaces/innerkits/cellular_data/cellular_data_types.h",
+                            "cellular_data_types.h",
                             "cellular_data_client.h",
                             "i_cellular_data_manager.h"
                         ],

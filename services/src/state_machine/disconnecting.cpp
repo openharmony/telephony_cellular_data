@@ -17,6 +17,7 @@
 
 #include "hril_data_parcel.h"
 #include "telephony_log_wrapper.h"
+#include "radio_event.h"
 
 #include "cellular_data_event_code.h"
 #include "inactive.h"
@@ -58,7 +59,7 @@ void Disconnecting::ProcessDisconnectTimeout(const AppExecFwk::InnerEvent::Point
     }
     Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
     inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
-    inActive->SetReason(REASON_RETRY_CONNECTION);
+    inActive->SetReason(DisConnectionReason::REASON_CLEAR_CONNECTION);
     stateMachine->TransitionTo(stateMachine->inActiveState_);
     TELEPHONY_LOGI("ProcessDisconnectTimeout");
 }
@@ -82,7 +83,7 @@ bool Disconnecting::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
             stateMachine->DeferEvent(std::move(event));
             retVal = PROCESSED;
             break;
-        case ObserverHandler::RADIO_RIL_DEACTIVATE_DATA_CALL: {
+        case RadioEvent::RADIO_RIL_DEACTIVATE_DATA_CALL: {
             Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
             std::shared_ptr<HRilRadioResponseInfo> rilInfo = event->GetSharedObject<HRilRadioResponseInfo>();
             if (rilInfo == nullptr) {

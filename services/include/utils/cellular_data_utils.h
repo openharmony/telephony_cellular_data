@@ -38,6 +38,7 @@ public:
     static int32_t GetPrefixLen(const std::vector<std::string> &netmask, const size_t start);
     static int GetDefaultMobileMtuConfig();
     static bool GetDefaultPreferApnConfig();
+    static std::string ConvertRadioTechToRadioName(const int32_t radioTech);
 
 private:
     CellularDataUtils() = default;

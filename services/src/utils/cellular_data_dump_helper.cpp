@@ -58,25 +58,26 @@ void CellularDataDumpHelper::ShowHelp(std::string &result) const
 
 void CellularDataDumpHelper::ShowCellularDataInfo(std::string &result) const
 {
+    CellularDataService &dataService = DelayedRefSingleton<CellularDataService>::GetInstance();
     result.append("Ohos cellular_call service: ");
     result.append(",    Ohos cellular_call bind time:  ");
-    result.append(DelayedSingleton<CellularDataService>::GetInstance()->GetBindTime());
+    result.append(dataService.GetBindTime());
     result.append("\n");
     result.append("Ohos cellular_call service: ");
     result.append(",    Ohos cellular_call end time:  ");
-    result.append(DelayedSingleton<CellularDataService>::GetInstance()->GetEndTime());
+    result.append(dataService.GetEndTime());
     result.append("\n");
     result.append("Ohos cellular_data server:  ");
     result.append(" ,  Ohos cellular_data default slot id:  ");
-    result.append(DelayedSingleton<CellularDataService>::GetInstance()->GetCellularDataSlotIdDump());
+    result.append(dataService.GetCellularDataSlotIdDump());
     result.append("\n");
     result.append("Ohos cellular_data server:  ");
     result.append(" ,  Ohos cellular_data output state machine current status:  ");
-    result.append(DelayedSingleton<CellularDataService>::GetInstance()->GetStateMachineCurrentStatusDump());
+    result.append(dataService.GetStateMachineCurrentStatusDump());
     result.append("\n");
     result.append("Ohos cellular_data server:  ");
     result.append(",   Ohos cellular_data output dataflow info: ");
-    result.append(DelayedSingleton<CellularDataService>::GetInstance()->GetFlowDataInfoDump());
+    result.append(dataService.GetFlowDataInfoDump());
     result.append("\n");
 }
 } // namespace Telephony

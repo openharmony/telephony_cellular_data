@@ -76,10 +76,9 @@ public:
      * Processing of APN content changes
      *
      * @param slotId card slot identification
-     * @param apns changed apns
      * @return the number of apns created else 84082688 invalid parameter
      */
-    int32_t HandleApnChanged(int32_t slotId, std::string apns);
+    int32_t HandleApnChanged(int32_t slotId);
 
     /**
      * Get the slotId that uses the data traffic by default

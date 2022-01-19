@@ -16,7 +16,7 @@
 #ifndef APN_HOLDER_H
 #define APN_HOLDER_H
 
-#include <atomic>
+#include <map>
 
 #include "apn_item.h"
 #include "cellular_data_constant.h"
@@ -28,7 +28,7 @@ class CellularDataStateMachine;
 
 class ApnHolder : public RefBase {
 public:
-    ApnHolder(const int32_t priority);
+    ApnHolder(const std::string &apnType, const int32_t priority);
     ~ApnHolder();
     sptr<ApnItem> GetNextRetryApn() const;
     void SetAllMatchedApns(std::vector<sptr<ApnItem>> &matchedApns);
@@ -40,7 +40,6 @@ public:
     bool IsDataCallEnabled() const;
     bool IsDataCallConnectable() const;
     std::string GetApnType() const;
-    void SetApnType(const std::string &type);
     void ReleaseDataConnection();
     int32_t GetProfileId(const std::string &apnType) const;
     void SetCellularDataStateMachine(const std::shared_ptr<CellularDataStateMachine> &stateMachine);

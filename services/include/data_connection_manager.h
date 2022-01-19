@@ -20,8 +20,6 @@
 #include <map>
 #include <memory>
 
-#include "observer_handler.h"
-
 #include "data_connection_monitor.h"
 #include "state_machine.h"
 

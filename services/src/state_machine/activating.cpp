@@ -17,12 +17,10 @@
 
 #include "hril_data_parcel.h"
 #include "telephony_log_wrapper.h"
+#include "radio_event.h"
 
 #include "cellular_data_event_code.h"
-#include "cellular_data_utils.h"
 #include "inactive.h"
-#include "network_search_utils.h"
-#include "ril_adapter_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -77,7 +75,7 @@ bool Activating::RilActivatePdpContextDone(const AppExecFwk::InnerEvent::Pointer
     if (resultInfo->active == 0) {
         Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
         inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
-        inActive->SetReason(REASON_RETRY_CONNECTION);
+        inActive->SetReason(DisConnectionReason::REASON_RETRY_CONNECTION);
         stateMachine->TransitionTo(stateMachine->inActiveState_);
         return true;
     }
@@ -95,13 +93,15 @@ bool Activating::RilActivatePdpContextDone(const AppExecFwk::InnerEvent::Pointer
 DisConnectionReason Activating::DataCallPdpError(int32_t reason)
 {
     switch (reason) {
+        case HRilPdpErrorReason::HRIL_PDP_ERR_RETRY:
+        case HRilPdpErrorReason::HRIL_PDP_ERR_UNKNOWN:
         case HRilPdpErrorReason::HRIL_PDP_ERR_SHORTAGE_RESOURCES:
         case HRilPdpErrorReason::HRIL_PDP_ERR_ACTIVATION_REJECTED_UNSPECIFIED:
         case HRilPdpErrorReason::HRIL_PDP_ERR_SERVICE_OPTION_TEMPORARILY_OUT_OF_ORDER:
         case HRilPdpErrorReason::HRIL_PDP_ERR_APN_NOT_SUPPORTED_IN_CURRENT_RAT_PLMN:
         case HRilPdpErrorReason::HRIL_PDP_ERR_APN_RESTRICTION_VALUE_INCOMPATIBLE: {
             TELEPHONY_LOGE("DataCall: The connection failed, try again");
-            return REASON_RETRY_CONNECTION;
+            return DisConnectionReason::REASON_RETRY_CONNECTION;
         }
         case HRilPdpErrorReason::HRIL_PDP_ERR_MULT_ACCESSES_PDN_NOT_ALLOWED:
         case HRilPdpErrorReason::HRIL_PDP_ERR_OPERATOR_DETERMINED_BARRING:
@@ -117,16 +117,15 @@ DisConnectionReason Activating::DataCallPdpError(int32_t reason)
         case HRilPdpErrorReason::HRIL_PDP_ERR_IPV4V6_ONLY_ALLOWED:
         case HRilPdpErrorReason::HRIL_PDP_ERR_NON_IP_ONLY_ALLOWED:
         case HRilPdpErrorReason::HRIL_PDP_ERR_MAX_NUM_OF_PDP_CONTEXTS:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_PROTOCOL_ERRORS:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_UNKNOWN: {
+        case HRilPdpErrorReason::HRIL_PDP_ERR_PROTOCOL_ERRORS: {
             TELEPHONY_LOGE("DataCall: The connection failed, not try again");
-            return REASON_CLEAR_CONNECTION;
+            return DisConnectionReason::REASON_CLEAR_CONNECTION;
         }
         default:
             break;
     }
     TELEPHONY_LOGE("DataCall: Connection failed for an unsupported reason, not try again");
-    return REASON_CLEAR_CONNECTION;
+    return DisConnectionReason::REASON_CLEAR_CONNECTION;
 }
 
 bool Activating::RilErrorResponse(const AppExecFwk::InnerEvent::Pointer &event)
@@ -151,17 +150,17 @@ bool Activating::RilErrorResponse(const AppExecFwk::InnerEvent::Pointer &event)
         case HRilErrType::HRIL_ERR_GENERIC_FAILURE:
         case HRilErrType::HRIL_ERR_CMD_SEND_FAILURE:
         case HRilErrType::HRIL_ERR_NULL_POINT:
-            inActive->SetReason(REASON_RETRY_CONNECTION);
+            inActive->SetReason(DisConnectionReason::REASON_RETRY_CONNECTION);
             TELEPHONY_LOGI("Handle supported error responses and retry the connection.");
             break;
         case HRilErrType::HRIL_ERR_INVALID_RESPONSE:
         case HRilErrType::HRIL_ERR_CMD_NO_CARRIER:
         case HRilErrType::HRIL_ERR_HDF_IPC_FAILURE:
-            inActive->SetReason(REASON_CLEAR_CONNECTION);
+            inActive->SetReason(DisConnectionReason::REASON_CLEAR_CONNECTION);
             TELEPHONY_LOGI("Handle the supported error response and clear the connection.");
             break;
         default: {
-            inActive->SetReason(REASON_CLEAR_CONNECTION);
+            inActive->SetReason(DisConnectionReason::REASON_CLEAR_CONNECTION);
             TELEPHONY_LOGE("Handle the unsupported error response");
             break;
         }
@@ -188,7 +187,7 @@ void Activating::ProcessConnectTimeout(const AppExecFwk::InnerEvent::Pointer &ev
     }
     Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
     inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
-    inActive->SetReason(REASON_RETRY_CONNECTION);
+    inActive->SetReason(DisConnectionReason::REASON_RETRY_CONNECTION);
     stateMachine->TransitionTo(stateMachine->inActiveState_);
     TELEPHONY_LOGI("ProcessConnectTimeout");
 }
@@ -214,7 +213,7 @@ bool Activating::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
             stateMachine->DeferEvent(std::move(event));
             retVal = PROCESSED;
             break;
-        case ObserverHandler::RADIO_RIL_SETUP_DATA_CALL: {
+        case RadioEvent::RADIO_RIL_SETUP_DATA_CALL: {
             retVal = RilActivatePdpContextDone(event);
             break;
         }

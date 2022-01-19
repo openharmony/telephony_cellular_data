@@ -42,16 +42,6 @@ bool ApnItem::IsBadApn() const
     return badApn_;
 }
 
-bool ApnItem::IsTrafficUseApnType(const std::string &types) const
-{
-    return DATA_METERED_CONTEXT_ROLES == types;
-}
-
-bool ApnItem::IsTrafficUse(const ApnItem &item) const
-{
-    return false;
-}
-
 bool ApnItem::CanDealWithType(const std::string &type) const
 {
     for (std::string apnType : apnTypes_) {

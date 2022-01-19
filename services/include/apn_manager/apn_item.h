@@ -16,13 +16,11 @@
 #ifndef APN_ITEM_H
 #define APN_ITEM_H
 
-#include <map>
 #include <string>
 #include <vector>
 
 #include "refbase.h"
 
-#include "hril_types.h"
 #include "pdp_profile_data.h"
 
 #include "cellular_data_constant.h"
@@ -34,8 +32,6 @@ public:
     ApnItem();
     ~ApnItem();
     std::vector<std::string> GetApnTypes() const;
-    bool IsTrafficUse(const ApnItem &item) const;
-    bool IsTrafficUseApnType(const std::string &types) const;
     bool CanDealWithType(const std::string &type) const;
     void MarkBadApn(bool badApn);
     bool IsBadApn() const;

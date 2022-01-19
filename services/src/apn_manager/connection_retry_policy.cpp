@@ -29,23 +29,18 @@ sptr<ApnItem> ConnectionRetryPolicy::GetNextRetryApnItem() const
         TELEPHONY_LOGE("matchedApns is null");
         return nullptr;
     }
-    if (currentApnIndex_ >= static_cast<int>(matchedApns_.size()) || currentApnIndex_ < 0) {
+    if (currentApnIndex_ >= static_cast<int32_t>(matchedApns_.size()) || currentApnIndex_ < 0) {
         currentApnIndex_ = 0;
         return matchedApns_[currentApnIndex_];
     }
     sptr<ApnItem> apnItem = matchedApns_[currentApnIndex_];
     tryCount_++;
-    if ((apnItem != nullptr && apnItem->IsBadApn()) || tryCount_ > maxCount_) {
+    if ((apnItem != nullptr && apnItem->IsBadApn()) || (tryCount_ > maxCount_)) {
         tryCount_ = 0;
         currentApnIndex_++;
         return GetNextRetryApnItem();
     }
     return apnItem;
-}
-
-std::vector<sptr<ApnItem>> ConnectionRetryPolicy::GetRetryApns() const
-{
-    return matchedApns_;
 }
 
 void ConnectionRetryPolicy::SetMatchedApns(std::vector<sptr<ApnItem>> &apns)

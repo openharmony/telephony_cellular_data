@@ -18,8 +18,6 @@
 #include <map>
 #include <string>
 
-#include "core_manager.h"
-
 #include "cellular_data_client.h"
 
 namespace OHOS {
@@ -80,7 +78,7 @@ public:
 
     static void IsCellularDataRoamingEnabledTest()
     {
-        int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+        int32_t slotId = DEFAULT_SIM_SLOT_ID;
         std::cout << "please input parameter int slotId" << std::endl;
         std::cin >> slotId;
         int32_t result = CellularDataClient::GetInstance().IsCellularDataRoamingEnabled(slotId);
@@ -89,7 +87,7 @@ public:
 
     static void EnableCellularDataRoamingTest()
     {
-        int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+        int32_t slotId = DEFAULT_SIM_SLOT_ID;
         int32_t type = 0;
         std::cout << "please input parameter int slotId " << std::endl;
         std::cin >> slotId;
@@ -102,13 +100,10 @@ public:
 
     static void HandleApnChangedTest()
     {
-        int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
-        std::string apns;
-        std::cout << "please input parameter apn" << std::endl;
-        std::cin >> apns;
+        int32_t slotId = DEFAULT_SIM_SLOT_ID;
         sptr<ICellularDataManager> proxy = CellularDataClient::GetInstance().GetProxy();
         if (proxy != nullptr) {
-            int32_t result = proxy->HandleApnChanged(slotId, apns);
+            int32_t result = proxy->HandleApnChanged(slotId);
             std::cout << "TelephonyTestService Remote result [" << result << "]" << std::endl;
         } else {
             std::cout << "TelephonyTestService Remote is null" << std::endl;
@@ -128,7 +123,7 @@ public:
 
     static void SetDefaultSlotId()
     {
-        int32_t slotId = CoreManager::DEFAULT_SLOT_ID;
+        int32_t slotId = DEFAULT_SIM_SLOT_ID;
         std::cout << "please input parameter int slot" << std::endl;
         std::cin >> slotId;
         sptr<ICellularDataManager> proxy = CellularDataClient::GetInstance().GetProxy();

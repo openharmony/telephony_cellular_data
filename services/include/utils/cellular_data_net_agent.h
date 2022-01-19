@@ -88,14 +88,6 @@ public:
      */
     int32_t GetSupplierId(const int32_t slotId, uint64_t capability) const;
 
-    /**
-     * Update the network capability information
-     *
-     * @param slotId card slot identification
-     * @param capability a network capability
-     */
-    void UpdateNetCapabilities(const int32_t slotId, uint64_t capability);
-
 private:
     std::vector<NetSupplier> netSuppliers_;
     sptr<NetManagerCallBack> callBack_;

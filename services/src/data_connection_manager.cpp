@@ -15,16 +15,15 @@
 
 #include "data_connection_manager.h"
 
+#include "core_manager_inner.h"
 #include "hril_data_parcel.h"
-#include "observer_handler.h"
+#include "radio_event.h"
 #include "telephony_log_wrapper.h"
 
 #include "cellular_data_event_code.h"
 #include "cellular_data_handler.h"
 #include "cellular_data_state_machine.h"
 #include "cellular_data_utils.h"
-#include "network_search_utils.h"
-#include "ril_adapter_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -122,16 +121,17 @@ void DataConnectionManager::StopStallDetectionTimer()
 
 void DataConnectionManager::RegisterRadioObserver()
 {
-    RilAdapterUtils::RegisterRilConnected(
-        slotId_, stateMachineEventHandler_, ObserverHandler::RADIO_CONNECTED, nullptr);
-    RilAdapterUtils::PdpContextListUpdated(
-        slotId_, stateMachineEventHandler_, ObserverHandler::RADIO_DATA_CALL_LIST_CHANGED, nullptr);
+    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
+    coreInner.RegisterCoreNotify(slotId_, stateMachineEventHandler_, RadioEvent::RADIO_CONNECTED, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, stateMachineEventHandler_,
+        RadioEvent::RADIO_DATA_CALL_LIST_CHANGED, nullptr);
 }
 
 void DataConnectionManager::UnRegisterRadioObserver() const
 {
-    RilAdapterUtils::UnRegisterRilConnected(slotId_, ObserverHandler::RADIO_CONNECTED);
-    RilAdapterUtils::UnPdpContextListUpdated(slotId_, ObserverHandler::RADIO_DATA_CALL_LIST_CHANGED);
+    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
+    coreInner.UnRegisterCoreNotify(slotId_, stateMachineEventHandler_, RadioEvent::RADIO_CONNECTED);
+    coreInner.UnRegisterCoreNotify(slotId_, stateMachineEventHandler_, RadioEvent::RADIO_DATA_CALL_LIST_CHANGED);
 }
 
 void CcmDefaultState::StateBegin()
@@ -152,10 +152,10 @@ bool CcmDefaultState::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
     }
     int32_t id = event->GetInnerEventId();
     switch (id) {
-        case ObserverHandler::RADIO_CONNECTED:
+        case RadioEvent::RADIO_CONNECTED:
             TELEPHONY_LOGI("Radio is connected");
             break;
-        case ObserverHandler::RADIO_DATA_CALL_LIST_CHANGED:
+        case RadioEvent::RADIO_DATA_CALL_LIST_CHANGED:
             RadioDataCallListChanged(event);
             break;
         default:
@@ -248,7 +248,7 @@ int32_t DataConnectionManager::GetDataFlowType()
         return static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_NONE);
     }
     CellDataFlowType flowType = connectionMonitor_->GetDataFlowType();
-    return static_cast<int>(flowType);
+    return static_cast<int32_t>(flowType);
 }
 
 void DataConnectionManager::SetDataFlowType(CellDataFlowType dataFlowType)
@@ -302,14 +302,10 @@ std::string DataConnectionManager::GetDefaultTcpBufferConfig()
 LinkBandwidthInfo DataConnectionManager::GetBandwidthsByRadioTech(const int32_t radioTech)
 {
     LinkBandwidthInfo linkBandwidthInfo;
-    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId_);
-    if (core == nullptr) {
-        TELEPHONY_LOGE("core is null slotId:%{public}d", slotId_);
-        return linkBandwidthInfo;
-    }
-    NrState nrState = core->GetNrState(slotId_);
-    FrequencyType frequencyType = core->GetFrequencyType(slotId_);
-    std::string radioTechName = NetworkSearchUtils::ConvertRadioTechToRadioName(radioTech);
+    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
+    NrState nrState = coreInner.GetNrState(slotId_);
+    FrequencyType frequencyType = coreInner.GetFrequencyType(slotId_);
+    std::string radioTechName = CellularDataUtils::ConvertRadioTechToRadioName(radioTech);
     if (radioTech == (int32_t)RadioTech::RADIO_TECHNOLOGY_LTE &&
         (nrState == NrState::NR_NSA_STATE_DUAL_CONNECTED || nrState == NrState::NR_NSA_STATE_CONNECTED_DETECT)) {
         if (frequencyType == FrequencyType::FREQ_TYPE_MMWAVE) {
@@ -334,13 +330,9 @@ LinkBandwidthInfo DataConnectionManager::GetBandwidthsByRadioTech(const int32_t 
 std::string DataConnectionManager::GetTcpBufferByRadioTech(const int32_t radioTech)
 {
     std::string tcpBuffer = "";
-    std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(0);
-    if (core == nullptr) {
-        TELEPHONY_LOGE("core is null slotId:%{public}d", 0);
-        return tcpBuffer;
-    }
-    NrState nrState = core->GetNrState(0);
-    std::string radioTechName = NetworkSearchUtils::ConvertRadioTechToRadioName(radioTech);
+    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
+    NrState nrState = coreInner.GetNrState(slotId_);
+    std::string radioTechName = CellularDataUtils::ConvertRadioTechToRadioName(radioTech);
     if ((radioTech == (int32_t)RadioTech::RADIO_TECHNOLOGY_LTE ||
         radioTech == (int32_t)RadioTech::RADIO_TECHNOLOGY_LTE_CA) &&
         (nrState == NrState::NR_NSA_STATE_DUAL_CONNECTED || nrState == NrState::NR_NSA_STATE_CONNECTED_DETECT)) {

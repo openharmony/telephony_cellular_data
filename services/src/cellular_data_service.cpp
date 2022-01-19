@@ -22,9 +22,9 @@
 #include "net_specifier.h"
 
 #include "cellular_data_error.h"
-#include "core_manager.h"
-#include "sim_utils.h"
+#include "core_manager_inner.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_permission.h"
 
 #include "cellular_data_net_agent.h"
 #include "cellular_data_dump_helper.h"
@@ -35,7 +35,7 @@ namespace Telephony {
 using namespace NetManagerStandard;
 
 bool g_registerResult =
-    SystemAbility::MakeAndRegisterAbility(DelayedSingleton<CellularDataService>::GetInstance().get());
+    SystemAbility::MakeAndRegisterAbility(&DelayedRefSingleton<CellularDataService>::GetInstance());
 CellularDataService::CellularDataService()
     : SystemAbility(TELEPHONY_CELLULAR_DATA_SYS_ABILITY_ID, true), registerToService_(false),
     state_(ServiceRunningState::STATE_NOT_START)
@@ -52,7 +52,6 @@ void CellularDataService::OnStart()
         TELEPHONY_LOGE("CellularDataService has already started.");
         return;
     }
-    WaitCoreServiceToInit();
     if (!Init()) {
         TELEPHONY_LOGE("failed to init CellularDataService");
         return;
@@ -100,23 +99,6 @@ int32_t CellularDataService::Dump(std::int32_t fd, const std::vector<std::u16str
     return TELEPHONY_ERR_FAIL;
 }
 
-void CellularDataService::WaitCoreServiceToInit()
-{
-    uint32_t i = 0;
-    int slotId = CoreManager::DEFAULT_SLOT_ID;
-    for (i = 0; i < CONNECT_MAX_TRY_COUNT; i++) {
-        std::shared_ptr<Core> core = CoreManager::GetInstance().getCore(slotId);
-        if (core != nullptr && core->IsInitCore()) {
-            TELEPHONY_LOGI("CellularDataService connection successful");
-            break;
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(CONNECT_SERVICE_WAIT_TIME));
-    }
-    if (CONNECT_MAX_TRY_COUNT == i) {
-        TELEPHONY_LOGI("CellularDataService connection failed");
-    }
-}
-
 bool CellularDataService::Init()
 {
     eventLoop_ = AppExecFwk::EventRunner::Create("CellularDataService");
@@ -127,7 +109,7 @@ bool CellularDataService::Init()
     InitModule();
     eventLoop_->Run();
     if (!registerToService_) {
-        bool ret = Publish(DelayedSingleton<CellularDataService>::GetInstance().get());
+        bool ret = Publish(DelayedRefSingleton<CellularDataService>::GetInstance().AsObject());
         if (!ret) {
             TELEPHONY_LOGE("CellularDataService::Init Publish failed!");
             return false;
@@ -135,7 +117,11 @@ bool CellularDataService::Init()
         registerToService_ = true;
     }
     for (const std::pair<const int32_t, std::shared_ptr<CellularDataController>> &it : cellularDataControllers_) {
-        it.second->AsynchronousRegister();
+        if (it.second != nullptr) {
+            it.second->AsynchronousRegister();
+        } else {
+            TELEPHONY_LOGE("CellularDataController is null");
+        }
     }
     RegisterAllNetSpecifier();
     return true;
@@ -143,6 +129,9 @@ bool CellularDataService::Init()
 
 int32_t CellularDataService::IsCellularDataEnabled()
 {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     int32_t slotId = CellularDataService::GetDefaultCellularDataSlotId();
     if (!CheckParamValid(slotId)) {
         TELEPHONY_LOGE("cellularDataControllers_[%{public}d] is null", slotId);
@@ -155,12 +144,20 @@ int32_t CellularDataService::IsCellularDataEnabled()
 
 int32_t CellularDataService::EnableCellularData(bool enable)
 {
-    int32_t slotId = CellularDataService::GetDefaultCellularDataSlotId();
-    if (!CheckParamValid(slotId)) {
-        TELEPHONY_LOGE("cellularDataControllers_[%{public}d] is null", slotId);
-        return CELLULAR_DATA_INVALID_PARAM;
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    bool result = cellularDataControllers_[slotId]->SetCellularDataEnable(enable);
+    bool result = false;
+    for (const std::pair<const int32_t, std::shared_ptr<CellularDataController>> &it : cellularDataControllers_) {
+        if (it.second != nullptr) {
+            bool itemResult = it.second->SetCellularDataEnable(enable);
+            if (!result) {
+                result = itemResult;
+            }
+        } else {
+            TELEPHONY_LOGE("CellularDataController is null");
+        }
+    }
     return result ? static_cast<int32_t>(DataRespondCode::SET_SUCCESS) :
         static_cast<int32_t>(DataRespondCode::SET_FAILED);
 }
@@ -173,9 +170,9 @@ int32_t CellularDataService::GetCellularDataState()
         return CELLULAR_DATA_INVALID_PARAM;
     }
     int32_t dataState = CellularDataStateAdapter(
-        cellularDataControllers_[slotId]->GetCellularDataState(DATA_CONTEXT_ROLE_DEFAULT));
-    int32_t reason = cellularDataControllers_[slotId]->GetDisConnectionReason();
-    if (reason == REASON_GSM_AND_CALLING_ONLY) {
+        cellularDataControllers_[slotId]->GetCellularDataState());
+    DisConnectionReason reason = cellularDataControllers_[slotId]->GetDisConnectionReason();
+    if (reason == DisConnectionReason::REASON_GSM_AND_CALLING_ONLY) {
         if (cellularDataControllers_[slotId]->IsRestrictedMode()) {
             dataState = static_cast<int32_t>(DataConnectionStatus::DATA_STATE_SUSPENDED);
         }
@@ -186,6 +183,9 @@ int32_t CellularDataService::GetCellularDataState()
 
 int32_t CellularDataService::IsCellularDataRoamingEnabled(const int32_t slotId)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (!CheckParamValid(slotId)) {
         TELEPHONY_LOGE("cellularDataControllers_[%{public}d] is null", slotId);
         return CELLULAR_DATA_INVALID_PARAM;
@@ -197,6 +197,9 @@ int32_t CellularDataService::IsCellularDataRoamingEnabled(const int32_t slotId)
 
 int32_t CellularDataService::EnableCellularDataRoaming(const int32_t slotId, bool enable)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (!CheckParamValid(slotId)) {
         TELEPHONY_LOGE("cellularDataControllers_[%{public}d] is null", slotId);
         return CELLULAR_DATA_INVALID_PARAM;
@@ -212,9 +215,9 @@ void CellularDataService::InitModule()
     netAgent.ClearNetSupplier();
     cellularDataControllers_.clear();
     std::vector<uint64_t> netCapabilities;
-    netCapabilities.push_back(NetCapabilities::NET_CAPABILITIES_INTERNET);
-    netCapabilities.push_back(NetCapabilities::NET_CAPABILITIES_MMS);
-    int32_t simNum = SimUtils::GetSimNum();
+    netCapabilities.push_back(NetCap::NET_CAPABILITY_INTERNET);
+    netCapabilities.push_back(NetCap::NET_CAPABILITY_MMS);
+    int32_t simNum = CoreManagerInner::GetInstance().GetMaxSimCount();
     for (int32_t i = 0; i < simNum; ++i) {
         std::shared_ptr<CellularDataController> cellularDataController =
         std::make_shared<CellularDataController>(eventLoop_, i);
@@ -226,10 +229,9 @@ void CellularDataService::InitModule()
             std::pair<int32_t, std::shared_ptr<CellularDataController>>(i, cellularDataController));
         for (uint64_t capability: netCapabilities) {
             NetSupplier netSupplier = { 0 };
-            netSupplier.supplierId = NET_CONN_ERR_INVALID_SUPPLIER_ID;
+            netSupplier.supplierId = 0;
             netSupplier.slotId = i;
-            netSupplier.netType = NetworkType::NET_TYPE_CELLULAR;
-            netSupplier.capabilities = capability;
+            netSupplier.capability = capability;
             netAgent.AddNetSupplier(netSupplier);
         }
     }
@@ -282,9 +284,8 @@ void CellularDataService::DispatchEvent(const int32_t slotId, const AppExecFwk::
 
 void CellularDataService::RegisterAllNetSpecifier()
 {
-    TELEPHONY_LOGI("CellularDataService %{public}p", this);
     std::map<int32_t, std::shared_ptr<CellularDataController>>::iterator itController
-        = cellularDataControllers_.find(CoreManager::DEFAULT_SLOT_ID);
+        = cellularDataControllers_.find(DEFAULT_SIM_SLOT_ID);
     if (!CellularDataNetAgent::GetInstance().RegisterNetSupplier()) {
         if (itController != cellularDataControllers_.end() && (itController->second != nullptr)) {
             itController->second->SendRegisterNetManagerEvent();
@@ -292,7 +293,7 @@ void CellularDataService::RegisterAllNetSpecifier()
             TELEPHONY_LOGE("not register NetSupplier size:%{public}zu", cellularDataControllers_.size());
         }
     }
-    if (CellularDataNetAgent::GetInstance().RegisterPolicyCallback() != 0) {
+    if (!CellularDataNetAgent::GetInstance().RegisterPolicyCallback()) {
         if (itController != cellularDataControllers_.end() && (itController->second != nullptr)) {
             itController->second->SendRegisterPolicyEvent();
         } else {
@@ -307,54 +308,65 @@ void CellularDataService::UnRegisterAllNetSpecifier()
     CellularDataNetAgent::GetInstance().UnregisterPolicyCallback();
 }
 
-int32_t CellularDataService::HandleApnChanged(const int32_t slotId, std::string apns)
+int32_t CellularDataService::HandleApnChanged(const int32_t slotId)
 {
     if (!CheckParamValid(slotId)) {
         TELEPHONY_LOGE("cellularDataControllers_[%{public}d] is null", slotId);
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    int32_t result = cellularDataControllers_[slotId]->HandleApnChanged(apns);
-    return result;
+    bool result = cellularDataControllers_[slotId]->HandleApnChanged();
+    return result ? static_cast<int32_t>(DataRespondCode::SET_SUCCESS) :
+        static_cast<int32_t>(DataRespondCode::SET_FAILED);
 }
 
 int32_t CellularDataService::GetDefaultCellularDataSlotId()
 {
-    return SimUtils::GetDefaultCellularDataSlotId();
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    return CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
 }
 
 int32_t CellularDataService::SetDefaultCellularDataSlotId(const int32_t slotId)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (!CheckParamValid(slotId)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
     int32_t formerSlotId = GetDefaultCellularDataSlotId();
-    TELEPHONY_LOGI("former slot id is :=  %{public}d", formerSlotId);
-    if (formerSlotId == TELEPHONY_ERROR) {
+    if (formerSlotId < 0) {
         TELEPHONY_LOGI("No old card slot id.");
     }
-    int32_t result = SimUtils::SetDefaultCellularDataSlotId(slotId);
-    if (result == static_cast<int32_t>(DataRespondCode::SET_SUCCESS)) {
-        if (formerSlotId >= 0 && formerSlotId != slotId) {
-            cellularDataControllers_[formerSlotId]->ClearAllConnectionsFormerSlot();
-        }
-        if (IsCellularDataEnabled()) {
-            cellularDataControllers_[slotId]->ConnectDataNetWork();
-        }
-    } else {
+    bool result = CoreManagerInner::GetInstance().SetDefaultCellularDataSlotId(slotId);
+    if (!result) {
         TELEPHONY_LOGE("set slot id fail");
+        return static_cast<int32_t>(DataRespondCode::SET_FAILED);
     }
-    return result;
+    if (formerSlotId >= 0 && formerSlotId != slotId) {
+        std::map<int32_t, std::shared_ptr<CellularDataController>>::iterator itController
+           = cellularDataControllers_.find(formerSlotId);
+        if (itController != cellularDataControllers_.end() && (itController->second != nullptr)) {
+            itController->second->ClearAllConnections();
+        } else {
+            TELEPHONY_LOGI("Not find old slot[%{public}d] object", formerSlotId);
+        }
+    }
+    if (IsCellularDataEnabled()) {
+        cellularDataControllers_[slotId]->ConnectDataNetWork();
+    }
+    return static_cast<int32_t>(DataRespondCode::SET_SUCCESS);
 }
 
 int32_t CellularDataService::GetCellularDataFlowType()
 {
     int32_t slotId = CellularDataService::GetDefaultCellularDataSlotId();
     if (!CheckParamValid(slotId)) {
-        TELEPHONY_LOGE("slotId[%{public}d] invalid", slotId);
+        TELEPHONY_LOGE("cellularDataControllers_[%{public}d] is null", slotId);
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    bool isSuspend = (GetCellularDataState() == static_cast<int32_t>(DataConnectionStatus::DATA_STATE_SUSPENDED));
-    if (isSuspend) {
+    if (GetCellularDataState() == static_cast<int32_t>(DataConnectionStatus::DATA_STATE_SUSPENDED)) {
         return static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_DORMANT);
     }
     int32_t result = cellularDataControllers_[slotId]->GetCellularDataFlowType();
@@ -388,26 +400,22 @@ std::string CellularDataService::GetCellularDataSlotIdDump()
 std::string CellularDataService::GetStateMachineCurrentStatusDump()
 {
     std::ostringstream oss;
-    int32_t slotId = 0;
-    int32_t statusDefault = 0;
-    int32_t statusIms = 0;
-    slotId = GetDefaultCellularDataSlotId();
+    int32_t slotId = GetDefaultCellularDataSlotId();
     if (!CheckParamValid(slotId)) {
         oss << "default slotId: " << slotId;
         return oss.str();
     }
-    statusDefault = cellularDataControllers_[slotId]->GetCellularDataState(DATA_CONTEXT_ROLE_DEFAULT);
-    statusIms = cellularDataControllers_[slotId]->GetCellularDataState(DATA_CONTEXT_ROLE_IMS);
-    oss << "Default connect state: " << statusDefault;
-    oss << "Ims connect state:  " << statusIms;
+    ApnProfileState statusDefault = cellularDataControllers_[slotId]->GetCellularDataState(DATA_CONTEXT_ROLE_DEFAULT);
+    ApnProfileState statusIms = cellularDataControllers_[slotId]->GetCellularDataState(DATA_CONTEXT_ROLE_IMS);
+    oss << "Default connect state: " << static_cast<int32_t>(statusDefault);
+    oss << "Ims connect state:  " << static_cast<int32_t>(statusIms);
     return oss.str();
 }
 
 std::string CellularDataService::GetFlowDataInfoDump()
 {
     std::ostringstream oss;
-    int32_t slotId = 0;
-    slotId = GetDefaultCellularDataSlotId();
+    int32_t slotId = GetDefaultCellularDataSlotId();
     if (!CheckParamValid(slotId)) {
         oss << "default slotId: " << slotId;
         return oss.str();
@@ -419,7 +427,6 @@ std::string CellularDataService::GetFlowDataInfoDump()
 
 int32_t CellularDataService::StrategySwitch(int32_t slotId, bool enable)
 {
-    TELEPHONY_LOGI("slotId is :%{public}d enable is :%{public}d", slotId, enable);
     if (!CheckParamValid(slotId)) {
         TELEPHONY_LOGE("cellularDataControllers_[%{public}d] is null", slotId);
         return CELLULAR_DATA_INVALID_PARAM;
