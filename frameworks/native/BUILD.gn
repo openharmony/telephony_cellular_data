@@ -38,21 +38,16 @@ ohos_shared_library("tel_cellular_data_api") {
     "$SUBSYSTEM_DIR/frameworks/native/cellular_data_service_proxy.cpp",
   ]
 
-  include_dirs =
-      [ "//base/telephony/core_service/interfaces/innerkits/include" ]
-
   public_configs = [ ":cellular_data_util_config" ]
 
-  deps = [
-    "//base/telephony/core_service/utils:libtel_common",
-    "//utils/native/base:utils",
-  ]
-
   external_deps = [
+    "core_service:libtel_common",
+    "core_service:tel_core_service_api",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
+    "utils_base:utils",
   ]
 
   part_name = "cellular_data"
