@@ -61,7 +61,6 @@ public:
     int32_t GetDefaultCellularDataSlotId() override;
     int32_t SetDefaultCellularDataSlotId(const int32_t slotId) override;
     int32_t GetCellularDataFlowType() override;
-    void RegisterAllNetSpecifier();
     void DispatchEvent(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
     int32_t HasInternetCapability(const int32_t slotId, const int32_t cid) override;
     int32_t ClearCellularDataConnections(const int32_t slotId) override;

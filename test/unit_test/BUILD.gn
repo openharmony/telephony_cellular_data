@@ -23,10 +23,9 @@ ohos_executable("tel_cellular_data_ui_test") {
     "$SOURCE_DIR/services/include/common",
   ]
 
-  deps = [
-    "//base/telephony/core_service/utils:libtel_common",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
-  ]
+  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+
+  deps = [ "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native" ]
 
   external_deps = [
     "appexecfwk_standard:libeventhandler",

@@ -42,7 +42,7 @@ void DataConnectionMonitor::StartStallDetectionTimer(std::shared_ptr<AppExecFwk:
     if (!cellularDataHandler_.lock()) {
         cellularDataHandler_ = std::static_pointer_cast<CellularDataHandler>(cellularDataHandler);
     }
-    TELEPHONY_LOGI("start stall detection");
+    TELEPHONY_LOGI("Slot%{public}d: start stall detection", slotId_);
     stallDetectionEnabled = true;
     if (!HasInnerEvent(CellularDataEventCode::MSG_STALL_DETECTION_EVENT_ID) && stallDetectionEnabled) {
         AppExecFwk::InnerEvent::Pointer event =
@@ -53,7 +53,7 @@ void DataConnectionMonitor::StartStallDetectionTimer(std::shared_ptr<AppExecFwk:
 
 void DataConnectionMonitor::OnStallDetectionTimer()
 {
-    TELEPHONY_LOGI("on stall detection");
+    TELEPHONY_LOGI("Slot%{public}d: on stall detection", slotId_);
     UpdateFlowInfo();
     if (noRecvPackets_ > RECOVERY_TRIGGER_PACKET) {
         HandleRecovery();
@@ -68,7 +68,7 @@ void DataConnectionMonitor::OnStallDetectionTimer()
 
 void DataConnectionMonitor::StopStallDetectionTimer()
 {
-    TELEPHONY_LOGI("stop stall detection");
+    TELEPHONY_LOGI("Slot%{public}d: stop stall detection", slotId_);
     stallDetectionEnabled = false;
     RemoveEvent(CellularDataEventCode::MSG_STALL_DETECTION_EVENT_ID);
 }
@@ -76,7 +76,7 @@ void DataConnectionMonitor::StopStallDetectionTimer()
 void DataConnectionMonitor::UpdateFlowInfo()
 {
     if (stallDetectionTrafficManager_ == nullptr) {
-        TELEPHONY_LOGE("stallDetectionTrafficManager_ is null");
+        TELEPHONY_LOGE("Slot%{public}d: stallDetectionTrafficManager_ is null", slotId_);
         return;
     }
     int64_t previousSentPackets = 0;
@@ -94,7 +94,7 @@ void DataConnectionMonitor::UpdateFlowInfo()
         noRecvPackets_ = 0;
         dataRecoveryState_ = RecoveryState::STATE_REQUEST_CONTEXT_LIST;
     } else {
-        TELEPHONY_LOGE("Update Flow Info nothing to do");
+        TELEPHONY_LOGE("Slot%{public}d: Update Flow Info nothing to do", slotId_);
     }
 }
 
@@ -102,35 +102,35 @@ void DataConnectionMonitor::HandleRecovery()
 {
     std::shared_ptr<CellularDataHandler> cellularDataHandler = cellularDataHandler_.lock();
     if (cellularDataHandler == nullptr) {
-        TELEPHONY_LOGE("cellularDataHandler is null");
+        TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler is null", slotId_);
         return;
     }
-    TELEPHONY_LOGI("Handle recovery");
+    TELEPHONY_LOGI("Slot%{public}d: Handle recovery", slotId_);
     switch (dataRecoveryState_) {
         case RecoveryState::STATE_REQUEST_CONTEXT_LIST: {
-            TELEPHONY_LOGI("Handle Recovery: get data call list");
+            TELEPHONY_LOGI("Slot%{public}d: Handle Recovery: get data call list", slotId_);
             dataRecoveryState_ = RecoveryState::STATE_CLEANUP_CONNECTIONS;
             GetPdpContextList();
             break;
         }
         case RecoveryState::STATE_CLEANUP_CONNECTIONS:
-            TELEPHONY_LOGI("Handle Recovery: cleanup connections");
+            TELEPHONY_LOGI("Slot%{public}d: Handle Recovery: cleanup connections", slotId_);
             dataRecoveryState_ = RecoveryState::STATE_REREGISTER_NETWORK;
             cellularDataHandler->ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
             break;
         case RecoveryState::STATE_REREGISTER_NETWORK:
-            TELEPHONY_LOGI("Handle Recovery: re-register network");
+            TELEPHONY_LOGI("Slot%{public}d: Handle Recovery: re-register network", slotId_);
             dataRecoveryState_ = RecoveryState::STATE_RADIO_STATUS_RESTART;
             GetPreferredNetworkPara();
             break;
         case RecoveryState::STATE_RADIO_STATUS_RESTART:
-            TELEPHONY_LOGI("Handle Recovery: radio restart");
+            TELEPHONY_LOGI("Slot%{public}d: Handle Recovery: radio restart", slotId_);
             dataRecoveryState_ = RecoveryState::STATE_REQUEST_CONTEXT_LIST;
             cellularDataHandler->ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
             SetRadioState(CORE_SERVICE_POWER_OFF, RadioEvent::RADIO_OFF);
             break;
         default:
-            TELEPHONY_LOGE("Handle Recovery is falsie");
+            TELEPHONY_LOGE("Slot%{public}d: Handle Recovery is falsie", slotId_);
             break;
     }
 }
@@ -186,7 +186,7 @@ void DataConnectionMonitor::SetPreferredNetworkPara(const AppExecFwk::InnerEvent
 void DataConnectionMonitor::UpdateDataFlowType()
 {
     if (trafficManager_ == nullptr) {
-        TELEPHONY_LOGE("trafficManager is null");
+        TELEPHONY_LOGE("Slot%{public}d: trafficManager is null", slotId_);
         return;
     }
     int64_t previousSentPackets = 0;
@@ -231,7 +231,7 @@ void DataConnectionMonitor::SetDataFlowType(CellDataFlowType dataFlowType)
 void DataConnectionMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        TELEPHONY_LOGE("event is null");
+        TELEPHONY_LOGE("Slot%{public}d: event is null", slotId_);
         return;
     }
     uint32_t eventID = event->GetInnerEventId();
@@ -244,22 +244,22 @@ void DataConnectionMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &
             OnStallDetectionTimer();
             break;
         case RadioEvent::RADIO_DATA_CALL_LIST_CHANGED:
-            TELEPHONY_LOGI("radio call list changed complete");
+            TELEPHONY_LOGI("Slot%{public}d: radio call list changed complete", slotId_);
             break;
         case RadioEvent::RADIO_GET_PREFERRED_NETWORK_MODE:
             SetPreferredNetworkPara(event);
             break;
         case RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE:
-            TELEPHONY_LOGI("set preferred network mode complete");
+            TELEPHONY_LOGI("Slot%{public}d: set preferred network mode complete", slotId_);
             break;
         case RadioEvent::RADIO_OFF:
             SetRadioState(CORE_SERVICE_POWER_ON, RadioEvent::RADIO_ON);
             break;
         case RadioEvent::RADIO_ON:
-            TELEPHONY_LOGI("set radio state on complete");
+            TELEPHONY_LOGI("Slot%{public}d: set radio state on complete", slotId_);
             break;
         default:
-            TELEPHONY_LOGI("connection monitor ProcessEvent code = %{public}u", eventID);
+            TELEPHONY_LOGI("Slot%{public}d: connection monitor ProcessEvent code = %{public}u", slotId_, eventID);
             break;
     }
 }
