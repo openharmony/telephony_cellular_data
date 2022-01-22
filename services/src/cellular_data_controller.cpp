@@ -46,8 +46,8 @@ void CellularDataController::Init()
     roamingObserver_ = std::make_unique<CellularDataRoamingObserver>(cellularDataHandler_).release();
     cellularDataRdbObserver_ = std::make_unique<CellularDataRdbObserver>(cellularDataHandler_).release();
     if (cellularDataHandler_ == nullptr || settingObserver_ == nullptr || cellularDataRdbObserver_ == nullptr) {
-        TELEPHONY_LOGE("CellularDataController init failed, "
-            "cellularDataHandler_ or settingObserver_ or cellularDataRdbObserver_ is null");
+        TELEPHONY_LOGE("Slot%{public}d: CellularDataController init failed, "
+            "cellularDataHandler_ or settingObserver_ or cellularDataRdbObserver_ is null", slotId_);
         return;
     }
     cellularDataHandler_->Init();
@@ -56,9 +56,9 @@ void CellularDataController::Init()
 
 bool CellularDataController::SetCellularDataEnable(bool userDataEnabled)
 {
-    TELEPHONY_LOGI("userDataEnabled =: %{public}d", userDataEnabled);
+    TELEPHONY_LOGI("Slot%{public}d: userDataEnabled =: %{public}d", slotId_, userDataEnabled);
     if (cellularDataHandler_ == nullptr) {
-        TELEPHONY_LOGE("SetCellularDataEnable cellularDataHandler_ is null");
+        TELEPHONY_LOGE("Slot%{public}d: SetCellularDataEnable cellularDataHandler_ is null", slotId_);
         return false;
     }
     return cellularDataHandler_->SetCellularDataEnable(userDataEnabled);
@@ -67,7 +67,7 @@ bool CellularDataController::SetCellularDataEnable(bool userDataEnabled)
 bool CellularDataController::IsCellularDataEnabled() const
 {
     if (cellularDataHandler_ == nullptr) {
-        TELEPHONY_LOGE("IsCellularDataEnabled cellularDataHandler_ is null");
+        TELEPHONY_LOGE("Slot%{public}d: IsCellularDataEnabled cellularDataHandler_ is null", slotId_);
         return false;
     }
     return cellularDataHandler_->IsCellularDataEnabled();
@@ -76,7 +76,7 @@ bool CellularDataController::IsCellularDataEnabled() const
 ApnProfileState CellularDataController::GetCellularDataState() const
 {
     if (cellularDataHandler_ == nullptr) {
-        TELEPHONY_LOGE("GetCellularDataState cellularDataHandler_ is null");
+        TELEPHONY_LOGE("Slot%{public}d: GetCellularDataState cellularDataHandler_ is null", slotId_);
         return ApnProfileState::PROFILE_STATE_FAILED;
     }
     return cellularDataHandler_->GetCellularDataState();
@@ -85,7 +85,7 @@ ApnProfileState CellularDataController::GetCellularDataState() const
 ApnProfileState CellularDataController::GetCellularDataState(const std::string &apnType) const
 {
     if (cellularDataHandler_ == nullptr) {
-        TELEPHONY_LOGE("GetCellularDataState cellularDataHandler_ is null");
+        TELEPHONY_LOGE("Slot%{public}d: GetCellularDataState cellularDataHandler_ is null", slotId_);
         return ApnProfileState::PROFILE_STATE_FAILED;
     }
     return cellularDataHandler_->GetCellularDataState(apnType);
@@ -94,7 +94,7 @@ ApnProfileState CellularDataController::GetCellularDataState(const std::string &
 bool CellularDataController::IsCellularDataRoamingEnabled() const
 {
     if (cellularDataHandler_ == nullptr) {
-        TELEPHONY_LOGE("IsCellularDataRoamingEnabled cellularDataHandler_ is null");
+        TELEPHONY_LOGE("Slot%{public}d: IsCellularDataRoamingEnabled cellularDataHandler_ is null", slotId_);
         return false;
     }
     return cellularDataHandler_->IsCellularDataRoamingEnabled();
@@ -103,7 +103,7 @@ bool CellularDataController::IsCellularDataRoamingEnabled() const
 bool CellularDataController::SetCellularDataRoamingEnabled(bool dataRoamingEnabled)
 {
     if (cellularDataHandler_ == nullptr) {
-        TELEPHONY_LOGE("SetCellularDataRoamingEnabled cellularDataHandler is null");
+        TELEPHONY_LOGE("Slot%{public}d: SetCellularDataRoamingEnabled cellularDataHandler is null", slotId_);
         return false;
     }
     return cellularDataHandler_->SetCellularDataRoamingEnabled(dataRoamingEnabled);
@@ -112,7 +112,7 @@ bool CellularDataController::SetCellularDataRoamingEnabled(bool dataRoamingEnabl
 bool CellularDataController::ReleaseNet(const NetRequest &request)
 {
     if (cellularDataHandler_ == nullptr) {
-        TELEPHONY_LOGE("ReleaseNet cellularDataHandler_ is null");
+        TELEPHONY_LOGE("Slot%{public}d: ReleaseNet cellularDataHandler_ is null", slotId_);
         return false;
     }
     return cellularDataHandler_->ReleaseNet(request);
@@ -121,51 +121,41 @@ bool CellularDataController::ReleaseNet(const NetRequest &request)
 bool CellularDataController::RequestNet(const NetRequest &request)
 {
     if (cellularDataHandler_ == nullptr) {
-        TELEPHONY_LOGE("RequestNet cellularDataHandler_ is null");
+        TELEPHONY_LOGE("Slot%{public}d: RequestNet cellularDataHandler_ is null", slotId_);
         return false;
     }
     return cellularDataHandler_->RequestNet(request);
 }
 
-void CellularDataController::SendRegisterNetManagerEvent()
-{
-    SendEvent(CellularDataEventCode::MSG_REG_NET_MANAGER, REG_NET_MANAGER_DELAY_TIME, Priority::LOW);
-}
-
-void CellularDataController::SendRegisterPolicyEvent()
-{
-    SendEvent(CellularDataEventCode::MSG_REG_POLICY_CALL_BACK, REG_NET_MANAGER_DELAY_TIME, Priority::LOW);
-}
-
 void CellularDataController::AsynchronousRegister()
 {
     if (CoreManagerInner::GetInstance().IsInitFinished()) {
-        TELEPHONY_LOGI("core inited %{public}d", slotId_);
+        TELEPHONY_LOGI("Slot%{public}d: core inited", slotId_);
         Init();
         RegisterEvents();
         return;
     }
-    TELEPHONY_LOGI("AsynchronousRegister := %{public}d", slotId_);
+    TELEPHONY_LOGI("Slot%{public}d: AsynchronousRegister", slotId_);
     SendEvent(CellularDataEventCode::MSG_ASYNCHRONOUS_REGISTER_EVENT_ID, CORE_INIT_DELAY_TIME, Priority::HIGH);
 }
 
 void CellularDataController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        TELEPHONY_LOGE("ProcessEvent event is null.");
+        TELEPHONY_LOGE("Slot%{public}d: ProcessEvent event is null.", slotId_);
         return;
     }
     int32_t eventId = event->GetInnerEventId();
     switch (eventId) {
         case CellularDataEventCode::MSG_REG_NET_MANAGER: {
             if (!CellularDataNetAgent::GetInstance().RegisterNetSupplier()) {
-                SendRegisterNetManagerEvent();
+                SendEvent(CellularDataEventCode::MSG_REG_NET_MANAGER, REG_NET_MANAGER_DELAY_TIME, Priority::LOW);
             }
             break;
         }
         case CellularDataEventCode::MSG_REG_POLICY_CALL_BACK: {
             if (!CellularDataNetAgent::GetInstance().RegisterPolicyCallback()) {
-                SendRegisterPolicyEvent();
+                SendEvent(CellularDataEventCode::MSG_REG_POLICY_CALL_BACK, REG_NET_MANAGER_DELAY_TIME, Priority::LOW);
             }
             break;
         }
@@ -173,7 +163,7 @@ void CellularDataController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer 
             AsynchronousRegister();
             break;
         default:
-            TELEPHONY_LOGE("ProcessEvent nothing to do");
+            TELEPHONY_LOGE("Slot%{public}d: ProcessEvent nothing to do", slotId_);
             break;
     }
 }
@@ -181,13 +171,14 @@ void CellularDataController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer 
 void CellularDataController::RegisterEvents()
 {
     if (cellularDataHandler_ == nullptr) {
-        TELEPHONY_LOGE("core is null or cellularDataHandler is null");
+        TELEPHONY_LOGE("Slot%{public}d: core is null or cellularDataHandler is null", slotId_);
         return;
     }
-    TELEPHONY_LOGI("RegisterEvents start");
+    TELEPHONY_LOGI("Slot%{public}d: RegisterEvents start", slotId_);
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_SIM_STATE_CHANGE, nullptr);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_SIM_RECORDS_LOADED, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_SIM_ACCOUNT_LOADED, nullptr);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_CONNECTION_ATTACHED, nullptr);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_CONNECTION_DETACHED, nullptr);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_ROAMING_OPEN, nullptr);
@@ -204,7 +195,13 @@ void CellularDataController::RegisterEvents()
         if (networkSearchCallback != nullptr) {
             coreInner.RegisterCellularDataObject(networkSearchCallback);
         } else {
-            TELEPHONY_LOGE("networkSearchCallback is null");
+            TELEPHONY_LOGE("Slot%{public}d: networkSearchCallback is null", slotId_);
+        }
+        if (!CellularDataNetAgent::GetInstance().RegisterNetSupplier()) {
+            SendEvent(CellularDataEventCode::MSG_REG_NET_MANAGER, REG_NET_MANAGER_DELAY_TIME, Priority::LOW);
+        }
+        if (!CellularDataNetAgent::GetInstance().RegisterPolicyCallback()) {
+            SendEvent(CellularDataEventCode::MSG_REG_POLICY_CALL_BACK, REG_NET_MANAGER_DELAY_TIME, Priority::LOW);
         }
     }
 }
@@ -212,13 +209,14 @@ void CellularDataController::RegisterEvents()
 void CellularDataController::UnRegisterEvents()
 {
     if (cellularDataHandler_ == nullptr) {
-        TELEPHONY_LOGE("UnRegisterEvents cellularDataHandler_ is null");
+        TELEPHONY_LOGE("Slot%{public}d: UnRegisterEvents cellularDataHandler_ is null", slotId_);
         return;
     }
-    TELEPHONY_LOGI("UnRegisterEvents start");
+    TELEPHONY_LOGI("Slot%{public}d: UnRegisterEvents start", slotId_);
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_SIM_STATE_CHANGE);
     coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_SIM_RECORDS_LOADED);
+    coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
     coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_CONNECTION_ATTACHED);
     coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_CONNECTION_DETACHED);
     coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_ROAMING_OPEN);
@@ -230,7 +228,7 @@ void CellularDataController::UnRegisterEvents()
     coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_EMERGENCY_STATE_CLOSE);
     coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_NR_STATE_CHANGED);
     coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_NR_FREQUENCY_CHANGED);
-    TELEPHONY_LOGI("UnRegisterEvents end");
+    TELEPHONY_LOGI("Slot%{public}d: UnRegisterEvents end", slotId_);
 }
 
 void CellularDataController::UnRegisterDataObserver()
@@ -258,7 +256,7 @@ void CellularDataController::RegisterDatabaseObserver()
 bool CellularDataController::HandleApnChanged()
 {
     if (cellularDataHandler_ == nullptr) {
-        TELEPHONY_LOGE("ApnChanged cellularDataHandler_ is null");
+        TELEPHONY_LOGE("Slot%{public}d: ApnChanged cellularDataHandler_ is null", slotId_);
         return static_cast<int32_t>(DataRespondCode::SET_FAILED);
     }
     return cellularDataHandler_->HandleApnChanged();
@@ -267,16 +265,16 @@ bool CellularDataController::HandleApnChanged()
 int32_t CellularDataController::GetCellularDataFlowType()
 {
     if (cellularDataHandler_ == nullptr) {
-        TELEPHONY_LOGE("cellular data handler is null");
+        TELEPHONY_LOGE("Slot%{public}d: cellular data handler is null", slotId_);
         return static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_NONE);
     }
     return cellularDataHandler_->GetCellularDataFlowType();
 }
 
-void CellularDataController::ConnectDataNetWork()
+void CellularDataController::EstablishDataConnection()
 {
     if (cellularDataHandler_ != nullptr) {
-        cellularDataHandler_->ConnectDataNeWork();
+        cellularDataHandler_->EstablishAllApnsIfConnectable();
     }
 }
 
@@ -307,7 +305,7 @@ DisConnectionReason CellularDataController::GetDisConnectionReason()
 bool CellularDataController::HasInternetCapability(const int32_t cid) const
 {
     if (cellularDataHandler_ == nullptr) {
-        TELEPHONY_LOGE("cellularDataHandler_ is null");
+        TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler_ is null", slotId_);
         return false;
     }
     return cellularDataHandler_->HasInternetCapability(cid);
@@ -316,7 +314,7 @@ bool CellularDataController::HasInternetCapability(const int32_t cid) const
 bool CellularDataController::ClearAllConnections() const
 {
     if (cellularDataHandler_ == nullptr) {
-        TELEPHONY_LOGE("SetCellularDataRoamingEnabled cellularDataHandler is null");
+        TELEPHONY_LOGE("Slot%{public}d: SetCellularDataRoamingEnabled cellularDataHandler is null", slotId_);
         return false;
     }
     cellularDataHandler_->ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);

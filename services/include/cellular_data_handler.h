@@ -59,7 +59,6 @@ public:
     void HandleApnChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleCallStateUpdate(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t GetCellularDataFlowType();
-    void ConnectDataNeWork();
     void SetPolicyDataOn(bool enable);
     bool IsRestrictedMode() const;
     DisConnectionReason GetDisConnectionReason();
@@ -84,6 +83,7 @@ private:
     void HandleSettingSwitchChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleVoiceCallChanged(int32_t state);
     void HandleSimStateOrRecordsChanged(const AppExecFwk::InnerEvent::Pointer &event);
+    void HandleSimAccountLoaded(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleRadioStateChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void PsDataRatChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void SetRilAttachApn();
@@ -140,6 +140,7 @@ private:
         {RadioEvent::RADIO_STATE_CHANGED, &CellularDataHandler::HandleRadioStateChanged},
         {RadioEvent::RADIO_SIM_STATE_CHANGE, &CellularDataHandler::HandleSimStateOrRecordsChanged},
         {RadioEvent::RADIO_SIM_RECORDS_LOADED, &CellularDataHandler::HandleSimStateOrRecordsChanged},
+        {RadioEvent::RADIO_SIM_ACCOUNT_LOADED, &CellularDataHandler::HandleSimAccountLoaded},
         {RadioEvent::RADIO_PS_RAT_CHANGED, &CellularDataHandler::PsDataRatChanged},
         {CellularDataEventCode::MSG_APN_CHANGED, &CellularDataHandler::HandleApnChanged},
         {RadioEvent::RADIO_CALL_STATUS_INFO, &CellularDataHandler::HandleCallStateUpdate},

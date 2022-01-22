@@ -96,12 +96,12 @@ void CellularDataStateMachine::DoConnect(const DataConnectionParams &connectionP
     activeDataParam.dataProfile.userName = apn->attr_.user_;
     activeDataParam.dataProfile.password = apn->attr_.password_;
     activeDataParam.dataProfile.roamingProtocol = apn->attr_.roamingProtocol_;
-    TELEPHONY_LOGI("Activate PDP context (slot%{public}d %{public}d, %{public}s, %{public}s)", slotId,
-        apn->attr_.profileId_, apn->attr_.apn_, apn->attr_.protocol_);
+    TELEPHONY_LOGI("Slot%{public}d: Activate PDP context (%{public}d, %{public}s, %{public}s, %{public}s)", slotId,
+        apn->attr_.profileId_, apn->attr_.apn_, apn->attr_.protocol_, apn->attr_.types_);
     int32_t result = CoreManagerInner::GetInstance().ActivatePdpContext(slotId, RadioEvent::RADIO_RIL_SETUP_DATA_CALL,
         activeDataParam, stateMachineEventHandler_);
     if (result != TELEPHONY_ERR_SUCCESS) {
-        TELEPHONY_LOGE("Activate PDP context failed");
+        TELEPHONY_LOGE("Slot%{public}d: Activate PDP context failed", slotId);
     }
     stateMachineEventHandler_->SendEvent(CellularDataEventCode::MSG_CONNECT_TIMEOUT_CHECK, connectId_,
         CONNECTION_DISCONNECTION_TIMEOUT);
@@ -111,8 +111,8 @@ void CellularDataStateMachine::FreeConnection(const DataDisconnectParams &params
 {
     const int32_t slotId = GetSlotId();
     int32_t apnId = ApnManager::FindApnIdByApnName(params.GetApnType());
-    TELEPHONY_LOGI("Deactivate PDP context cid:%{public}d type:%{public}s id:%{public}d slot:%{public}d",
-        cid_, params.GetApnType().c_str(), apnId, slotId);
+    TELEPHONY_LOGI("Slot%{public}d: Deactivate PDP context cid:%{public}d type:%{public}s id:%{public}d",
+        slotId, cid_, params.GetApnType().c_str(), apnId);
     DeactivateDataParam deactivateDataParam;
     deactivateDataParam.param = connectId_;
     deactivateDataParam.cid = cid_;
@@ -120,7 +120,7 @@ void CellularDataStateMachine::FreeConnection(const DataDisconnectParams &params
     int32_t result = CoreManagerInner::GetInstance().DeactivatePdpContext(slotId,
         RadioEvent::RADIO_RIL_DEACTIVATE_DATA_CALL, deactivateDataParam, stateMachineEventHandler_);
     if (result != TELEPHONY_ERR_SUCCESS) {
-        TELEPHONY_LOGE("Deactivate PDP context failed");
+        TELEPHONY_LOGE("Slot%{public}d: Deactivate PDP context failed", slotId);
     }
     stateMachineEventHandler_->SendEvent(CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK, connectId_,
         CONNECTION_DISCONNECTION_TIMEOUT);
@@ -173,7 +173,7 @@ void CellularDataStateMachine::UpdateNetworkInfo(const SetupDataCallResultInfo &
 {
     std::lock_guard<std::mutex> guard(mtx_);
     int32_t slotId = GetSlotId();
-    TELEPHONY_LOGI("dataCall slot:%{public}d, capability:%{public}" PRIu64", state:%{public}d, addr:%{public}s, "
+    TELEPHONY_LOGI("Slot%{public}d: dataCall, capability:%{public}" PRIu64", state:%{public}d, addr:%{public}s, "
         "dns: %{public}s, gw: %{public}s", slotId, capability_, dataCallInfo.reason,
         dataCallInfo.address.c_str(), dataCallInfo.dns.c_str(), dataCallInfo.gateway.c_str());
     std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(dataCallInfo.address);
@@ -186,7 +186,7 @@ void CellularDataStateMachine::UpdateNetworkInfo(const SetupDataCallResultInfo &
         return;
     }
     if (netLinkInfo_ == nullptr || netSupplierInfo_ == nullptr) {
-        TELEPHONY_LOGE("start update net info,but netLinkInfo or netSupplierInfo is null!");
+        TELEPHONY_LOGE("Slot%{public}d: start update net info,but netLinkInfo or netSupplierInfo is null!", slotId);
         return;
     }
     bool roamingState = false;

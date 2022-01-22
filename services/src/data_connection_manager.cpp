@@ -33,7 +33,7 @@ DataConnectionManager::DataConnectionManager(const std::shared_ptr<AppExecFwk::E
     connectionMonitor_ = std::make_shared<DataConnectionMonitor>(runner, slotId);
     ccmDefaultState_ = std::make_unique<CcmDefaultState>(*this, "CcmDefaultState").release();
     if (connectionMonitor_ == nullptr || ccmDefaultState_ == nullptr) {
-        TELEPHONY_LOGE("connectionMonitor_ or ccmDefaultState is null");
+        TELEPHONY_LOGE("Slot%{public}d: connectionMonitor_ or ccmDefaultState is null", slotId_);
         return;
     }
     StateMachine::SetOriginalState(ccmDefaultState_);
@@ -52,7 +52,7 @@ void DataConnectionManager::AddConnectionStateMachine(const std::shared_ptr<Cell
 void DataConnectionManager::RemoveConnectionStateMachine(const std::shared_ptr<CellularDataStateMachine> &stateMachine)
 {
     if (stateMachine == nullptr) {
-        TELEPHONY_LOGE("stateMachine is null");
+        TELEPHONY_LOGE("Slot%{public}d: stateMachine is null", slotId_);
         return;
     }
     for (std::vector<std::shared_ptr<CellularDataStateMachine>>::const_iterator iter =
@@ -244,7 +244,7 @@ int32_t DataConnectionManager::GetSlotId() const
 int32_t DataConnectionManager::GetDataFlowType()
 {
     if (connectionMonitor_ == nullptr) {
-        TELEPHONY_LOGE("connection monitor is null");
+        TELEPHONY_LOGE("Slot%{public}d: connection monitor is null", slotId_);
         return static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_NONE);
     }
     CellDataFlowType flowType = connectionMonitor_->GetDataFlowType();
@@ -254,7 +254,7 @@ int32_t DataConnectionManager::GetDataFlowType()
 void DataConnectionManager::SetDataFlowType(CellDataFlowType dataFlowType)
 {
     if (connectionMonitor_ == nullptr) {
-        TELEPHONY_LOGE("connection monitor is null");
+        TELEPHONY_LOGE("Slot%{public}d: connection monitor is null", slotId_);
         return;
     }
     connectionMonitor_->SetDataFlowType(dataFlowType);
@@ -280,7 +280,7 @@ std::string DataConnectionManager::GetDefaultBandWidthsConfig()
             }
         }
     }
-    TELEPHONY_LOGI("BANDWIDTH_CONFIG_MAP size is %{public}zu", bandwidthConfigMap_.size());
+    TELEPHONY_LOGI("Slot%{public}d: BANDWIDTH_CONFIG_MAP size is %{public}zu", slotId_, bandwidthConfigMap_.size());
     return "bandWidth";
 }
 
@@ -292,10 +292,9 @@ std::string DataConnectionManager::GetDefaultTcpBufferConfig()
     std::vector<std::string> tcpBufferVec = CellularDataUtils::Split(tcpBufferConfig, ";");
     for (std::string tcpBuffer : tcpBufferVec) {
         std::vector<std::string> str = CellularDataUtils::Split(tcpBuffer, ":");
-        TELEPHONY_LOGI("key = %{public}s, value = %{public}s", str.front().c_str(), str.back().c_str());
         tcpBufferConfigMap_.emplace(str.front(), str.back());
     }
-    TELEPHONY_LOGI("TCP_BUFFER_CONFIG_MAP size is %{public}zu", tcpBufferConfigMap_.size());
+    TELEPHONY_LOGI("Slot%{public}d: TCP_BUFFER_CONFIG_MAP size is %{public}zu", slotId_, tcpBufferConfigMap_.size());
     return tcpBufferConfig;
 }
 
@@ -317,12 +316,12 @@ LinkBandwidthInfo DataConnectionManager::GetBandwidthsByRadioTech(const int32_t 
     if (radioTechName == "NR") {
         radioTechName = "NR_SA";
     }
-    TELEPHONY_LOGI("accessRadioName is %{public}s", radioTechName.c_str());
+    TELEPHONY_LOGI("Slot%{public}d: accessRadioName is %{public}s", slotId_, radioTechName.c_str());
     std::map<std::string, LinkBandwidthInfo>::iterator iter = bandwidthConfigMap_.find(radioTechName);
     if (iter != bandwidthConfigMap_.end()) {
         linkBandwidthInfo = iter->second;
-        TELEPHONY_LOGI("name is %{public}s upBandwidth = %{public}u downBandwidth = %{public}u",
-            iter->first.c_str(), linkBandwidthInfo.upBandwidth, linkBandwidthInfo.downBandwidth);
+        TELEPHONY_LOGI("Slot%{public}d: name is %{public}s upBandwidth = %{public}u downBandwidth = %{public}u",
+            slotId_, iter->first.c_str(), linkBandwidthInfo.upBandwidth, linkBandwidthInfo.downBandwidth);
     }
     return linkBandwidthInfo;
 }

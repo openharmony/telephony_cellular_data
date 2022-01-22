@@ -39,12 +39,10 @@ public:
     ApnProfileState GetCellularDataState() const;
     ApnProfileState GetCellularDataState(const std::string &apnType) const;
     bool IsCellularDataRoamingEnabled() const;
-    void SendRegisterNetManagerEvent();
-    void SendRegisterPolicyEvent();
     void AsynchronousRegister();
     bool HandleApnChanged();
     int32_t GetCellularDataFlowType();
-    void ConnectDataNetWork();
+    void EstablishDataConnection();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t SetPolicyDataOn(bool enable);
     bool IsRestrictedMode() const;

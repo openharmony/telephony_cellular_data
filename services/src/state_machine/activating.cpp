@@ -121,8 +121,13 @@ DisConnectionReason Activating::DataCallPdpError(int32_t reason)
             TELEPHONY_LOGE("DataCall: The connection failed, not try again");
             return DisConnectionReason::REASON_CLEAR_CONNECTION;
         }
-        default:
+        default: {
+            if (reason > HRIL_PDP_ERR_PROTOCOL_ERRORS && reason < HRIL_PDP_ERR_APN_RESTRICTION_VALUE_INCOMPATIBLE) {
+                TELEPHONY_LOGE("DataCall: The protocol error, not try again");
+                return DisConnectionReason::REASON_CLEAR_CONNECTION;
+            }
             break;
+        }
     }
     TELEPHONY_LOGE("DataCall: Connection failed for an unsupported reason, not try again");
     return DisConnectionReason::REASON_CLEAR_CONNECTION;

@@ -123,7 +123,6 @@ bool CellularDataService::Init()
             TELEPHONY_LOGE("CellularDataController is null");
         }
     }
-    RegisterAllNetSpecifier();
     return true;
 }
 
@@ -282,26 +281,6 @@ void CellularDataService::DispatchEvent(const int32_t slotId, const AppExecFwk::
     cellularDataControllers_[slotId]->ProcessEvent(event);
 }
 
-void CellularDataService::RegisterAllNetSpecifier()
-{
-    std::map<int32_t, std::shared_ptr<CellularDataController>>::iterator itController
-        = cellularDataControllers_.find(DEFAULT_SIM_SLOT_ID);
-    if (!CellularDataNetAgent::GetInstance().RegisterNetSupplier()) {
-        if (itController != cellularDataControllers_.end() && (itController->second != nullptr)) {
-            itController->second->SendRegisterNetManagerEvent();
-        } else {
-            TELEPHONY_LOGE("not register NetSupplier size:%{public}zu", cellularDataControllers_.size());
-        }
-    }
-    if (!CellularDataNetAgent::GetInstance().RegisterPolicyCallback()) {
-        if (itController != cellularDataControllers_.end() && (itController->second != nullptr)) {
-            itController->second->SendRegisterPolicyEvent();
-        } else {
-            TELEPHONY_LOGE("not register NetPolicy size:%{public}zu", cellularDataControllers_.size());
-        }
-    }
-}
-
 void CellularDataService::UnRegisterAllNetSpecifier()
 {
     CellularDataNetAgent::GetInstance().UnregisterNetSupplier();
@@ -346,7 +325,7 @@ int32_t CellularDataService::SetDefaultCellularDataSlotId(const int32_t slotId)
     }
     if (formerSlotId >= 0 && formerSlotId != slotId) {
         std::map<int32_t, std::shared_ptr<CellularDataController>>::iterator itController
-           = cellularDataControllers_.find(formerSlotId);
+            = cellularDataControllers_.find(formerSlotId);
         if (itController != cellularDataControllers_.end() && (itController->second != nullptr)) {
             itController->second->ClearAllConnections();
         } else {
@@ -354,7 +333,7 @@ int32_t CellularDataService::SetDefaultCellularDataSlotId(const int32_t slotId)
         }
     }
     if (IsCellularDataEnabled()) {
-        cellularDataControllers_[slotId]->ConnectDataNetWork();
+        cellularDataControllers_[slotId]->EstablishDataConnection();
     }
     return static_cast<int32_t>(DataRespondCode::SET_SUCCESS);
 }
