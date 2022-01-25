@@ -36,9 +36,9 @@ ohos_unittest("tel_cellular_data_test") {
   deps = [ "//utils/native/base:utils" ]
 
   external_deps = [
-    "appexecfwk_standard:libeventhandler",
     "cellular_data:tel_cellular_data_api",
     "core_service:tel_core_service_api",
+    "eventhandler:libeventhandler",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
