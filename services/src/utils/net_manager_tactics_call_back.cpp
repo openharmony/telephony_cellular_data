@@ -20,10 +20,11 @@
 
 namespace OHOS {
 namespace Telephony {
-int32_t NetManagerTacticsCallBack::NetStrategySwitch(int32_t slotId, bool enable)
+int32_t NetManagerTacticsCallBack::NetStrategySwitch(const std::string &slotId, bool enable)
 {
-    int32_t result = DelayedRefSingleton<CellularDataService>::GetInstance().StrategySwitch(slotId, enable);
-    TELEPHONY_LOGI("StrategySwitch[%{public}d, %{public}d] result %{public}d", slotId, enable, result);
+    const int32_t netSimId = std::stoi(slotId);
+    int32_t result = DelayedRefSingleton<CellularDataService>::GetInstance().StrategySwitch(netSimId, enable);
+    TELEPHONY_LOGI("StrategySwitch[%{public}d, %{public}d] result %{public}d", netSimId, enable, result);
     return result;
 }
 } // Telephony
