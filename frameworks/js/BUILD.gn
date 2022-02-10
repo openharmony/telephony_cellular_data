@@ -34,7 +34,7 @@ ohos_shared_library("data") {
   ]
 
   external_deps = [
-    "ability_runtime:want",
+    "ability_base:want",
     "cellular_data:tel_cellular_data_api",
     "eventhandler:libeventhandler",
     "ipc:ipc_core",
