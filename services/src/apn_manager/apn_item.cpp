@@ -78,7 +78,7 @@ sptr<ApnItem> ApnItem::MakeDefaultApn(const std::string &apnType)
             return nullptr;
         }
     }
-    TELEPHONY_LOGE("MakeDefaultApn: type = %{public}s", apnItem->attr_.types_);
+    TELEPHONY_LOGI("MakeDefaultApn: type = %{public}s", apnItem->attr_.types_);
     return apnItem;
 }
 

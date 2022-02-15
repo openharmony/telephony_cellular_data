@@ -36,7 +36,7 @@ void TrafficManagement::GetPacketData(int64_t &sendPackets, int64_t &recvPackets
 void TrafficManagement::UpdatePacketData()
 {
     DataFlowStatistics dataState;
-    const std::string interfaceName = "usb0";
+    const std::string interfaceName = "rmnet0";
     sendPackets_ = dataState.GetIfaceTxPackets(interfaceName);
     recvPackets_ = dataState.GetIfaceRxPackets(interfaceName);
 }
