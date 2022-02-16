@@ -19,8 +19,7 @@ import {AsyncCallback} from "./basic";
  * Provides methods related to cellular data services.
  *
  * @since 7
- * @sysCap SystemCapability.Telephony.Telephony
- * @devices phone, tablet, wearable
+ * @sysCap SystemCapability.Telephony.CellularData
  */
 declare namespace data {
   /**
