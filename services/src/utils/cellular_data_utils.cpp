@@ -39,7 +39,7 @@ std::vector<AddressInfo> CellularDataUtils::ParseIpAddr(const std::string &addre
         std::vector<std::string> ipData = Split(ipItem, "/");
         ipInfo.ip = ipData[0];
         if (ipData.size() >= VALID_IP_SIZE) {
-            ipInfo.prefixLen = atoi(ipData[1].c_str());
+            ipInfo.prefixLen = std::stoi(ipData[1].c_str());
             if (flag == ".") {
                 std::vector<std::string> ipSubData = Split(ipInfo.ip, flag);
                 ipInfo.type = (ipSubData.size() > MAX_IPV4_ITEM) ? INetAddr::IpType::IPV6 : INetAddr::IpType::IPV4;
@@ -191,7 +191,7 @@ int32_t CellularDataUtils::GetPrefixLen(const std::vector<std::string> &netmask,
 {
     int32_t prefixLen = 0;
     for (size_t i = start; i < netmask.size(); ++i) {
-        int32_t maskValue = (atoi(netmask[i].c_str()) & 0x00FF);
+        int32_t maskValue = (std::stoi(netmask[i].c_str()) & 0x00FF);
         if (maskValue == 0) {
             break;
         }
@@ -218,6 +218,14 @@ bool CellularDataUtils::GetDefaultPreferApnConfig()
     char preferApn[MIN_BUFFER_SIZE] = {0};
     GetParameter(CONFIG_PREFERAPN.c_str(), DEFAULT_PREFER_APN.c_str(), preferApn, MIN_BUFFER_SIZE);
     return std::atoi(preferApn);
+}
+
+bool CellularDataUtils::GetDefaultMultipleConnectionsConfig()
+{
+    char connections[MIN_BUFFER_SIZE] = {0};
+    GetParameter(CONFIG_MULTIPLE_CONNECTIONS.c_str(), DEFAULT_MULTIPLE_CONNECTIONS.c_str(),
+        connections, MIN_BUFFER_SIZE);
+    return std::atoi(connections) > 0 ? true : false;
 }
 
 std::string CellularDataUtils::ConvertRadioTechToRadioName(const int32_t radioTech)

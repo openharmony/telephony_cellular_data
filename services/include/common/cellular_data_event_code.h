@@ -39,8 +39,8 @@ public:
     static const int32_t MSG_ESTABLISH_DATA_CONNECTION = BASE + 12;
     static const int32_t MSG_ESTABLISH_DATA_CONNECTION_COMPLETE = BASE + 13;
     static const int32_t MSG_DISCONNECT_DATA_COMPLETE = BASE + 14;
-    static const int32_t MSG_ROAMING_ON = BASE + 15;
-    static const int32_t MSG_ROAMING_OFF = BASE + 16;
+    static const int32_t MSG_STATE_MACHINE_INIT = BASE + 15;
+    static const int32_t MSG_STATE_MACHINE_QUIT = BASE + 16;
     static const int32_t MSG_SETTING_SWITCH = BASE + 17;
     static const uint32_t MSG_REG_NET_MANAGER = BASE + 18;
     static const uint32_t MSG_ASYNCHRONOUS_REGISTER_EVENT_ID = BASE + 19;

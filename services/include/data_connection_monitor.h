@@ -24,7 +24,6 @@
 
 namespace OHOS {
 namespace Telephony {
-class CellularDataHandler;
 class DataConnectionMonitor : public AppExecFwk::EventHandler {
 public:
     explicit DataConnectionMonitor(const std::shared_ptr<AppExecFwk::EventRunner> &runner, int32_t slotId);
@@ -32,10 +31,8 @@ public:
 
     /**
      * Start the data detection
-     *
-     * @param cellularDataHandler EventHandler for processing messages
      */
-    void StartStallDetectionTimer(std::shared_ptr<AppExecFwk::EventHandler> &cellularDataHandler);
+    void StartStallDetectionTimer();
 
     /**
      * Data detection is in progress
@@ -106,7 +103,6 @@ public:
 private:
     std::unique_ptr<TrafficManagement> trafficManager_;
     std::unique_ptr<TrafficManagement> stallDetectionTrafficManager_;
-    std::weak_ptr<CellularDataHandler> cellularDataHandler_;
     bool updateNetStat_ = false;
     bool stallDetectionEnabled = false;
     int64_t noRecvPackets_ = 0;

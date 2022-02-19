@@ -34,10 +34,13 @@ CellularDataNetAgent::CellularDataNetAgent()
 
 CellularDataNetAgent::~CellularDataNetAgent() = default;
 
-bool CellularDataNetAgent::RegisterNetSupplier()
+bool CellularDataNetAgent::RegisterNetSupplier(const int32_t slotId)
 {
     bool flag = false;
     for (NetSupplier &netSupplier : netSuppliers_) {
+        if (netSupplier.slotId != slotId) {
+            continue;
+        }
         std::shared_ptr<NetManagerStandard::NetConnClient> netManager = DelayedSingleton<NetConnClient>::GetInstance();
         if (netManager == nullptr) {
             TELEPHONY_LOGE("NetConnClient is null");

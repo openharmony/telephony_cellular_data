@@ -48,7 +48,7 @@ public:
     bool IsRestrictedMode() const;
     DisConnectionReason GetDisConnectionReason();
     bool HasInternetCapability(const int32_t cid) const;
-    bool ClearAllConnections() const;
+    bool ClearAllConnections(DisConnectionReason reason) const;
 
 private:
     void RegisterEvents();

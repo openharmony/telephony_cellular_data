@@ -15,17 +15,35 @@
 
 #include "net_manager_tactics_call_back.h"
 
+#include "cellular_data_error.h"
 #include "cellular_data_service.h"
+#include "core_manager_inner.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-int32_t NetManagerTacticsCallBack::NetStrategySwitch(const std::string &slotId, bool enable)
+int32_t NetManagerTacticsCallBack::NetStrategySwitch(const std::string &simId, bool enable)
 {
-    const int32_t netSimId = std::stoi(slotId);
-    int32_t result = DelayedRefSingleton<CellularDataService>::GetInstance().StrategySwitch(netSimId, enable);
-    TELEPHONY_LOGI("StrategySwitch[%{public}d, %{public}d] result %{public}d", netSimId, enable, result);
-    return result;
+    if (simId.length() == 0) {
+        TELEPHONY_LOGI("StrategySwitch[The simd length is 0]");
+        return CELLULAR_DATA_INVALID_PARAM;
+    }
+    const int32_t netSimId = std::stoi(simId);
+    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
+    for (int32_t  i = 0; i < SIM_SLOT_COUNT; ++i) {
+        IccAccountInfo accountInfo;
+        if (!coreInner.GetSimAccountInfo(i, accountInfo)) {
+            continue;
+        }
+        if (netSimId == accountInfo.simId) {
+            int32_t result = DelayedRefSingleton<CellularDataService>::GetInstance().StrategySwitch(i, enable);
+            TELEPHONY_LOGI("StrategySwitch[%{public}s, %{public}d, %{public}d] result %{public}d", simId.c_str(),
+                i, enable, result);
+            return result;
+        }
+    }
+    TELEPHONY_LOGI("StrategySwitch fail[%{public}s, %{public}d]", simId.c_str(), enable);
+    return CELLULAR_DATA_INVALID_PARAM;
 }
 } // Telephony
 } // OHOS

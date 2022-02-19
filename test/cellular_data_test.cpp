@@ -19,9 +19,11 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
+#include "core_service_client.h"
+#include "telephony_types.h"
+
 #include "cellular_data_error.h"
 #include "cellular_data_types.h"
-#include "core_service_client.h"
 #include "i_cellular_data_manager.h"
 
 namespace OHOS {

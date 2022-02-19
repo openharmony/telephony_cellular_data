@@ -105,10 +105,10 @@ void DataConnectionManager::RemoveActiveConnectionByCid(int32_t cid)
     }
 }
 
-void DataConnectionManager::StartStallDetectionTimer(std::shared_ptr<AppExecFwk::EventHandler> cellularDataHandler)
+void DataConnectionManager::StartStallDetectionTimer()
 {
     if (connectionMonitor_ != nullptr) {
-        connectionMonitor_->StartStallDetectionTimer(cellularDataHandler);
+        connectionMonitor_->StartStallDetectionTimer();
     }
 }
 

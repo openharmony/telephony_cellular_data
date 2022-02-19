@@ -37,7 +37,7 @@ public:
     bool isNoActiveConnection() const;
     std::map<int32_t, std::shared_ptr<CellularDataStateMachine>> GetActiveConnection() const;
     void RemoveActiveConnectionByCid(int32_t cid);
-    void StartStallDetectionTimer(std::shared_ptr<AppExecFwk::EventHandler> cellularDataHandler);
+    void StartStallDetectionTimer();
     void StopStallDetectionTimer();
     void RegisterRadioObserver();
     void UnRegisterRadioObserver() const;

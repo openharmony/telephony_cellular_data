@@ -35,16 +35,16 @@
 
 namespace OHOS {
 namespace Telephony {
-class CellularDataHandler : public AppExecFwk::EventHandler {
+class CellularDataHandler : public AppExecFwk::EventHandler, public EventFwk::CommonEventSubscriber {
 public:
-    explicit CellularDataHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner, int32_t slotId);
+    explicit CellularDataHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
+        const EventFwk::CommonEventSubscribeInfo &sp, int32_t slotId);
     ~CellularDataHandler();
     void Init();
-    void StartStallDetectionTimer();
-    void StopStallDetectionTimer();
     bool ReleaseNet(const NetRequest &request);
     bool RequestNet(const NetRequest &request);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
+    void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
     bool SetCellularDataEnable(bool userDataEnabled);
     bool IsCellularDataEnabled() const;
     bool IsCellularDataRoamingEnabled() const;
@@ -57,7 +57,6 @@ public:
     int32_t GetSlotId() const;
     bool HandleApnChanged();
     void HandleApnChanged(const AppExecFwk::InnerEvent::Pointer &event);
-    void HandleCallStateUpdate(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t GetCellularDataFlowType();
     void SetPolicyDataOn(bool enable);
     bool IsRestrictedMode() const;
@@ -79,7 +78,6 @@ private:
     void DisconnectDataComplete(const AppExecFwk::InnerEvent::Pointer &event);
     void MsgEstablishDataConnection(const AppExecFwk::InnerEvent::Pointer &event);
     void MsgRequestNetwork(const AppExecFwk::InnerEvent::Pointer &event);
-    void CheckAndUpdateNetInfo(sptr<ApnHolder> &apnHolder, std::shared_ptr<SetupDataCallResultInfo> &infos) const;
     void HandleSettingSwitchChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleVoiceCallChanged(int32_t state);
     void HandleSimStateOrRecordsChanged(const AppExecFwk::InnerEvent::Pointer &event);
@@ -120,6 +118,7 @@ private:
     int defaultMobileMtuConfig_ = 0;
     bool defaultPreferApn_ = true;
     bool physicalConnectionActiveState_ = false;
+    bool multipleConnectionsEnabled_ = false;
     std::vector<std::string> upLinkThresholds_;
     std::vector<std::string> downLinkThresholds_;
 
@@ -143,7 +142,6 @@ private:
         {RadioEvent::RADIO_SIM_ACCOUNT_LOADED, &CellularDataHandler::HandleSimAccountLoaded},
         {RadioEvent::RADIO_PS_RAT_CHANGED, &CellularDataHandler::PsDataRatChanged},
         {CellularDataEventCode::MSG_APN_CHANGED, &CellularDataHandler::HandleApnChanged},
-        {RadioEvent::RADIO_CALL_STATUS_INFO, &CellularDataHandler::HandleCallStateUpdate},
         {CellularDataEventCode::MSG_SET_RIL_ATTACH_APN, &CellularDataHandler::SetRilAttachApnResponse},
         {RadioEvent::RADIO_NR_STATE_CHANGED, &CellularDataHandler::HandleRadioNrStateChanged},
         {RadioEvent::RADIO_NR_FREQUENCY_CHANGED, &CellularDataHandler::HandleRadioNrFrequencyChanged},

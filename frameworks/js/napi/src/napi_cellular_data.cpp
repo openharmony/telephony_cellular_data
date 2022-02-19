@@ -197,9 +197,8 @@ static void IsCellularDataEnabledCallback(napi_env env, napi_status status, void
     std::unique_ptr<AsyncContext> asyncContext(context);
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {
-        napi_status status =
-            napi_get_boolean(env, asyncContext->result == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED),
-                &callbackValue);
+        napi_status status = napi_get_boolean(env,
+            asyncContext->result == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED), &callbackValue);
         NAPI_CALL_RETURN_VOID(env, status);
     } else {
         callbackValue =
@@ -466,14 +465,13 @@ static void IsCellularDataRoamingEnabledCallback(napi_env env, napi_status statu
     std::unique_ptr<AsyncContext> asyncContext(context);
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {
-        napi_status status = napi_get_boolean(
-            env, asyncContext->result == static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_ENABLED),
+        napi_status status = napi_get_boolean(env,
+            asyncContext->result == static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_ENABLED),
             &callbackValue);
         NAPI_CALL_RETURN_VOID(env, status);
     } else {
         if (asyncContext->errorCode == ERROR_NATIVE_API_EXECUTE_FAIL) {
-            callbackValue =
-                NapiUtil::CreateErrorMessage(env, "slotId input error", ERROR_NATIVE_API_EXECUTE_FAIL);
+            callbackValue = NapiUtil::CreateErrorMessage(env, "slotId input error", ERROR_NATIVE_API_EXECUTE_FAIL);
         } else {
             callbackValue =
                 NapiUtil::CreateErrorMessage(env, "cellular data service unavailable", ERROR_SERVICE_UNAVAILABLE);
@@ -597,11 +595,10 @@ static void SetDefaultCellularDataSlotIdCallback(napi_env env, napi_status statu
         NAPI_CALL_RETURN_VOID(env, napi_get_undefined(env, &callbackValue));
     } else {
         if (asyncContext->errorCode == ERROR_NATIVE_API_EXECUTE_FAIL) {
-            callbackValue =
-                    NapiUtil::CreateErrorMessage(env, "slotId input error", ERROR_NATIVE_API_EXECUTE_FAIL);
+            callbackValue = NapiUtil::CreateErrorMessage(env, "slotId input error", ERROR_NATIVE_API_EXECUTE_FAIL);
         } else {
             callbackValue =
-                    NapiUtil::CreateErrorMessage(env, "cellular data service unavailable", ERROR_SERVICE_UNAVAILABLE);
+                NapiUtil::CreateErrorMessage(env, "cellular data service unavailable", ERROR_SERVICE_UNAVAILABLE);
         }
     }
     NapiUtil::Handle1ValueCallback(env, asyncContext, callbackValue);
@@ -685,31 +682,99 @@ static napi_value GetCellularDataFlowType(napi_env env, napi_callback_info info)
         NativeGetCellularDataFlowType, GetCellularDataFlowTypeCallback);
 }
 
+static napi_value CreateEnumConstructor(napi_env env, napi_callback_info info)
+{
+    napi_value thisArg = nullptr;
+    void *data = nullptr;
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisArg, &data);
+    napi_value global = nullptr;
+    napi_get_global(env, &global);
+    return thisArg;
+}
+
+static napi_value InitEnumDataConnectState(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "DATA_STATE_UNKNOWN", NapiUtil::ToInt32Value(env, static_cast<int32_t>(DATA_STATE_UNKNOWN))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "DATA_STATE_DISCONNECTED", NapiUtil::ToInt32Value(env, static_cast<int32_t>(DATA_STATE_DISCONNECTED))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "DATA_STATE_CONNECTING", NapiUtil::ToInt32Value(env, static_cast<int32_t>(DATA_STATE_CONNECTING))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "DATA_STATE_CONNECTED", NapiUtil::ToInt32Value(env, static_cast<int32_t>(DATA_STATE_CONNECTED))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "DATA_STATE_SUSPENDED", NapiUtil::ToInt32Value(env, static_cast<int32_t>(DATA_STATE_SUSPENDED))),
+    };
+    NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
+    return exports;
+}
+
+static napi_value CreateDataConnectState(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "DATA_STATE_UNKNOWN", NapiUtil::ToInt32Value(env, static_cast<int32_t>(DATA_STATE_UNKNOWN))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "DATA_STATE_DISCONNECTED", NapiUtil::ToInt32Value(env, static_cast<int32_t>(DATA_STATE_DISCONNECTED))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "DATA_STATE_CONNECTING", NapiUtil::ToInt32Value(env, static_cast<int32_t>(DATA_STATE_CONNECTING))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "DATA_STATE_CONNECTED", NapiUtil::ToInt32Value(env, static_cast<int32_t>(DATA_STATE_CONNECTED))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "DATA_STATE_SUSPENDED", NapiUtil::ToInt32Value(env, static_cast<int32_t>(DATA_STATE_SUSPENDED))),
+
+    };
+    napi_value result = nullptr;
+    napi_define_class(env, "DataConnectState", NAPI_AUTO_LENGTH, CreateEnumConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result);
+    napi_set_named_property(env, exports, "DataConnectState", result);
+    return exports;
+}
+
+static napi_value InitEnumDataFlowType(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_NONE",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_NONE))),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_DOWN",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_DOWN))),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_UP",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_UP))),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_UP_DOWN",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_UP_DOWN))),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_DORMANT",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_DORMANT))),
+    };
+    NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
+    return exports;
+}
+
+static napi_value CreateDataFlowType(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_NONE",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_NONE))),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_DOWN",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_DOWN))),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_UP",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_UP))),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_UP_DOWN",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_UP_DOWN))),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_DORMANT",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_DORMANT))),
+    };
+    napi_value result = nullptr;
+    napi_define_class(env, "DataFlowType", NAPI_AUTO_LENGTH, CreateEnumConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result);
+    napi_set_named_property(env, exports, "DataFlowType", result);
+    return exports;
+}
+
 EXTERN_C_START
 napi_value RegistCellularData(napi_env env, napi_value exports)
 {
     auto cellularDataPoxy = CellularDataClient::GetInstance().GetProxy();
-    napi_value dataStateUnknown = nullptr;
-    napi_value dataStateDisconnected = nullptr;
-    napi_value dataStateConnecting = nullptr;
-    napi_value dataStateConnected = nullptr;
-    napi_value dataStateSuspended = nullptr;
-    napi_value dataflowtypenone = nullptr;
-    napi_value dataflowtypedown = nullptr;
-    napi_value dataflowtypeup = nullptr;
-    napi_value dataflowtypeupdown = nullptr;
-    napi_value dataflowtypedormant = nullptr;
-    napi_create_int32(env, static_cast<int32_t>(DataConnectionState::DATA_STATE_UNKNOWN), &dataStateUnknown);
-    napi_create_int32(
-        env, static_cast<int32_t>(DataConnectionState::DATA_STATE_DISCONNECTED), &dataStateDisconnected);
-    napi_create_int32(env, static_cast<int32_t>(DataConnectionState::DATA_STATE_CONNECTING), &dataStateConnecting);
-    napi_create_int32(env, static_cast<int32_t>(DataConnectionState::DATA_STATE_CONNECTED), &dataStateConnected);
-    napi_create_int32(env, static_cast<int32_t>(DataConnectionState::DATA_STATE_SUSPENDED), &dataStateSuspended);
-    napi_create_int32(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_NONE), &dataflowtypenone);
-    napi_create_int32(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_DOWN), &dataflowtypedown);
-    napi_create_int32(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_UP), &dataflowtypeup);
-    napi_create_int32(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_UP_DOWN), &dataflowtypeupdown);
-    napi_create_int32(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_DORMANT), &dataflowtypedormant);
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("getCellularDataState", GetCellularDataState),
         DECLARE_NAPI_FUNCTION("isCellularDataEnabled", IsCellularDataEnabled),
@@ -721,18 +786,12 @@ napi_value RegistCellularData(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getDefaultCellularDataSlotId", GetDefaultCellularDataSlotId),
         DECLARE_NAPI_FUNCTION("setDefaultCellularDataSlotId", SetDefaultCellularDataSlotId),
         DECLARE_NAPI_FUNCTION("getCellularDataFlowType", GetCellularDataFlowType),
-        DECLARE_NAPI_STATIC_PROPERTY("DATA_STATE_UNKNOWN", dataStateUnknown),
-        DECLARE_NAPI_STATIC_PROPERTY("DATA_STATE_DISCONNECTED", dataStateDisconnected),
-        DECLARE_NAPI_STATIC_PROPERTY("DATA_STATE_CONNECTING", dataStateConnecting),
-        DECLARE_NAPI_STATIC_PROPERTY("DATA_STATE_CONNECTED", dataStateConnected),
-        DECLARE_NAPI_STATIC_PROPERTY("DATA_STATE_SUSPENDED", dataStateSuspended),
-        DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_NONE", dataflowtypenone),
-        DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_DOWN", dataflowtypedown),
-        DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_UP", dataflowtypeup),
-        DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_UP_DOWN", dataflowtypeupdown),
-        DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_DORMANT", dataflowtypedormant),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
+    CreateDataConnectState(env, exports);
+    InitEnumDataConnectState(env, exports);
+    CreateDataFlowType(env, exports);
+    InitEnumDataFlowType(env, exports);
     return exports;
 }
 EXTERN_C_END

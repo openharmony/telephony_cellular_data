@@ -52,7 +52,6 @@ ohos_shared_library("tel_cellular_data") {
   include_dirs = [
     "$SOURCE_DIR/services/include",
     "$SOURCE_DIR/services/include/common",
-    "$SOURCE_DIR/services/include/external",
     "$SOURCE_DIR/services/include/state_machine",
     "$SOURCE_DIR/services/include/utils",
     "$SOURCE_DIR/services/include/apn_manager",
@@ -75,7 +74,6 @@ ohos_shared_library("tel_cellular_data") {
 
   external_deps = [
     "ability_base:want",
-    "ability_runtime:app_manager",
     "bundle_framework:appexecfwk_core",
     "ces_standard:cesfwk_innerkits",
     "eventhandler:libeventhandler",
