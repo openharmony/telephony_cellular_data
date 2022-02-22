@@ -18,7 +18,6 @@
 #include "string_ex.h"
 #include "system_ability_definition.h"
 
-#include "net_conn_constants.h"
 #include "net_specifier.h"
 
 #include "cellular_data_error.h"
@@ -164,19 +163,17 @@ int32_t CellularDataService::EnableCellularData(bool enable)
 int32_t CellularDataService::GetCellularDataState()
 {
     int32_t slotId = CellularDataService::GetDefaultCellularDataSlotId();
-    if (!CheckParamValid(slotId)) {
+    std::map<int32_t, std::shared_ptr<CellularDataController>>::const_iterator item =
+        cellularDataControllers_.find(slotId);
+    if (item == cellularDataControllers_.end() || item->second == nullptr) {
         TELEPHONY_LOGE("cellularDataControllers_[%{public}d] is null", slotId);
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    int32_t dataState = CellularDataStateAdapter(
-        cellularDataControllers_[slotId]->GetCellularDataState());
-    DisConnectionReason reason = cellularDataControllers_[slotId]->GetDisConnectionReason();
-    if (reason == DisConnectionReason::REASON_GSM_AND_CALLING_ONLY) {
-        if (cellularDataControllers_[slotId]->IsRestrictedMode()) {
-            dataState = static_cast<int32_t>(DataConnectionStatus::DATA_STATE_SUSPENDED);
-        }
+    int32_t dataState = CellularDataStateAdapter(item->second->GetCellularDataState());
+    DisConnectionReason reason = item->second->GetDisConnectionReason();
+    if (reason == DisConnectionReason::REASON_GSM_AND_CALLING_ONLY && item->second->IsRestrictedMode()) {
+        dataState = static_cast<int32_t>(DataConnectionStatus::DATA_STATE_SUSPENDED);
     }
-    TELEPHONY_LOGI("slotId=%{public}d, dataState=%{public}d", slotId, dataState);
     return dataState;
 }
 
@@ -327,7 +324,7 @@ int32_t CellularDataService::SetDefaultCellularDataSlotId(const int32_t slotId)
         std::map<int32_t, std::shared_ptr<CellularDataController>>::iterator itController
             = cellularDataControllers_.find(formerSlotId);
         if (itController != cellularDataControllers_.end() && (itController->second != nullptr)) {
-            itController->second->ClearAllConnections();
+            itController->second->ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
         } else {
             TELEPHONY_LOGI("Not find old slot[%{public}d] object", formerSlotId);
         }
@@ -341,15 +338,17 @@ int32_t CellularDataService::SetDefaultCellularDataSlotId(const int32_t slotId)
 int32_t CellularDataService::GetCellularDataFlowType()
 {
     int32_t slotId = CellularDataService::GetDefaultCellularDataSlotId();
-    if (!CheckParamValid(slotId)) {
+    std::map<int32_t, std::shared_ptr<CellularDataController>>::const_iterator item =
+        cellularDataControllers_.find(slotId);
+    if (item == cellularDataControllers_.end() || item->second == nullptr) {
         TELEPHONY_LOGE("cellularDataControllers_[%{public}d] is null", slotId);
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    if (GetCellularDataState() == static_cast<int32_t>(DataConnectionStatus::DATA_STATE_SUSPENDED)) {
+    DisConnectionReason reason = item->second->GetDisConnectionReason();
+    if (reason == DisConnectionReason::REASON_GSM_AND_CALLING_ONLY && item->second->IsRestrictedMode()) {
         return static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_DORMANT);
     }
-    int32_t result = cellularDataControllers_[slotId]->GetCellularDataFlowType();
-    TELEPHONY_LOGI("CellDataFlowType:%{public}d", result);
+    int32_t result = item->second->GetCellularDataFlowType();
     return result;
 }
 
@@ -427,13 +426,20 @@ int32_t CellularDataService::HasInternetCapability(const int32_t slotId, const i
 
 int32_t CellularDataService::ClearCellularDataConnections(const int32_t slotId)
 {
-    if (!CheckParamValid(slotId)) {
+    return ClearAllConnections(slotId, DisConnectionReason::REASON_CLEAR_CONNECTION);
+}
+
+int32_t CellularDataService::ClearAllConnections(const int32_t slotId, DisConnectionReason reason)
+{
+    std::map<int32_t, std::shared_ptr<CellularDataController>>::const_iterator item =
+        cellularDataControllers_.find(slotId);
+    if (item == cellularDataControllers_.end() || item->second == nullptr) {
         TELEPHONY_LOGE("cellularDataControllers_[%{public}d] is null", slotId);
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    bool result = cellularDataControllers_[slotId]->ClearAllConnections();
+    bool result = item->second->ClearAllConnections(reason);
     return result ? static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS) :
-        static_cast<int32_t>(RequestNetCode::REQUEST_FAILED);
+       static_cast<int32_t>(RequestNetCode::REQUEST_FAILED);
 }
 } // namespace Telephony
 } // namespace OHOS

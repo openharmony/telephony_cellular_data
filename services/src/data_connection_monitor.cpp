@@ -20,7 +20,7 @@
 #include "telephony_log_wrapper.h"
 
 #include "cellular_data_event_code.h"
-#include "cellular_data_handler.h"
+#include "cellular_data_service.h"
 #include "cellular_data_types.h"
 
 namespace OHOS {
@@ -37,11 +37,8 @@ DataConnectionMonitor::~DataConnectionMonitor()
     RemoveAllEvents();
 }
 
-void DataConnectionMonitor::StartStallDetectionTimer(std::shared_ptr<AppExecFwk::EventHandler> &cellularDataHandler)
+void DataConnectionMonitor::StartStallDetectionTimer()
 {
-    if (!cellularDataHandler_.lock()) {
-        cellularDataHandler_ = std::static_pointer_cast<CellularDataHandler>(cellularDataHandler);
-    }
     TELEPHONY_LOGI("Slot%{public}d: start stall detection", slotId_);
     stallDetectionEnabled = true;
     if (!HasInnerEvent(CellularDataEventCode::MSG_STALL_DETECTION_EVENT_ID) && stallDetectionEnabled) {
@@ -100,12 +97,6 @@ void DataConnectionMonitor::UpdateFlowInfo()
 
 void DataConnectionMonitor::HandleRecovery()
 {
-    std::shared_ptr<CellularDataHandler> cellularDataHandler = cellularDataHandler_.lock();
-    if (cellularDataHandler == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler is null", slotId_);
-        return;
-    }
-    TELEPHONY_LOGI("Slot%{public}d: Handle recovery", slotId_);
     switch (dataRecoveryState_) {
         case RecoveryState::STATE_REQUEST_CONTEXT_LIST: {
             TELEPHONY_LOGI("Slot%{public}d: Handle Recovery: get data call list", slotId_);
@@ -113,25 +104,37 @@ void DataConnectionMonitor::HandleRecovery()
             GetPdpContextList();
             break;
         }
-        case RecoveryState::STATE_CLEANUP_CONNECTIONS:
+        case RecoveryState::STATE_CLEANUP_CONNECTIONS: {
             TELEPHONY_LOGI("Slot%{public}d: Handle Recovery: cleanup connections", slotId_);
             dataRecoveryState_ = RecoveryState::STATE_REREGISTER_NETWORK;
-            cellularDataHandler->ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
+            int32_t ret = DelayedRefSingleton<CellularDataService>::GetInstance().ClearAllConnections(
+                slotId_, DisConnectionReason::REASON_RETRY_CONNECTION);
+            if (ret != static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)) {
+                TELEPHONY_LOGE("Slot%{public}d: Handle Recovery: cleanup connections failed", slotId_);
+            }
             break;
-        case RecoveryState::STATE_REREGISTER_NETWORK:
+        }
+        case RecoveryState::STATE_REREGISTER_NETWORK: {
             TELEPHONY_LOGI("Slot%{public}d: Handle Recovery: re-register network", slotId_);
             dataRecoveryState_ = RecoveryState::STATE_RADIO_STATUS_RESTART;
             GetPreferredNetworkPara();
             break;
-        case RecoveryState::STATE_RADIO_STATUS_RESTART:
+        }
+        case RecoveryState::STATE_RADIO_STATUS_RESTART: {
             TELEPHONY_LOGI("Slot%{public}d: Handle Recovery: radio restart", slotId_);
             dataRecoveryState_ = RecoveryState::STATE_REQUEST_CONTEXT_LIST;
-            cellularDataHandler->ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
+            int32_t ret = DelayedRefSingleton<CellularDataService>::GetInstance().ClearAllConnections(
+                slotId_, DisConnectionReason::REASON_RETRY_CONNECTION);
+            if (ret != static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)) {
+                TELEPHONY_LOGE("Slot%{public}d: Handle Recovery: radio restart cleanup connections failed", slotId_);
+            }
             SetRadioState(CORE_SERVICE_POWER_OFF, RadioEvent::RADIO_OFF);
             break;
-        default:
+        }
+        default: {
             TELEPHONY_LOGE("Slot%{public}d: Handle Recovery is falsie", slotId_);
             break;
+        }
     }
 }
 

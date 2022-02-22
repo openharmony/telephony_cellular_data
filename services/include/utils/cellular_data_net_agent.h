@@ -41,7 +41,7 @@ public:
      *
      * @return true if register success else return false;
      */
-    bool RegisterNetSupplier();
+    bool RegisterNetSupplier(const int32_t slotId);
 
     /**
      * Cancel the registration information to the network management

@@ -18,6 +18,8 @@
 #include <map>
 #include <string>
 
+#include "telephony_types.h"
+
 #include "cellular_data_client.h"
 
 namespace OHOS {

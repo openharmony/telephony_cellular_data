@@ -26,6 +26,8 @@
 
 #include "telephony_log_wrapper.h"
 
+#include "cellular_data_event_code.h"
+
 namespace OHOS {
 namespace Telephony {
 class State : public RefBase {
@@ -121,12 +123,12 @@ public:
             TELEPHONY_LOGE("The event parameter is incorrect");
             return;
         }
-        if (event->GetInnerEventId() == CMD_STATE_MACHINE_QUIT) {
+        if (event->GetInnerEventId() == CellularDataEventCode::MSG_STATE_MACHINE_QUIT) {
             TELEPHONY_LOGI("State machine exit");
             Quit();
             return;
         }
-        if (event->GetInnerEventId() == CMD_STATE_MACHINE_INIT) {
+        if (event->GetInnerEventId() == CellularDataEventCode::MSG_STATE_MACHINE_INIT) {
             destState_ = originalState_;
             InitCmdEnter(originalState_);
         }
@@ -142,10 +144,6 @@ public:
             tmpState = tmpState->parent_;
         }
     }
-
-public:
-    const static int32_t CMD_STATE_MACHINE_INIT = 0;
-    const static int32_t CMD_STATE_MACHINE_QUIT = 10;
 
 private:
     void InitCmdEnter(const sptr<State> &state)
@@ -200,7 +198,7 @@ public:
     void Quit()
     {
         AppExecFwk::InnerEvent::Pointer event =
-            AppExecFwk::InnerEvent::Get(StateMachineEventHandler::CMD_STATE_MACHINE_QUIT);
+            AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_STATE_MACHINE_QUIT);
         if (stateMachineEventHandler_ == nullptr) {
             TELEPHONY_LOGE("stateMachineEventHandler_ is null");
             return;
@@ -215,7 +213,7 @@ public:
             return;
         }
         AppExecFwk::InnerEvent::Pointer event =
-            AppExecFwk::InnerEvent::Get(StateMachineEventHandler::CMD_STATE_MACHINE_INIT);
+            AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_STATE_MACHINE_INIT);
         stateMachineEventHandler_->SendImmediateEvent(event);
     }
 

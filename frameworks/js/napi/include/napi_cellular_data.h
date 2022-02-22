@@ -31,6 +31,33 @@ struct AsyncContext : BaseContext {
     int32_t slotId = 0;
     int32_t result = ERROR_SERVICE_UNAVAILABLE;
 };
+
+enum DataConnectState {
+    /**
+     * Indicates that a cellular data link is unknown.
+     */
+    DATA_STATE_UNKNOWN = -1,
+
+    /**
+     * Indicates that a cellular data link is disconnected.
+     */
+    DATA_STATE_DISCONNECTED = 0,
+
+    /**
+     * Indicates that a cellular data link is being connected.
+     */
+    DATA_STATE_CONNECTING = 1,
+
+    /**
+     * Indicates that a cellular data link is connected.
+     */
+    DATA_STATE_CONNECTED = 2,
+
+    /**
+     * Indicates that a cellular data link is suspended.
+     */
+    DATA_STATE_SUSPENDED = 3
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // NAPI_CELLULAR_DATA_H
