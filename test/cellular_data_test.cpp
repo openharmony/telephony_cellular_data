@@ -46,11 +46,15 @@ public:
     static int32_t GetCellularDataFlowTypeTest();
     static void WaitTestTimeout(const int32_t status);
     static sptr<ICellularDataManager> GetProxy();
+    static string GetCmdResult(const string &strCmd);
+    static int32_t PingTest();
 
 public:
     static sptr<ICellularDataManager> proxy_;
     static const int32_t SLEEP_TIME = 1;
     static const int32_t DATA_SLOT_ID_INVALID = DEFAULT_SIM_SLOT_ID + 10;
+    static const int32_t PING_CHECK_SUCCESS = 0;
+    static const int32_t PING_CHECK_FAIL = 1;
 };
 
 sptr<ICellularDataManager> CellularDataTest::proxy_;
@@ -99,6 +103,42 @@ void CellularDataTest::WaitTestTimeout(const int32_t status)
             return;
         }
         count++;
+    }
+}
+
+string CellularDataTest::GetCmdResult(const string &strCmd)
+{
+    char buf[10240] = {0};
+    FILE *pf;
+    char *fgetsRet;
+
+    if ((pf = popen(strCmd.c_str(), "r")) == nullptr) {
+        return "";
+    }
+    string strResult;
+    while ((fgetsRet = fgets(buf, sizeof buf, pf)) != nullptr) {
+        strResult += buf;
+    }
+    pclose(pf);
+    unsigned int iSize = strResult.size();
+    if (iSize > 0 && strResult[iSize - 1] == '\n') {
+        strResult = strResult.substr(0, iSize - 1);
+    }
+    return strResult;
+}
+
+int32_t CellularDataTest::PingTest()
+{
+    string strCmd = "ping -c3 www.openharmony.cn";
+    string strRe = GetCmdResult(strCmd);
+    std::cout << strRe << std::endl;
+
+    // if ping succeed, the result should contains something like:
+    // 3 packets transmitted, 3 received, 0% packet loss, time 5440ms
+    if (strRe.find("3 received") != string::npos) {
+        return PING_CHECK_SUCCESS;
+    } else {
+        return PING_CHECK_FAIL;
     }
 }
 
@@ -242,15 +282,34 @@ HWTEST_F(CellularDataTest, EnableCellularData_Test, TestSize.Level2)
     }
     int32_t enabled = CellularDataTest::IsCellularDataEnabledTest();
     if (enabled == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED)) {
+        // It takes seconds after being enabled for the connection status
+        // changed to DATA_STATE_CONNECTED, so we must wait it out before excecuting ping check
+        WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_CONNECTED));
+        sleep(SLEEP_TIME);
+        std::cout << "Cellular Data Connected Ping..." << std::endl;
+        int32_t pingResult = CellularDataTest::PingTest();
+        ASSERT_TRUE(pingResult == PING_CHECK_SUCCESS);
         int32_t disabled = CellularDataTest::EnableCellularDataTest(false);
         ASSERT_TRUE(disabled == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
         WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED));
+        sleep(SLEEP_TIME);
+        std::cout << "Cellular Data Disconnected Ping..." << std::endl;
+        pingResult = CellularDataTest::PingTest();
+        ASSERT_TRUE(pingResult == PING_CHECK_FAIL);
     } else {
         int32_t result = CellularDataTest::EnableCellularDataTest(true);
         ASSERT_TRUE(result == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
         WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_CONNECTED));
+        sleep(SLEEP_TIME);
+        std::cout << "Cellular Data Connected Ping..." << std::endl;
+        int32_t pingResult = CellularDataTest::PingTest();
+        ASSERT_TRUE(pingResult == PING_CHECK_SUCCESS);
         CellularDataTest::EnableCellularDataTest(false);
         WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED));
+        sleep(SLEEP_TIME);
+        std::cout << "Cellular Data Disconnected Ping..." << std::endl;
+        pingResult = CellularDataTest::PingTest();
+        ASSERT_TRUE(pingResult == PING_CHECK_FAIL);
     }
 }
 
@@ -403,12 +462,22 @@ HWTEST_F(CellularDataTest, DataFlowType_Test_01, TestSize.Level3)
     CellularDataTest::EnableCellularDataTest(false);
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED));
     sleep(SLEEP_TIME);
+
     CellularDataTest::EnableCellularDataTest(true);
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_CONNECTED));
+    sleep(SLEEP_TIME);
+    std::cout << "Cellular Data Connected Ping..." << std::endl;
+    int32_t pingResult = CellularDataTest::PingTest();
+    ASSERT_TRUE(pingResult == PING_CHECK_SUCCESS);
     int32_t dataFlowType = CellularDataTest::GetCellularDataFlowTypeTest();
     ASSERT_TRUE(dataFlowType >= 0);
+
     CellularDataTest::EnableCellularDataTest(false);
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED));
+    sleep(SLEEP_TIME);
+    std::cout << "Cellular Data Disconnected Ping..." << std::endl;
+    pingResult = CellularDataTest::PingTest();
+    ASSERT_TRUE(pingResult == PING_CHECK_FAIL);
     dataFlowType = CellularDataTest::GetCellularDataFlowTypeTest();
     ASSERT_TRUE(dataFlowType == 0);
 }

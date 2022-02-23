@@ -67,13 +67,13 @@ sptr<ApnItem> ApnItem::MakeDefaultApn(const std::string &apnType)
         DEFAULT_AUTH_TYPE, "cmnet", "CMNET", "", ""};
     apnItem->apnTypes_ = CellularDataUtils::Split(apnType, ",");
     apnItem->attr_ = attr;
-    if (strcpy_s(apnItem->attr_.types_, apnType.size() + 1, apnType.c_str()) != EOK) {
+    if (strcpy_s(apnItem->attr_.types_, ALL_APN_ITEM_CHAR_LENGTH, apnType.c_str()) != EOK) {
         TELEPHONY_LOGE("MakeDefaultApn: types_ copy fail");
         return nullptr;
     }
     if (apnType == "mms") {
         std::string apn = "cmwap";
-        if (strcpy_s(apnItem->attr_.apn_, apn.size() + 1, apn.c_str()) != EOK) {
+        if (strcpy_s(apnItem->attr_.apn_, ALL_APN_ITEM_CHAR_LENGTH, apn.c_str()) != EOK) {
             TELEPHONY_LOGE("MakeDefaultApn: types_ copy fail");
             return nullptr;
         }
@@ -92,37 +92,37 @@ sptr<ApnItem> ApnItem::MakeApn(const PdpProfile &apnData)
     apnItem->apnTypes_ = CellularDataUtils::Split(apnData.apnTypes, ",");
     apnItem->attr_.profileId_ = apnData.profileId;
     apnItem->attr_.authType_ = apnData.authType;
-    if (strcpy_s(apnItem->attr_.types_, apnData.apnTypes.size() + 1, apnData.apnTypes.c_str()) != EOK) {
+    if (strcpy_s(apnItem->attr_.types_, ALL_APN_ITEM_CHAR_LENGTH, apnData.apnTypes.c_str()) != EOK) {
         TELEPHONY_LOGE("MakeApn: types_ copy fail");
         return nullptr;
     }
     std::string numeric = apnData.mcc + apnData.mnc;
-    if (strcpy_s(apnItem->attr_.numeric_, numeric.size() + 1, numeric.c_str()) != EOK) {
+    if (strcpy_s(apnItem->attr_.numeric_, ALL_APN_ITEM_CHAR_LENGTH, numeric.c_str()) != EOK) {
         TELEPHONY_LOGE("MakeApn: types_ copy fail");
         return nullptr;
     }
-    if (strcpy_s(apnItem->attr_.protocol_, apnData.pdpProtocol.size() + 1, apnData.pdpProtocol.c_str()) != EOK) {
+    if (strcpy_s(apnItem->attr_.protocol_, ALL_APN_ITEM_CHAR_LENGTH, apnData.pdpProtocol.c_str()) != EOK) {
         TELEPHONY_LOGE("MakeApn: protocol_ copy fail");
         return nullptr;
     }
-    if (strcpy_s(apnItem->attr_.roamingProtocol_, apnData.roamPdpProtocol.size() + 1,
+    if (strcpy_s(apnItem->attr_.roamingProtocol_, ALL_APN_ITEM_CHAR_LENGTH,
         apnData.roamPdpProtocol.c_str()) != EOK) {
         TELEPHONY_LOGE("MakeApn: roamingProtocol_ copy fail");
         return nullptr;
     }
-    if (strcpy_s(apnItem->attr_.apn_, apnData.apn.size() + 1, apnData.apn.c_str()) != EOK) {
+    if (strcpy_s(apnItem->attr_.apn_, ALL_APN_ITEM_CHAR_LENGTH, apnData.apn.c_str()) != EOK) {
         TELEPHONY_LOGE("MakeApn: apn_ copy fail");
         return nullptr;
     }
-    if (strcpy_s(apnItem->attr_.apnName_, apnData.profileName.size() + 1, apnData.profileName.c_str()) != EOK) {
+    if (strcpy_s(apnItem->attr_.apnName_, ALL_APN_ITEM_CHAR_LENGTH, apnData.profileName.c_str()) != EOK) {
         TELEPHONY_LOGE("MakeApn: apnName_ copy fail");
         return nullptr;
     }
-    if (strcpy_s(apnItem->attr_.user_, apnData.authUser.size() + 1, apnData.authUser.c_str()) != EOK) {
+    if (strcpy_s(apnItem->attr_.user_, ALL_APN_ITEM_CHAR_LENGTH, apnData.authUser.c_str()) != EOK) {
         TELEPHONY_LOGE("MakeApn: user_ copy fail");
         return nullptr;
     }
-    if (strcpy_s(apnItem->attr_.password_, apnData.authPwd.size() + 1, apnData.authPwd.c_str()) != EOK) {
+    if (strcpy_s(apnItem->attr_.password_, ALL_APN_ITEM_CHAR_LENGTH, apnData.authPwd.c_str()) != EOK) {
         TELEPHONY_LOGE("MakeApn: password_ copy fail");
         return nullptr;
     }
