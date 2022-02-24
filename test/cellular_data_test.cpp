@@ -185,18 +185,33 @@ sptr<ICellularDataManager> CellularDataTest::GetProxy()
     return nullptr;
 }
 
+/**
+ * @tc.number   GetProxy_Test
+ * @tc.name     Check whether the cellular data service(SystemAbility) is started
+ * @tc.desc     Function test
+ */
 HWTEST_F(CellularDataTest, GetProxy_Test, TestSize.Level1)
 {
     CellularDataTest::proxy_ = CellularDataTest::GetProxy();
     ASSERT_FALSE(CellularDataTest::proxy_ == nullptr);
 }
 
+/**
+ * @tc.number   IsCellularDataEnabled_Test
+ * @tc.name     Test cellular data switch status(enabled or disabled)
+ * @tc.desc     Function test
+ */
 HWTEST_F(CellularDataTest, IsCellularDataEnabled_Test, TestSize.Level1)
 {
     int32_t result = CellularDataTest::IsCellularDataEnabledTest();
     ASSERT_TRUE(result >= static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_DISABLED));
 }
 
+/**
+ * @tc.number   DefaultCellularDataSlotId_Test
+ * @tc.name     Test set default data card slot
+ * @tc.desc     Function test
+ */
 HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test, TestSize.Level2)
 {
     if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
@@ -215,6 +230,11 @@ HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test, TestSize.Level2)
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
 }
 
+/**
+ * @tc.number   EnableCellularData_Test
+ * @tc.name     Test cellular data switch
+ * @tc.desc     Function test
+ */
 HWTEST_F(CellularDataTest, EnableCellularData_Test, TestSize.Level2)
 {
     if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
@@ -234,6 +254,11 @@ HWTEST_F(CellularDataTest, EnableCellularData_Test, TestSize.Level2)
     }
 }
 
+/**
+ * @tc.number   DataRoamingState_ValidSlot_Test_01
+ * @tc.name     Test the cellular data roaming switch with a slot id
+ * @tc.desc     Function test
+ */
 HWTEST_F(CellularDataTest, DataRoamingState_ValidSlot_Test_01, TestSize.Level3)
 {
     if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
@@ -267,6 +292,11 @@ HWTEST_F(CellularDataTest, DataRoamingState_ValidSlot_Test_01, TestSize.Level3)
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
 }
 
+/**
+ * @tc.number   EnableCellularDataRoaming_ValidSlot_Test_01
+ * @tc.name     Test the cellular data roaming switch with a slot id
+ * @tc.desc     Function test
+ */
 HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_01, TestSize.Level3)
 {
     if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
@@ -296,6 +326,11 @@ HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_01, TestSize
     }
 }
 
+/**
+ * @tc.number   GetCellularDataState_ValidityTest_01
+ * @tc.name     Test the GetCellularDataState function
+ * @tc.desc     Function test
+ */
 HWTEST_F(CellularDataTest, GetCellularDataState_ValidityTest_01, TestSize.Level3)
 {
     if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
@@ -324,6 +359,11 @@ HWTEST_F(CellularDataTest, GetCellularDataState_ValidityTest_01, TestSize.Level3
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED));
 }
 
+/**
+ * @tc.number   DataRoamingState_InValidSlot_Test_01
+ * @tc.name     Test the EnableCellularDataRoaming function with a invalid slot id
+ * @tc.desc     Function test
+ */
 HWTEST_F(CellularDataTest, DataRoamingState_InValidSlot_Test_01, TestSize.Level3)
 {
     if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
@@ -349,6 +389,11 @@ HWTEST_F(CellularDataTest, DataRoamingState_InValidSlot_Test_01, TestSize.Level3
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
 }
 
+/**
+ * @tc.number   DataFlowType_Test_01
+ * @tc.name     Test the GetCellularDataFlowType function
+ * @tc.desc     Function test
+ */
 HWTEST_F(CellularDataTest, DataFlowType_Test_01, TestSize.Level3)
 {
     if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
