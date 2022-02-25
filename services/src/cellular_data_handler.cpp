@@ -199,9 +199,17 @@ void CellularDataHandler::ClearAllConnections(DisConnectionReason reason)
     for (const sptr<ApnHolder> &apn : apnManager_->GetAllApnHolder()) {
         ClearConnection(apn, reason);
     }
-    if (connectionManager_ != nullptr) {
-        connectionManager_->StopStallDetectionTimer();
-        connectionManager_->EndNetStatistics();
+
+    if (connectionManager_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: in ClearAllConnections connectionManager_ is null", slotId_);
+        return;
+    }
+    connectionManager_->StopStallDetectionTimer();
+    connectionManager_->EndNetStatistics();
+    
+    if (dataSwitchSettings_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: in ClearAllConnections dataSwitchSettings_ is null", slotId_);
+        return;
     }
     if (!dataSwitchSettings_->GetUserDataOn()) {
         connectionManager_->SetDataFlowType(CellDataFlowType::DATA_FLOW_TYPE_NONE);
@@ -414,6 +422,10 @@ void CellularDataHandler::AttemptEstablishDataConnection(sptr<ApnHolder> &apnHol
 
 std::shared_ptr<CellularDataStateMachine> CellularDataHandler::FindIdleCellularDataConnection() const
 {
+    if (connectionManager_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: in FindIdleCellularDataConnection connectionManager_ is null", slotId_);
+        return nullptr;
+    }
     std::vector<std::shared_ptr<CellularDataStateMachine>> allMachines = connectionManager_->GetAllConnectionMachine();
     for (const std::shared_ptr<CellularDataStateMachine> &connect : allMachines) {
         if (connect == nullptr || apnManager_ == nullptr) {
@@ -474,6 +486,10 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
             return false;
         }
         cellularDataStateMachine->Init();
+        if (connectionManager_ == nullptr) {
+            TELEPHONY_LOGE("Slot%{public}d: in EstablishDataConnection connectionManager_ is null", slotId_);
+            return false;
+        }
         connectionManager_->AddConnectionStateMachine(cellularDataStateMachine);
     }
     cellularDataStateMachine->SetCapability(apnHolder->GetCapability());
@@ -537,6 +553,10 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
 {
     if ((event == nullptr) || (apnManager_ == nullptr)) {
         TELEPHONY_LOGE("Slot%{public}d: event or apnManager is null", slotId_);
+        return;
+    }
+    if (connectionManager_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: in DisconnectDataComplete connectionManager_ is null", slotId_);
         return;
     }
     std::unique_ptr<DataDisconnectParams> object = event->GetUniqueObject<DataDisconnectParams>();
