@@ -44,7 +44,6 @@
                 "safwk",
                 "samgr_standard",
                 "startup_l2",
-                "state_registry",
                 "utils_base"
             ],
             "third_party": [
