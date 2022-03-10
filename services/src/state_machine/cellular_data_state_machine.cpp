@@ -249,7 +249,7 @@ void CellularDataStateMachine::ResolveDns(std::vector<AddressInfo> &dnsInfoArray
         dnsAddr.family_ = dnsInfo.type;
         dnsAddr.type_ = dnsInfo.type;
         dnsAddr.hostName_ = DEFAULT_HOSTNAME;
-        dnsAddr.netMask_ = DEFAULT_MASK;
+        dnsAddr.netMask_ = dnsInfo.netMask;
         dnsAddr.prefixlen_ = dnsInfo.prefixLen;
         netLinkInfo_->dnsList_.push_back(dnsAddr);
     }
@@ -272,7 +272,7 @@ void CellularDataStateMachine::ResolveRoute(std::vector<AddressInfo> &routeInfoA
         route.destination_.type_ = routeInfo.type;
         route.destination_.hostName_ = DEFAULT_HOSTNAME;
         route.destination_.netMask_ = DEFAULT_MASK;
-        route.destination_.prefixlen_ = routeInfo.prefixLen;
+        route.destination_.prefixlen_ = 0;
         netLinkInfo_->routeList_.push_back(route);
     }
 }
