@@ -109,8 +109,6 @@ static void NativeGetCellularDataState(napi_env env, void *data)
 {
     auto asyncContext = static_cast<AsyncContext *>(data);
     if (asyncContext == nullptr) {
-        asyncContext->resolved = false;
-        asyncContext->errorCode = ERROR_SERVICE_UNAVAILABLE;
         return;
     }
     if (IsCellularDataManagerInited()) {
@@ -127,8 +125,6 @@ static void GetCellularDataStateCallback(napi_env env, napi_status status, void 
 {
     auto context = static_cast<AsyncContext *>(data);
     if (context == nullptr) {
-        context->resolved = false;
-        context->errorCode = ERROR_SERVICE_UNAVAILABLE;
         return;
     }
     std::unique_ptr<AsyncContext> asyncContext(context);
@@ -172,8 +168,6 @@ static void NativeIsCellularDataEnabled(napi_env env, void *data)
 {
     auto asyncContext = static_cast<AsyncContext *>(data);
     if (asyncContext == nullptr) {
-        asyncContext->resolved = false;
-        asyncContext->errorCode = ERROR_SERVICE_UNAVAILABLE;
         return;
     }
     if (IsCellularDataManagerInited()) {
@@ -190,8 +184,6 @@ static void IsCellularDataEnabledCallback(napi_env env, napi_status status, void
 {
     auto context = static_cast<AsyncContext *>(data);
     if (context == nullptr) {
-        context->resolved = false;
-        context->errorCode = ERROR_SERVICE_UNAVAILABLE;
         return;
     }
     std::unique_ptr<AsyncContext> asyncContext(context);
@@ -234,8 +226,6 @@ static void NativeEnableCellularData(napi_env env, void *data)
     TELEPHONY_LOGI("NativeEnableCellularData start");
     auto asyncContext = static_cast<AsyncContext *>(data);
     if (asyncContext == nullptr) {
-        asyncContext->resolved = false;
-        asyncContext->errorCode = ERROR_SERVICE_UNAVAILABLE;
         return;
     }
     if (IsCellularDataManagerInited()) {
@@ -258,8 +248,6 @@ static void VoidValueCallback(napi_env env, napi_status status, void *data)
     TELEPHONY_LOGI("VoidValueCallback start");
     auto context = static_cast<AsyncContext *>(data);
     if (context == nullptr) {
-        context->resolved = false;
-        context->errorCode = ERROR_SERVICE_UNAVAILABLE;
         return;
     }
     std::unique_ptr<AsyncContext> asyncContext(context);
@@ -306,8 +294,6 @@ static void NativeDisableCellularData(napi_env env, void *data)
 {
     auto asyncContext = static_cast<AsyncContext *>(data);
     if (asyncContext == nullptr) {
-        asyncContext->resolved = false;
-        asyncContext->errorCode = ERROR_SERVICE_UNAVAILABLE;
         return;
     }
     if (IsCellularDataManagerInited()) {
@@ -348,8 +334,6 @@ static void NativeEnableCellularDataRoaming(napi_env env, void *data)
     TELEPHONY_LOGI("NativeEnableCellularDataRoaming start");
     auto asyncContext = static_cast<AsyncContext *>(data);
     if (asyncContext == nullptr) {
-        asyncContext->resolved = false;
-        asyncContext->errorCode = ERROR_SERVICE_UNAVAILABLE;
         return;
     }
     if (IsCellularDataManagerInited()) {
@@ -390,8 +374,6 @@ static void NativeDisableCellularDataRoaming(napi_env env, void *data)
 {
     auto asyncContext = static_cast<AsyncContext *>(data);
     if (asyncContext == nullptr) {
-        asyncContext->resolved = false;
-        asyncContext->errorCode = ERROR_SERVICE_UNAVAILABLE;
         return;
     }
     if (IsCellularDataManagerInited()) {
@@ -431,8 +413,6 @@ static void NativeIsCellularDataRoamingEnabled(napi_env env, void *data)
 {
     auto asyncContext = static_cast<AsyncContext *>(data);
     if (asyncContext == nullptr) {
-        asyncContext->resolved = false;
-        asyncContext->errorCode = ERROR_SERVICE_UNAVAILABLE;
         return;
     }
     if (IsCellularDataManagerInited()) {
@@ -458,8 +438,6 @@ static void IsCellularDataRoamingEnabledCallback(napi_env env, napi_status statu
 {
     auto context = static_cast<AsyncContext *>(data);
     if (context == nullptr) {
-        context->resolved = false;
-        context->errorCode = ERROR_SERVICE_UNAVAILABLE;
         return;
     }
     std::unique_ptr<AsyncContext> asyncContext(context);
@@ -515,8 +493,6 @@ static void NativeGetDefaultCellularDataSlotId(napi_env env, void *data)
 {
     auto context = static_cast<AsyncContext *>(data);
     if (context == nullptr) {
-        context->resolved = false;
-        context->errorCode = ERROR_SERVICE_UNAVAILABLE;
         return;
     }
     context->slotId = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
@@ -531,8 +507,6 @@ static void GetDefaultCellularDataSlotIdCallback(napi_env env, napi_status statu
 {
     auto asyncContext = static_cast<AsyncContext *>(data);
     if (asyncContext == nullptr) {
-        asyncContext->resolved = false;
-        asyncContext->errorCode = ERROR_SERVICE_UNAVAILABLE;
         return;
     }
     napi_value callbackValue = nullptr;
@@ -564,8 +538,6 @@ static void NativeSetDefaultCellularDataSlotId(napi_env env, void *data)
 {
     auto asyncContext = static_cast<AsyncContext *>(data);
     if (asyncContext == nullptr) {
-        asyncContext->resolved = false;
-        asyncContext->errorCode = ERROR_SERVICE_UNAVAILABLE;
         return;
     }
     if (IsCellularDataManagerInited()) {
@@ -586,8 +558,6 @@ static void SetDefaultCellularDataSlotIdCallback(napi_env env, napi_status statu
 {
     auto asyncContext = static_cast<AsyncContext *>(data);
     if (asyncContext == nullptr) {
-        asyncContext->resolved = false;
-        asyncContext->errorCode = ERROR_SERVICE_UNAVAILABLE;
         return;
     }
     napi_value callbackValue = nullptr;
@@ -626,8 +596,6 @@ void NativeGetCellularDataFlowType(napi_env env, void *data)
 {
     auto asyncContext = static_cast<AsyncContext *>(data);
     if (asyncContext == nullptr) {
-        asyncContext->resolved = false;
-        asyncContext->errorCode = ERROR_SERVICE_UNAVAILABLE;
         return;
     }
     if (IsCellularDataManagerInited()) {
@@ -646,8 +614,6 @@ void GetCellularDataFlowTypeCallback(napi_env env, napi_status status, void *dat
     TELEPHONY_LOGI("GetCellularDataFlowTypeCallback start");
     auto context = static_cast<AsyncContext *>(data);
     if (context == nullptr) {
-        context->resolved = false;
-        context->errorCode = ERROR_SERVICE_UNAVAILABLE;
         return;
     }
     std::unique_ptr<AsyncContext> asyncContext(context);
