@@ -225,6 +225,7 @@ sptr<ICellularDataManager> CellularDataTest::GetProxy()
     return nullptr;
 }
 
+#ifndef TEL_TEST_UNSUPPORT
 /**
  * @tc.number   GetProxy_Test
  * @tc.name     Check whether the cellular data service(SystemAbility) is started
@@ -481,5 +482,16 @@ HWTEST_F(CellularDataTest, DataFlowType_Test_01, TestSize.Level3)
     dataFlowType = CellularDataTest::GetCellularDataFlowTypeTest();
     ASSERT_TRUE(dataFlowType == 0);
 }
+#else // TEL_TEST_UNSUPPORT
+/**
+ * @tc.number   DataMock_Test_01
+ * @tc.name     Test for unsupport platform
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, DataMock_Test_01, TestSize.Level3)
+{
+    EXPECT_TRUE(true);
+}
+#endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
 } // namespace OHOS
