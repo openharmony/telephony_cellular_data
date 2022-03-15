@@ -67,12 +67,12 @@ ohos_shared_library("tel_cellular_data") {
     "//base/telephony/core_service/utils:libtel_common",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/aafwk/standard/interfaces/innerkits/dataobs_manager:dataobs_manager",
-    "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
     "ability_base:want",
+    "ability_base:zuri",
     "bundle_framework:appexecfwk_core",
     "ces_standard:cesfwk_innerkits",
     "core_service:tel_core_service_api",
