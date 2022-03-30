@@ -30,6 +30,9 @@ CellularDataNetAgent::CellularDataNetAgent()
 {
     callBack_ = std::make_unique<NetManagerCallBack>().release();
     tacticsCallBack_ = std::make_unique<NetManagerTacticsCallBack>().release();
+    if (callBack_ == nullptr || tacticsCallBack_ == nullptr) {
+        TELEPHONY_LOGE("Callback or tacticsCallBack init failed");
+    }
 }
 
 CellularDataNetAgent::~CellularDataNetAgent() = default;
