@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Telephony {
 class CellularDataRdbObserver : public AAFwk::DataAbilityObserverStub {
 public:
-    CellularDataRdbObserver(std::shared_ptr<CellularDataHandler> &cellularDataHandler);
+    explicit CellularDataRdbObserver(std::shared_ptr<CellularDataHandler> &cellularDataHandler);
     ~CellularDataRdbObserver();
     void OnChange() override;
 

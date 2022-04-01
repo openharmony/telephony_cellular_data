@@ -165,7 +165,12 @@ int32_t ApnManager::CreateAllApnItemByDatabase(const std::string &numeric)
     std::string mnc = numeric.substr(mcc.size(), numeric.size() - mcc.size());
     TELEPHONY_LOGI("mcc = %{public}s, mnc = %{public}s", mcc.c_str(), mnc.c_str());
     std::vector<PdpProfile> apnVec;
-    if (!CellularDataRdbHelper::GetInstance()->QueryApns(mcc, mnc, apnVec)) {
+    auto helper = CellularDataRdbHelper::GetInstance();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("get cellularDataRdbHelper failed");
+        return count;
+    }
+    if (!helper->QueryApns(mcc, mnc, apnVec)) {
         TELEPHONY_LOGE("query apns from data ability fail");
         return count;
     }

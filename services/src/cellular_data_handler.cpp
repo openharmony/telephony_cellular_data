@@ -69,6 +69,10 @@ bool CellularDataHandler::ReleaseNet(const NetRequest &request)
         return false;
     }
     std::unique_ptr<NetRequest> netRequest = std::make_unique<NetRequest>();
+    if (netRequest == nullptr) {
+        TELEPHONY_LOGE("Netrequest is null");
+        return false;
+    }
     netRequest->capability = request.capability;
     netRequest->ident = request.ident;
     AppExecFwk::InnerEvent::Pointer event =
@@ -95,6 +99,10 @@ bool CellularDataHandler::RequestNet(const NetRequest &request)
         return true;
     }
     std::unique_ptr<NetRequest> netRequest = std::make_unique<NetRequest>();
+    if (netRequest == nullptr) {
+        TELEPHONY_LOGE("Netrequest is null");
+        return false;
+    }
     netRequest->capability = request.capability;
     netRequest->ident = request.ident;
     AppExecFwk::InnerEvent::Pointer event =
@@ -206,7 +214,7 @@ void CellularDataHandler::ClearAllConnections(DisConnectionReason reason)
     }
     connectionManager_->StopStallDetectionTimer();
     connectionManager_->EndNetStatistics();
-    
+
     if (dataSwitchSettings_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: in ClearAllConnections dataSwitchSettings_ is null", slotId_);
         return;
@@ -501,6 +509,10 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
     StateNotification::GetInstance().UpdateCellularDataConnectState(slotId_, PROFILE_STATE_CONNECTING, radioTech);
     std::unique_ptr<DataConnectionParams> object =
         std::make_unique<DataConnectionParams>(apnHolder, profileId, radioTech, roamingState, userDataRoaming, true);
+    if (object == nullptr) {
+        TELEPHONY_LOGE("DataConnectionParams is nullptr");
+        return false;
+    }
     TELEPHONY_LOGI("Slot%{public}d: MSG_SM_CONNECT profileId:%{public}d type:%{public}s networkType:%{public}d",
         slotId_, profileId, apnHolder->GetApnType().c_str(), radioTech);
     InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT, object);
@@ -619,7 +631,7 @@ void CellularDataHandler::HandleSortConnection()
 
 void CellularDataHandler::MsgEstablishDataConnection(const InnerEvent::Pointer &event)
 {
-    if (apnManager_ == nullptr && event == nullptr) {
+    if (apnManager_ == nullptr || event == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: apnManager_ or event is null", slotId_);
         return;
     }
@@ -643,7 +655,7 @@ void CellularDataHandler::MsgEstablishDataConnection(const InnerEvent::Pointer &
 
 void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
 {
-    if (apnManager_ == nullptr && event == nullptr) {
+    if (apnManager_ == nullptr || event == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: apnManager_ or event is null", slotId_);
         return;
     }

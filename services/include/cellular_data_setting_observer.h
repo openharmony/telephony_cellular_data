@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Telephony {
 class CellularDataSettingObserver : public AAFwk::DataAbilityObserverStub {
 public:
-    CellularDataSettingObserver(std::shared_ptr<CellularDataHandler> &cellularDataHandler);
+    explicit CellularDataSettingObserver(std::shared_ptr<CellularDataHandler> &cellularDataHandler);
     ~CellularDataSettingObserver();
     void OnChange() override;
 

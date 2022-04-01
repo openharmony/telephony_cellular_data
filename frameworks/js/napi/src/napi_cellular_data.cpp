@@ -152,7 +152,7 @@ static napi_value GetCellularDataState(napi_env env, napi_callback_info info)
     NAPI_ASSERT(env, MatchCellularDataParameters(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
-        std::string errorCode = std::to_string(napi_invalid_arg);
+        std::string errorCode = std::to_string(napi_generic_failure);
         std::string errorMessage = "error at baseContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
@@ -209,7 +209,7 @@ static napi_value IsCellularDataEnabled(napi_env env, napi_callback_info info)
     NAPI_ASSERT(env, MatchCellularDataParameters(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
-        std::string errorCode = std::to_string(napi_invalid_arg);
+        std::string errorCode = std::to_string(napi_generic_failure);
         std::string errorMessage = "error at baseContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
@@ -278,7 +278,7 @@ static napi_value EnableCellularData(napi_env env, napi_callback_info info)
     NAPI_ASSERT(env, MatchCellularDataParameters(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
-        std::string errorCode = std::to_string(napi_invalid_arg);
+        std::string errorCode = std::to_string(napi_generic_failure);
         std::string errorMessage = "error at baseContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
@@ -320,6 +320,9 @@ static napi_value DisableCellularData(napi_env env, napi_callback_info info)
     NAPI_ASSERT(env, MatchCellularDataParameters(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
+        std::string errorCode = std::to_string(napi_generic_failure);
+        std::string errorMessage = "error at baseContext is nullptr";
+        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
     if (parameterCount == 1) {
@@ -362,6 +365,12 @@ static napi_value EnableCellularDataRoaming(napi_env env, napi_callback_info inf
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     NAPI_ASSERT(env, MatchEnableCellularDataRoamingParameters(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<AsyncContext>();
+    if (asyncContext == nullptr) {
+        std::string errorCode = std::to_string(napi_generic_failure);
+        std::string errorMessage = "error at baseContext is nullptr";
+        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
+        return nullptr;
+    }
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
     if (parameterCount == paramLimitTwo) {
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
@@ -401,6 +410,12 @@ static napi_value DisableCellularDataRoaming(napi_env env, napi_callback_info in
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     NAPI_ASSERT(env, MatchEnableCellularDataRoamingParameters(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<AsyncContext>();
+    if (asyncContext == nullptr) {
+        std::string errorCode = std::to_string(napi_generic_failure);
+        std::string errorMessage = "error at baseContext is nullptr";
+        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
+        return nullptr;
+    }
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
     if (parameterCount == paramLimitTwo) {
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
@@ -468,6 +483,12 @@ static napi_value IsCellularDataRoamingEnabled(napi_env env, napi_callback_info 
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchEnableCellularDataRoamingParameters(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<AsyncContext>();
+    if (asyncContext == nullptr) {
+        std::string errorCode = std::to_string(napi_generic_failure);
+        std::string errorMessage = "error at baseContext is nullptr";
+        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
+        return nullptr;
+    }
     napi_get_value_int32(env, parameters[0], &asyncContext->slotId);
     if (parameterCount == paramLimitTwo) {
         napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef);
@@ -527,6 +548,12 @@ static napi_value GetDefaultCellularDataSlotId(napi_env env, napi_callback_info 
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchGetDefaultCellularDataSlotIdParameters(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<AsyncContext>();
+    if (asyncContext == nullptr) {
+        std::string errorCode = std::to_string(napi_generic_failure);
+        std::string errorMessage = "error at baseContext is nullptr";
+        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
+        return nullptr;
+    }
     if (parameterCount == 1) {
         napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef);
     }
@@ -584,6 +611,12 @@ static napi_value SetDefaultCellularDataSlotId(napi_env env, napi_callback_info 
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchEnableCellularDataRoamingParameters(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<AsyncContext>();
+    if (asyncContext == nullptr) {
+        std::string errorCode = std::to_string(napi_generic_failure);
+        std::string errorMessage = "error at baseContext is nullptr";
+        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
+        return nullptr;
+    }
     napi_get_value_int32(env, parameters[0], &asyncContext->slotId);
     if (parameterCount == paramLimitTwo) {
         napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef);
@@ -641,6 +674,12 @@ static napi_value GetCellularDataFlowType(napi_env env, napi_callback_info info)
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     NAPI_ASSERT(env, MatchGetDefaultCellularDataSlotIdParameters(env, parameters, parameterCount), "type mismatch");
     auto asyncContext = std::make_unique<AsyncContext>();
+    if (asyncContext == nullptr) {
+        std::string errorCode = std::to_string(napi_generic_failure);
+        std::string errorMessage = "error at baseContext is nullptr";
+        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
+        return nullptr;
+    }
     if (parameterCount == 1) {
         napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef);
     }
@@ -768,8 +807,8 @@ static napi_module _cellularDataModule = {
     .nm_filename = nullptr,
     .nm_register_func = RegistCellularData,
     .nm_modname = "telephony.data",
-    .nm_priv = ((void *)0),
-    .reserved = {0},
+    .nm_priv = nullptr,
+    .reserved = {nullptr},
 };
 
 extern "C" __attribute__((constructor)) void RegisterCellularDataModule(void)

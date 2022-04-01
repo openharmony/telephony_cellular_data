@@ -43,6 +43,10 @@ void Inactive::StateBegin()
         // send MSG_DISCONNECT_DATA_COMPLETE to CellularDataHandler
         std::string apnType = ApnManager::FindApnNameByApnId(deActiveApnTypeId_);
         std::unique_ptr<DataDisconnectParams> object = std::make_unique<DataDisconnectParams>(apnType, reason_);
+        if (object == nullptr) {
+            TELEPHONY_LOGE("Create data disconnect params failed");
+            return;
+        }
         AppExecFwk::InnerEvent::Pointer event =
             AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_DISCONNECT_DATA_COMPLETE, object);
         if (stateMachine->cellularDataHandler_ != nullptr) {

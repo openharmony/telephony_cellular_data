@@ -30,6 +30,9 @@ DataConnectionMonitor::DataConnectionMonitor(const std::shared_ptr<AppExecFwk::E
 {
     trafficManager_ = std::make_unique<TrafficManagement>();
     stallDetectionTrafficManager_ = std::make_unique<TrafficManagement>();
+    if (trafficManager_ == nullptr || stallDetectionTrafficManager_ == nullptr) {
+        TELEPHONY_LOGE("TrafficManager or stallDetectionTrafficManager init failed");
+    }
 }
 
 DataConnectionMonitor::~DataConnectionMonitor()
