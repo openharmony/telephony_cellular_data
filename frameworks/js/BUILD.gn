@@ -29,7 +29,7 @@ ohos_shared_library("data") {
   ]
 
   deps = [
-    "//foundation/ace/napi:ace_napi",
+    "//foundation/arkui/napi:ace_napi",
     "//utils/native/base:utils",
   ]
 
