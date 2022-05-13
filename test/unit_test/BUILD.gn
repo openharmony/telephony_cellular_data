@@ -31,7 +31,7 @@ ohos_executable("tel_cellular_data_ui_test") {
     "cellular_data:tel_cellular_data_api",
     "core_service:tel_core_service_api",
     "eventhandler:libeventhandler",
-    "startup_l2:syspara",
+    "init:libbegetutil",
   ]
 
   defines += [
