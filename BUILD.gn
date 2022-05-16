@@ -77,6 +77,7 @@ ohos_shared_library("tel_cellular_data") {
     "common_event_service:cesfwk_innerkits",
     "core_service:tel_core_service_api",
     "eventhandler:libeventhandler",
+    "init:libbegetutil",
     "ipc:ipc_core",
     "native_appdatamgr:native_dataability",
     "native_appdatamgr:native_rdb",
@@ -86,7 +87,6 @@ ohos_shared_library("tel_cellular_data") {
     "ril_adapter:hril_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "init:libbegetutil",
   ]
   defines += [
     "TELEPHONY_LOG_TAG = \"CELLULAR_DATA\"",
