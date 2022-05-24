@@ -10,6 +10,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//base/telephony/cellular_data/callular_data_aafwk.gni")
 import("//base/telephony/core_service/telephony.gni")
 import("//build/ohos.gni")
 
@@ -57,16 +58,16 @@ ohos_shared_library("tel_cellular_data") {
     "$SOURCE_DIR/services/include/apn_manager",
     "$SOURCE_DIR/interfaces/innerkits",
     "//base/telephony/data_storage/pdp_profile/include",
-    "//foundation/aafwk/standard/interfaces/innerkits/dataobs_manager/include",
+    "${aafwk_inner_api_path}/dataobs_manager/include",
   ]
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   deps = [
+    "${aafwk_inner_api_path}/dataobs_manager:dataobs_manager",
+    "${aafwk_kits_path}/ability/native:abilitykit_native",
     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
     "//base/telephony/core_service/utils:libtel_common",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
-    "//foundation/aafwk/standard/interfaces/innerkits/dataobs_manager:dataobs_manager",
     "//utils/native/base:utils",
   ]
 
