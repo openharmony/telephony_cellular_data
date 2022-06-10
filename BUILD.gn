@@ -84,7 +84,7 @@ ohos_shared_library("tel_cellular_data") {
     "netmanager_base:net_policy_manager_if",
     "netmanager_base:net_stats_manager_if",
     "relational_store:native_rdb",
-    "ril_adapter:hril_innerkits",
+    "ril_device_driver_interface:hril_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
     "startup_l2:syspara",
