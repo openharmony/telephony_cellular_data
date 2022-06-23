@@ -58,14 +58,14 @@ ohos_shared_library("tel_cellular_data") {
     "$SOURCE_DIR/services/include/apn_manager",
     "$SOURCE_DIR/interfaces/innerkits",
     "//base/telephony/data_storage/pdp_profile/include",
-    "${aafwk_inner_api_path}/dataobs_manager/include",
+    "${ability_runtime_inner_api_path}/dataobs_manager/include",
   ]
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   deps = [
-    "${aafwk_inner_api_path}/dataobs_manager:dataobs_manager",
-    "${aafwk_kits_path}/ability/native:abilitykit_native",
+    "${ability_runtime_inner_api_path}/dataobs_manager:dataobs_manager",
+    "${ability_runtime_kits_path}/ability/native:abilitykit_native",
     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
     "//base/telephony/core_service/utils:libtel_common",
     "//utils/native/base:utils",
