@@ -15,15 +15,14 @@
 
 #include "cellular_data_controller.h"
 
-#include "common_event_manager.h"
-#include "core_manager_inner.h"
-#include "uri.h"
-
 #include "cellular_data_constant.h"
 #include "cellular_data_settings_rdb_helper.h"
+#include "common_event_manager.h"
+#include "core_manager_inner.h"
 #include "network_search_callback.h"
 #include "radio_event.h"
 #include "telephony_log_wrapper.h"
+#include "uri.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -49,8 +48,10 @@ void CellularDataController::Init()
     roamingObserver_ = std::make_unique<CellularDataRoamingObserver>(cellularDataHandler_).release();
     cellularDataRdbObserver_ = std::make_unique<CellularDataRdbObserver>(cellularDataHandler_).release();
     if (cellularDataHandler_ == nullptr || settingObserver_ == nullptr || cellularDataRdbObserver_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: CellularDataController init failed, "
-            "cellularDataHandler_ or settingObserver_ or cellularDataRdbObserver_ is null", slotId_);
+        TELEPHONY_LOGE(
+            "Slot%{public}d: CellularDataController init failed, "
+            "cellularDataHandler_ or settingObserver_ or cellularDataRdbObserver_ is null",
+            slotId_);
         return;
     }
     cellularDataHandler_->Init();
@@ -137,7 +138,6 @@ void CellularDataController::AsynchronousRegister()
         RegisterEvents();
         return;
     }
-    TELEPHONY_LOGI("Slot%{public}d: AsynchronousRegister", slotId_);
     SendEvent(CellularDataEventCode::MSG_ASYNCHRONOUS_REGISTER_EVENT_ID, CORE_INIT_DELAY_TIME, Priority::HIGH);
 }
 
