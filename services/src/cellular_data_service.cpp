@@ -25,6 +25,7 @@
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
 
+#include "cellular_data_hisysevent.h"
 #include "cellular_data_net_agent.h"
 #include "cellular_data_dump_helper.h"
 #include "data_connection_monitor.h"
@@ -149,6 +150,9 @@ int32_t CellularDataService::EnableCellularData(bool enable)
     for (const std::pair<const int32_t, std::shared_ptr<CellularDataController>> &it : cellularDataControllers_) {
         if (it.second != nullptr) {
             bool itemResult = it.second->SetCellularDataEnable(enable);
+            if (itemResult) {
+                CellularDataHisysevent::DataConnectStateEventWrite(enable);
+            }
             if (!result) {
                 result = itemResult;
             }

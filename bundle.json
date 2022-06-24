@@ -23,6 +23,9 @@
             "SystemCapability.Telephony.CellularData"
         ],
         "features": [],
+        "hisysevent_config": [
+            "//base/telephony/cellular_data/hisysevent.yaml"
+        ],
         "adapted_system_type": [
             "standard"
         ],

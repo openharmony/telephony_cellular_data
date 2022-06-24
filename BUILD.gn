@@ -41,6 +41,7 @@ ohos_shared_library("tel_cellular_data") {
     "$SOURCE_DIR/services/src/state_notification.cpp",
     "$SOURCE_DIR/services/src/traffic_management.cpp",
     "$SOURCE_DIR/services/src/utils/cellular_data_dump_helper.cpp",
+    "$SOURCE_DIR/services/src/utils/cellular_data_hisysevent.cpp",
     "$SOURCE_DIR/services/src/utils/cellular_data_net_agent.cpp",
     "$SOURCE_DIR/services/src/utils/cellular_data_rdb_helper.cpp",
     "$SOURCE_DIR/services/src/utils/cellular_data_settings_rdb_helper.cpp",
@@ -57,6 +58,7 @@ ohos_shared_library("tel_cellular_data") {
     "$SOURCE_DIR/services/include/utils",
     "$SOURCE_DIR/services/include/apn_manager",
     "$SOURCE_DIR/interfaces/innerkits",
+    "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
     "//base/telephony/data_storage/pdp_profile/include",
     "${aafwk_inner_api_path}/dataobs_manager/include",
   ]
@@ -79,6 +81,7 @@ ohos_shared_library("tel_cellular_data") {
     "common_event_service:cesfwk_innerkits",
     "core_service:tel_core_service_api",
     "eventhandler:libeventhandler",
+    "hisysevent_native:libhisysevent",
     "ipc:ipc_core",
     "netmanager_base:net_conn_manager_if",
     "netmanager_base:net_policy_manager_if",
