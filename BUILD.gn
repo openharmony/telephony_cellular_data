@@ -66,6 +66,7 @@ ohos_shared_library("tel_cellular_data") {
   deps = [
     "${aafwk_inner_api_path}/dataobs_manager:dataobs_manager",
     "${aafwk_path}/frameworks/native/ability/native:abilitykit_native",
+    "${aafwk_path}/frameworks/native/ability/native:data_ability_helper",
     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
     "//base/telephony/core_service/utils:libtel_common",
     "//utils/native/base:utils",
