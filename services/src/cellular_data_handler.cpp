@@ -263,6 +263,10 @@ ApnProfileState CellularDataHandler::GetCellularDataState(const std::string &apn
         return ApnProfileState::PROFILE_STATE_IDLE;
     }
     sptr<ApnHolder> apnHolder = apnManager_->GetApnHolder(apnType);
+    if (apnHolder == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: apnHolder is null", slotId_);
+        return ApnProfileState::PROFILE_STATE_IDLE;
+    }
     return apnHolder->GetApnState();
 }
 
