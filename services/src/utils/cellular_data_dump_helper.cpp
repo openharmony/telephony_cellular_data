@@ -25,15 +25,14 @@ CellularDataDumpHelper::CellularDataDumpHelper()
 bool CellularDataDumpHelper::Dump(const std::vector<std::string> &args, std::string &result) const
 {
     result.clear();
-    bool retRes = true;
-    for (size_t i = 0; i<args.size()-1; i++) {
+    for (int32_t i = 0; i < (int32_t)args.size() - 1; i++) {
         if (args[i] == "cellular_data" && args[i+1] == "--help") {
             ShowHelp(result);
             return true;
         }
     }
     ShowCellularDataInfo(result);
-    return retRes;
+    return true;
 }
 
 void CellularDataDumpHelper::ShowHelp(std::string &result) const
