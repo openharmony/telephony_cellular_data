@@ -46,7 +46,7 @@
                 "ril_adapter",
                 "safwk",
                 "samgr_standard",
-                "startup_l2",
+                "init",
                 "utils_base"
             ],
             "third_party": [
