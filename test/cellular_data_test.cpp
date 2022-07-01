@@ -259,16 +259,16 @@ HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test, TestSize.Level2)
         return;
     }
     int32_t result = CellularDataTest::GetDefaultCellularDataSlotIdTest();
-    if (result < DEFAULT_SIM_SLOT_ID) {
+    if (result < DEFAULT_SIM_SLOT_ID_REMOVE) {
         return;
     }
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
     ASSERT_TRUE(result == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
     // Multiple cards will need to be optimized again
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID - 1);
-    ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
+    ASSERT_TRUE(result == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(DATA_SLOT_ID_INVALID);
-    ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
+    ASSERT_TRUE(result == static_cast<int32_t>(DataRespondCode::SET_FAILED));
 }
 
 /**
