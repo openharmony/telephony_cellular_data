@@ -80,6 +80,7 @@ ohos_shared_library("tel_cellular_data") {
     "bundle_framework:appexecfwk_core",
     "common_event_service:cesfwk_innerkits",
     "core_service:tel_core_service_api",
+    "drivers_interface_ril:hril_innerkits",
     "eventhandler:libeventhandler",
     "hisysevent_native:libhisysevent",
     "init:libbegetutil",
@@ -89,7 +90,6 @@ ohos_shared_library("tel_cellular_data") {
     "netmanager_base:net_stats_manager_if",
     "relational_store:native_dataability",
     "relational_store:native_rdb",
-    "ril_device_driver_interface:hril_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
