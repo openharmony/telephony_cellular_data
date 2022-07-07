@@ -15,6 +15,7 @@
 
 #include "data_switch_settings.h"
 
+#include "cellular_data_hisysevent.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -39,6 +40,7 @@ void DataSwitchSettings::SetInternalDataOn(bool internalDataOn)
 void DataSwitchSettings::SetUserDataOn(bool userDataOn)
 {
     userDataOn_ = userDataOn;
+    CellularDataHisysevent::DataConnectStateEventWrite(userDataOn);
 }
 
 bool DataSwitchSettings::GetUserDataOn() const

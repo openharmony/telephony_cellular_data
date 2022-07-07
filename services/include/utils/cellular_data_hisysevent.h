@@ -25,7 +25,7 @@ static const std::string DOMAIN_CELLULAR_DATA = "CELLULAR_DATA";
 static const std::string DATA_CONNECTION_STATE_EVENT = "DATA_CONNECTION_STATE";
 
 // KEY
-static const std::string DATA_CONNECTION_KEY = "state";
+static const std::string DATA_CONNECTION_KEY = "STATE";
 
 class CellularDataHisysevent {
 public:
