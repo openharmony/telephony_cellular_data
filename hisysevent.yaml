@@ -15,4 +15,4 @@ domain: CELLULAR_DATA
 
 DATA_CONNECTION_STATE:
   __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: data connection status}
-  state: {type: INT32, desc: data_connection_on or data_connection_off}
+  STATE: {type: INT32, desc: 0_OFF 1_ON}
