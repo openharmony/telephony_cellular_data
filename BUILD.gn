@@ -94,8 +94,8 @@ ohos_shared_library("tel_cellular_data") {
     "samgr_standard:samgr_proxy",
   ]
   defines += [
-    "TELEPHONY_LOG_TAG = \"CELLULAR_DATA\"",
-    "LOG_DOMAIN = 0xD002B01",
+    "TELEPHONY_LOG_TAG = \"CellularData\"",
+    "LOG_DOMAIN = 0xD001F03",
   ]
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
