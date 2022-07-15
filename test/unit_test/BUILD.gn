@@ -36,8 +36,8 @@ ohos_executable("tel_cellular_data_ui_test") {
   ]
 
   defines += [
-    "TELEPHONY_LOG_TAG = \"CelllularDataTest\"",
-    "LOG_DOMAIN = 0xD002B01",
+    "TELEPHONY_LOG_TAG = \"CelllularDataUiTest\"",
+    "LOG_DOMAIN = 0xD000F00",
   ]
 
   if (is_standard_system) {

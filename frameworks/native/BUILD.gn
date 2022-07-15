@@ -53,7 +53,10 @@ ohos_shared_library("tel_cellular_data_api") {
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
-
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CellularDataApi\"",
+    "LOG_DOMAIN = 0xD001F03",
+  ]
   part_name = "cellular_data"
   subsystem_name = "telephony"
 }

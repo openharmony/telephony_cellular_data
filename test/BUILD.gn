@@ -48,7 +48,10 @@ ohos_unittest("tel_cellular_data_test") {
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
-
+  defines += [
+    "TELEPHONY_LOG_TAG = \"CelllularDataTest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
   } else {
