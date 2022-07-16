@@ -27,7 +27,7 @@ namespace Telephony {
 class DataConnectionMonitor : public AppExecFwk::EventHandler {
 public:
     explicit DataConnectionMonitor(const std::shared_ptr<AppExecFwk::EventRunner> &runner, int32_t slotId);
-    ~DataConnectionMonitor();
+    ~DataConnectionMonitor() = default;
 
     /**
      * Start the data detection

@@ -40,7 +40,12 @@ DataConnectionManager::DataConnectionManager(const std::shared_ptr<AppExecFwk::E
     StateMachine::Start();
 }
 
-DataConnectionManager::~DataConnectionManager() = default;
+DataConnectionManager::~DataConnectionManager()
+{
+    if (connectionMonitor_ != nullptr) {
+        connectionMonitor_->RemoveAllEvents();
+    }
+}
 
 void DataConnectionManager::AddConnectionStateMachine(const std::shared_ptr<CellularDataStateMachine> &stateMachine)
 {
