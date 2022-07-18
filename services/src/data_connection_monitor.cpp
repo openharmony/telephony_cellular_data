@@ -35,11 +35,6 @@ DataConnectionMonitor::DataConnectionMonitor(const std::shared_ptr<AppExecFwk::E
     }
 }
 
-DataConnectionMonitor::~DataConnectionMonitor()
-{
-    RemoveAllEvents();
-}
-
 void DataConnectionMonitor::StartStallDetectionTimer()
 {
     TELEPHONY_LOGI("Slot%{public}d: start stall detection", slotId_);
