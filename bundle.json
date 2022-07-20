@@ -38,7 +38,7 @@
                 "appexecfwk_standard",
                 "common_event_service",
                 "core_service",
-                "dmsfwk_standard",
+                "dmsfwk",
                 "hiviewdfx_hilog_native",
                 "ipc",
                 "relational_store",
