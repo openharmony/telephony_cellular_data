@@ -44,10 +44,10 @@ ohos_shared_library("tel_cellular_data_api") {
 
   deps = [
     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
