@@ -20,12 +20,12 @@
 
 namespace OHOS {
 namespace Telephony {
-static const std::string DOMAIN_CELLULAR_DATA = "CELLULAR_DATA";
+static constexpr const char *DOMAIN_CELLULAR_DATA = "CELLULAR_DATA";
 // EVENT
-static const std::string DATA_CONNECTION_STATE_EVENT = "DATA_CONNECTION_STATE";
+static constexpr const char *DATA_CONNECTION_STATE_EVENT = "DATA_CONNECTION_STATE";
 
 // KEY
-static const std::string DATA_CONNECTION_KEY = "STATE";
+static constexpr const char *DATA_CONNECTION_KEY = "STATE";
 
 class CellularDataHisysevent {
 public:

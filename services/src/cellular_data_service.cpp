@@ -251,7 +251,7 @@ bool CellularDataService::CheckParamValid(const int32_t slotId)
 
 int32_t CellularDataService::ReleaseNet(const NetRequest &request)
 {
-    int32_t slotId = std::stoi(request.ident.substr(IDENT_PREFIX.length()));
+    int32_t slotId = std::stoi(request.ident.substr(strlen(IDENT_PREFIX)));
     if (!CheckParamValid(slotId)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
@@ -261,7 +261,7 @@ int32_t CellularDataService::ReleaseNet(const NetRequest &request)
 
 int32_t CellularDataService::RequestNet(const NetRequest &request)
 {
-    int32_t slotId = std::stoi(request.ident.substr(IDENT_PREFIX.length()));
+    int32_t slotId = std::stoi(request.ident.substr(strlen(IDENT_PREFIX)));
     if (!CheckParamValid(slotId)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
