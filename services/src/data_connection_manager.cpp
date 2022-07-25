@@ -269,7 +269,7 @@ std::string DataConnectionManager::GetDefaultBandWidthsConfig()
 {
     bandwidthConfigMap_.clear();
     char bandWidthBuffer[MAX_BUFFER_SIZE] = {0};
-    GetParameter(CONFIG_BANDWIDTH.c_str(), DEFAULT_BANDWIDTH_CONFIG.c_str(), bandWidthBuffer, MAX_BUFFER_SIZE);
+    GetParameter(CONFIG_BANDWIDTH, DEFAULT_BANDWIDTH_CONFIG, bandWidthBuffer, MAX_BUFFER_SIZE);
     std::vector<std::string> linkBandwidthVec = CellularDataUtils::Split(bandWidthBuffer, ";");
     for (std::string temp : linkBandwidthVec) {
         std::vector<std::string> linkBandwidths = CellularDataUtils::Split(temp, ":");
@@ -293,7 +293,7 @@ std::string DataConnectionManager::GetDefaultTcpBufferConfig()
 {
     tcpBufferConfigMap_.clear();
     char tcpBufferConfig[MAX_BUFFER_SIZE] = {0};
-    GetParameter(CONFIG_TCP_BUFFER.c_str(), DEFAULT_TCP_BUFFER_CONFIG.c_str(), tcpBufferConfig, MAX_BUFFER_SIZE);
+    GetParameter(CONFIG_TCP_BUFFER, DEFAULT_TCP_BUFFER_CONFIG, tcpBufferConfig, MAX_BUFFER_SIZE);
     std::vector<std::string> tcpBufferVec = CellularDataUtils::Split(tcpBufferConfig, ";");
     for (std::string tcpBuffer : tcpBufferVec) {
         std::vector<std::string> str = CellularDataUtils::Split(tcpBuffer, ":");

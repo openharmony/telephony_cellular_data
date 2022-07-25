@@ -209,22 +209,21 @@ int32_t CellularDataUtils::GetPrefixLen(const std::vector<std::string> &netmask,
 int CellularDataUtils::GetDefaultMobileMtuConfig()
 {
     char mobile_mtu[MIN_BUFFER_SIZE] = {0};
-    GetParameter(CONFIG_MOBILE_MTU.c_str(), DEFAULT_MOBILE_MTU.c_str(), mobile_mtu, MIN_BUFFER_SIZE);
+    GetParameter(CONFIG_MOBILE_MTU, DEFAULT_MOBILE_MTU, mobile_mtu, MIN_BUFFER_SIZE);
     return std::atoi(mobile_mtu);
 }
 
 bool CellularDataUtils::GetDefaultPreferApnConfig()
 {
     char preferApn[MIN_BUFFER_SIZE] = {0};
-    GetParameter(CONFIG_PREFERAPN.c_str(), DEFAULT_PREFER_APN.c_str(), preferApn, MIN_BUFFER_SIZE);
+    GetParameter(CONFIG_PREFERAPN, DEFAULT_PREFER_APN, preferApn, MIN_BUFFER_SIZE);
     return std::atoi(preferApn);
 }
 
 bool CellularDataUtils::GetDefaultMultipleConnectionsConfig()
 {
     char connections[MIN_BUFFER_SIZE] = {0};
-    GetParameter(CONFIG_MULTIPLE_CONNECTIONS.c_str(), DEFAULT_MULTIPLE_CONNECTIONS.c_str(),
-        connections, MIN_BUFFER_SIZE);
+    GetParameter(CONFIG_MULTIPLE_CONNECTIONS, DEFAULT_MULTIPLE_CONNECTIONS, connections, MIN_BUFFER_SIZE);
     return std::atoi(connections) > 0 ? true : false;
 }
 

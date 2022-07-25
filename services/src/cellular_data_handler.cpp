@@ -133,7 +133,7 @@ bool CellularDataHandler::SetCellularDataEnable(bool userDataOn)
             }
             if (!apnHolder->IsDataCallEnabled()) {
                 NetRequest netRequest;
-                netRequest.ident = IDENT_PREFIX + std::to_string(slotId_);
+                netRequest.ident = std::string(IDENT_PREFIX) + std::to_string(slotId_);
                 netRequest.capability = NetCap::NET_CAPABILITY_INTERNET;
                 apnHolder->RequestCellularData(netRequest);
                 AttemptEstablishDataConnection(apnHolder);
@@ -1129,8 +1129,7 @@ void CellularDataHandler::GetDefaultUpLinkThresholdsConfig()
 {
     upLinkThresholds_.clear();
     char upLinkConfig[UP_DOWN_LINK_SIZE] = {0};
-    GetParameter(CONFIG_UPLINK_THRESHOLDS.c_str(), CAPACITY_THRESHOLDS_FOR_UPLINK.c_str(),
-        upLinkConfig, UP_DOWN_LINK_SIZE);
+    GetParameter(CONFIG_UPLINK_THRESHOLDS, CAPACITY_THRESHOLDS_FOR_UPLINK, upLinkConfig, UP_DOWN_LINK_SIZE);
     TELEPHONY_LOGI("Slot%{public}d: upLinkThresholds = %{public}s", slotId_, upLinkConfig);
     upLinkThresholds_ = CellularDataUtils::Split(upLinkConfig, ",");
 }
@@ -1139,8 +1138,7 @@ void CellularDataHandler::GetDefaultDownLinkThresholdsConfig()
 {
     downLinkThresholds_.clear();
     char downLinkConfig[UP_DOWN_LINK_SIZE] = {0};
-    GetParameter(CONFIG_DOWNLINK_THRESHOLDS.c_str(), CAPACITY_THRESHOLDS_FOR_DOWNLINK.c_str(),
-        downLinkConfig, UP_DOWN_LINK_SIZE);
+    GetParameter(CONFIG_DOWNLINK_THRESHOLDS, CAPACITY_THRESHOLDS_FOR_DOWNLINK, downLinkConfig, UP_DOWN_LINK_SIZE);
     TELEPHONY_LOGI("Slot%{public}d: downLinkThresholds_ = %{public}s", slotId_, downLinkConfig);
     downLinkThresholds_ = CellularDataUtils::Split(downLinkConfig, ",");
 }
@@ -1188,7 +1186,7 @@ void CellularDataHandler::HandleDBSettingEnableChanged(const AppExecFwk::InnerEv
             }
             if (!apnHolder->IsDataCallEnabled()) {
                 NetRequest netRequest;
-                netRequest.ident = IDENT_PREFIX + std::to_string(slotId_);
+                netRequest.ident = std::string(IDENT_PREFIX) + std::to_string(slotId_);
                 netRequest.capability = NetCap::NET_CAPABILITY_INTERNET;
                 apnHolder->RequestCellularData(netRequest);
                 AttemptEstablishDataConnection(apnHolder);
