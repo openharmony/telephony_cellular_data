@@ -28,13 +28,11 @@ ohos_shared_library("data") {
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/napi_util.cpp",
   ]
 
-  deps = [
-    "//foundation/arkui/napi:ace_napi",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//foundation/arkui/napi:ace_napi" ]
 
   external_deps = [
     "ability_base:want",
+    "c_utils:utils",
     "cellular_data:tel_cellular_data_api",
     "eventhandler:libeventhandler",
     "ipc:ipc_core",
