@@ -180,7 +180,6 @@ static const int32_t DEFAULT_MCC_SIZE = 3;
 static const int32_t NULL_POINTER_EXCEPTION = -1;
 static constexpr const char *ROUTED_IPV4 = "0.0.0.0";
 static constexpr const char *ROUTED_IPV6 = "::";
-static constexpr const char *CALL_STATE_CHANGE_ACTION = "com.hos.action.CALL_STATE_CHANGE";
 static constexpr const char *CONFIG_DOWNLINK_THRESHOLDS = "persist.sys.data.downlink";
 static constexpr const char *CONFIG_UPLINK_THRESHOLDS = "persist.sys.data.uplink";
 static constexpr const char *CONFIG_TCP_BUFFER = "persist.sys.data.tcpbuffer";

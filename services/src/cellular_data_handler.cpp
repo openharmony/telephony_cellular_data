@@ -20,18 +20,21 @@
 
 #include "cellular_data_constant.h"
 #include "cellular_data_settings_rdb_helper.h"
-#include "cellular_data_utils.h"
 #include "cellular_data_types.h"
-#include "hril_call_parcel.h"
-#include "str_convert.h"
+#include "cellular_data_utils.h"
+#include "common_event_manager.h"
+#include "common_event_support.h"
 #include "core_manager_inner.h"
+#include "hril_call_parcel.h"
 #include "radio_event.h"
+#include "str_convert.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_types.h"
 
 namespace OHOS {
 namespace Telephony {
 using namespace AppExecFwk;
+using namespace OHOS::EventFwk;
 using namespace NetManagerStandard;
 CellularDataHandler::CellularDataHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
     const EventFwk::CommonEventSubscribeInfo &sp, int32_t slotId) : EventHandler(runner), CommonEventSubscriber(sp),
@@ -708,7 +711,7 @@ void CellularDataHandler::OnReceiveEvent(const EventFwk::CommonEventData &data)
 {
     const AAFwk::Want &want = data.GetWant();
     std::string action = want.GetAction();
-    if (CALL_STATE_CHANGE_ACTION == action) {
+    if (EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED == action) {
         int32_t slotId = want.GetIntParam("slotId", 0);
         if (slotId_ != slotId) {
             return;

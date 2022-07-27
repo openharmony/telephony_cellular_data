@@ -18,6 +18,7 @@
 #include "cellular_data_constant.h"
 #include "cellular_data_settings_rdb_helper.h"
 #include "common_event_manager.h"
+#include "common_event_support.h"
 #include "core_manager_inner.h"
 #include "network_search_callback.h"
 #include "radio_event.h"
@@ -27,6 +28,7 @@
 namespace OHOS {
 namespace Telephony {
 using namespace NetManagerStandard;
+using namespace OHOS::EventFwk;
 
 CellularDataController::CellularDataController(std::shared_ptr<AppExecFwk::EventRunner> &runner, int32_t slotId)
     : AppExecFwk::EventHandler(runner), slotId_(slotId)
@@ -41,7 +43,7 @@ CellularDataController::~CellularDataController()
 void CellularDataController::Init()
 {
     EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CALL_STATE_CHANGE_ACTION);
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     cellularDataHandler_ = std::make_shared<CellularDataHandler>(GetEventRunner(), subscriberInfo, slotId_);
     settingObserver_ = std::make_unique<CellularDataSettingObserver>(cellularDataHandler_).release();
