@@ -66,6 +66,10 @@ public:
 private:
     std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect();
     std::shared_ptr<CellularDataStateMachine> FindIdleCellularDataConnection() const;
+    bool CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder);
+    bool CheckAttachAndSimState(sptr<ApnHolder> &apnHolder);
+    bool CheckRoamingState(sptr<ApnHolder> &apnHolder);
+    bool CheckApnState(sptr<ApnHolder> &apnHolder);
     void AttemptEstablishDataConnection(sptr<ApnHolder> &apnHolder);
     bool EstablishDataConnection(sptr<ApnHolder> &apnHolder, int32_t radioTech);
     void RadioPsConnectionAttached(const AppExecFwk::InnerEvent::Pointer &event);

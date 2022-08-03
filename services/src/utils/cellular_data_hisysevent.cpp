@@ -20,34 +20,54 @@
 
 namespace OHOS {
 namespace Telephony {
+static constexpr const char *DOMAIN_CELLULAR_DATA = "CELLULAR_DATA";
+// EVENT
+static constexpr const char *DATA_CONNECTION_STATE_EVENT = "DATA_CONNECTION_STATE";
+static constexpr const char *DATA_DEACTIVED_EVENT = "DATA_DEACTIVED";
+static constexpr const char *ROAMING_DATA_CONNECTION_STATE_EVENT = "ROAMING_DATA_CONNECTION_STATE";
+static constexpr const char *DATA_ACTIVATE_FAILED_EVENT = "DATA_ACTIVATE_FAILED";
+
+// KEY
+static constexpr const char *DATA_CONNECTION_KEY = "STATE";
+static constexpr const char *SLOT_ID_KEY = "SLOT_ID";
+static constexpr const char *DATA_SWITCH_KEY = "DATA_SWITCH";
+static constexpr const char *UPLINK_DATA_KEY = "UPLINK_DATA";
+static constexpr const char *DOWNLINK_DATA_KEY = "DOWNLINK_DATA";
+static constexpr const char *DATASTATE_KEY = "DATASTATE";
+static constexpr const char *ERROR_TYPE_KEY = "ERROR_TYPE";
+static constexpr const char *ERROR_MSG_KEY = "ERROR_MSG";
+
 template<typename... Types>
-void CellularDataHisysevent::WriteHiSysEvent(const std::string &eventName, Types... args)
+void CellularDataHiSysEvent::WriteHiSysEvent(const std::string &eventName, Types... args)
 {
     OHOS::HiviewDFX::HiSysEvent::EventType type;
-    if (eventName == DATA_CONNECTION_STATE_EVENT) {
-        type = HiviewDFX::HiSysEvent::EventType::STATISTIC;
+    if (eventName == DATA_CONNECTION_STATE_EVENT || eventName == DATA_DEACTIVED_EVENT ||
+        eventName == ROAMING_DATA_CONNECTION_STATE_EVENT) {
+        type = HiviewDFX::HiSysEvent::EventType::BEHAVIOR;
+    } else if (eventName == DATA_ACTIVATE_FAILED_EVENT) {
+        type = HiviewDFX::HiSysEvent::EventType::FAULT;
     } else {
-        TELEPHONY_LOGE("CellularDataHisysevent::WriteHiSysEvent the event name is not in the processing scope!");
+        TELEPHONY_LOGE("CellularDataHiSysEvent::WriteHiSysEvent the event name is not in the processing scope!");
         return;
     }
     OHOS::HiviewDFX::HiSysEvent::Write(DOMAIN_CELLULAR_DATA, eventName, type, args...);
 }
 
-void CellularDataHisysevent::HiSysEventWriteString(
-    const std::string &eventName, const std::string eventKey, std::string eventValue)
+void CellularDataHiSysEvent::DataConnectStateBehaviorEvent(const int32_t state)
 {
-    WriteHiSysEvent(eventName, eventKey, eventValue);
+    WriteHiSysEvent(DATA_CONNECTION_STATE_EVENT, DATA_CONNECTION_KEY, state);
 }
 
-void CellularDataHisysevent::HiSysEventWriteInt(
-    const std::string &eventName, const std::string eventKey, int32_t eventValue)
+void CellularDataHiSysEvent::RoamingConnectStateBehaviorEvent(const int32_t state)
 {
-    WriteHiSysEvent(eventName, eventKey, eventValue);
+    WriteHiSysEvent(ROAMING_DATA_CONNECTION_STATE_EVENT, DATA_CONNECTION_KEY, state);
 }
 
-void CellularDataHisysevent::DataConnectStateEventWrite(int32_t eventValue)
+void CellularDataHiSysEvent::DataActivateFaultEvent(const CellDataActivateInfo &info, const std::string &errorMsg)
 {
-    HiSysEventWriteInt(DATA_CONNECTION_STATE_EVENT, DATA_CONNECTION_KEY, eventValue);
+    WriteHiSysEvent(DATA_ACTIVATE_FAILED_EVENT, SLOT_ID_KEY, info.slotId, DATA_SWITCH_KEY, info.switchState,
+        UPLINK_DATA_KEY, info.uplinkData, DOWNLINK_DATA_KEY, info.downlinkData, DATASTATE_KEY, info.dataState,
+        ERROR_TYPE_KEY, info.errorType, ERROR_MSG_KEY, errorMsg);
 }
 } // namespace Telephony
 } // namespace OHOS

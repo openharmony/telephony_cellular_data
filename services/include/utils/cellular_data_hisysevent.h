@@ -20,20 +20,44 @@
 
 namespace OHOS {
 namespace Telephony {
-static constexpr const char *DOMAIN_CELLULAR_DATA = "CELLULAR_DATA";
-// EVENT
-static constexpr const char *DATA_CONNECTION_STATE_EVENT = "DATA_CONNECTION_STATE";
+// VALUE
+static const int32_t INVALID_SLOT_ID = -1;
+static const int32_t INVALID_PARAMETER = -1;
+static const int32_t SWITCH_ON = 1;
+static const int32_t SWITCH_OFF = 0;
 
-// KEY
-static constexpr const char *DATA_CONNECTION_KEY = "STATE";
+struct CellDataActivateInfo {
+    int32_t slotId;
+    int32_t switchState;
+    int32_t uplinkData;
+    int32_t downlinkData;
+    int32_t dataState;
+    int32_t errorType;
+};
 
-class CellularDataHisysevent {
+// errorcode
+enum {
+    DATA_ERR_PERMISSION_ERROR = 200,
+    DATA_ERR_DATABASE_WRITE_ERROR,
+    DATA_ERR_PS_NOT_ATTACH,
+    DATA_ERR_SIM_NOT_READY,
+    DATA_ERR_CELLULAR_DATA_SLOT_ID_MISMATCH,
+    DATA_ERR_ROAMING_SWITCH_OFF_AND_ROAMING,
+    DATA_ERR_CALL_AND_DATA_NOT_CONCURRENCY,
+    DATA_ERR_HAS_HIGHER_PRIORITY_CONNECTION,
+    DATA_ERR_PDP_ACTIVATE_FAIL,
+    DATA_ERR_PDP_DEACTIVATE_FAIL,
+};
+
+class CellularDataHiSysEvent {
 public:
+    static void DataConnectStateBehaviorEvent(const int32_t state);
+    static void RoamingConnectStateBehaviorEvent(const int32_t state);
+    static void DataActivateFaultEvent(const CellDataActivateInfo &info, const std::string &errorMsg);
+
+private:
     template<typename... Types>
     static void WriteHiSysEvent(const std::string &eventName, Types... args);
-    static void HiSysEventWriteString(const std::string &eventName, const std::string eventKey, std::string eventValue);
-    static void HiSysEventWriteInt(const std::string &eventName, const std::string eventKey, int32_t eventValue);
-    static void DataConnectStateEventWrite(int32_t eventValue);
 };
 } // namespace Telephony
 } // namespace OHOS

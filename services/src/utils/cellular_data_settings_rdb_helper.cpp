@@ -18,9 +18,12 @@
 #include "telephony_log_wrapper.h"
 
 #include "cellular_data_constant.h"
+#include "cellular_data_hisysevent.h"
 
 namespace OHOS {
 namespace Telephony {
+static constexpr const int32_t E_ERROR = -1;
+
 CellularDataSettingsRdbHelper::CellularDataSettingsRdbHelper()
 {
     settingHelper_ = CreateDataAbilityHelper();
@@ -117,6 +120,21 @@ void CellularDataSettingsRdbHelper::PutValue(Uri &uri, const std::string &column
         result = settingHelper_->Update(uri, bucket, predicates);
     }
     TELEPHONY_LOGI("put value return %{public}d", result);
+    if (result == E_ERROR) {
+        Uri userDataEnableUri(CELLULAR_DATA_SETTING_DATA_ENABLE_URI);
+        Uri userDataRoamingUri(CELLULAR_DATA_SETTING_DATA_ROAMING_URI);
+        if (uri == userDataEnableUri) {
+            struct CellDataActivateInfo info = { INVALID_SLOT_ID, value, INVALID_PARAMETER, INVALID_PARAMETER,
+                INVALID_PARAMETER, DATA_ERR_DATABASE_WRITE_ERROR };
+            CellularDataHiSysEvent::DataActivateFaultEvent(info, "SetCellularDataEnable " + std::to_string(value));
+        } else if (uri == userDataRoamingUri) {
+            struct CellDataActivateInfo info = { INVALID_SLOT_ID, value, INVALID_PARAMETER, INVALID_PARAMETER,
+                INVALID_PARAMETER, DATA_ERR_DATABASE_WRITE_ERROR };
+            CellularDataHiSysEvent::DataActivateFaultEvent(info, "SetUserDataRoamingOn " + std::to_string(value));
+        } else {
+            TELEPHONY_LOGI("result is %{public}d, do not handle.", result);
+        }
+    }
     settingHelper_->NotifyChange(uri);
     settingHelper_->Release();
 }

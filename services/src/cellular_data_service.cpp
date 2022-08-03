@@ -21,6 +21,7 @@
 #include "net_specifier.h"
 
 #include "cellular_data_error.h"
+#include "cellular_data_hisysevent.h"
 #include "core_manager_inner.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
@@ -143,12 +144,19 @@ int32_t CellularDataService::IsCellularDataEnabled()
 int32_t CellularDataService::EnableCellularData(bool enable)
 {
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        int32_t slotId = CellularDataService::GetDefaultCellularDataSlotId();
+        struct CellDataActivateInfo info = { slotId, enable, INVALID_PARAMETER, INVALID_PARAMETER, INVALID_PARAMETER,
+            DATA_ERR_PERMISSION_ERROR };
+        CellularDataHiSysEvent::DataActivateFaultEvent(info, Permission::SET_TELEPHONY_STATE);
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     bool result = false;
     for (const std::pair<const int32_t, std::shared_ptr<CellularDataController>> &it : cellularDataControllers_) {
         if (it.second != nullptr) {
             bool itemResult = it.second->SetCellularDataEnable(enable);
+            if (itemResult) {
+                CellularDataHiSysEvent::DataConnectStateBehaviorEvent(enable);
+            }
             if (!result) {
                 result = itemResult;
             }
@@ -201,6 +209,9 @@ int32_t CellularDataService::EnableCellularDataRoaming(const int32_t slotId, boo
         return CELLULAR_DATA_INVALID_PARAM;
     }
     bool result = cellularDataControllers_[slotId]->SetCellularDataRoamingEnabled(enable);
+    if (result) {
+        CellularDataHiSysEvent::RoamingConnectStateBehaviorEvent(enable);
+    }
     return result ? static_cast<int32_t>(DataRespondCode::SET_SUCCESS) :
         static_cast<int32_t>(DataRespondCode::SET_FAILED);
 }
