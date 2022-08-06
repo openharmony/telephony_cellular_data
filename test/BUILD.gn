@@ -45,7 +45,7 @@ ohos_unittest("tel_cellular_data_test") {
     "init:libbegetutil",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
   defines += [
     "TELEPHONY_LOG_TAG = \"CelllularDataTest\"",

@@ -45,7 +45,7 @@
                 "netmanager_base",
                 "ril_adapter",
                 "safwk",
-                "samgr_standard",
+                "samgr",
                 "init",
                 "utils_base"
             ],
