@@ -24,42 +24,21 @@ std::vector<AddressInfo> CellularDataUtils::ParseIpAddr(const std::string &addre
 {
     std::vector<AddressInfo> ipInfoArray;
     std::vector<std::string> ipArray = Split(address, " ");
-    bool bMaskAddr = false;
     for (std::string &ipItem: ipArray) {
         AddressInfo ipInfo;
         std::string flag = (ipItem.find('.') == std::string::npos) ? ":" : ".";
-        if (bMaskAddr) {
-            bMaskAddr = false;
-            if (ipInfoArray.size() > 0) {
-                ipInfoArray[ipInfoArray.size()-1].netMask = ipItem;
-                ipInfoArray[ipInfoArray.size()-1].prefixLen = GetPrefixLen(ipItem, flag);
-            }
-            continue;
-        }
         std::vector<std::string> ipData = Split(ipItem, "/");
         ipInfo.ip = ipData[0];
+        if (flag == ".") {
+            std::vector<std::string> ipSubData = Split(ipInfo.ip, flag);
+            ipInfo.type = (ipSubData.size() > MIN_IPV4_ITEM) ? INetAddr::IpType::IPV6 : INetAddr::IpType::IPV4;
+            ipInfo.prefixLen = (ipSubData.size() > MIN_IPV4_ITEM) ? IPV6_BIT : IPV4_BIT;
+        } else {
+            ipInfo.type = INetAddr::IpType::IPV6;
+            ipInfo.prefixLen = IPV6_BIT;
+        }
         if (ipData.size() >= VALID_IP_SIZE) {
             ipInfo.prefixLen = std::stoi(ipData[1].c_str());
-            if (flag == ".") {
-                std::vector<std::string> ipSubData = Split(ipInfo.ip, flag);
-                ipInfo.type = (ipSubData.size() > MAX_IPV4_ITEM) ? INetAddr::IpType::IPV6 : INetAddr::IpType::IPV4;
-            } else {
-                ipInfo.type = INetAddr::IpType::IPV6;
-            }
-        } else {
-            ipInfo.prefixLen = 0;
-            if (flag == ".") {
-                // a1.a2.a3.a4 only address
-                // a1.a2.a3.a4.m1.m2.m3.m4
-                // a1.a2.a3...a15.a16 only address
-                // a1.a2.a3...a15.a16.m1.m2.m3...m15.m16
-                if (ParseDotIpData(ipItem, ipInfo)) {
-                    bMaskAddr = true;
-                }
-            } else {
-                bMaskAddr = true;
-                ipInfo.type = INetAddr::IpType::IPV6;
-            }
         }
         ipInfoArray.push_back(ipInfo);
     }
