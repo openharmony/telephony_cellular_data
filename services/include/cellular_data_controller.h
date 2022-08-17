@@ -39,6 +39,7 @@ public:
     ApnProfileState GetCellularDataState() const;
     ApnProfileState GetCellularDataState(const std::string &apnType) const;
     bool IsCellularDataRoamingEnabled() const;
+    void SetDataPermitted(bool dataPermitted) const;
     void AsynchronousRegister();
     bool HandleApnChanged();
     int32_t GetCellularDataFlowType();

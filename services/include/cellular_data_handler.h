@@ -62,6 +62,7 @@ public:
     bool IsRestrictedMode() const;
     DisConnectionReason GetDisConnectionReason();
     bool HasInternetCapability(const int32_t cid) const;
+    void SetDataPermitted(bool dataPermitted);
 
 private:
     std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect();
@@ -102,6 +103,8 @@ private:
     void HandleDBSettingEnableChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleDBSettingRoamingChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleSortConnection();
+    void SetDataPermittedResponse(const AppExecFwk::InnerEvent::Pointer &event);
+    void SyncDataPermitted();
 
 private:
     sptr<ApnManager> apnManager_;
