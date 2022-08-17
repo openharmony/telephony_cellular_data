@@ -885,9 +885,11 @@ void CellularDataHandler::HandleSimAccountLoaded(const InnerEvent::Pointer &even
     int32_t defaultSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
     TELEPHONY_LOGI("Slot%{public}d: HandleSimAccountLoaded defaultSlotId is: %{public}d", slotId_, defaultSlotId);
     if (slotId_ == defaultSlotId) {
+        SetDataPermitted(true);
         EstablishAllApnsIfConnectable();
     } else {
         ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
+        SetDataPermitted(false);
     }
 }
 
@@ -973,6 +975,7 @@ void CellularDataHandler::HandleRadioStateChanged(const AppExecFwk::InnerEvent::
             break;
         }
         case CORE_SERVICE_POWER_ON:
+            SyncDataPermitted();
             SetRilLinkBandwidths();
             EstablishAllApnsIfConnectable();
             break;
@@ -1037,6 +1040,48 @@ bool CellularDataHandler::IsRestrictedMode() const
 DisConnectionReason CellularDataHandler::GetDisConnectionReason()
 {
     return disconnectionReason_;
+}
+
+void CellularDataHandler::SyncDataPermitted()
+{
+    const int32_t defSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
+    if (defSlotId < 0) {
+        TELEPHONY_LOGE("Slot%{public}d: defSlotId is %{public}d.", slotId_, defSlotId);
+        return;
+    }
+    if (defSlotId == slotId_) {
+        SetDataPermitted(true);
+    } else {
+        SetDataPermitted(false);
+    }
+}
+
+void CellularDataHandler::SetDataPermitted(bool dataPermitted)
+{
+    TELEPHONY_LOGI("Slot%{public}d: dataPermitted is %{public}d.", slotId_, dataPermitted);
+    int32_t maxSimCount = CoreManagerInner::GetInstance().GetMaxSimCount();
+    if (maxSimCount <= 1) {
+        TELEPHONY_LOGE("Slot%{public}d: maxSimCount is: %{public}d", slotId_, maxSimCount);
+        return;
+    }
+    CoreManagerInner::GetInstance().SetDataPermitted(
+        slotId_, CellularDataEventCode::MSG_SET_DATA_PERMITTED, dataPermitted, shared_from_this());
+}
+
+void CellularDataHandler::SetDataPermittedResponse(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: event is null", slotId_);
+        return;
+    }
+    std::shared_ptr<TelRilResponseInfo<int32_t>> rilInfo = event->GetSharedObject<TelRilResponseInfo<int32_t>>();
+    if (rilInfo == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: HRilRadioResponseInfo is null", slotId_);
+        return;
+    }
+    if (rilInfo->errorNo != 0) {
+        TELEPHONY_LOGE("Slot%{public}d: SetDataPermitted error", slotId_);
+    }
 }
 
 void CellularDataHandler::SetRilAttachApn()

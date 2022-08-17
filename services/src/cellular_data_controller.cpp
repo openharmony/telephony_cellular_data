@@ -114,6 +114,15 @@ bool CellularDataController::SetCellularDataRoamingEnabled(bool dataRoamingEnabl
     return cellularDataHandler_->SetCellularDataRoamingEnabled(dataRoamingEnabled);
 }
 
+void CellularDataController::SetDataPermitted(bool dataPermitted) const
+{
+    if (cellularDataHandler_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: SetDataPermitted cellularDataHandler is null", slotId_);
+        return;
+    }
+    cellularDataHandler_->SetDataPermitted(dataPermitted);
+}
+
 bool CellularDataController::ReleaseNet(const NetRequest &request)
 {
     if (cellularDataHandler_ == nullptr) {

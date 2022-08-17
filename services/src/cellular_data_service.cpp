@@ -337,7 +337,16 @@ int32_t CellularDataService::SetDefaultCellularDataSlotId(const int32_t slotId)
             TELEPHONY_LOGI("Not find old slot[%{public}d] object", formerSlotId);
         }
     }
-    if (IsCellularDataEnabled() && slotId > DEFAULT_SIM_SLOT_ID_REMOVE) {
+    int32_t newSlotId = GetDefaultCellularDataSlotId();
+    if (formerSlotId != newSlotId) {
+        if (CheckParamValid(formerSlotId)) {
+            cellularDataControllers_[formerSlotId]->SetDataPermitted(false);
+        }
+        if (CheckParamValid(newSlotId)) {
+            cellularDataControllers_[newSlotId]->SetDataPermitted(true);
+        }
+    }
+    if (IsCellularDataEnabled() && CheckParamValid(slotId)) {
         cellularDataControllers_[slotId]->EstablishDataConnection();
     }
     return static_cast<int32_t>(DataRespondCode::SET_SUCCESS);
