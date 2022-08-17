@@ -15,11 +15,11 @@
 
 #include "active.h"
 
-#include "telephony_log_wrapper.h"
-
+#include "cellular_data_hisysevent.h"
 #include "cellular_data_utils.h"
-#include "inactive.h"
 #include "core_manager_inner.h"
+#include "inactive.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -100,6 +100,7 @@ bool Active::ProcessDisconnectAllDone(const AppExecFwk::InnerEvent::Pointer &eve
 bool Active::ProcessLostConnection(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("Active::EVENT_LOST_CONNECTION");
+    CellularDataHiSysEvent::WriteDataDeactiveBehaviorEvent(INVALID_PARAMETER, DataDisconnectCause::LOST_CONNECTION);
     std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
     if (stateMachine == nullptr) {
         TELEPHONY_LOGE("stateMachine is null");

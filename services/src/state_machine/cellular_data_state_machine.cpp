@@ -103,9 +103,8 @@ void CellularDataStateMachine::DoConnect(const DataConnectionParams &connectionP
         activeDataParam, stateMachineEventHandler_);
     if (result != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("Slot%{public}d: Activate PDP context failed", slotId);
-        struct CellDataActivateInfo info = { slotId, SWITCH_ON, INVALID_PARAMETER, INVALID_PARAMETER, INVALID_PARAMETER,
-            DATA_ERR_PDP_ACTIVATE_FAIL };
-        CellularDataHiSysEvent::DataActivateFaultEvent(info, "Activate PDP context failed");
+        CellularDataHiSysEvent::WriteDataActivateFaultEvent(
+            slotId, SWITCH_ON, CellularDataErrorCode::DATA_ERROR_PDP_ACTIVATE_FAIL, "Activate PDP context failed");
     }
     stateMachineEventHandler_->SendEvent(CellularDataEventCode::MSG_CONNECT_TIMEOUT_CHECK, connectId_,
         CONNECTION_DISCONNECTION_TIMEOUT);
@@ -125,9 +124,8 @@ void CellularDataStateMachine::FreeConnection(const DataDisconnectParams &params
         RadioEvent::RADIO_RIL_DEACTIVATE_DATA_CALL, deactivateDataParam, stateMachineEventHandler_);
     if (result != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("Slot%{public}d: Deactivate PDP context failed", slotId);
-        struct CellDataActivateInfo info = { slotId, SWITCH_OFF, INVALID_PARAMETER, INVALID_PARAMETER,
-            INVALID_PARAMETER, DATA_ERR_PDP_DEACTIVATE_FAIL };
-        CellularDataHiSysEvent::DataActivateFaultEvent(info, "Deactivate PDP context failed");
+        CellularDataHiSysEvent::WriteDataActivateFaultEvent(
+            slotId, SWITCH_OFF, CellularDataErrorCode::DATA_ERROR_PDP_DEACTIVATE_FAIL, "Deactivate PDP context failed");
     }
     stateMachineEventHandler_->SendEvent(CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK, connectId_,
         CONNECTION_DISCONNECTION_TIMEOUT);

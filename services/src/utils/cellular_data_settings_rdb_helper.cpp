@@ -124,13 +124,13 @@ void CellularDataSettingsRdbHelper::PutValue(Uri &uri, const std::string &column
         Uri userDataEnableUri(CELLULAR_DATA_SETTING_DATA_ENABLE_URI);
         Uri userDataRoamingUri(CELLULAR_DATA_SETTING_DATA_ROAMING_URI);
         if (uri == userDataEnableUri) {
-            struct CellDataActivateInfo info = { INVALID_SLOT_ID, value, INVALID_PARAMETER, INVALID_PARAMETER,
-                INVALID_PARAMETER, DATA_ERR_DATABASE_WRITE_ERROR };
-            CellularDataHiSysEvent::DataActivateFaultEvent(info, "SetCellularDataEnable " + std::to_string(value));
+            CellularDataHiSysEvent::WriteDataActivateFaultEvent(INVALID_PARAMETER, value,
+                CellularDataErrorCode::DATA_ERROR_DATABASE_WRITE_ERROR,
+                "SetCellularDataEnable " + std::to_string(value) + " fail");
         } else if (uri == userDataRoamingUri) {
-            struct CellDataActivateInfo info = { INVALID_SLOT_ID, value, INVALID_PARAMETER, INVALID_PARAMETER,
-                INVALID_PARAMETER, DATA_ERR_DATABASE_WRITE_ERROR };
-            CellularDataHiSysEvent::DataActivateFaultEvent(info, "SetUserDataRoamingOn " + std::to_string(value));
+            CellularDataHiSysEvent::WriteDataActivateFaultEvent(INVALID_PARAMETER, value,
+                CellularDataErrorCode::DATA_ERROR_DATABASE_WRITE_ERROR,
+                "SetUserDataRoamingOn " + std::to_string(value) + " fail");
         } else {
             TELEPHONY_LOGI("result is %{public}d, do not handle.", result);
         }

@@ -145,9 +145,8 @@ int32_t CellularDataService::EnableCellularData(bool enable)
 {
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         int32_t slotId = CellularDataService::GetDefaultCellularDataSlotId();
-        struct CellDataActivateInfo info = { slotId, enable, INVALID_PARAMETER, INVALID_PARAMETER, INVALID_PARAMETER,
-            DATA_ERR_PERMISSION_ERROR };
-        CellularDataHiSysEvent::DataActivateFaultEvent(info, Permission::SET_TELEPHONY_STATE);
+        CellularDataHiSysEvent::WriteDataActivateFaultEvent(
+            slotId, enable, CellularDataErrorCode::DATA_ERROR_PERMISSION_ERROR, Permission::SET_TELEPHONY_STATE);
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     bool result = false;
@@ -155,7 +154,7 @@ int32_t CellularDataService::EnableCellularData(bool enable)
         if (it.second != nullptr) {
             bool itemResult = it.second->SetCellularDataEnable(enable);
             if (itemResult) {
-                CellularDataHiSysEvent::DataConnectStateBehaviorEvent(enable);
+                CellularDataHiSysEvent::WriteDataConnectStateBehaviorEvent(enable);
             }
             if (!result) {
                 result = itemResult;
@@ -210,7 +209,7 @@ int32_t CellularDataService::EnableCellularDataRoaming(const int32_t slotId, boo
     }
     bool result = cellularDataControllers_[slotId]->SetCellularDataRoamingEnabled(enable);
     if (result) {
-        CellularDataHiSysEvent::RoamingConnectStateBehaviorEvent(enable);
+        CellularDataHiSysEvent::WriteRoamingConnectStateBehaviorEvent(enable);
     }
     return result ? static_cast<int32_t>(DataRespondCode::SET_SUCCESS) :
         static_cast<int32_t>(DataRespondCode::SET_FAILED);
@@ -418,6 +417,9 @@ int32_t CellularDataService::StrategySwitch(int32_t slotId, bool enable)
         return CELLULAR_DATA_INVALID_PARAM;
     }
     int32_t result = cellularDataControllers_[slotId]->SetPolicyDataOn(enable);
+    if (result == static_cast<int32_t>(DataRespondCode::SET_SUCCESS) && enable) {
+        CellularDataHiSysEvent::WriteDataDeactiveBehaviorEvent(slotId, DataDisconnectCause::HIGN_PRIORITY_NETWORK);
+    }
     return result;
 }
 

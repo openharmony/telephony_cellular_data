@@ -58,7 +58,6 @@ ohos_shared_library("tel_cellular_data") {
     "$SOURCE_DIR/services/include/utils",
     "$SOURCE_DIR/services/include/apn_manager",
     "$SOURCE_DIR/interfaces/innerkits",
-    "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
     "//base/telephony/data_storage/pdp_profile/include",
     "${ability_runtime_inner_api_path}/dataobs_manager/include",
   ]
@@ -83,6 +82,7 @@ ohos_shared_library("tel_cellular_data") {
     "drivers_interface_ril:hril_innerkits",
     "eventhandler:libeventhandler",
     "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
     "init:libbegetutil",
     "ipc:ipc_core",
     "netmanager_base:net_conn_manager_if",

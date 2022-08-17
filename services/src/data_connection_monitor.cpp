@@ -20,6 +20,7 @@
 #include "telephony_log_wrapper.h"
 
 #include "cellular_data_event_code.h"
+#include "cellular_data_hisysevent.h"
 #include "cellular_data_service.h"
 #include "cellular_data_types.h"
 
@@ -100,6 +101,7 @@ void DataConnectionMonitor::HandleRecovery()
             TELEPHONY_LOGI("Slot%{public}d: Handle Recovery: get data call list", slotId_);
             dataRecoveryState_ = RecoveryState::STATE_CLEANUP_CONNECTIONS;
             GetPdpContextList();
+            CellularDataHiSysEvent::WriteDataDeactiveBehaviorEvent(slotId_, DataDisconnectCause::ON_THE_NETWORK_SIDE);
             break;
         }
         case RecoveryState::STATE_CLEANUP_CONNECTIONS: {
