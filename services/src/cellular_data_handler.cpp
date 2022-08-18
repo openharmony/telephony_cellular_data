@@ -26,6 +26,7 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "core_manager_inner.h"
+#include "hitrace_meter.h"
 #include "hril_call_parcel.h"
 #include "radio_event.h"
 #include "str_convert.h"
@@ -144,6 +145,7 @@ bool CellularDataHandler::SetCellularDataEnable(bool userDataOn)
                 return true;
             }
         } else {
+            CellularDataHiSysEvent::WriteDataDeactiveBehaviorEvent(slotId_, DataDisconnectCause::BY_USER);
             ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
         }
     } else {
@@ -391,9 +393,9 @@ bool CellularDataHandler::CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder)
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     if (defSlotId != slotId_) {
         TELEPHONY_LOGI("Slot%{public}d: default:%{public}d, current:%{public}d", slotId_, defSlotId, slotId_);
-        struct CellDataActivateInfo info = { slotId_, SWITCH_ON, INVALID_PARAMETER, INVALID_PARAMETER,
-            INVALID_PARAMETER, DATA_ERR_CELLULAR_DATA_SLOT_ID_MISMATCH };
-        CellularDataHiSysEvent::DataActivateFaultEvent(info, "Default cellular data slot id is not current slot id");
+        CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
+            CellularDataErrorCode::DATA_ERROR_CELLULAR_DATA_SLOT_ID_MISMATCH,
+            "Default cellular data slot id is not current slot id");
         return false;
     }
     return true;
@@ -411,15 +413,13 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
     TELEPHONY_LOGI("Slot%{public}d: attached: %{public}d simState: %{public}d", slotId_, attached, simState);
     bool isEmergencyApn = apnHolder->IsEmergencyType();
     if (!isEmergencyApn && !attached) {
-        struct CellDataActivateInfo info = { slotId_, SWITCH_ON, INVALID_PARAMETER, INVALID_PARAMETER,
-            INVALID_PARAMETER, DATA_ERR_PS_NOT_ATTACH };
-        CellularDataHiSysEvent::DataActivateFaultEvent(info, "It is not emergencyApn and not attached");
+        CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
+            CellularDataErrorCode::DATA_ERROR_PS_NOT_ATTACH, "It is not emergencyApn and not attached");
         return false;
     }
     if (!isEmergencyApn && (simState != (int32_t)SimState::SIM_STATE_READY)) {
-        struct CellDataActivateInfo info = { slotId_, SWITCH_ON, INVALID_PARAMETER, INVALID_PARAMETER,
-            INVALID_PARAMETER, DATA_ERR_SIM_NOT_READY };
-        CellularDataHiSysEvent::DataActivateFaultEvent(info, "It is not emergencyApn and sim not ready");
+        CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
+            CellularDataErrorCode::DATA_ERROR_SIM_NOT_READY, "It is not emergencyApn and sim not ready");
         return false;
     }
     return true;
@@ -442,17 +442,16 @@ bool CellularDataHandler::CheckRoamingState(sptr<ApnHolder> &apnHolder)
         isAllowActiveData = true;
     }
     if (!isAllowActiveData) {
-        struct CellDataActivateInfo info = { slotId_, SWITCH_ON, INVALID_PARAMETER, INVALID_PARAMETER,
-            INVALID_PARAMETER, DATA_ERR_ROAMING_SWITCH_OFF_AND_ROAMING };
-        CellularDataHiSysEvent::DataActivateFaultEvent(info, "Data roaming is not on and is roaming");
+        CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
+            CellularDataErrorCode::DATA_ERROR_ROAMING_SWITCH_OFF_AND_ROAMING, "Data roaming is not on and is roaming");
         TELEPHONY_LOGE("Slot%{public}d: AllowActiveData:%{public}d lastCallState_:%{public}d", slotId_,
             isAllowActiveData, lastCallState_);
         return false;
     }
     if (IsRestrictedMode()) {
-        struct CellDataActivateInfo info = { slotId_, SWITCH_ON, INVALID_PARAMETER, INVALID_PARAMETER,
-            INVALID_PARAMETER, DATA_ERR_CALL_AND_DATA_NOT_CONCURRENCY };
-        CellularDataHiSysEvent::DataActivateFaultEvent(info, "CS call and data are not allowed concurrency");
+        CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
+            CellularDataErrorCode::DATA_ERROR_CALL_AND_DATA_NOT_CONCURRENCY,
+            "CS call and data are not allowed concurrency");
         TELEPHONY_LOGE("Slot%{public}d: AllowActiveData:%{public}d lastCallState_:%{public}d", slotId_,
             isAllowActiveData, lastCallState_);
         return false;
@@ -486,16 +485,22 @@ bool CellularDataHandler::CheckApnState(sptr<ApnHolder> &apnHolder)
 
 void CellularDataHandler::AttemptEstablishDataConnection(sptr<ApnHolder> &apnHolder)
 {
-    if (!CheckCellularDataSlotId(apnHolder) || !CheckAttachAndSimState(apnHolder) ||
-        !CheckRoamingState(apnHolder) || !CheckApnState(apnHolder)) {
+    if (!CheckCellularDataSlotId(apnHolder) || !CheckAttachAndSimState(apnHolder) || !CheckRoamingState(apnHolder)) {
         return;
     }
-
+    DelayedSingleton<CellularDataHiSysEvent>::GetInstance()->SetCellularDataActivateStartTime();
+    StartTrace(HITRACE_TAG_OHOS, "ActivateCellularData");
+    if (!CheckApnState(apnHolder)) {
+        FinishTrace(HITRACE_TAG_OHOS);
+        return;
+    }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     int32_t radioTech = coreInner.GetPsRadioTech(slotId_);
     if (!EstablishDataConnection(apnHolder, radioTech)) {
         TELEPHONY_LOGE("Slot%{public}d: Establish data connection fail", slotId_);
     }
+    FinishTrace(HITRACE_TAG_OHOS);
+    DelayedSingleton<CellularDataHiSysEvent>::GetInstance()->JudgingDataActivateTimeOut(slotId_, SWITCH_ON);
 }
 
 std::shared_ptr<CellularDataStateMachine> CellularDataHandler::FindIdleCellularDataConnection() const
@@ -1134,11 +1139,11 @@ bool CellularDataHandler::HasAnyHigherPriorityConnection(const sptr<ApnHolder> &
         if (sortApnHolder->GetPriority() > apnHolder->GetPriority()) {
             if (sortApnHolder->IsDataCallEnabled() &&
                 (sortApnHolder->GetApnState() == ApnProfileState::PROFILE_STATE_CONNECTED ||
-                sortApnHolder->GetApnState() == ApnProfileState::PROFILE_STATE_CONNECTING ||
-                sortApnHolder->GetApnState() == ApnProfileState::PROFILE_STATE_DISCONNECTING)) {
-                struct CellDataActivateInfo info = { slotId_, SWITCH_ON, INVALID_PARAMETER, INVALID_PARAMETER,
-                    INVALID_PARAMETER, DATA_ERR_HAS_HIGHER_PRIORITY_CONNECTION };
-                CellularDataHiSysEvent::DataActivateFaultEvent(info, "There is higher priority connection");
+                    sortApnHolder->GetApnState() == ApnProfileState::PROFILE_STATE_CONNECTING ||
+                    sortApnHolder->GetApnState() == ApnProfileState::PROFILE_STATE_DISCONNECTING)) {
+                CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
+                    CellularDataErrorCode::DATA_ERROR_HAS_HIGHER_PRIORITY_CONNECTION,
+                    "There is higher priority connection");
                 return true;
             }
         }

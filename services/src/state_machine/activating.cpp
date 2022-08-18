@@ -15,12 +15,12 @@
 
 #include "activating.h"
 
-#include "hril_data_parcel.h"
-#include "telephony_log_wrapper.h"
-#include "radio_event.h"
-
 #include "cellular_data_event_code.h"
+#include "cellular_data_hisysevent.h"
+#include "hril_data_parcel.h"
 #include "inactive.h"
+#include "radio_event.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -154,10 +154,14 @@ bool Activating::RilErrorResponse(const AppExecFwk::InnerEvent::Pointer &event)
     switch (rilInfo->error) {
         case HRilErrType::HRIL_ERR_GENERIC_FAILURE:
         case HRilErrType::HRIL_ERR_CMD_SEND_FAILURE:
-        case HRilErrType::HRIL_ERR_NULL_POINT:
+        case HRilErrType::HRIL_ERR_NULL_POINT: {
             inActive->SetReason(DisConnectionReason::REASON_RETRY_CONNECTION);
+            CellularDataHiSysEvent::WriteDataActivateFaultEvent(INVALID_PARAMETER, SWITCH_ON,
+                CellularDataErrorCode::DATA_ERROR_RADIO_RESPONSEINFO_ERROR,
+                "HRilErrType " + std::to_string(static_cast<int32_t>(rilInfo->error)));
             TELEPHONY_LOGI("Handle supported error responses and retry the connection.");
             break;
+        }
         case HRilErrType::HRIL_ERR_INVALID_RESPONSE:
         case HRilErrType::HRIL_ERR_CMD_NO_CARRIER:
         case HRilErrType::HRIL_ERR_HDF_IPC_FAILURE:
