@@ -33,6 +33,11 @@ static bool IsCellularDataManagerInited()
     return CellularDataClient::GetInstance().IsConnect();
 }
 
+static inline bool IsValidSlotId(int32_t slotId)
+{
+    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT));
+}
+
 static bool MatchCellularDataParameters(napi_env env, const napi_value parameters[], const size_t parameterCount)
 {
     switch (parameterCount) {
@@ -223,7 +228,6 @@ static napi_value IsCellularDataEnabled(napi_env env, napi_callback_info info)
 
 static void NativeEnableCellularData(napi_env env, void *data)
 {
-    TELEPHONY_LOGI("NativeEnableCellularData start");
     auto asyncContext = static_cast<AsyncContext *>(data);
     if (asyncContext == nullptr) {
         return;
@@ -240,12 +244,10 @@ static void NativeEnableCellularData(napi_env env, void *data)
         asyncContext->resolved = false;
         asyncContext->errorCode = ERROR_SERVICE_UNAVAILABLE;
     }
-    TELEPHONY_LOGI("NativeEnableCellularData start");
 }
 
 static void VoidValueCallback(napi_env env, napi_status status, void *data)
 {
-    TELEPHONY_LOGI("VoidValueCallback start");
     auto context = static_cast<AsyncContext *>(data);
     if (context == nullptr) {
         return;
@@ -260,7 +262,10 @@ static void VoidValueCallback(napi_env env, napi_status status, void *data)
             errorMessage = "cellular data service unavailable";
         }
         if (asyncContext->errorCode == ERROR_NATIVE_API_EXECUTE_FAIL) {
-            errorMessage = "slotId input error";
+            errorMessage = "api execute failed";
+        }
+        if (asyncContext->errorCode == ERROR_SLOT_ID_INVALID) {
+            errorMessage = "slotId is invalid";
         }
         callbackValue = NapiUtil::CreateErrorMessage(env, errorMessage, asyncContext->errorCode);
     }
@@ -334,9 +339,13 @@ static napi_value DisableCellularData(napi_env env, napi_callback_info info)
 
 static void NativeEnableCellularDataRoaming(napi_env env, void *data)
 {
-    TELEPHONY_LOGI("NativeEnableCellularDataRoaming start");
     auto asyncContext = static_cast<AsyncContext *>(data);
     if (asyncContext == nullptr) {
+        return;
+    }
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeEnableCellularDataRoaming slotId is invalid");
+        asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
     if (IsCellularDataManagerInited()) {
@@ -385,6 +394,11 @@ static void NativeDisableCellularDataRoaming(napi_env env, void *data)
     if (asyncContext == nullptr) {
         return;
     }
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeDisableCellularDataRoaming slotId is invalid");
+        asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
+        return;
+    }
     if (IsCellularDataManagerInited()) {
         int32_t enableResult =
             CellularDataClient::GetInstance().EnableCellularDataRoaming(asyncContext->slotId, false);
@@ -430,6 +444,11 @@ static void NativeIsCellularDataRoamingEnabled(napi_env env, void *data)
     if (asyncContext == nullptr) {
         return;
     }
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeIsCellularDataRoamingEnabled slotId is invalid");
+        asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
+        return;
+    }
     if (IsCellularDataManagerInited()) {
         auto &dataManager = CellularDataClient::GetInstance();
         asyncContext->result = dataManager.IsCellularDataRoamingEnabled(asyncContext->slotId);
@@ -464,7 +483,10 @@ static void IsCellularDataRoamingEnabledCallback(napi_env env, napi_status statu
         NAPI_CALL_RETURN_VOID(env, status);
     } else {
         if (asyncContext->errorCode == ERROR_NATIVE_API_EXECUTE_FAIL) {
-            callbackValue = NapiUtil::CreateErrorMessage(env, "slotId input error", ERROR_NATIVE_API_EXECUTE_FAIL);
+            callbackValue = NapiUtil::CreateErrorMessage(
+                env, "IsCellularDataRoamingEnabled api execute failed", ERROR_NATIVE_API_EXECUTE_FAIL);
+        } else if (asyncContext->errorCode == ERROR_SLOT_ID_INVALID) {
+            callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
         } else {
             callbackValue =
                 NapiUtil::CreateErrorMessage(env, "cellular data service unavailable", ERROR_SERVICE_UNAVAILABLE);
@@ -567,6 +589,11 @@ static void NativeSetDefaultCellularDataSlotId(napi_env env, void *data)
     if (asyncContext == nullptr) {
         return;
     }
+    if (!IsValidSlotId(asyncContext->slotId) && (asyncContext->slotId != DEFAULT_SIM_SLOT_ID_REMOVE)) {
+        TELEPHONY_LOGE("NativeSetDefaultCellularDataSlotId slotId is invalid");
+        asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
+        return;
+    }
     if (IsCellularDataManagerInited()) {
         int32_t setResult = CellularDataClient::GetInstance().SetDefaultCellularDataSlotId(asyncContext->slotId);
         if (setResult == static_cast<int32_t>(DataRespondCode::SET_SUCCESS)) {
@@ -592,7 +619,10 @@ static void SetDefaultCellularDataSlotIdCallback(napi_env env, napi_status statu
         NAPI_CALL_RETURN_VOID(env, napi_get_undefined(env, &callbackValue));
     } else {
         if (asyncContext->errorCode == ERROR_NATIVE_API_EXECUTE_FAIL) {
-            callbackValue = NapiUtil::CreateErrorMessage(env, "slotId input error", ERROR_NATIVE_API_EXECUTE_FAIL);
+            callbackValue = NapiUtil::CreateErrorMessage(
+                env, "SetDefaultCellularDataSlotId api execute failed", ERROR_NATIVE_API_EXECUTE_FAIL);
+        } else if (asyncContext->errorCode == ERROR_SLOT_ID_INVALID) {
+            callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
         } else {
             callbackValue =
                 NapiUtil::CreateErrorMessage(env, "cellular data service unavailable", ERROR_SERVICE_UNAVAILABLE);
@@ -644,7 +674,6 @@ void NativeGetCellularDataFlowType(napi_env env, void *data)
 
 void GetCellularDataFlowTypeCallback(napi_env env, napi_status status, void *data)
 {
-    TELEPHONY_LOGI("GetCellularDataFlowTypeCallback start");
     auto context = static_cast<AsyncContext *>(data);
     if (context == nullptr) {
         return;
