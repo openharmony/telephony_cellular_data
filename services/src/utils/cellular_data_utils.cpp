@@ -15,6 +15,7 @@
 
 #include "cellular_data_utils.h"
 
+#include "telephony_common_utils.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -37,7 +38,7 @@ std::vector<AddressInfo> CellularDataUtils::ParseIpAddr(const std::string &addre
             ipInfo.type = INetAddr::IpType::IPV6;
             ipInfo.prefixLen = IPV6_BIT;
         }
-        if (ipData.size() >= VALID_IP_SIZE) {
+        if ((ipData.size() >= VALID_IP_SIZE) && IsValidDecValue(ipData[1].c_str())) {
             ipInfo.prefixLen = std::stoi(ipData[1].c_str());
         }
         ipInfoArray.push_back(ipInfo);
@@ -170,6 +171,9 @@ int32_t CellularDataUtils::GetPrefixLen(const std::vector<std::string> &netmask,
 {
     int32_t prefixLen = 0;
     for (size_t i = start; i < netmask.size(); ++i) {
+        if (!IsValidDecValue(netmask[i].c_str())) {
+            break;
+        }
         int32_t maskValue = (std::stoi(netmask[i].c_str()) & 0x00FF);
         if (maskValue == 0) {
             break;
