@@ -68,6 +68,8 @@ public:
     int32_t StrategySwitch(int32_t slotId, bool enable);
     int32_t RequestNet(const NetRequest &request);
     int32_t ReleaseNet(const NetRequest &request);
+    int32_t GetServiceRunningState();
+    int64_t GetSpendTime();
 
 private:
     bool Init();

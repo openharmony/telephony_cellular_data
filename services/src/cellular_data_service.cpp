@@ -451,5 +451,15 @@ int32_t CellularDataService::ClearAllConnections(const int32_t slotId, DisConnec
     return result ? static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS) :
        static_cast<int32_t>(RequestNetCode::REQUEST_FAILED);
 }
+
+int32_t CellularDataService::GetServiceRunningState()
+{
+    return static_cast<int32_t>(state_);
+}
+
+int64_t CellularDataService::GetSpendTime()
+{
+    return endTime_ - bindTime_;
+}
 } // namespace Telephony
 } // namespace OHOS
