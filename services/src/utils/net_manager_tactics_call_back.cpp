@@ -18,6 +18,7 @@
 #include "cellular_data_error.h"
 #include "cellular_data_service.h"
 #include "core_manager_inner.h"
+#include "telephony_common_utils.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -26,6 +27,9 @@ int32_t NetManagerTacticsCallBack::NetStrategySwitch(const std::string &simId, b
 {
     if (simId.length() == 0) {
         TELEPHONY_LOGI("StrategySwitch[The simd length is 0]");
+        return CELLULAR_DATA_INVALID_PARAM;
+    }
+    if (!IsValidDecValue(simId)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
     const int32_t netSimId = std::stoi(simId);

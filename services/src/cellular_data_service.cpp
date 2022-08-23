@@ -15,20 +15,18 @@
 
 #include "cellular_data_service.h"
 
-#include "string_ex.h"
-#include "system_ability_definition.h"
-
-#include "net_specifier.h"
-
+#include "cellular_data_dump_helper.h"
 #include "cellular_data_error.h"
 #include "cellular_data_hisysevent.h"
+#include "cellular_data_net_agent.h"
 #include "core_manager_inner.h"
+#include "data_connection_monitor.h"
+#include "net_specifier.h"
+#include "string_ex.h"
+#include "system_ability_definition.h"
+#include "telephony_common_utils.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
-
-#include "cellular_data_net_agent.h"
-#include "cellular_data_dump_helper.h"
-#include "data_connection_monitor.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -261,7 +259,11 @@ bool CellularDataService::CheckParamValid(const int32_t slotId)
 
 int32_t CellularDataService::ReleaseNet(const NetRequest &request)
 {
-    int32_t slotId = std::stoi(request.ident.substr(strlen(IDENT_PREFIX)));
+    std::string requestIdent = request.ident.substr(strlen(IDENT_PREFIX));
+    if (!IsValidDecValue(requestIdent)) {
+        return CELLULAR_DATA_INVALID_PARAM;
+    }
+    int32_t slotId = std::stoi(requestIdent);
     if (!CheckParamValid(slotId)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
@@ -271,7 +273,11 @@ int32_t CellularDataService::ReleaseNet(const NetRequest &request)
 
 int32_t CellularDataService::RequestNet(const NetRequest &request)
 {
-    int32_t slotId = std::stoi(request.ident.substr(strlen(IDENT_PREFIX)));
+    std::string requestIdent = request.ident.substr(strlen(IDENT_PREFIX));
+    if (!IsValidDecValue(requestIdent)) {
+        return CELLULAR_DATA_INVALID_PARAM;
+    }
+    int32_t slotId = std::stoi(requestIdent);
     if (!CheckParamValid(slotId)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
