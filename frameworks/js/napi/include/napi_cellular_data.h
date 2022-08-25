@@ -16,14 +16,10 @@
 #ifndef NAPI_CELLULAR_DATA_H
 #define NAPI_CELLULAR_DATA_H
 
-#include <codecvt>
-#include <locale>
-#include <string>
+#include <stdint.h>
 
 #include "base_context.h"
 #include "telephony_napi_common_error.h"
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
 #include "telephony_types.h"
 
 namespace OHOS {
