@@ -19,19 +19,19 @@
 #include <atomic>
 #include <memory>
 
-#include "common_event_manager.h"
-#include "event_handler.h"
-#include "inner_event.h"
-
-#include "hril_data_parcel.h"
-#include "tel_profile_util.h"
-
 #include "apn_manager.h"
 #include "cellular_data_event_code.h"
+#include "cellular_data_roaming_observer.h"
+#include "cellular_data_setting_observer.h"
 #include "cellular_data_state_machine.h"
+#include "common_event_manager.h"
 #include "data_switch_settings.h"
-#include "state_notification.h"
+#include "event_handler.h"
+#include "hril_data_parcel.h"
+#include "inner_event.h"
 #include "radio_event.h"
+#include "state_notification.h"
+#include "tel_profile_util.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -105,6 +105,8 @@ private:
     void HandleSortConnection();
     void SetDataPermittedResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void SyncDataPermitted();
+    void RegisterDataSettingObserver();
+    void UnRegisterDataSettingObserver();
 
 private:
     sptr<ApnManager> apnManager_;
@@ -128,6 +130,8 @@ private:
     bool multipleConnectionsEnabled_ = false;
     std::vector<std::string> upLinkThresholds_;
     std::vector<std::string> downLinkThresholds_;
+    sptr<CellularDataSettingObserver> settingObserver_;
+    sptr<CellularDataRoamingObserver> roamingObserver_;
 
     using Fun = void (CellularDataHandler::*)(const AppExecFwk::InnerEvent::Pointer &event);
     std::map<uint32_t, Fun> eventIdMap_ {

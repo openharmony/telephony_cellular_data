@@ -15,19 +15,15 @@
 
 #include "cellular_data_settings_rdb_helper.h"
 
-#include "telephony_log_wrapper.h"
-
 #include "cellular_data_constant.h"
 #include "cellular_data_hisysevent.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
 static constexpr const int32_t E_ERROR = -1;
 
-CellularDataSettingsRdbHelper::CellularDataSettingsRdbHelper()
-{
-    settingHelper_ = CreateDataAbilityHelper();
-}
+CellularDataSettingsRdbHelper::CellularDataSettingsRdbHelper() {}
 
 CellularDataSettingsRdbHelper::~CellularDataSettingsRdbHelper() {}
 
@@ -49,75 +45,82 @@ std::shared_ptr<AppExecFwk::DataAbilityHelper> CellularDataSettingsRdbHelper::Cr
 void CellularDataSettingsRdbHelper::UnRegisterSettingsObserver(
     const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    if (settingHelper_ == nullptr) {
+    std::shared_ptr<AppExecFwk::DataAbilityHelper> settingHelper = CreateDataAbilityHelper();
+    if (settingHelper == nullptr) {
         TELEPHONY_LOGE("UnRegister settings observer failed by nullptr");
         return;
     }
-    settingHelper_->UnregisterObserver(uri, dataObserver);
-    settingHelper_->Release();
+    settingHelper->UnregisterObserver(uri, dataObserver);
+    settingHelper->Release();
 }
 
 void CellularDataSettingsRdbHelper::RegisterSettingsObserver(
-    const Uri &uri, const sptr<AAFwk::IDataAbilityObserver>&dataObserver)
+    const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    if (settingHelper_ == nullptr) {
+    std::shared_ptr<AppExecFwk::DataAbilityHelper> settingHelper = CreateDataAbilityHelper();
+    if (settingHelper == nullptr) {
         TELEPHONY_LOGE("Register settings observer by nullptr");
         return;
     }
-    settingHelper_->RegisterObserver(uri, dataObserver);
-    settingHelper_->Release();
+    settingHelper->RegisterObserver(uri, dataObserver);
+    settingHelper->Release();
 }
 
 void CellularDataSettingsRdbHelper::NotifyChange(const Uri &uri)
 {
-    if (settingHelper_ == nullptr) {
+    std::shared_ptr<AppExecFwk::DataAbilityHelper> settingHelper = CreateDataAbilityHelper();
+    if (settingHelper == nullptr) {
         TELEPHONY_LOGE("notify settings changed fail by nullptr");
         return;
     }
-    settingHelper_->NotifyChange(uri);
-    settingHelper_->Release();
+    settingHelper->NotifyChange(uri);
+    settingHelper->Release();
 }
 
 int CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &column)
 {
-    int resultValue = 0;
-    if (settingHelper_ == nullptr) {
+    std::shared_ptr<AppExecFwk::DataAbilityHelper> settingHelper = CreateDataAbilityHelper();
+    if (settingHelper == nullptr) {
         TELEPHONY_LOGE("helper_ is null");
         return NULL_POINTER_EXCEPTION;
     }
     NativeRdb::DataAbilityPredicates predicates;
     std::vector<std::string> columns;
-    columns.emplace_back(column);
-    std::shared_ptr<NativeRdb::AbsSharedResultSet> result = settingHelper_->Query(uri, columns, predicates);
+    predicates.EqualTo(CELLULAR_DATA_COLUMN_KEYWORD, column);
+    std::shared_ptr<NativeRdb::AbsSharedResultSet> result = settingHelper->Query(uri, columns, predicates);
     if (result == nullptr) {
         TELEPHONY_LOGE("setting DB: query error");
         return NULL_POINTER_EXCEPTION;
     }
-    settingHelper_->Release();
+    settingHelper->Release();
     result->GoToFirstRow();
     int columnIndex;
-    result->GetColumnIndex(column, columnIndex);
-    result->GetInt(columnIndex, resultValue);
+    std::string resultValue;
+    result->GetColumnIndex(CELLULAR_DATA_COLUMN_VALUE, columnIndex);
+    result->GetString(columnIndex, resultValue);
     result->Close();
-    TELEPHONY_LOGI("Query end resultValue is %{public}d", resultValue);
-    return resultValue;
+    TELEPHONY_LOGI("Query end resultValue is %{public}s", resultValue.c_str());
+    return resultValue.empty() ? NULL_POINTER_EXCEPTION : atoi(resultValue.c_str());
 }
 
 void CellularDataSettingsRdbHelper::PutValue(Uri &uri, const std::string &column, int value)
 {
-    if (settingHelper_ == nullptr) {
+    std::shared_ptr<AppExecFwk::DataAbilityHelper> settingHelper = CreateDataAbilityHelper();
+    if (settingHelper == nullptr) {
         TELEPHONY_LOGE("helper_ is null");
         return;
     }
     int existValue = GetValue(uri, column);
     NativeRdb::ValuesBucket bucket;
-    bucket.PutInt(column, value);
+    bucket.PutString(CELLULAR_DATA_COLUMN_VALUE, std::to_string(value));
+    bucket.PutString(CELLULAR_DATA_COLUMN_KEYWORD, column);
     int32_t result;
-    if (existValue < 0) {
-        result = settingHelper_->Insert(uri, bucket);
+    if (existValue <= NULL_POINTER_EXCEPTION) {
+        result = settingHelper->Insert(uri, bucket);
     } else {
         NativeRdb::DataAbilityPredicates predicates;
-        result = settingHelper_->Update(uri, bucket, predicates);
+        predicates.EqualTo(CELLULAR_DATA_COLUMN_KEYWORD, column);
+        result = settingHelper->Update(uri, bucket, predicates);
     }
     TELEPHONY_LOGI("put value return %{public}d", result);
     if (result == E_ERROR) {
@@ -135,8 +138,8 @@ void CellularDataSettingsRdbHelper::PutValue(Uri &uri, const std::string &column
             TELEPHONY_LOGI("result is %{public}d, do not handle.", result);
         }
     }
-    settingHelper_->NotifyChange(uri);
-    settingHelper_->Release();
+    settingHelper->NotifyChange(uri);
+    settingHelper->Release();
 }
 } // namespace Telephony
 } // namespace OHOS
