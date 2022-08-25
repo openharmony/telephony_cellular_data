@@ -16,12 +16,16 @@
 #ifndef CELLULAR_DATA_SERVICE_PROXY_H
 #define CELLULAR_DATA_SERVICE_PROXY_H
 
-#include "iremote_proxy.h"
+#include <cstdint>
 
+#include "functional"
 #include "i_cellular_data_manager.h"
-#include "telephony_log_wrapper.h"
+#include "iremote_broker.h"
+#include "iremote_proxy.h"
+#include "refbase.h"
 
 namespace OHOS {
+class IRemoteObject;
 namespace Telephony {
 class CellularDataServiceProxy : public IRemoteProxy<ICellularDataManager> {
 public:
