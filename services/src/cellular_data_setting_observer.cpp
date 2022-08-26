@@ -15,15 +15,16 @@
 
 #include "cellular_data_setting_observer.h"
 
-#include "telephony_log_wrapper.h"
-
 #include "cellular_data_constant.h"
+#include "cellular_data_event_code.h"
 #include "cellular_data_settings_rdb_helper.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-CellularDataSettingObserver::CellularDataSettingObserver(std::shared_ptr<CellularDataHandler> &cellularDataHandler)
-    : cellularDataHandler_(cellularDataHandler)
+CellularDataSettingObserver::CellularDataSettingObserver(
+    std::shared_ptr<AppExecFwk::EventHandler> &&cellularDataHandler)
+    : cellularDataHandler_(std::move(cellularDataHandler))
 {}
 
 CellularDataSettingObserver::~CellularDataSettingObserver() = default;

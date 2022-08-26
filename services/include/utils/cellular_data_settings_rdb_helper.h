@@ -59,9 +59,6 @@ public:
     int GetValue(Uri &uri, const std::string &column);
     void PutValue(Uri &uri, const std::string &column, int value);
     std::shared_ptr<AppExecFwk::DataAbilityHelper> CreateDataAbilityHelper();
-
-private:
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> settingHelper_;
 };
 } // namespace Telephony
 } // namespace OHOS

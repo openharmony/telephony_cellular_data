@@ -15,15 +15,17 @@
 
 #include "cellular_data_roaming_observer.h"
 
-#include "telephony_log_wrapper.h"
-
 #include "cellular_data_constant.h"
+#include "cellular_data_event_code.h"
 #include "cellular_data_settings_rdb_helper.h"
+#include "core_manager_inner.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-CellularDataRoamingObserver::CellularDataRoamingObserver(std::shared_ptr<CellularDataHandler> &cellularDataHandler)
-    : cellularDataHandler_(cellularDataHandler)
+CellularDataRoamingObserver::CellularDataRoamingObserver(
+    std::shared_ptr<AppExecFwk::EventHandler> &&cellularDataHandler, int32_t slotId)
+    : cellularDataHandler_(std::move(cellularDataHandler)), slotId_(slotId)
 {}
 
 CellularDataRoamingObserver::~CellularDataRoamingObserver() = default;
@@ -34,8 +36,13 @@ void CellularDataRoamingObserver::OnChange()
     if (settingHelper == nullptr) {
         return;
     }
-    Uri uri(CELLULAR_DATA_SETTING_DATA_ROAMING_URI);
-    int value = settingHelper->GetValue(uri, CELLULAR_DATA_COLUMN_ROAMING);
+    int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId_);
+    if (simId <= INVALID_SIM_ID) {
+        TELEPHONY_LOGE("Slot%{public}d: failed due to invalid sim id %{public}d", slotId_, simId);
+        return;
+    }
+    Uri uri(std::string(CELLULAR_DATA_SETTING_DATA_ROAMING_URI) + std::to_string(simId));
+    int value = settingHelper->GetValue(uri, std::string(CELLULAR_DATA_COLUMN_ROAMING) + std::to_string(simId));
     TELEPHONY_LOGI("cellular data roaming switch is %{public}d", value);
     if (cellularDataHandler_ != nullptr) {
         cellularDataHandler_->SendEvent(CellularDataEventCode::MSG_DB_SETTING_ROAMING_CHANGED, value, 0);
