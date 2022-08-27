@@ -17,6 +17,7 @@
 
 #include "cellular_data_service.h"
 #include "core_service_client.h"
+#include "enum_convert.h"
 #include "telephony_types.h"
 
 namespace OHOS {
@@ -36,7 +37,7 @@ bool CellularDataDumpHelper::Dump(const std::vector<std::string> &args, std::str
     return true;
 }
 
-bool CellularDataDumpHelper::WhetherHasSimCard(const int32_t slotId) const
+bool CellularDataDumpHelper::HasSimCard(const int32_t slotId) const
 {
     return DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId);
 }
@@ -66,42 +67,42 @@ void CellularDataDumpHelper::ShowCellularDataInfo(std::string &result) const
 {
     CellularDataService &dataService = DelayedRefSingleton<CellularDataService>::GetInstance();
     result.append("Ohos cellular data service: \n");
-    result.append("Ohos cellular data bind time:  ");
-    result.append(dataService.GetBindTime());
+    result.append("BeginTime                    : ");
+    result.append(dataService.GetBeginTime());
     result.append("\n");
-    result.append("Ohos cellular data end time:  ");
+    result.append("EndTime                      : ");
     result.append(dataService.GetEndTime());
     result.append("\n");
-    result.append("Ohos cellular data spend time:  ");
+    result.append("SpendTime                    : ");
     result.append(std::to_string(dataService.GetSpendTime()));
     result.append("\n");
-    result.append("Ohos cellular data default slot id:  ");
+    result.append("CellularDataSlotId           : ");
     result.append(dataService.GetCellularDataSlotIdDump());
     result.append("\n");
-    result.append("Ohos cellular data output state machine current status:  ");
+    result.append("StateMachineCurrentStatus    : ");
     result.append(dataService.GetStateMachineCurrentStatusDump());
     result.append("\n");
-    result.append("Ohos cellular data output dataflow info: ");
+    result.append("FlowDataInfo                 : ");
     result.append(dataService.GetFlowDataInfoDump());
     result.append("\n");
     result.append("ServiceRunningState          : ");
     result.append(std::to_string(dataService.GetServiceRunningState()));
     result.append("\n");
     for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
-        if (WhetherHasSimCard(i)) {
+        if (HasSimCard(i)) {
             result.append("SlotId                       : ");
             result.append(std::to_string(i));
             result.append("\n");
-            result.append("VoiceActivationState         : ");
-            result.append(std::to_string(dataService.IsCellularDataRoamingEnabled(i)));
+            result.append("CellularDataRoamingEnabled   : ");
+            result.append(GetBoolValue(dataService.IsCellularDataRoamingEnabled(i)));
             result.append("\n");
         }
     }
-    result.append("DataConnectionState          : ");
-    result.append(std::to_string(dataService.IsCellularDataEnabled()));
+    result.append("CellularDataEnabled          : ");
+    result.append(GetBoolValue(dataService.IsCellularDataEnabled()));
     result.append("\n");
-    result.append("CellularDataConnectionState  : ");
-    result.append(std::to_string(dataService.GetCellularDataState()));
+    result.append("CellularDataState            : ");
+    result.append(GetCellularDataConnectionState(dataService.GetCellularDataState()));
     result.append("\n");
 }
 } // namespace Telephony

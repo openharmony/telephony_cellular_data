@@ -31,7 +31,7 @@ public:
 private:
     void ShowHelp(std::string &result) const;
     void ShowCellularDataInfo(std::string &result) const;
-    bool WhetherHasSimCard(const int32_t slotId) const;
+    bool HasSimCard(const int32_t slotId) const;
 
 private:
     static constexpr HiviewDFX::HiLogLabel LOG_LABEL = {LOG_CORE, LOG_DOMAIN, "CellularDataDumpHelper"};

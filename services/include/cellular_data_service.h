@@ -47,7 +47,7 @@ public:
      */
     void OnStop() override;
     int32_t Dump(std::int32_t fd, const std::vector<std::u16string>& args) override;
-    std::string GetBindTime();
+    std::string GetBeginTime();
     std::string GetEndTime();
     std::string GetCellularDataSlotIdDump();
     std::string GetStateMachineCurrentStatusDump();
@@ -81,7 +81,7 @@ private:
     std::map<int32_t, std::shared_ptr<CellularDataController>> cellularDataControllers_;
     std::shared_ptr<AppExecFwk::EventRunner> eventLoop_;
     bool registerToService_;
-    int64_t bindTime_ = 0L;
+    int64_t beginTime_ = 0L;
     int64_t endTime_ = 0L;
     ServiceRunningState state_;
     static constexpr HiviewDFX::HiLogLabel LOG_LABEL = {LOG_CORE, LOG_DOMAIN, "CellularDataService"};
