@@ -56,6 +56,7 @@ void CellularDataHandler::Init()
     }
     apnManager_->InitApnHolders();
     apnManager_->CreateAllApnItem();
+    dataSwitchSettings_->LoadSwitchValue();
     GetConfigurationFor5G();
     SetRilLinkBandwidths();
 }
