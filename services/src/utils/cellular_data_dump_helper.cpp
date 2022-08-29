@@ -1,32 +1,34 @@
 /*
-* Copyright (C) 2021 Huawei Device Co., Ltd.
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #include "cellular_data_dump_helper.h"
+
 #include "cellular_data_service.h"
+#include "core_service_client.h"
+#include "enum_convert.h"
+#include "telephony_types.h"
 
 namespace OHOS {
 namespace Telephony {
-CellularDataDumpHelper::CellularDataDumpHelper()
-{
-}
+CellularDataDumpHelper::CellularDataDumpHelper() {}
 
 bool CellularDataDumpHelper::Dump(const std::vector<std::string> &args, std::string &result) const
 {
     result.clear();
     for (int32_t i = 0; i < (int32_t)args.size() - 1; i++) {
-        if (args[i] == "cellular_data" && args[i+1] == "--help") {
+        if (args[i] == "cellular_data" && args[i + 1] == "--help") {
             ShowHelp(result);
             return true;
         }
@@ -35,8 +37,14 @@ bool CellularDataDumpHelper::Dump(const std::vector<std::string> &args, std::str
     return true;
 }
 
+bool CellularDataDumpHelper::HasSimCard(const int32_t slotId) const
+{
+    return DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId);
+}
+
 void CellularDataDumpHelper::ShowHelp(std::string &result) const
 {
+    result.append("CellularData:\n");
     result.append("Usage:dump <command> [options]\n");
     result.append("Description:\n");
     result.append("-cellular_data_info          ");
@@ -58,25 +66,43 @@ void CellularDataDumpHelper::ShowHelp(std::string &result) const
 void CellularDataDumpHelper::ShowCellularDataInfo(std::string &result) const
 {
     CellularDataService &dataService = DelayedRefSingleton<CellularDataService>::GetInstance();
-    result.append("Ohos cellular_call service: ");
-    result.append(",    Ohos cellular_call bind time:  ");
-    result.append(dataService.GetBindTime());
+    result.append("Ohos cellular data service: \n");
+    result.append("BeginTime                    : ");
+    result.append(dataService.GetBeginTime());
     result.append("\n");
-    result.append("Ohos cellular_call service: ");
-    result.append(",    Ohos cellular_call end time:  ");
+    result.append("EndTime                      : ");
     result.append(dataService.GetEndTime());
     result.append("\n");
-    result.append("Ohos cellular_data server:  ");
-    result.append(" ,  Ohos cellular_data default slot id:  ");
+    result.append("SpendTime                    : ");
+    result.append(std::to_string(dataService.GetSpendTime()));
+    result.append("\n");
+    result.append("CellularDataSlotId           : ");
     result.append(dataService.GetCellularDataSlotIdDump());
     result.append("\n");
-    result.append("Ohos cellular_data server:  ");
-    result.append(" ,  Ohos cellular_data output state machine current status:  ");
+    result.append("StateMachineCurrentStatus    : ");
     result.append(dataService.GetStateMachineCurrentStatusDump());
     result.append("\n");
-    result.append("Ohos cellular_data server:  ");
-    result.append(",   Ohos cellular_data output dataflow info: ");
+    result.append("FlowDataInfo                 : ");
     result.append(dataService.GetFlowDataInfoDump());
+    result.append("\n");
+    result.append("ServiceRunningState          : ");
+    result.append(std::to_string(dataService.GetServiceRunningState()));
+    result.append("\n");
+    for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
+        if (HasSimCard(i)) {
+            result.append("SlotId                       : ");
+            result.append(std::to_string(i));
+            result.append("\n");
+            result.append("CellularDataRoamingEnabled   : ");
+            result.append(GetBoolValue(dataService.IsCellularDataRoamingEnabled(i)));
+            result.append("\n");
+        }
+    }
+    result.append("CellularDataEnabled          : ");
+    result.append(GetBoolValue(dataService.IsCellularDataEnabled()));
+    result.append("\n");
+    result.append("CellularDataState            : ");
+    result.append(GetCellularDataConnectionState(dataService.GetCellularDataState()));
     result.append("\n");
 }
 } // namespace Telephony

@@ -43,7 +43,7 @@ CellularDataService::~CellularDataService() = default;
 
 void CellularDataService::OnStart()
 {
-    bindTime_ =
+    beginTime_ =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
             .count();
     if (state_ == ServiceRunningState::STATE_RUNNING) {
@@ -374,10 +374,10 @@ int32_t CellularDataService::GetCellularDataFlowType()
     return result;
 }
 
-std::string CellularDataService::GetBindTime()
+std::string CellularDataService::GetBeginTime()
 {
     std::ostringstream oss;
-    oss << bindTime_;
+    oss << beginTime_;
     TELEPHONY_LOGI("bindTime :=  %{public}s", oss.str().c_str());
     return oss.str();
 }
@@ -465,6 +465,16 @@ int32_t CellularDataService::ClearAllConnections(const int32_t slotId, DisConnec
     bool result = item->second->ClearAllConnections(reason);
     return result ? static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS) :
        static_cast<int32_t>(RequestNetCode::REQUEST_FAILED);
+}
+
+int32_t CellularDataService::GetServiceRunningState()
+{
+    return static_cast<int32_t>(state_);
+}
+
+int64_t CellularDataService::GetSpendTime()
+{
+    return endTime_ - beginTime_;
 }
 } // namespace Telephony
 } // namespace OHOS
