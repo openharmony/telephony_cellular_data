@@ -21,30 +21,21 @@
 
 ```
 base/telephony/cellular_data/
-├── figures
-├── frameworks
-│   ├── js
-│   │   └── napi
-│   │       ├── include                  # js头文件
-│   │       └── src                      # js源文件
-│   └── native
-├── interfaces                           # 对外暴露的接口
-│   ├── innerkits
-│   └── kits
-│       └── js
-│           └── declaration              # 外部 JS API 接口
+├── figures                              # Readme资源文件
+├── frameworks                           # 框架层目录
+│   ├── js                               # js相关代码
+│   └── native                           # native相关代码
+├── interfaces                           # 接口目录
+│   ├── innerkits                        # 部件间的内部接口
+│   └── kits                             # 对应用提供的接口（例如JS接口）
 ├── sa_profile                           # SA配置
-├── services
-│   ├── include                          # 头文件
-│   │   ├── apn_manager
-│   │   ├── common
-│   │   ├── state_machine
-│   │   └── utils
-│   └── src                              # 源文件
-│       ├── apn_manager
-│       ├── state_machine
-│       └── utils
-└── test
+├── services                             # 蜂窝数据服务代码目录
+│   ├── include                          # 蜂窝数据服务头文件目录
+│   └── src                              # 蜂窝数据服务实现代码目录
+│       ├── apn_manager                  # APN管理代码目录
+│       ├── state_machine                # 数据连接状态机代码目录
+│       └── utils                        # 蜂窝数据工具代码目录
+└── test                                 # 蜂窝数据测试代码目录
     └── unit_test                        # 单元测试相关代码
 ```
 
@@ -64,6 +55,8 @@ base/telephony/cellular_data/
 | ------------------------------------------------------------ | ------------------------ | -------------------------------- |
 | function isCellularDataEnabled(callback: AsyncCallback\<boolean>): void; | 获取蜂窝数据开关是否打开 | ohos.permission.GET_NETWORK_INFO |
 | function getCellularDataState(callback: AsyncCallback\<DataConnectState>): void; | 获取蜂窝数据状态         | ohos.permission.GET_NETWORK_INFO |
+
+完整的JS API说明以及实例代码请参考：[蜂窝数据](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/reference/apis/js-apis-telephony-data.md)。
 
 ## 使用说明<a name="section160mcpsimp"></a>
 
@@ -143,10 +136,11 @@ base/telephony/cellular_data/
 
 ## 相关仓<a name="section234mcpsimp"></a>
 
-电话服务子系统
+[电话服务子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/电话服务子系统.md)
 
 telephony_cellular_data
 
-telephony_core_service
+[telephony_core_service](https://gitee.com/openharmony/telephony_core_service/blob/master/README_zh.md)
 
-telephony_ril_adapter
+[telephony_ril_adapter](https://gitee.com/openharmony/telephony_ril_adapter/blob/master/README_zh.md)
+
