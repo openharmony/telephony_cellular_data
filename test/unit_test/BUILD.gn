@@ -26,12 +26,10 @@ ohos_executable("tel_cellular_data_ui_test") {
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
-  deps = [
-    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native" ]
 
   external_deps = [
+    "c_utils:utils",
     "cellular_data:tel_cellular_data_api",
     "core_service:tel_core_service_api",
     "eventhandler:libeventhandler",
