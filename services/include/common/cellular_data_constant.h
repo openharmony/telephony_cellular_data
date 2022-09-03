@@ -102,11 +102,7 @@ enum DataContextRolesId {
     DATA_CONTEXT_ROLE_EMERGENCY_ID = 7
 };
 
-enum class DataContextPriority : int32_t {
-    PRIORITY_LOW,
-    PRIORITY_NORMAL,
-    PRIORITY_HIGH
-};
+enum class DataContextPriority : int32_t { PRIORITY_LOW, PRIORITY_NORMAL, PRIORITY_HIGH };
 
 enum TelCallStatus {
     CALL_STATUS_UNKNOWN = -1,
@@ -163,9 +159,9 @@ static const std::string DEFAULT_HOSTNAME = "";
 static const std::string DEFAULT_MASK = "";
 static const std::string CELLULAR_DATA_RDB_URI = "dataability:///com.ohos.pdpprofileability/net/pdp_profile";
 static const std::string CELLULAR_DATA_SETTING_DATA_ENABLE_URI =
-    "dataability:///com.ohos.settingability/cellular_data_enable";
+    "dataability:///com.ohos.settingsdata.DataAbility/cellular_data_enable";
 static const std::string CELLULAR_DATA_SETTING_DATA_ROAMING_URI =
-    "dataability:///com.ohos.settingability/cellular_data_roaming_enable";
+    "dataability:///com.ohos.settingsdata.DataAbility/cellular_data_roaming_enable";
 static const int32_t DEFAULT_NET_STATISTICS_PERIOD = 3 * 1000;
 static const int32_t DEFAULT_STALL_DETECTION_PERIOD = 10 * 1000;
 static const int32_t ESTABLISH_DATA_CONNECTION_DELAY = 1 * 1000;
@@ -222,6 +218,9 @@ static const int32_t DELAY_SET_RIL_BANDWIDTH_MS = 3000;
 static const int32_t DELAY_SET_RIL_UP_DOWN_BANDWIDTH_MS = 50;
 static const std::string CELLULAR_DATA_COLUMN_ENABLE = "cellular_data_enable";
 static const std::string CELLULAR_DATA_COLUMN_ROAMING = "cellular_data_roaming_enable";
+static constexpr const char *CELLULAR_DATA_COLUMN_KEYWORD = "KEYWORD";
+static constexpr const char *CELLULAR_DATA_COLUMN_VALUE = "VALUE";
+const int32_t INVALID_SIM_ID = 0;
 } // namespace Telephony
 } // namespace OHOS
 #endif // CELLULAR_DATA_CONSTANT_H

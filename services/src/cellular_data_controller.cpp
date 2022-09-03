@@ -45,12 +45,11 @@ void CellularDataController::Init()
     matchingSkills.AddEvent(CALL_STATE_CHANGE_ACTION);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     cellularDataHandler_ = std::make_shared<CellularDataHandler>(GetEventRunner(), subscriberInfo, slotId_);
-    settingObserver_ = std::make_unique<CellularDataSettingObserver>(cellularDataHandler_).release();
-    roamingObserver_ = std::make_unique<CellularDataRoamingObserver>(cellularDataHandler_).release();
     cellularDataRdbObserver_ = std::make_unique<CellularDataRdbObserver>(cellularDataHandler_).release();
-    if (cellularDataHandler_ == nullptr || settingObserver_ == nullptr || cellularDataRdbObserver_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: CellularDataController init failed, "
-            "cellularDataHandler_ or settingObserver_ or cellularDataRdbObserver_ is null", slotId_);
+    if (cellularDataHandler_ == nullptr || cellularDataRdbObserver_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: CellularDataController init failed, cellularDataHandler_ or "
+                       "cellularDataRdbObserver_ is null",
+            slotId_);
         return;
     }
     cellularDataHandler_->Init();
@@ -237,20 +236,10 @@ void CellularDataController::UnRegisterDataObserver()
 {
     std::shared_ptr<CellularDataRdbHelper> cellularDataDbHelper = CellularDataRdbHelper::GetInstance();
     cellularDataDbHelper->UnRegisterObserver(cellularDataRdbObserver_);
-    Uri dataEnableUri(CELLULAR_DATA_SETTING_DATA_ENABLE_URI);
-    Uri dataRoamingUri(CELLULAR_DATA_SETTING_DATA_ROAMING_URI);
-    std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
-    settingHelper->UnRegisterSettingsObserver(dataEnableUri, settingObserver_);
-    settingHelper->UnRegisterSettingsObserver(dataRoamingUri, roamingObserver_);
 }
 
 void CellularDataController::RegisterDatabaseObserver()
 {
-    std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
-    Uri dataEnableUri(CELLULAR_DATA_SETTING_DATA_ENABLE_URI);
-    Uri dataRoamingUri(CELLULAR_DATA_SETTING_DATA_ROAMING_URI);
-    settingHelper->RegisterSettingsObserver(dataEnableUri, settingObserver_);
-    settingHelper->RegisterSettingsObserver(dataRoamingUri, roamingObserver_);
     std::shared_ptr<CellularDataRdbHelper> cellularDataDbHelper = CellularDataRdbHelper::GetInstance();
     cellularDataDbHelper->RegisterObserver(cellularDataRdbObserver_);
 }
