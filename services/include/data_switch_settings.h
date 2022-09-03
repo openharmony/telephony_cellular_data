@@ -16,11 +16,13 @@
 #ifndef DATA_SWITCH_SETTINGS_H
 #define DATA_SWITCH_SETTINGS_H
 
+#include <stdint.h>
+
 namespace OHOS {
 namespace Telephony {
 class DataSwitchSettings {
 public:
-    DataSwitchSettings() = default;
+    DataSwitchSettings(int32_t slotId);
     ~DataSwitchSettings() = default;
     void LoadSwitchValue();
     bool IsInternalDataOn() const;
@@ -30,17 +32,18 @@ public:
     bool IsCarrierDataOn() const;
     void SetCarrierDataOn(bool carrierDataOn);
     bool IsAllowActiveData() const;
-    bool GetUserDataOn() const;
+    bool GetUserDataOn();
     void SetUserDataOn(bool userDataOn);
-    bool IsUserDataRoamingOn() const;
+    bool IsUserDataRoamingOn();
     void SetUserDataRoamingOn(bool dataRoamingEnabled);
 
 private:
     bool internalDataOn_ = false;
     bool userDataOn_ = false;
     bool userDataRoaming_ = false;
-    bool policyDataOn_ = false;
+    bool policyDataOn_ = true;
     bool carrierDataOn_ = false;
+    const int32_t slotId_;
 };
 } // namespace Telephony
 } // namespace OHOS

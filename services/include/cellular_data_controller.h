@@ -21,8 +21,6 @@
 #include "cellular_data_constant.h"
 #include "cellular_data_handler.h"
 #include "cellular_data_rdb_observer.h"
-#include "cellular_data_roaming_observer.h"
-#include "cellular_data_setting_observer.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -58,8 +56,6 @@ private:
 
 private:
     std::shared_ptr<CellularDataHandler> cellularDataHandler_;
-    sptr<CellularDataSettingObserver> settingObserver_;
-    sptr<CellularDataRoamingObserver> roamingObserver_;
     sptr<CellularDataRdbObserver> cellularDataRdbObserver_;
     const int32_t slotId_;
 };
