@@ -589,6 +589,22 @@ static napi_value GetDefaultCellularDataSlotId(napi_env env, napi_callback_info 
         NativeGetDefaultCellularDataSlotId, GetDefaultCellularDataSlotIdCallback);
 }
 
+static napi_value GetDefaultCellularDataSlotIdSync(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 1;
+    napi_value parameters[] = {nullptr};
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    int32_t slotId = -1;
+    napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
+    if (parameterCount == 0) {
+        slotId = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();;
+    }
+    napi_value value = nullptr;
+    NAPI_CALL(env, napi_create_int32(env, slotId, &value));
+    return value;
+}
+
 static void NativeSetDefaultCellularDataSlotId(napi_env env, void *data)
 {
     auto asyncContext = static_cast<AsyncContext *>(data);
@@ -824,6 +840,7 @@ napi_value RegistCellularData(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("disableCellularDataRoaming", DisableCellularDataRoaming),
         DECLARE_NAPI_FUNCTION("isCellularDataRoamingEnabled", IsCellularDataRoamingEnabled),
         DECLARE_NAPI_FUNCTION("getDefaultCellularDataSlotId", GetDefaultCellularDataSlotId),
+        DECLARE_NAPI_FUNCTION("getDefaultCellularDataSlotIdSync", GetDefaultCellularDataSlotIdSync),
         DECLARE_NAPI_FUNCTION("setDefaultCellularDataSlotId", SetDefaultCellularDataSlotId),
         DECLARE_NAPI_FUNCTION("getCellularDataFlowType", GetCellularDataFlowType),
     };

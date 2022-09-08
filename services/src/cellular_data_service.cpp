@@ -313,9 +313,6 @@ int32_t CellularDataService::HandleApnChanged(const int32_t slotId)
 
 int32_t CellularDataService::GetDefaultCellularDataSlotId()
 {
-    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
-        return TELEPHONY_ERR_PERMISSION_ERR;
-    }
     return CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
 }
 
