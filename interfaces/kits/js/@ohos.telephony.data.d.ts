@@ -34,6 +34,16 @@ declare namespace data {
   function getDefaultCellularDataSlotId(): Promise<number>;
 
   /**
+   * Checks whether cellular data services are enabled.
+   *
+   * <p>Requires Permission: {@code ohos.permission.GET_NETWORK_INFO}.
+   *
+   * @return Returns default cellular data slot id.
+   * @permission ohos.permission.GET_NETWORK_INFO
+   */
+  function getDefaultCellularDataSlotIdSync(): number;
+
+  /**
    * Switches cellular data services to another card, without changing the default settings.
    *
    * @param slotId Indicates the ID of the target card slot.
