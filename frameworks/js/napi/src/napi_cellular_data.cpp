@@ -183,8 +183,14 @@ static void NativeIsCellularDataEnabled(napi_env env, void *data)
     }
     if (IsCellularDataManagerInited()) {
         int32_t dataEnabled = CellularDataClient::GetInstance().IsCellularDataEnabled();
-        asyncContext->resolved = true;
-        asyncContext->result = dataEnabled;
+        if (dataEnabled == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED) ||
+            dataEnabled == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_DISABLED)) {
+            asyncContext->resolved = true;
+            asyncContext->result = dataEnabled;
+        } else {
+            asyncContext->resolved = false;
+            asyncContext->errorCode = ERROR_NATIVE_API_EXECUTE_FAIL;
+        }
     } else {
         asyncContext->resolved = false;
         asyncContext->errorCode = ERROR_SERVICE_UNAVAILABLE;
@@ -204,8 +210,13 @@ static void IsCellularDataEnabledCallback(napi_env env, napi_status status, void
             asyncContext->result == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED), &callbackValue);
         NAPI_CALL_RETURN_VOID(env, status);
     } else {
-        callbackValue =
-            NapiUtil::CreateErrorMessage(env, "cellular data service unavailable", ERROR_SERVICE_UNAVAILABLE);
+        if (asyncContext->errorCode == ERROR_NATIVE_API_EXECUTE_FAIL) {
+            callbackValue = NapiUtil::CreateErrorMessage(
+                env, "IsCellularDataEnable api execute failed", ERROR_NATIVE_API_EXECUTE_FAIL);
+        } else {
+            callbackValue =
+                NapiUtil::CreateErrorMessage(env, "cellular data service unavailable", ERROR_SERVICE_UNAVAILABLE);
+        }
     }
     NapiUtil::Handle2ValueCallback(env, asyncContext.release(), callbackValue);
 }
@@ -544,11 +555,13 @@ static void NativeGetDefaultCellularDataSlotId(napi_env env, void *data)
     if (context == nullptr) {
         return;
     }
-    context->slotId = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
-    if (context->slotId >= 0) {
+    int32_t result = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
+    if (IsValidSlotId(result) || result == DEFAULT_SIM_SLOT_ID_REMOVE) {
+        context->slotId = result;
         context->resolved = true;
     } else {
         context->resolved = false;
+        context->errorCode = ERROR_NATIVE_API_EXECUTE_FAIL;
     }
 }
 
@@ -562,7 +575,12 @@ static void GetDefaultCellularDataSlotIdCallback(napi_env env, napi_status statu
     if (asyncContext->resolved) {
         NAPI_CALL_RETURN_VOID(env, napi_create_int32(env, asyncContext->slotId, &callbackValue));
     } else {
-        callbackValue = NapiUtil::CreateErrorMessage(env, "get default cellular data slotId failed");
+        if (asyncContext->errorCode == ERROR_NATIVE_API_EXECUTE_FAIL) {
+            callbackValue = NapiUtil::CreateErrorMessage(
+                env, "GetDefaultCellularDataSlotId api execute failed", ERROR_NATIVE_API_EXECUTE_FAIL);
+        } else {
+            callbackValue = NapiUtil::CreateErrorMessage(env, "get default cellular data slotId failed");
+        }
     }
     NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
 }
