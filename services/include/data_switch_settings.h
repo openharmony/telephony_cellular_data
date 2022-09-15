@@ -32,16 +32,16 @@ public:
     bool IsCarrierDataOn() const;
     void SetCarrierDataOn(bool carrierDataOn);
     bool IsAllowActiveData() const;
-    bool GetUserDataOn() const;
+    bool GetUserDataOn();
     void SetUserDataOn(bool userDataOn);
-    bool IsUserDataRoamingOn() const;
+    bool IsUserDataRoamingOn();
     void SetUserDataRoamingOn(bool dataRoamingEnabled);
 
 private:
     bool internalDataOn_ = false;
     bool userDataOn_ = false;
     bool userDataRoaming_ = false;
-    bool policyDataOn_ = false;
+    bool policyDataOn_ = true;
     bool carrierDataOn_ = false;
     const int32_t slotId_;
 };

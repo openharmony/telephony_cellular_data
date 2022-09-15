@@ -859,6 +859,7 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
                     UnRegisterDataSettingObserver();
                 }
             } else {
+                dataSwitchSettings_->LoadSwitchValue();
                 if (lastIccID_ != u"" && lastIccID_ == CoreManagerInner::GetInstance().GetSimIccId(slotId_)) {
                     EstablishAllApnsIfConnectable();
                 }
