@@ -32,14 +32,10 @@ ohos_shared_library("data") {
   deps = [ "//foundation/arkui/napi:ace_napi" ]
 
   external_deps = [
-    "ability_base:want",
     "c_utils:utils",
     "cellular_data:tel_cellular_data_api",
-    "eventhandler:libeventhandler",
     "init:libbegetutil",
     "ipc:ipc_core",
-    "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CellularDataJsApi\"",
