@@ -18,7 +18,7 @@
 
 #include "gtest/gtest-message.h"
 #include "gtest/gtest-test-part.h"
-#include "gtest/gtest_pred_impl.h"
+#include "gtest/gtest.h"
 #include "gtest/hwext/gtest-tag.h"
 #include "cellular_data_error.h"
 #include "cellular_data_types.h"
@@ -29,6 +29,7 @@
 #include "iosfwd"
 #include "iostream"
 #include "iremote_broker.h"
+#include "iremote_object.h"
 #include "iservice_registry.h"
 #include "ostream"
 #include "refbase.h"
@@ -38,7 +39,6 @@
 #include "unistd.h"
 
 namespace OHOS {
-class IRemoteObject;
 namespace Telephony {
 using namespace testing::ext;
 
