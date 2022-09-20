@@ -32,21 +32,20 @@
             "components": [
                 "ability_base",
                 "ability_runtime",
-                "appexecfwk_standard",
+                "c_utils",
                 "common_event_service",
                 "core_service",
-                "dmsfwk",
+                "eventhandler",
+                "hisysevent_native",
+                "hitrace_native",
                 "hiviewdfx_hilog_native",
-                "ipc",
-                "relational_store",
-                "netmanager_base",
-                "ril_adapter",
-                "safwk",
-                "samgr",
                 "init",
-                "utils_base"
-            ],
-            "third_party": [
+                "ipc",
+                "napi",
+                "netmanager_base",
+                "relational_store",
+                "safwk",
+                "samgr"
             ]
         },
         "build": {
