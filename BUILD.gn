@@ -78,7 +78,6 @@ ohos_shared_library("tel_cellular_data") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "core_service:tel_core_service_api",
-    "drivers_interface_ril:hril_innerkits",
     "eventhandler:libeventhandler",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
