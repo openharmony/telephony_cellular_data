@@ -598,7 +598,7 @@ static napi_value GetDefaultCellularDataSlotIdSync(napi_env env, napi_callback_i
     int32_t slotId = -1;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     if (parameterCount == 0) {
-        slotId = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();;
+        slotId = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
     }
     napi_value value = nullptr;
     NAPI_CALL(env, napi_create_int32(env, slotId, &value));
