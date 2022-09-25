@@ -1087,12 +1087,12 @@ void CellularDataHandler::SetDataPermitted(bool dataPermitted)
 void CellularDataHandler::SetDataPermittedResponse(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: event is null", slotId_);
+        TELEPHONY_LOGE("SetDataPermittedResponse:Slot%{public}d: event is null", slotId_);
         return;
     }
     std::shared_ptr<TelRilResponseInfo<int32_t>> rilInfo = event->GetSharedObject<TelRilResponseInfo<int32_t>>();
     if (rilInfo == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: HRilRadioResponseInfo is null", slotId_);
+        TELEPHONY_LOGE("SetDataPermittedResponse:Slot%{public}d: HRilRadioResponseInfo is null", slotId_);
         return;
     }
     if (rilInfo->errorNo != 0) {
@@ -1122,12 +1122,12 @@ void CellularDataHandler::SetRilAttachApn()
 void CellularDataHandler::SetRilAttachApnResponse(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: event is null", slotId_);
+        TELEPHONY_LOGE("SetRilAttachApnResponse:Slot%{public}d: event is null", slotId_);
         return;
     }
     std::shared_ptr<TelRilResponseInfo<int32_t>> rilInfo = event->GetSharedObject<TelRilResponseInfo<int32_t>>();
     if (rilInfo == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: HRilRadioResponseInfo is null", slotId_);
+        TELEPHONY_LOGE("SetRilAttachApnResponse:Slot%{public}d: HRilRadioResponseInfo is null", slotId_);
         return;
     }
     if (rilInfo->errorNo != 0) {
@@ -1364,12 +1364,13 @@ void CellularDataHandler::HandleDBSettingRoamingChanged(const AppExecFwk::InnerE
 void CellularDataHandler::UnRegisterDataSettingObserver()
 {
     if (settingObserver_ == nullptr || roamingObserver_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: settingObserver_ or roamingObserver_ is null", slotId_);
+        TELEPHONY_LOGE(
+            "UnRegisterDataSettingObserver:Slot%{public}d: settingObserver_ or roamingObserver_ is null", slotId_);
         return;
     }
     std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
     if (settingHelper == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: settingHelper is null", slotId_);
+        TELEPHONY_LOGE("UnRegisterDataSettingObserver:Slot%{public}d: settingHelper is null", slotId_);
         return;
     }
     Uri dataEnableUri(CELLULAR_DATA_SETTING_DATA_ENABLE_URI);
@@ -1377,7 +1378,8 @@ void CellularDataHandler::UnRegisterDataSettingObserver()
 
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId_);
     if (simId <= INVALID_SIM_ID) {
-        TELEPHONY_LOGE("Slot%{public}d: failed due to invalid sim id %{public}d", slotId_, simId);
+        TELEPHONY_LOGE(
+            "UnRegisterDataSettingObserver:Slot%{public}d: failed due to invalid sim id %{public}d", slotId_, simId);
         return;
     }
     Uri dataRoamingUri(std::string(CELLULAR_DATA_SETTING_DATA_ROAMING_URI) + std::to_string(simId));
@@ -1387,12 +1389,13 @@ void CellularDataHandler::UnRegisterDataSettingObserver()
 void CellularDataHandler::RegisterDataSettingObserver()
 {
     if (settingObserver_ == nullptr || roamingObserver_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: settingObserver_ or roamingObserver_ is null", slotId_);
+        TELEPHONY_LOGE(
+            "RegisterDataSettingObserver:Slot%{public}d: settingObserver_ or roamingObserver_ is null", slotId_);
         return;
     }
     std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
     if (settingHelper == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: settingHelper is null", slotId_);
+        TELEPHONY_LOGE("RegisterDataSettingObserver:Slot%{public}d: settingHelper is null", slotId_);
         return;
     }
     Uri dataEnableUri(CELLULAR_DATA_SETTING_DATA_ENABLE_URI);
@@ -1400,7 +1403,8 @@ void CellularDataHandler::RegisterDataSettingObserver()
 
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId_);
     if (simId <= INVALID_SIM_ID) {
-        TELEPHONY_LOGE("Slot%{public}d: failed due to invalid sim id %{public}d", slotId_, simId);
+        TELEPHONY_LOGE(
+            "RegisterDataSettingObserver:Slot%{public}d: failed due to invalid sim id %{public}d", slotId_, simId);
         return;
     }
     Uri dataRoamingUri(std::string(CELLULAR_DATA_SETTING_DATA_ROAMING_URI) + std::to_string(simId));
