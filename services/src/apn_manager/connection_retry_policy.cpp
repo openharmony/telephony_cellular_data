@@ -19,6 +19,8 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr static const int64_t DEFAULT_DELAY_FOR_NEXT_APN = 2 * 1000;
+
 ConnectionRetryPolicy::ConnectionRetryPolicy() = default;
 
 ConnectionRetryPolicy::~ConnectionRetryPolicy() = default;
