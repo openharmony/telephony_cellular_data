@@ -36,7 +36,6 @@ public:
     void InitialRetryCountValue();
 
 private:
-    constexpr static const int64_t DEFAULT_DELAY_FOR_NEXT_APN = 2 * 1000;
     std::vector<sptr<ApnItem>> matchedApns_;
     mutable int32_t tryCount_ = 0;
     int32_t maxCount_ = 5;
