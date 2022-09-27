@@ -34,6 +34,9 @@ ohos_unittest("tel_cellular_data_test") {
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
     "c_utils:utils",
     "cellular_data:tel_cellular_data_api",
     "core_service:tel_core_service_api",
