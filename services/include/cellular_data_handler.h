@@ -113,7 +113,7 @@ private:
     std::unique_ptr<DataSwitchSettings> dataSwitchSettings_;
     sptr<DataConnectionManager> connectionManager_;
     std::u16string lastIccID_;
-    int32_t lastCallState_ = (int32_t)TelCallStatus::CALL_STATE_RELEASED;
+    int32_t lastCallState_ = (int32_t)TelCallStatus::CALL_STATUS_IDLE;
     const int32_t slotId_;
     DisConnectionReason disconnectionReason_ = DisConnectionReason::REASON_NORMAL;
     std::shared_ptr<AppExecFwk::EventRunner> stateMachineEventLoop_;

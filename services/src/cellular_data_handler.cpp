@@ -823,7 +823,7 @@ void CellularDataHandler::HandleVoiceCallChanged(int32_t state)
     if (lastCallState_ != state) {
         // call is busy
         lastCallState_ = state;
-        if (state != TelCallStatus::CALL_STATE_RELEASED) {
+        if (state != TelCallStatus::CALL_STATUS_IDLE && state != TelCallStatus::CALL_STATUS_DISCONNECTED) {
             if (apnManager_->HasAnyConnectedState() && support) {
                 connectionManager_->EndNetStatistics();
                 connectionManager_->SetDataFlowType(CellDataFlowType::DATA_FLOW_TYPE_DORMANT);
@@ -1047,7 +1047,8 @@ void CellularDataHandler::SetPolicyDataOn(bool enable)
 bool CellularDataHandler::IsRestrictedMode() const
 {
     bool support = CoreManagerInner::GetInstance().GetPsRadioTech(slotId_) == (int32_t)RadioTech::RADIO_TECHNOLOGY_GSM;
-    bool inCall = lastCallState_ != TelCallStatus::CALL_STATE_RELEASED;
+    bool inCall = (lastCallState_ != TelCallStatus::CALL_STATUS_IDLE &&
+                   lastCallState_ != TelCallStatus::CALL_STATUS_DISCONNECTED);
     TELEPHONY_LOGI("Slot%{public}d: radio technology is gsm only:%{public}d and call is busy:%{public}d", slotId_,
         support, inCall);
     return inCall && support;
