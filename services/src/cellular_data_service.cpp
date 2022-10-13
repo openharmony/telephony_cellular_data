@@ -313,6 +313,10 @@ int32_t CellularDataService::HandleApnChanged(const int32_t slotId)
 
 int32_t CellularDataService::GetDefaultCellularDataSlotId()
 {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     return CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
 }
 
@@ -448,6 +452,10 @@ int32_t CellularDataService::HasInternetCapability(const int32_t slotId, const i
 
 int32_t CellularDataService::ClearCellularDataConnections(const int32_t slotId)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     return ClearAllConnections(slotId, DisConnectionReason::REASON_CLEAR_CONNECTION);
 }
 
