@@ -21,6 +21,7 @@
 #include "cellular_data_constant.h"
 #include "cellular_data_handler.h"
 #include "cellular_data_rdb_observer.h"
+#include "system_ability_status_change_stub.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -58,7 +59,20 @@ private:
 private:
     std::shared_ptr<CellularDataHandler> cellularDataHandler_;
     sptr<CellularDataRdbObserver> cellularDataRdbObserver_;
+    sptr<ISystemAbilityStatusChange> netManagerListener_ = nullptr;
     const int32_t slotId_;
+
+private:
+    class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
+    public:
+        explicit SystemAbilityStatusChangeListener(int32_t slotId);
+        ~SystemAbilityStatusChangeListener() = default;
+        void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+        void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+
+    private:
+        const int32_t slotId_;
+    };
 };
 } // namespace Telephony
 } // namespace OHOS
