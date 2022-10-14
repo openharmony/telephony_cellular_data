@@ -58,7 +58,7 @@ ohos_shared_library("tel_cellular_data") {
     "$SOURCE_DIR/services/include/utils",
     "$SOURCE_DIR/services/include/apn_manager",
     "$SOURCE_DIR/interfaces/innerkits",
-    "//base/telephony/data_storage/pdp_profile/include",
+    "//base/telephony/telephony_data/pdp_profile/include",
     "${ability_runtime_inner_api_path}/dataobs_manager/include",
   ]
 
