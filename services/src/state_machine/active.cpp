@@ -52,7 +52,9 @@ bool Active::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
     uint32_t eventCode = event->GetInnerEventId();
     std::map<uint32_t, Fun>::iterator it = eventIdFunMap_.find(eventCode);
     if (it != eventIdFunMap_.end()) {
-        return (this->*(it->second))(event);
+        if (it->second != nullptr) {
+            return (this->*(it->second))(event);
+        }
     }
     return retVal;
 }
@@ -71,7 +73,17 @@ bool Active::ProcessDisconnectDone(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGE("stateMachine is null");
         return false;
     }
+
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is null");
+        return false;
+    }
     std::unique_ptr<DataDisconnectParams> object = event->GetUniqueObject<DataDisconnectParams>();
+    if (object == nullptr) {
+        TELEPHONY_LOGE("object is null");
+        return false;
+    }
+
     DisConnectionReason reason = object->GetReason();
     Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
     inActive->SetReason(reason);
@@ -194,6 +206,11 @@ bool Active::ProcessDataConnectionComplete(const AppExecFwk::InnerEvent::Pointer
         return false;
     }
     resultInfo->flag = shareStateMachine->apnId_;
+
+    if (shareStateMachine->stateMachineEventHandler_ == nullptr) {
+        TELEPHONY_LOGE("stateMachineEventHandler_ is null");
+        return false;
+    }
     shareStateMachine->stateMachineEventHandler_->RemoveEvent(CellularDataEventCode::MSG_CONNECT_TIMEOUT_CHECK);
     if (shareStateMachine->cellularDataHandler_ != nullptr) {
         shareStateMachine->cellularDataHandler_->SendEvent(
