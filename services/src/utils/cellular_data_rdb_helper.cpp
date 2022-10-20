@@ -90,6 +90,11 @@ bool CellularDataRdbHelper::QueryApns(const std::string &mcc, const std::string 
 void CellularDataRdbHelper::ReadApnResult(
     const std::shared_ptr<NativeRdb::AbsSharedResultSet> &result, std::vector<PdpProfile> &apnVec)
 {
+    if (result == nullptr) {
+        TELEPHONY_LOGI("ReadApnResult result is nullptr");
+        return;
+    }
+
     int rowCnt = 0;
     int index = 0;
     result->GetRowCount(rowCnt);
