@@ -48,13 +48,23 @@ void CellularDataController::Init()
     cellularDataHandler_ = std::make_shared<CellularDataHandler>(GetEventRunner(), subscriberInfo, slotId_);
     cellularDataRdbObserver_ = std::make_unique<CellularDataRdbObserver>(cellularDataHandler_).release();
     if (cellularDataHandler_ == nullptr || cellularDataRdbObserver_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: CellularDataController init failed, cellularDataHandler_ or "
-                       "cellularDataRdbObserver_ is null",
-            slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler_ or cellularDataRdbObserver_ is null", slotId_);
         return;
     }
     cellularDataHandler_->Init();
     RegisterDatabaseObserver();
+    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgrProxy == nullptr) {
+        TELEPHONY_LOGE("samgrProxy is nullptr");
+        return;
+    }
+    netManagerListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(slotId_);
+    if (netManagerListener_ == nullptr) {
+        TELEPHONY_LOGE("netManagerListener_ is nullptr");
+        return;
+    }
+    samgrProxy->SubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID, netManagerListener_);
+    samgrProxy->SubscribeSystemAbility(COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID, netManagerListener_);
 }
 
 bool CellularDataController::SetCellularDataEnable(bool userDataEnabled)
@@ -319,6 +329,46 @@ bool CellularDataController::ClearAllConnections(DisConnectionReason reason) con
     }
     cellularDataHandler_->ClearAllConnections(reason);
     return true;
+}
+
+CellularDataController::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(int32_t slotId)
+    : slotId_(slotId)
+{}
+
+void CellularDataController::SystemAbilityStatusChangeListener::OnAddSystemAbility(
+    int32_t systemAbilityId, const std::string &deviceId)
+{
+    switch (systemAbilityId) {
+        case COMM_NET_CONN_MANAGER_SYS_ABILITY_ID:
+            TELEPHONY_LOGI("COMM_NET_CONN_MANAGER_SYS_ABILITY_ID running");
+            CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
+            break;
+        case COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID:
+            TELEPHONY_LOGI("COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID running");
+            if (slotId_ == 0) {
+                CellularDataNetAgent::GetInstance().RegisterPolicyCallback();
+            }
+            break;
+        default:
+            TELEPHONY_LOGE("systemAbilityId is invalid");
+            break;
+    }
+}
+
+void CellularDataController::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
+    int32_t systemAbilityId, const std::string &deviceId)
+{
+    switch (systemAbilityId) {
+        case COMM_NET_CONN_MANAGER_SYS_ABILITY_ID:
+            TELEPHONY_LOGE("COMM_NET_CONN_MANAGER_SYS_ABILITY_ID stopped");
+            break;
+        case COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID:
+            TELEPHONY_LOGE("COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID stopped");
+            break;
+        default:
+            TELEPHONY_LOGE("systemAbilityId is invalid");
+            break;
+    }
 }
 } // namespace Telephony
 } // namespace OHOS
