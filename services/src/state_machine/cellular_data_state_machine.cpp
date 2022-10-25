@@ -186,8 +186,8 @@ void CellularDataStateMachine::UpdateNetworkInfo(const SetupDataCallResultInfo &
 {
     std::lock_guard<std::mutex> guard(mtx_);
     int32_t slotId = GetSlotId();
-    TELEPHONY_LOGI("Slot%{public}d: dataCall, capability:%{public}" PRIu64", state:%{public}d, addr:%{public}s, "
-        "dns: %{public}s, gw: %{public}s", slotId, capability_, dataCallInfo.reason,
+    TELEPHONY_LOGD("Slot%{private}d: dataCall, capability:%{private}" PRIu64", state:%{private}d, addr:%{private}s, "
+        "dns: %{private}s, gw: %{private}s", slotId, capability_, dataCallInfo.reason,
         dataCallInfo.address.c_str(), dataCallInfo.dns.c_str(), dataCallInfo.gateway.c_str());
     std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(dataCallInfo.address);
     std::vector<AddressInfo> dnsInfoArray = CellularDataUtils::ParseNormalIpAddr(dataCallInfo.dns);
@@ -236,8 +236,8 @@ void CellularDataStateMachine::UpdateNetworkInfo()
 
 void CellularDataStateMachine::ResolveIp(std::vector<AddressInfo> &ipInfoArray)
 {
-    TELEPHONY_LOGI("Resolve Ip ifaceName_: %{public}s, domain_: %{public}s, mtu_: %{public}d, isAvailable_:"
-        " %{public}d, isRoaming_:%{public}d", netLinkInfo_->ifaceName_.c_str(),
+    TELEPHONY_LOGD("Resolve Ip ifaceName_: %{private}s, domain_: %{private}s, mtu_: %{private}d, isAvailable_:"
+        " %{private}d, isRoaming_:%{private}d", netLinkInfo_->ifaceName_.c_str(),
         netLinkInfo_->domain_.c_str(), netLinkInfo_->mtu_,
         netSupplierInfo_->isAvailable_, netSupplierInfo_->isRoaming_);
     netLinkInfo_->netAddrList_.clear();
