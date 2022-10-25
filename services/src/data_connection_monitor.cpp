@@ -181,6 +181,10 @@ void DataConnectionMonitor::GetPreferredNetworkPara()
 void DataConnectionMonitor::SetPreferredNetworkPara(const AppExecFwk::InnerEvent::Pointer &event)
 {
     std::shared_ptr<PreferredNetworkTypeInfo> preferredNetworkInfo = event->GetSharedObject<PreferredNetworkTypeInfo>();
+    if (preferredNetworkInfo == nullptr) {
+        TELEPHONY_LOGE("preferredNetworkInfo is null");
+        return;
+    }
     int32_t networkType = preferredNetworkInfo->preferredNetworkType;
     CoreManagerInner::GetInstance().SetPreferredNetworkPara(slotId_,
         RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, networkType, shared_from_this());

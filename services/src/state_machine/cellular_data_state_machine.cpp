@@ -106,8 +106,12 @@ void CellularDataStateMachine::DoConnect(const DataConnectionParams &connectionP
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(
             slotId, SWITCH_ON, CellularDataErrorCode::DATA_ERROR_PDP_ACTIVATE_FAIL, "Activate PDP context failed");
     }
-    stateMachineEventHandler_->SendEvent(CellularDataEventCode::MSG_CONNECT_TIMEOUT_CHECK, connectId_,
-        CONNECTION_DISCONNECTION_TIMEOUT);
+    if (stateMachineEventHandler_ == nullptr) {
+        TELEPHONY_LOGE("stateMachineEventHandler_ is nullptr");
+        return;
+    }
+    stateMachineEventHandler_->SendEvent(
+        CellularDataEventCode::MSG_CONNECT_TIMEOUT_CHECK, connectId_, CONNECTION_DISCONNECTION_TIMEOUT);
 }
 
 void CellularDataStateMachine::FreeConnection(const DataDisconnectParams &params)
@@ -127,8 +131,12 @@ void CellularDataStateMachine::FreeConnection(const DataDisconnectParams &params
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(
             slotId, SWITCH_OFF, CellularDataErrorCode::DATA_ERROR_PDP_DEACTIVATE_FAIL, "Deactivate PDP context failed");
     }
-    stateMachineEventHandler_->SendEvent(CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK, connectId_,
-        CONNECTION_DISCONNECTION_TIMEOUT);
+    if (stateMachineEventHandler_ == nullptr) {
+        TELEPHONY_LOGE("stateMachineEventHandler_ is nullptr");
+        return;
+    }
+    stateMachineEventHandler_->SendEvent(
+        CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK, connectId_, CONNECTION_DISCONNECTION_TIMEOUT);
 }
 
 bool CellularDataStateMachine::operator==(const CellularDataStateMachine &stateMachine) const
