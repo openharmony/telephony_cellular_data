@@ -43,7 +43,9 @@ int32_t CellularDataServiceStub::OnRemoteRequest(
     }
     std::map<uint32_t, Fun>::iterator it = eventIdFunMap_.find(code);
     if (it != eventIdFunMap_.end()) {
-        return (this->*(it->second))(data, reply);
+        if (it->second != nullptr) {
+            return (this->*(it->second))(data, reply);
+        }
     } else {
         TELEPHONY_LOGE("event code is not exist");
     }
