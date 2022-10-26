@@ -154,7 +154,7 @@ static constexpr const char *DATA_METERED_CONTEXT_ROLES = "default";
 static constexpr const char *IS_CELLULAR_DATA_ENABLE = "isCellularDataEnable";
 static constexpr const char *IS_ROAMING = "isRoaming";
 static constexpr const char *SETTING_SWITCH = "settingSwitch";
-static constexpr const char *IDENT_PREFIX = "slotId";
+static constexpr const char *IDENT_PREFIX = "simId";
 static constexpr const char *DEFAULT_HOSTNAME = "";
 static constexpr const char *DEFAULT_MASK = "";
 static constexpr const char *CELLULAR_DATA_RDB_URI = "dataability:///com.ohos.pdpprofileability/net/pdp_profile";
@@ -183,26 +183,23 @@ static constexpr const char *CONFIG_BANDWIDTH = "persist.sys.data.bandwidth";
 static constexpr const char *CONFIG_PREFERAPN = "persist.sys.data.preferapn";
 static constexpr const char *CONFIG_MOBILE_MTU = "persist.sys.data.mobilemtu";
 static constexpr const char *CONFIG_MULTIPLE_CONNECTIONS = "persist.sys.data.multiple.connections";
-static constexpr const char *CAPACITY_THRESHOLDS_FOR_DOWNLINK =
-    "100,500,1000,5000,10000,20000,50000,75000,"
-    "100000,200000,500000,1000000,1500000,2000000";
-static constexpr const char *CAPACITY_THRESHOLDS_FOR_UPLINK =
-    "100,500,1000,5000,10000,20000,50000,75000,"
-    "100000,200000,500000";
-static constexpr const char *DEFAULT_TCP_BUFFER_CONFIG =
-    "UMTS:58254,349525,1048576,58254,349525,1048576;"
-    "HSPA:40778,244668,734003,16777,100663,301990;"
-    "HSUPA:131072,262144,2441216,4096,16384,399360;"
-    "HSDPA:61167,367002,1101005,8738,52429,262114;"
-    "HSPAP:122334,734003,2202010,32040,192239,576717;"
-    "EDGE:4093,26280,70800,4096,16384,70800;"
-    "eHRPD:131072,262144,1048576,4096,16384,524288;"
-    "1xRTT:16384,32768,131072,4096,16384,102400;"
-    "GPRS:4092,8760,48000,4096,8760,48000;"
-    "EVDO:4094,87380,262144,4096,16384,262144;"
-    "LTE:524288,1048576,2097152,262144,524288,1048576;"
-    "NR:2097152,6291456,16777216,512000,2097152,8388608;"
-    "LTE_CA:4096,6291456,12582912,4096,1048576,2097152";
+static constexpr const char *CAPACITY_THRESHOLDS_FOR_DOWNLINK = "100,500,1000,5000,10000,20000,50000,75000,"
+                                                                "100000,200000,500000,1000000,1500000,2000000";
+static constexpr const char *CAPACITY_THRESHOLDS_FOR_UPLINK = "100,500,1000,5000,10000,20000,50000,75000,"
+                                                              "100000,200000,500000";
+static constexpr const char *DEFAULT_TCP_BUFFER_CONFIG = "UMTS:58254,349525,1048576,58254,349525,1048576;"
+                                                         "HSPA:40778,244668,734003,16777,100663,301990;"
+                                                         "HSUPA:131072,262144,2441216,4096,16384,399360;"
+                                                         "HSDPA:61167,367002,1101005,8738,52429,262114;"
+                                                         "HSPAP:122334,734003,2202010,32040,192239,576717;"
+                                                         "EDGE:4093,26280,70800,4096,16384,70800;"
+                                                         "eHRPD:131072,262144,1048576,4096,16384,524288;"
+                                                         "1xRTT:16384,32768,131072,4096,16384,102400;"
+                                                         "GPRS:4092,8760,48000,4096,8760,48000;"
+                                                         "EVDO:4094,87380,262144,4096,16384,262144;"
+                                                         "LTE:524288,1048576,2097152,262144,524288,1048576;"
+                                                         "NR:2097152,6291456,16777216,512000,2097152,8388608;"
+                                                         "LTE_CA:4096,6291456,12582912,4096,1048576,2097152";
 constexpr const char *DEFAULT_BANDWIDTH_CONFIG =
     "GPRS:24,24;EDGE:70,18;UMTS:115,115;CDMA-IS95A:14,14;"
     "CDMA-IS95B:14,14;1xRTT:30,30;EvDo-rev.0:750,48;EvDo-rev.A:950,550;HSDPA:4300,620;"
