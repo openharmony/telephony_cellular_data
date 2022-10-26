@@ -32,11 +32,10 @@ namespace OHOS {
 namespace Telephony {
 using namespace NetManagerStandard;
 
-bool g_registerResult =
-    SystemAbility::MakeAndRegisterAbility(&DelayedRefSingleton<CellularDataService>::GetInstance());
+bool g_registerResult = SystemAbility::MakeAndRegisterAbility(&DelayedRefSingleton<CellularDataService>::GetInstance());
 CellularDataService::CellularDataService()
     : SystemAbility(TELEPHONY_CELLULAR_DATA_SYS_ABILITY_ID, true), registerToService_(false),
-    state_(ServiceRunningState::STATE_NOT_START)
+      state_(ServiceRunningState::STATE_NOT_START)
 {}
 
 CellularDataService::~CellularDataService() = default;
@@ -81,7 +80,7 @@ int32_t CellularDataService::Dump(std::int32_t fd, const std::vector<std::u16str
         TELEPHONY_LOGE("Dump fd invalid");
         return TELEPHONY_ERR_FAIL;
     }
-    for (const std::u16string& arg :args) {
+    for (const std::u16string &arg : args) {
         TELEPHONY_LOGI("Dump args: %s", Str16ToStr8(arg).c_str());
         argsInStr.emplace_back(Str16ToStr8(arg));
     }
@@ -135,8 +134,8 @@ int32_t CellularDataService::IsCellularDataEnabled()
         return CELLULAR_DATA_INVALID_PARAM;
     }
     bool result = cellularDataControllers_[slotId]->IsCellularDataEnabled();
-    return result ? static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED) :
-        static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_DISABLED);
+    return result ? static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED)
+                  : static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_DISABLED);
 }
 
 int32_t CellularDataService::EnableCellularData(bool enable)
@@ -161,8 +160,8 @@ int32_t CellularDataService::EnableCellularData(bool enable)
             TELEPHONY_LOGE("CellularDataController is null");
         }
     }
-    return result ? static_cast<int32_t>(DataRespondCode::SET_SUCCESS) :
-        static_cast<int32_t>(DataRespondCode::SET_FAILED);
+    return result ? static_cast<int32_t>(DataRespondCode::SET_SUCCESS)
+                  : static_cast<int32_t>(DataRespondCode::SET_FAILED);
 }
 
 int32_t CellularDataService::GetCellularDataState()
@@ -192,8 +191,8 @@ int32_t CellularDataService::IsCellularDataRoamingEnabled(const int32_t slotId)
         return CELLULAR_DATA_INVALID_PARAM;
     }
     bool result = cellularDataControllers_[slotId]->IsCellularDataRoamingEnabled();
-    return result ? static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_ENABLED) :
-        static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_DISABLED);
+    return result ? static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_ENABLED)
+                  : static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_DISABLED);
 }
 
 int32_t CellularDataService::EnableCellularDataRoaming(const int32_t slotId, bool enable)
@@ -209,8 +208,8 @@ int32_t CellularDataService::EnableCellularDataRoaming(const int32_t slotId, boo
     if (result) {
         CellularDataHiSysEvent::WriteRoamingConnectStateBehaviorEvent(enable);
     }
-    return result ? static_cast<int32_t>(DataRespondCode::SET_SUCCESS) :
-        static_cast<int32_t>(DataRespondCode::SET_FAILED);
+    return result ? static_cast<int32_t>(DataRespondCode::SET_SUCCESS)
+                  : static_cast<int32_t>(DataRespondCode::SET_FAILED);
 }
 
 void CellularDataService::InitModule()
@@ -224,14 +223,14 @@ void CellularDataService::InitModule()
     int32_t simNum = CoreManagerInner::GetInstance().GetMaxSimCount();
     for (int32_t i = 0; i < simNum; ++i) {
         std::shared_ptr<CellularDataController> cellularDataController =
-        std::make_shared<CellularDataController>(eventLoop_, i);
+            std::make_shared<CellularDataController>(eventLoop_, i);
         if (cellularDataController == nullptr) {
             TELEPHONY_LOGE("CellularDataService init module failed cellularDataController is null.");
             continue;
         }
         cellularDataControllers_.insert(
             std::pair<int32_t, std::shared_ptr<CellularDataController>>(i, cellularDataController));
-        for (uint64_t capability: netCapabilities) {
+        for (uint64_t capability : netCapabilities) {
             NetSupplier netSupplier = { 0 };
             netSupplier.supplierId = 0;
             netSupplier.slotId = i;
@@ -263,7 +262,8 @@ int32_t CellularDataService::ReleaseNet(const NetRequest &request)
     if (!IsValidDecValue(requestIdent)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    int32_t slotId = std::stoi(requestIdent);
+    int32_t simId = std::stoi(requestIdent);
+    int32_t slotId = CoreManagerInner::GetInstance().GetSlotId(simId);
     if (!CheckParamValid(slotId)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
@@ -277,7 +277,8 @@ int32_t CellularDataService::RequestNet(const NetRequest &request)
     if (!IsValidDecValue(requestIdent)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    int32_t slotId = std::stoi(requestIdent);
+    int32_t simId = std::stoi(requestIdent);
+    int32_t slotId = CoreManagerInner::GetInstance().GetSlotId(simId);
     if (!CheckParamValid(slotId)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
@@ -307,8 +308,8 @@ int32_t CellularDataService::HandleApnChanged(const int32_t slotId)
         return CELLULAR_DATA_INVALID_PARAM;
     }
     bool result = cellularDataControllers_[slotId]->HandleApnChanged();
-    return result ? static_cast<int32_t>(DataRespondCode::SET_SUCCESS) :
-        static_cast<int32_t>(DataRespondCode::SET_FAILED);
+    return result ? static_cast<int32_t>(DataRespondCode::SET_SUCCESS)
+                  : static_cast<int32_t>(DataRespondCode::SET_FAILED);
 }
 
 int32_t CellularDataService::GetDefaultCellularDataSlotId()
@@ -335,8 +336,8 @@ int32_t CellularDataService::SetDefaultCellularDataSlotId(const int32_t slotId)
         return static_cast<int32_t>(DataRespondCode::SET_FAILED);
     }
     if (formerSlotId >= 0 && formerSlotId != slotId) {
-        std::map<int32_t, std::shared_ptr<CellularDataController>>::iterator itController
-            = cellularDataControllers_.find(formerSlotId);
+        std::map<int32_t, std::shared_ptr<CellularDataController>>::iterator itController =
+            cellularDataControllers_.find(formerSlotId);
         if (itController != cellularDataControllers_.end() && (itController->second != nullptr)) {
             itController->second->ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
         } else {
@@ -446,8 +447,8 @@ int32_t CellularDataService::HasInternetCapability(const int32_t slotId, const i
         return CELLULAR_DATA_INVALID_PARAM;
     }
     bool result = cellularDataControllers_[slotId]->HasInternetCapability(cid);
-    return result ? static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS) :
-        static_cast<int32_t>(RequestNetCode::REQUEST_FAILED);
+    return result ? static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)
+                  : static_cast<int32_t>(RequestNetCode::REQUEST_FAILED);
 }
 
 int32_t CellularDataService::ClearCellularDataConnections(const int32_t slotId)
@@ -468,8 +469,8 @@ int32_t CellularDataService::ClearAllConnections(const int32_t slotId, DisConnec
         return CELLULAR_DATA_INVALID_PARAM;
     }
     bool result = item->second->ClearAllConnections(reason);
-    return result ? static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS) :
-       static_cast<int32_t>(RequestNetCode::REQUEST_FAILED);
+    return result ? static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)
+                  : static_cast<int32_t>(RequestNetCode::REQUEST_FAILED);
 }
 
 int32_t CellularDataService::GetServiceRunningState()

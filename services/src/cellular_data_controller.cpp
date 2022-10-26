@@ -168,6 +168,10 @@ void CellularDataController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer 
     int32_t eventId = event->GetInnerEventId();
     switch (eventId) {
         case CellularDataEventCode::MSG_REG_NET_MANAGER: {
+            int32_t simState = CoreManagerInner::GetInstance().GetSimState(slotId_);
+            if (simState == static_cast<int32_t>(SimState::SIM_STATE_NOT_PRESENT)) {
+                return;
+            }
             if (!CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_)) {
                 SendEvent(CellularDataEventCode::MSG_REG_NET_MANAGER, REG_NET_MANAGER_DELAY_TIME, Priority::LOW);
             }
