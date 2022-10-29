@@ -67,7 +67,7 @@ base/telephony/cellular_data/
 
     ```
     import data from "@ohos.telephony.data";
-    
+
     // 调用接口【callback方式】
     data.isCellularDataEnabled((err, value) => {
       if (err) {

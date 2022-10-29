@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Telephony {
 class DataSwitchSettings {
 public:
-    DataSwitchSettings(int32_t slotId);
+    explicit DataSwitchSettings(int32_t slotId);
     ~DataSwitchSettings() = default;
     void LoadSwitchValue();
     bool IsInternalDataOn() const;
@@ -32,7 +32,7 @@ public:
     bool IsCarrierDataOn() const;
     void SetCarrierDataOn(bool carrierDataOn);
     bool IsAllowActiveData() const;
-    bool GetUserDataOn();
+    bool IsUserDataOn();
     void SetUserDataOn(bool userDataOn);
     bool IsUserDataRoamingOn();
     void SetUserDataRoamingOn(bool dataRoamingEnabled);
