@@ -76,7 +76,8 @@
                 }
             ],
             "test": [
-                "//base/telephony/cellular_data/test:unittest"
+                "//base/telephony/cellular_data/test:unittest",
+                "//base/telephony/cellular_data/test/fuzztest:fuzztest"
             ]
         }
     }
