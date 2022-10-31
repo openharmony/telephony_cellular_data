@@ -39,12 +39,8 @@ AddDataTokenFuzzer::AddDataTokenFuzzer()
         .aplStr = "system_basic",
     };
     currentID_ = GetAccessTokenId(&testDataInfoParams);
-    std::cout << "AddDataTokenFuzzer currentID_ : " << currentID_ << std::endl;
     SetSelfTokenID(currentID_);
     Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
-AddDataTokenFuzzer::~AddDataTokenFuzzer()
-{
-    std::cout << "AddDataTokenFuzzer ~AddDataTokenFuzzer" << std::endl;
-}
+AddDataTokenFuzzer::~AddDataTokenFuzzer() {}
 } // namespace OHOS
