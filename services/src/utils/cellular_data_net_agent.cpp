@@ -17,9 +17,9 @@
 
 #include <cinttypes>
 
+#include "core_manager_inner.h"
 #include "net_conn_client.h"
 #include "net_policy_client.h"
-
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -53,10 +53,14 @@ bool CellularDataNetAgent::RegisterNetSupplier(const int32_t slotId)
             TELEPHONY_LOGE("capabilities(%{public}" PRIu64 ") not support", netSupplier.capability);
             continue;
         }
-        std::set<NetCap> netCap {static_cast<NetCap>(netSupplier.capability)};
+        int32_t simId = CoreManagerInner::GetInstance().GetSimId(netSupplier.slotId);
+        if (simId <= INVALID_SIM_ID) {
+            return false;
+        }
+        std::set<NetCap> netCap { static_cast<NetCap>(netSupplier.capability) };
         uint32_t supplierId = 0;
-        int32_t result = netManager->RegisterNetSupplier(NetBearType::BEARER_CELLULAR,
-            std::string(IDENT_PREFIX) + std::to_string(netSupplier.slotId), netCap, supplierId);
+        int32_t result = netManager->RegisterNetSupplier(
+            NetBearType::BEARER_CELLULAR, std::string(IDENT_PREFIX) + std::to_string(simId), netCap, supplierId);
         if (result == 0) {
             TELEPHONY_LOGI("Register network successful, supplierId[%{public}d]", supplierId);
             flag = true;
@@ -146,7 +150,7 @@ int32_t CellularDataNetAgent::GetSupplierId(const int32_t slotId, uint64_t capab
     for (const NetSupplier &netSupplier : netSuppliers_) {
         if (netSupplier.slotId == slotId && netSupplier.capability == capability) {
             TELEPHONY_LOGI(
-                "find supplierId %{public}d capability:%{public}" PRIu64"", netSupplier.supplierId, capability);
+                "find supplierId %{public}d capability:%{public}" PRIu64 "", netSupplier.supplierId, capability);
             return netSupplier.supplierId;
         }
     }

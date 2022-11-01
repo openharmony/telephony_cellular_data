@@ -26,7 +26,7 @@ DataSwitchSettings::DataSwitchSettings(int32_t slotId) : slotId_(slotId) {}
 
 void DataSwitchSettings::LoadSwitchValue()
 {
-    GetUserDataOn();
+    IsUserDataOn();
     IsUserDataRoamingOn();
     TELEPHONY_LOGI("LoadSwitchValue userDataOn_:%{public}d userDataRoaming_:%{public}d policyDataOn_:%{public}d",
         userDataOn_, userDataRoaming_, policyDataOn_);
@@ -57,16 +57,16 @@ void DataSwitchSettings::SetUserDataOn(bool userDataOn)
     userDataOn_ = userDataOn;
 }
 
-bool DataSwitchSettings::GetUserDataOn()
+bool DataSwitchSettings::IsUserDataOn()
 {
     std::shared_ptr<CellularDataSettingsRdbHelper> settingsRdbHelper = CellularDataSettingsRdbHelper::GetInstance();
     if (settingsRdbHelper == nullptr) {
-        TELEPHONY_LOGE("GetUserDataOn settingsRdbHelper == nullptr!");
+        TELEPHONY_LOGE("IsUserDataOn settingsRdbHelper == nullptr!");
         return userDataOn_;
     }
     Uri userDataEnableUri(CELLULAR_DATA_SETTING_DATA_ENABLE_URI);
     int userDataOnValue = settingsRdbHelper->GetValue(userDataEnableUri, CELLULAR_DATA_COLUMN_ENABLE);
-    userDataOn_ = (userDataOnValue == static_cast<int>(DataSwitchCode::CELLULAR_DATA_ENABLED) ? true : false);
+    userDataOn_ = (userDataOnValue == static_cast<int>(DataSwitchCode::CELLULAR_DATA_ENABLED));
     return userDataOn_;
 }
 
@@ -107,8 +107,7 @@ bool DataSwitchSettings::IsUserDataRoamingOn()
     Uri userDataRoamingUri(std::string(CELLULAR_DATA_SETTING_DATA_ROAMING_URI) + std::to_string(simId));
     int userDataRoamingValue = settingsRdbHelper->GetValue(
         userDataRoamingUri, std::string(CELLULAR_DATA_COLUMN_ROAMING) + std::to_string(simId));
-    userDataRoaming_ =
-        (userDataRoamingValue == static_cast<int>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_ENABLED) ? true : false);
+    userDataRoaming_ = (userDataRoamingValue == static_cast<int>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_ENABLED));
     return userDataRoaming_;
 }
 
