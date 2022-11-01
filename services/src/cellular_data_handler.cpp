@@ -125,7 +125,7 @@ bool CellularDataHandler::SetCellularDataEnable(bool userDataOn)
         TELEPHONY_LOGE("Slot%{public}d: SetCellularDataEnable dataSwitchSettings_ is null.", slotId_);
         return false;
     }
-    if (dataSwitchSettings_->GetUserDataOn() != userDataOn) {
+    if (dataSwitchSettings_->IsUserDataOn() != userDataOn) {
         dataSwitchSettings_->SetUserDataOn(userDataOn);
         int32_t defaultSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
         if (userDataOn && defaultSlotId == slotId_) {
@@ -165,7 +165,7 @@ bool CellularDataHandler::IsCellularDataEnabled() const
         TELEPHONY_LOGE("Slot%{public}d: IsCellularDataEnabled dataSwitchSettings_ is null", slotId_);
         return false;
     }
-    return dataSwitchSettings_->GetUserDataOn();
+    return dataSwitchSettings_->IsUserDataOn();
 }
 
 bool CellularDataHandler::IsCellularDataRoamingEnabled() const
@@ -230,7 +230,7 @@ void CellularDataHandler::ClearAllConnections(DisConnectionReason reason)
         TELEPHONY_LOGE("Slot%{public}d: in ClearAllConnections dataSwitchSettings_ is null", slotId_);
         return;
     }
-    if (!dataSwitchSettings_->GetUserDataOn()) {
+    if (!dataSwitchSettings_->IsUserDataOn()) {
         connectionManager_->SetDataFlowType(CellDataFlowType::DATA_FLOW_TYPE_NONE);
     }
 }
@@ -389,7 +389,7 @@ void CellularDataHandler::EstablishAllApnsIfConnectable()
     }
 }
 
-bool CellularDataHandler::CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder)
+bool CellularDataHandler::CheckCellularDataSlotId()
 {
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
@@ -487,7 +487,7 @@ bool CellularDataHandler::CheckApnState(sptr<ApnHolder> &apnHolder)
 
 void CellularDataHandler::AttemptEstablishDataConnection(sptr<ApnHolder> &apnHolder)
 {
-    if (!CheckCellularDataSlotId(apnHolder) || !CheckAttachAndSimState(apnHolder) || !CheckRoamingState(apnHolder)) {
+    if (!CheckCellularDataSlotId() || !CheckAttachAndSimState(apnHolder) || !CheckRoamingState(apnHolder)) {
         return;
     }
     DelayedSingleton<CellularDataHiSysEvent>::GetInstance()->SetCellularDataActivateStartTime();
@@ -1295,7 +1295,7 @@ void CellularDataHandler::HandleDBSettingEnableChanged(const AppExecFwk::InnerEv
         return;
     }
     int64_t value = event->GetParam();
-    if (dataSwitchSettings_->GetUserDataOn() != value) {
+    if (dataSwitchSettings_->IsUserDataOn() != value) {
         dataSwitchSettings_->SetUserDataOn(value);
         if (value) {
             EstablishAllApnsIfConnectable();

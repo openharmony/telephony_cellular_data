@@ -84,9 +84,6 @@ private:
     int64_t beginTime_ = 0L;
     int64_t endTime_ = 0L;
     ServiceRunningState state_;
-    static constexpr HiviewDFX::HiLogLabel LOG_LABEL = {LOG_CORE, LOG_DOMAIN, "CellularDataService"};
-    constexpr static uint32_t CONNECT_MAX_TRY_COUNT = 120;
-    constexpr static uint32_t CONNECT_SERVICE_WAIT_TIME = 1000; // ms
 };
 } // namespace Telephony
 } // namespace OHOS

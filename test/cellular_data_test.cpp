@@ -144,6 +144,8 @@ public:
     static const int32_t DATA_SLOT_ID_INVALID = DEFAULT_SIM_SLOT_ID + 10;
     static const int32_t PING_CHECK_SUCCESS = 0;
     static const int32_t PING_CHECK_FAIL = 1;
+    static const int32_t MAX_TIMES = 35;
+    static const int32_t CMD_BUF_SIZE = 10240;
 };
 
 sptr<ICellularDataManager> CellularDataTest::proxy_;
@@ -188,9 +190,8 @@ void CellularDataTest::WaitTestTimeout(const int32_t status)
     if (proxy_ == nullptr) {
         return;
     }
-    const int32_t maxTimes = 35;
     int32_t count = 0;
-    while (count < maxTimes) {
+    while (count < MAX_TIMES) {
         sleep(SLEEP_TIME);
         if (proxy_->GetCellularDataState() == status) {
             return;
@@ -201,15 +202,14 @@ void CellularDataTest::WaitTestTimeout(const int32_t status)
 
 string CellularDataTest::GetCmdResult(const string &strCmd)
 {
-    char buf[10240] = { 0 };
+    char buf[CMD_BUF_SIZE] = { 0 };
     FILE *pf;
-    char *fgetsRet;
 
     if ((pf = popen(strCmd.c_str(), "r")) == nullptr) {
         return "";
     }
     string strResult;
-    while ((fgetsRet = fgets(buf, sizeof buf, pf)) != nullptr) {
+    while (fgets(buf, sizeof(buf), pf) != nullptr) {
         strResult += buf;
     }
     pclose(pf);
