@@ -58,7 +58,7 @@ void CellularDataController::Init()
         TELEPHONY_LOGE("samgrProxy is nullptr");
         return;
     }
-    netManagerListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(slotId_);
+    netManagerListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(slotId_, cellularDataHandler_);
     if (netManagerListener_ == nullptr) {
         TELEPHONY_LOGE("netManagerListener_ is nullptr");
         return;
@@ -335,8 +335,9 @@ bool CellularDataController::ClearAllConnections(DisConnectionReason reason) con
     return true;
 }
 
-CellularDataController::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(int32_t slotId)
-    : slotId_(slotId)
+CellularDataController::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(
+    int32_t slotId, std::shared_ptr<CellularDataHandler> handler)
+    : slotId_(slotId), handler_(handler)
 {}
 
 void CellularDataController::SystemAbilityStatusChangeListener::OnAddSystemAbility(
@@ -345,7 +346,12 @@ void CellularDataController::SystemAbilityStatusChangeListener::OnAddSystemAbili
     switch (systemAbilityId) {
         case COMM_NET_CONN_MANAGER_SYS_ABILITY_ID:
             TELEPHONY_LOGI("COMM_NET_CONN_MANAGER_SYS_ABILITY_ID running");
-            CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
+            if (isNetStopped_ && handler_ != nullptr) {
+                handler_->ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
+                CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
+                handler_->EstablishAllApnsIfConnectable();
+                isNetStopped_ = false;
+            }
             break;
         case COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID:
             TELEPHONY_LOGI("COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID running");
@@ -365,6 +371,7 @@ void CellularDataController::SystemAbilityStatusChangeListener::OnRemoveSystemAb
     switch (systemAbilityId) {
         case COMM_NET_CONN_MANAGER_SYS_ABILITY_ID:
             TELEPHONY_LOGE("COMM_NET_CONN_MANAGER_SYS_ABILITY_ID stopped");
+            isNetStopped_ = true;
             break;
         case COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID:
             TELEPHONY_LOGE("COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID stopped");
