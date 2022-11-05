@@ -65,13 +65,15 @@ private:
 private:
     class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
     public:
-        explicit SystemAbilityStatusChangeListener(int32_t slotId);
+        explicit SystemAbilityStatusChangeListener(int32_t slotId, std::shared_ptr<CellularDataHandler> handler);
         ~SystemAbilityStatusChangeListener() = default;
         void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
         void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
 
     private:
+        bool isNetStopped_ = false;
         const int32_t slotId_;
+        std::shared_ptr<CellularDataHandler> handler_;
     };
 };
 } // namespace Telephony
