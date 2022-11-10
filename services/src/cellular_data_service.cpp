@@ -128,12 +128,11 @@ int32_t CellularDataService::IsCellularDataEnabled()
     if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    int32_t slotId = CellularDataService::GetDefaultCellularDataSlotId();
-    if (!CheckParamValid(slotId)) {
-        TELEPHONY_LOGE("cellularDataControllers_[%{public}d] is null", slotId);
-        return CELLULAR_DATA_INVALID_PARAM;
+    if (cellularDataControllers_[DEFAULT_SIM_SLOT_ID] == nullptr) {
+        TELEPHONY_LOGE("cellularDataControllers_[0] is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    bool result = cellularDataControllers_[slotId]->IsCellularDataEnabled();
+    bool result = cellularDataControllers_[DEFAULT_SIM_SLOT_ID]->IsCellularDataEnabled();
     return result ? static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED)
                   : static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_DISABLED);
 }
