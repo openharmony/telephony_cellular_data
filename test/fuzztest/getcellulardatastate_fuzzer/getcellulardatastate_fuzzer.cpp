@@ -17,29 +17,210 @@
 
 #include <cstddef>
 #include <cstdint>
-
+#define private public
 #include "adddatatoken_fuzzer.h"
-#include "cellular_data_client.h"
+#include "cellular_data_service.h"
+#include "cellular_data_service_stub.h"
 #include "system_ability_definition.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
-void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
+static bool g_isInited = false;
+constexpr int32_t SLOT_NUM = 2;
+
+bool IsServiceInited()
 {
-    if (data == nullptr || size <= 0) {
+    if (!g_isInited) {
+        DelayedSingleton<CellularDataService>::GetInstance()->OnStart();
+        if (DelayedSingleton<CellularDataService>::GetInstance()->GetServiceRunningState() ==
+            static_cast<int32_t>(ServiceRunningState::STATE_RUNNING)) {
+            g_isInited = true;
+        }
+    }
+    return g_isInited;
+}
+
+void OnRemoteRequest(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size);
-    CellularDataClient::GetInstance().GetCellularDataState();
-    CellularDataClient::GetInstance().IsCellularDataEnabled();
-    CellularDataClient::GetInstance().IsCellularDataRoamingEnabled(slotId);
-    CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
-    CellularDataClient::GetInstance().EnableCellularDataRoaming(slotId, static_cast<int32_t>(size % 2));
-    CellularDataClient::GetInstance().SetDefaultCellularDataSlotId(slotId);
-    CellularDataClient::GetInstance().HasInternetCapability(slotId, size);
-    CellularDataClient::GetInstance().ClearCellularDataConnections(slotId);
-    CellularDataClient::GetInstance().GetCellularDataFlowType();
+    MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+        return;
+    }
+    size_t dataSize = size - sizeof(uint32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(uint32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(size);
+    MessageParcel reply;
+    MessageOption option;
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
+}
+
+void EnableCellularData(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CellularDataService>::GetInstance()->OnEnableCellularData(dataMessageParcel, reply);
+}
+
+void GetCellularDataState(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CellularDataService>::GetInstance()->OnGetCellularDataState(dataMessageParcel, reply);
+}
+
+void IsCellularDataEnabled(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CellularDataService>::GetInstance()->OnIsCellularDataEnabled(dataMessageParcel, reply);
+}
+
+void IsCellularDataRoamingEnabled(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CellularDataService>::GetInstance()->OnIsCellularDataRoamingEnabled(dataMessageParcel, reply);
+}
+
+void GetDefaultCellularDataSlotId(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CellularDataService>::GetInstance()->OnGetDefaultCellularDataSlotId(dataMessageParcel, reply);
+}
+
+void EnableCellularDataRoaming(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CellularDataService>::GetInstance()->OnEnableCellularDataRoaming(dataMessageParcel, reply);
+}
+
+void SetDefaultCellularDataSlotId(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CellularDataService>::GetInstance()->OnSetDefaultCellularDataSlotId(dataMessageParcel, reply);
+}
+
+void HasInternetCapability(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CellularDataService>::GetInstance()->OnHasInternetCapability(dataMessageParcel, reply);
+}
+
+void ClearCellularDataConnections(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CellularDataService>::GetInstance()->OnClearCellularDataConnections(dataMessageParcel, reply);
+}
+
+void GetCellularDataFlowType(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CellularDataService>::GetInstance()->OnGetCellularDataFlowType(dataMessageParcel, reply);
+}
+
+void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
+{
+    if (data == nullptr || size == 0) {
+        return;
+    }
+
+    OnRemoteRequest(data, size);
+    EnableCellularData(data, size);
+    GetCellularDataState(data, size);
+    IsCellularDataEnabled(data, size);
+    IsCellularDataRoamingEnabled(data, size);
+    GetDefaultCellularDataSlotId(data, size);
+    GetCellularDataFlowType(data, size);
+    EnableCellularDataRoaming(data, size);
+    SetDefaultCellularDataSlotId(data, size);
+    HasInternetCapability(data, size);
+    ClearCellularDataConnections(data, size);
 }
 } // namespace OHOS
 
