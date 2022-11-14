@@ -37,7 +37,15 @@ CellularDataController::CellularDataController(std::shared_ptr<AppExecFwk::Event
 CellularDataController::~CellularDataController()
 {
     UnRegisterEvents();
-    UnRegisterDataObserver();
+    UnRegisterDatabaseObserver();
+    if (netManagerListener_ != nullptr) {
+        auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy != nullptr) {
+            samgrProxy->UnSubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID, netManagerListener_);
+            samgrProxy->UnSubscribeSystemAbility(COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID, netManagerListener_);
+            netManagerListener_ = nullptr;
+        }
+    }
 }
 
 void CellularDataController::Init()
@@ -46,9 +54,8 @@ void CellularDataController::Init()
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     cellularDataHandler_ = std::make_shared<CellularDataHandler>(GetEventRunner(), subscriberInfo, slotId_);
-    cellularDataRdbObserver_ = std::make_unique<CellularDataRdbObserver>(cellularDataHandler_).release();
-    if (cellularDataHandler_ == nullptr || cellularDataRdbObserver_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler_ or cellularDataRdbObserver_ is null", slotId_);
+    if (cellularDataHandler_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler_ is null", slotId_);
         return;
     }
     cellularDataHandler_->Init();
@@ -255,14 +262,23 @@ void CellularDataController::UnRegisterEvents()
     TELEPHONY_LOGI("Slot%{public}d: UnRegisterEvents end", slotId_);
 }
 
-void CellularDataController::UnRegisterDataObserver()
+void CellularDataController::UnRegisterDatabaseObserver()
 {
+    if (cellularDataRdbObserver_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: cellularDataRdbObserver_ is null", slotId_);
+        return;
+    }
     std::shared_ptr<CellularDataRdbHelper> cellularDataDbHelper = CellularDataRdbHelper::GetInstance();
     cellularDataDbHelper->UnRegisterObserver(cellularDataRdbObserver_);
 }
 
 void CellularDataController::RegisterDatabaseObserver()
 {
+    cellularDataRdbObserver_ = std::make_unique<CellularDataRdbObserver>(cellularDataHandler_).release();
+    if (cellularDataRdbObserver_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: cellularDataRdbObserver_ is null", slotId_);
+        return;
+    }
     std::shared_ptr<CellularDataRdbHelper> cellularDataDbHelper = CellularDataRdbHelper::GetInstance();
     cellularDataDbHelper->RegisterObserver(cellularDataRdbObserver_);
 }
