@@ -54,7 +54,7 @@ private:
     void RegisterEvents();
     void UnRegisterEvents();
     void RegisterDatabaseObserver();
-    void UnRegisterDataObserver();
+    void UnRegisterDatabaseObserver();
 
 private:
     std::shared_ptr<CellularDataHandler> cellularDataHandler_;
