@@ -17,6 +17,7 @@
 #include <string>
 
 #include "accesstoken_kit.h"
+#include "cellular_data_client.h"
 #include "cellular_data_error.h"
 #include "cellular_data_types.h"
 #include "core_service_client.h"
@@ -138,7 +139,6 @@ public:
     static int32_t PingTest();
 
 public:
-    static sptr<ICellularDataManager> proxy_;
     static const int32_t SLEEP_TIME = 1;
     static const int32_t SIM_SLOT_ID_1 = DEFAULT_SIM_SLOT_ID + 1;
     static const int32_t DATA_SLOT_ID_INVALID = DEFAULT_SIM_SLOT_ID + 10;
@@ -147,8 +147,6 @@ public:
     static const int32_t MAX_TIMES = 35;
     static const int32_t CMD_BUF_SIZE = 10240;
 };
-
-sptr<ICellularDataManager> CellularDataTest::proxy_;
 
 void CellularDataTest::TearDownTestCase() {}
 
@@ -164,8 +162,6 @@ void CellularDataTest::SetUpTestCase()
     }
 
     AccessToken token;
-    proxy_ = GetProxy();
-    ASSERT_TRUE(proxy_ != nullptr);
     int32_t slotId = DATA_SLOT_ID_INVALID;
     if (CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         slotId = DEFAULT_SIM_SLOT_ID;
@@ -176,24 +172,21 @@ void CellularDataTest::SetUpTestCase()
         return;
     }
     // Set the default slot
-    int32_t result = proxy_->SetDefaultCellularDataSlotId(slotId);
+    int32_t result = CellularDataClient::GetInstance().SetDefaultCellularDataSlotId(slotId);
     if (result != static_cast<int32_t>(DataRespondCode::SET_SUCCESS)) {
         return;
     }
-    int32_t enable = proxy_->EnableCellularData(true);
+    int32_t enable = CellularDataClient::GetInstance().EnableCellularData(true);
     ASSERT_TRUE(enable == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_CONNECTED));
 }
 
 void CellularDataTest::WaitTestTimeout(const int32_t status)
 {
-    if (proxy_ == nullptr) {
-        return;
-    }
     int32_t count = 0;
     while (count < MAX_TIMES) {
         sleep(SLEEP_TIME);
-        if (proxy_->GetCellularDataState() == status) {
+        if (CellularDataClient::GetInstance().GetCellularDataState() == status) {
             return;
         }
         count++;
@@ -237,98 +230,49 @@ int32_t CellularDataTest::PingTest()
 
 int32_t CellularDataTest::IsCellularDataRoamingEnabledTest(int32_t slotId)
 {
-    if (proxy_ == nullptr) {
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t result = proxy_->IsCellularDataRoamingEnabled(slotId);
+    int32_t result = CellularDataClient::GetInstance().IsCellularDataRoamingEnabled(slotId);
     return result;
 }
 
 int32_t CellularDataTest::IsCellularDataEnabledTest()
 {
-    if (proxy_ == nullptr) {
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t result = proxy_->IsCellularDataEnabled();
+    int32_t result = CellularDataClient::GetInstance().IsCellularDataEnabled();
     return result;
 }
 
 int32_t CellularDataTest::EnableCellularDataTest(bool enable)
 {
-    if (proxy_ == nullptr) {
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t result = proxy_->EnableCellularData(enable);
+    int32_t result = CellularDataClient::GetInstance().EnableCellularData(enable);
     return result;
 }
 
 int32_t CellularDataTest::GetCellularDataStateTest()
 {
-    if (proxy_ == nullptr) {
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t result = proxy_->GetCellularDataState();
+    int32_t result = CellularDataClient::GetInstance().GetCellularDataState();
     return result;
 }
 
 int32_t CellularDataTest::EnableCellularDataRoamingTest(int32_t slotId, bool enable)
 {
-    if (proxy_ == nullptr) {
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    return proxy_->EnableCellularDataRoaming(slotId, enable);
+    return CellularDataClient::GetInstance().EnableCellularDataRoaming(slotId, enable);
 }
 
 int32_t CellularDataTest::GetDefaultCellularDataSlotIdTest()
 {
-    if (proxy_ == nullptr) {
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    return proxy_->GetDefaultCellularDataSlotId();
+    return CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
 }
 
 int32_t CellularDataTest::SetDefaultCellularDataSlotIdTest(int32_t slotId)
 {
-    if (proxy_ == nullptr) {
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    return proxy_->SetDefaultCellularDataSlotId(slotId);
+    return CellularDataClient::GetInstance().SetDefaultCellularDataSlotId(slotId);
 }
 
 int32_t CellularDataTest::GetCellularDataFlowTypeTest()
 {
-    if (proxy_ == nullptr) {
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    return proxy_->GetCellularDataFlowType();
-}
-
-sptr<ICellularDataManager> CellularDataTest::GetProxy()
-{
-    sptr<ISystemAbilityManager> systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemAbilityMgr == nullptr) {
-        return nullptr;
-    }
-    sptr<IRemoteObject> remote = systemAbilityMgr->CheckSystemAbility(TELEPHONY_CELLULAR_DATA_SYS_ABILITY_ID);
-    if (remote) {
-        sptr<ICellularDataManager> dataManager = iface_cast<ICellularDataManager>(remote);
-        return dataManager;
-    }
-    return nullptr;
+    return CellularDataClient::GetInstance().GetCellularDataFlowType();
 }
 
 #ifndef TEL_TEST_UNSUPPORT
-/**
- * @tc.number   GetProxy_Test
- * @tc.name     Check whether the cellular data service(SystemAbility) is started
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataTest, GetProxy_Test, TestSize.Level1)
-{
-    CellularDataTest::proxy_ = CellularDataTest::GetProxy();
-    ASSERT_FALSE(CellularDataTest::proxy_ == nullptr);
-}
-
 /**
  * @tc.number   IsCellularDataEnabled_Test
  * @tc.name     Test cellular data switch status(enabled or disabled)
