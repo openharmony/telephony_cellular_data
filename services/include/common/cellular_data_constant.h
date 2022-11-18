@@ -158,10 +158,12 @@ static constexpr const char *IDENT_PREFIX = "simId";
 static constexpr const char *DEFAULT_HOSTNAME = "";
 static constexpr const char *DEFAULT_MASK = "";
 static constexpr const char *CELLULAR_DATA_RDB_URI = "dataability:///com.ohos.pdpprofileability/net/pdp_profile";
+static constexpr const char *CELLULAR_DATA_SETTING_URI =
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
 static constexpr const char *CELLULAR_DATA_SETTING_DATA_ENABLE_URI =
-    "dataability:///com.ohos.settingsdata.DataAbility/cellular_data_enable";
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=cellular_data_enable";
 static constexpr const char *CELLULAR_DATA_SETTING_DATA_ROAMING_URI =
-    "dataability:///com.ohos.settingsdata.DataAbility/cellular_data_roaming_enable";
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=cellular_data_roaming_enable";
 static const int32_t DEFAULT_NET_STATISTICS_PERIOD = 3 * 1000;
 static const int32_t DEFAULT_STALL_DETECTION_PERIOD = 10 * 1000;
 static const int32_t ESTABLISH_DATA_CONNECTION_DELAY = 1 * 1000;

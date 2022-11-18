@@ -27,7 +27,7 @@ CellularDataSettingsRdbHelper::CellularDataSettingsRdbHelper() {}
 
 CellularDataSettingsRdbHelper::~CellularDataSettingsRdbHelper() {}
 
-std::shared_ptr<AppExecFwk::DataAbilityHelper> CellularDataSettingsRdbHelper::CreateDataAbilityHelper()
+std::shared_ptr<DataShare::DataShareHelper> CellularDataSettingsRdbHelper::CreateDataShareHelper()
 {
     sptr<ISystemAbilityManager> saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (saManager == nullptr) {
@@ -39,13 +39,13 @@ std::shared_ptr<AppExecFwk::DataAbilityHelper> CellularDataSettingsRdbHelper::Cr
         TELEPHONY_LOGE("CellularDataRdbHelper GetSystemAbility Service Failed.");
         return nullptr;
     }
-    return AppExecFwk::DataAbilityHelper::Creator(remoteObj);
+    return DataShare::DataShareHelper::Creator(remoteObj, CELLULAR_DATA_SETTING_URI);
 }
 
 void CellularDataSettingsRdbHelper::UnRegisterSettingsObserver(
     const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> settingHelper = CreateDataAbilityHelper();
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
     if (settingHelper == nullptr) {
         TELEPHONY_LOGE("UnRegister settings observer failed by nullptr");
         return;
@@ -57,7 +57,7 @@ void CellularDataSettingsRdbHelper::UnRegisterSettingsObserver(
 void CellularDataSettingsRdbHelper::RegisterSettingsObserver(
     const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> settingHelper = CreateDataAbilityHelper();
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
     if (settingHelper == nullptr) {
         TELEPHONY_LOGE("Register settings observer by nullptr");
         return;
@@ -68,7 +68,7 @@ void CellularDataSettingsRdbHelper::RegisterSettingsObserver(
 
 void CellularDataSettingsRdbHelper::NotifyChange(const Uri &uri)
 {
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> settingHelper = CreateDataAbilityHelper();
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
     if (settingHelper == nullptr) {
         TELEPHONY_LOGE("notify settings changed fail by nullptr");
         return;
@@ -79,15 +79,15 @@ void CellularDataSettingsRdbHelper::NotifyChange(const Uri &uri)
 
 int CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &column)
 {
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> settingHelper = CreateDataAbilityHelper();
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
     if (settingHelper == nullptr) {
         TELEPHONY_LOGE("helper_ is null");
         return NULL_POINTER_EXCEPTION;
     }
-    NativeRdb::DataAbilityPredicates predicates;
+    DataShare::DataSharePredicates predicates;
     std::vector<std::string> columns;
     predicates.EqualTo(CELLULAR_DATA_COLUMN_KEYWORD, column);
-    std::shared_ptr<NativeRdb::AbsSharedResultSet> result = settingHelper->Query(uri, columns, predicates);
+    auto result = settingHelper->Query(uri, predicates, columns);
     if (result == nullptr) {
         TELEPHONY_LOGE("setting DB: query error");
         return NULL_POINTER_EXCEPTION;
@@ -105,22 +105,24 @@ int CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &column)
 
 void CellularDataSettingsRdbHelper::PutValue(Uri &uri, const std::string &column, int value)
 {
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> settingHelper = CreateDataAbilityHelper();
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
     if (settingHelper == nullptr) {
         TELEPHONY_LOGE("helper_ is null");
         return;
     }
     int existValue = GetValue(uri, column);
-    NativeRdb::ValuesBucket bucket;
-    bucket.PutString(CELLULAR_DATA_COLUMN_VALUE, std::to_string(value));
-    bucket.PutString(CELLULAR_DATA_COLUMN_KEYWORD, column);
+    DataShare::DataShareValueObject keyObj(column);
+    DataShare::DataShareValueObject valueObj(std::to_string(value));
+    DataShare::DataShareValuesBucket bucket;
+    bucket.Put(CELLULAR_DATA_COLUMN_VALUE, valueObj);
+    bucket.Put(CELLULAR_DATA_COLUMN_KEYWORD, keyObj);
     int32_t result;
     if (existValue <= NULL_POINTER_EXCEPTION) {
         result = settingHelper->Insert(uri, bucket);
     } else {
-        NativeRdb::DataAbilityPredicates predicates;
+        DataShare::DataSharePredicates predicates;
         predicates.EqualTo(CELLULAR_DATA_COLUMN_KEYWORD, column);
-        result = settingHelper->Update(uri, bucket, predicates);
+        result = settingHelper->Update(uri, predicates, bucket);
     }
     TELEPHONY_LOGI("put value return %{public}d", result);
     if (result == E_ERROR) {

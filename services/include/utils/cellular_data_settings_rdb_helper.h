@@ -20,14 +20,14 @@
 #include <singleton.h>
 #include <utility>
 
-#include "abs_shared_result_set.h"
-#include "data_ability_helper.h"
-#include "data_ability_predicates.h"
+#include "datashare_helper.h"
+#include "datashare_predicates.h"
+#include "datashare_result_set.h"
+#include "datashare_values_bucket.h"
 #include "iservice_registry.h"
 #include "result_set.h"
 #include "system_ability_definition.h"
 #include "uri.h"
-#include "values_bucket.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -58,7 +58,7 @@ public:
     void NotifyChange(const Uri &uri);
     int GetValue(Uri &uri, const std::string &column);
     void PutValue(Uri &uri, const std::string &column, int value);
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> CreateDataAbilityHelper();
+    std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper();
 };
 } // namespace Telephony
 } // namespace OHOS
