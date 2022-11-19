@@ -137,6 +137,8 @@ public:
     static sptr<ICellularDataManager> GetProxy();
     static string GetCmdResult(const string &strCmd);
     static int32_t PingTest();
+    static int32_t HasInternetCapability(int32_t slotId, int32_t cid);
+    static int32_t ClearCellularDataConnections(int32_t slotId);
 
 public:
     static const int32_t SLEEP_TIME = 1;
@@ -272,6 +274,16 @@ int32_t CellularDataTest::GetCellularDataFlowTypeTest()
     return CellularDataClient::GetInstance().GetCellularDataFlowType();
 }
 
+int32_t CellularDataTest::HasInternetCapability(int32_t slotId, int32_t cid)
+{
+    CellularDataClient::GetInstance().IsConnect();
+    return CellularDataClient::GetInstance().HasInternetCapability(slotId, cid);
+}
+
+int32_t CellularDataTest::ClearCellularDataConnections(int32_t slotId)
+{
+    return CellularDataClient::GetInstance().ClearCellularDataConnections(slotId);
+}
 #ifndef TEL_TEST_UNSUPPORT
 /**
  * @tc.number   IsCellularDataEnabled_Test
@@ -698,6 +710,68 @@ HWTEST_F(CellularDataTest, DataFlowType_Test_02, TestSize.Level3)
     ASSERT_TRUE(pingResult == PING_CHECK_FAIL);
     dataFlowType = CellularDataTest::GetCellularDataFlowTypeTest();
     ASSERT_TRUE(dataFlowType == 0);
+}
+
+/**
+ * @tc.number   HasInternetCapability_Test_01
+ * @tc.name     Test the HasInternetCapability function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, HasInternetCapability_Test_01, TestSize.Level3)
+{
+    if (!CoreServiceClient::GetInstance().HasSimCard(SIM_SLOT_ID_1)) {
+        return;
+    }
+
+    int32_t cid = 1;
+    int32_t result = CellularDataTest::HasInternetCapability(SIM_SLOT_ID_1, cid);
+    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
+}
+
+/**
+ * @tc.number   HasInternetCapability_Test_02
+ * @tc.name     Test the HasInternetCapability function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, HasInternetCapability_Test_02, TestSize.Level3)
+{
+    if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+
+    int32_t cid = 1;
+    int32_t result = CellularDataTest::HasInternetCapability(DEFAULT_SIM_SLOT_ID, cid);
+    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
+}
+
+/**
+ * @tc.number   ClearCellularDataConnections_Test_01
+ * @tc.name     Test the ClearCellularDataConnections function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, ClearCellularDataConnections_Test_01, TestSize.Level3)
+{
+    if (!CoreServiceClient::GetInstance().HasSimCard(SIM_SLOT_ID_1)) {
+        return;
+    }
+
+    int32_t result = CellularDataTest::ClearCellularDataConnections(SIM_SLOT_ID_1);
+    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
+}
+
+/**
+ * @tc.number   ClearCellularDataConnections_Test_02
+ * @tc.name     Test the ClearCellularDataConnections function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, ClearCellularDataConnections_Test_02, TestSize.Level3)
+{
+    if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+
+    int32_t result = CellularDataTest::ClearCellularDataConnections(DEFAULT_SIM_SLOT_ID);
+    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
 }
 #else  // TEL_TEST_UNSUPPORT
 /**
