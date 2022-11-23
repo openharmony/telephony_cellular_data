@@ -47,6 +47,14 @@ using namespace testing::ext;
 using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 
+static const int32_t SLEEP_TIME = 1;
+static const int32_t SIM_SLOT_ID_1 = DEFAULT_SIM_SLOT_ID + 1;
+static const int32_t DATA_SLOT_ID_INVALID = DEFAULT_SIM_SLOT_ID + 10;
+static const int32_t PING_CHECK_SUCCESS = 0;
+static const int32_t PING_CHECK_FAIL = 1;
+static const int32_t MAX_TIMES = 35;
+static const int32_t CMD_BUF_SIZE = 10240;
+
 HapInfoParams testInfoParams = {
     .bundleName = "tel_cellular_data_test",
     .userID = 1,
@@ -139,15 +147,6 @@ public:
     static int32_t PingTest();
     static int32_t HasInternetCapability(int32_t slotId, int32_t cid);
     static int32_t ClearCellularDataConnections(int32_t slotId);
-
-public:
-    static const int32_t SLEEP_TIME = 1;
-    static const int32_t SIM_SLOT_ID_1 = DEFAULT_SIM_SLOT_ID + 1;
-    static const int32_t DATA_SLOT_ID_INVALID = DEFAULT_SIM_SLOT_ID + 10;
-    static const int32_t PING_CHECK_SUCCESS = 0;
-    static const int32_t PING_CHECK_FAIL = 1;
-    static const int32_t MAX_TIMES = 35;
-    static const int32_t CMD_BUF_SIZE = 10240;
 };
 
 void CellularDataTest::TearDownTestCase() {}
@@ -773,7 +772,7 @@ HWTEST_F(CellularDataTest, ClearCellularDataConnections_Test_02, TestSize.Level3
     int32_t result = CellularDataTest::ClearCellularDataConnections(DEFAULT_SIM_SLOT_ID);
     ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
 }
-#else  // TEL_TEST_UNSUPPORT
+#else // TEL_TEST_UNSUPPORT
 /**
  * @tc.number   DataMock_Test_01
  * @tc.name     Test for unsupport platform
