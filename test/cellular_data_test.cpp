@@ -291,6 +291,7 @@ int32_t CellularDataTest::ClearCellularDataConnections(int32_t slotId)
  */
 HWTEST_F(CellularDataTest, IsCellularDataEnabled_Test, TestSize.Level1)
 {
+    AccessToken token;
     int32_t result = CellularDataTest::IsCellularDataEnabledTest();
     ASSERT_TRUE(result >= static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_DISABLED));
 }
@@ -329,6 +330,7 @@ HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test_01, TestSize.Level2)
     if (!CoreServiceClient::GetInstance().HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
+    AccessToken token;
     int32_t result = CellularDataTest::GetDefaultCellularDataSlotIdTest();
     if (result < DEFAULT_SIM_SLOT_ID_REMOVE) {
         return;
@@ -379,6 +381,7 @@ HWTEST_F(CellularDataTest, EnableCellularData_Test_02, TestSize.Level2)
     if (!CoreServiceClient::GetInstance().HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
+    AccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
     CellularDataTest::EnableCellularDataTest(false);
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED));
@@ -447,6 +450,7 @@ HWTEST_F(CellularDataTest, DataRoamingState_ValidSlot_Test_02, TestSize.Level3)
     if (!CoreServiceClient::GetInstance().HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
+    AccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
     int32_t disabled = CellularDataTest::EnableCellularDataTest(false);
     ASSERT_TRUE(disabled == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
@@ -520,6 +524,7 @@ HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_02, TestSize
     if (!CoreServiceClient::GetInstance().HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
+    AccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
     int32_t disabled = CellularDataTest::EnableCellularDataTest(false);
     ASSERT_TRUE(disabled == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
@@ -588,6 +593,7 @@ HWTEST_F(CellularDataTest, GetCellularDataState_ValidityTest_02, TestSize.Level3
     if (!CoreServiceClient::GetInstance().HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
+    AccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
     int32_t enabled = CellularDataTest::IsCellularDataEnabledTest();
     if (enabled == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED)) {
@@ -687,6 +693,7 @@ HWTEST_F(CellularDataTest, DataFlowType_Test_02, TestSize.Level3)
     if (!CoreServiceClient::GetInstance().HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
+    AccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
     CellularDataTest::EnableCellularDataTest(false);
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED));
@@ -724,7 +731,7 @@ HWTEST_F(CellularDataTest, HasInternetCapability_Test_01, TestSize.Level3)
 
     int32_t cid = 1;
     int32_t result = CellularDataTest::HasInternetCapability(SIM_SLOT_ID_1, cid);
-    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
+    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_FAILED));
 }
 
 /**
@@ -740,7 +747,7 @@ HWTEST_F(CellularDataTest, HasInternetCapability_Test_02, TestSize.Level3)
 
     int32_t cid = 1;
     int32_t result = CellularDataTest::HasInternetCapability(DEFAULT_SIM_SLOT_ID, cid);
-    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
+    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_FAILED));
 }
 
 /**
@@ -753,7 +760,7 @@ HWTEST_F(CellularDataTest, ClearCellularDataConnections_Test_01, TestSize.Level3
     if (!CoreServiceClient::GetInstance().HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
-
+    AccessToken token;
     int32_t result = CellularDataTest::ClearCellularDataConnections(SIM_SLOT_ID_1);
     ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
 }
@@ -768,7 +775,7 @@ HWTEST_F(CellularDataTest, ClearCellularDataConnections_Test_02, TestSize.Level3
     if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-
+    AccessToken token;
     int32_t result = CellularDataTest::ClearCellularDataConnections(DEFAULT_SIM_SLOT_ID);
     ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
 }
