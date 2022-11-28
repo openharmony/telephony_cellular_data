@@ -20,7 +20,9 @@
 #include <iremote_object.h>
 #include <singleton.h>
 
+#include "data_sim_account_call_back.h"
 #include "i_cellular_data_manager.h"
+#include "sim_account_callback.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -40,6 +42,7 @@ public:
     int32_t HasInternetCapability(int32_t slotId, int32_t cid);
     int32_t ClearCellularDataConnections(int32_t slotId);
     sptr<ICellularDataManager> GetProxy();
+    int32_t UpdateDefaultCellularDataSlotId();
 
 private:
     class CellularDataDeathRecipient : public IRemoteObject::DeathRecipient {
@@ -56,11 +59,16 @@ private:
     };
 
     void OnRemoteDied(const wptr<IRemoteObject> &remote);
+    void RegisterSimAccountCallback();
+    void UnregisterSimAccountCallback();
 
 private:
     std::mutex mutexProxy_;
     sptr<ICellularDataManager> proxy_ {nullptr};
-    sptr<IRemoteObject::DeathRecipient> deathRecipient_ {nullptr};
+    sptr<IRemoteObject::DeathRecipient> deathRecipient_ { nullptr };
+    sptr<SimAccountCallback> callback_ { nullptr };
+    int32_t defaultCellularDataSlotId_;
+    bool registerStatus_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

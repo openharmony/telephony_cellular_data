@@ -26,11 +26,22 @@
 #include "system_ability_definition.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_types.h"
 
 namespace OHOS {
 namespace Telephony {
-CellularDataClient::CellularDataClient() = default;
-CellularDataClient::~CellularDataClient() = default;
+CellularDataClient::CellularDataClient()
+{
+    defaultCellularDataSlotId_ = INVALID_MAIN_CARD_SLOTID;
+    if (callback_ == nullptr) {
+        callback_ = new DataSimAccountCallback();
+    }
+}
+
+CellularDataClient::~CellularDataClient()
+{
+    UnregisterSimAccountCallback();
+}
 
 sptr<ICellularDataManager> CellularDataClient::GetProxy()
 {
@@ -89,24 +100,78 @@ bool CellularDataClient::IsConnect() const
     return (proxy_ != nullptr);
 }
 
+void CellularDataClient::RegisterSimAccountCallback()
+{
+    if (callback_ == nullptr) {
+        TELEPHONY_LOGE("callback_ is nullptr");
+        return;
+    }
+    if (registerStatus_) {
+        return;
+    }
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return;
+    }
+    int32_t ret = proxy->RegisterSimAccountCallback(callback_);
+    TELEPHONY_LOGI("CellularDataClient::RegisterSimAccountCallback ret:%{public}d", ret);
+    if (ret == TELEPHONY_ERR_SUCCESS) {
+        registerStatus_ = true;
+    }
+}
+
+void CellularDataClient::UnregisterSimAccountCallback()
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return;
+    }
+    int32_t ret = proxy->UnregisterSimAccountCallback();
+    TELEPHONY_LOGI("CellularDataClient::UnregisterSimAccountCallback ret:%{public}d", ret);
+}
+
 int32_t CellularDataClient::GetDefaultCellularDataSlotId()
 {
+    RegisterSimAccountCallback();
+    if (defaultCellularDataSlotId_ != INVALID_MAIN_CARD_SLOTID) {
+        return defaultCellularDataSlotId_;
+    }
     sptr<ICellularDataManager> proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetDefaultCellularDataSlotId();
+    defaultCellularDataSlotId_ = proxy->GetDefaultCellularDataSlotId();
+    return defaultCellularDataSlotId_;
 }
 
 int32_t CellularDataClient::SetDefaultCellularDataSlotId(int32_t slotId)
 {
+    RegisterSimAccountCallback();
     sptr<ICellularDataManager> proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->SetDefaultCellularDataSlotId(slotId);
+    int32_t result = proxy->SetDefaultCellularDataSlotId(slotId);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        defaultCellularDataSlotId_ = slotId;
+    }
+    return result;
+}
+
+int32_t CellularDataClient::UpdateDefaultCellularDataSlotId()
+{
+    defaultCellularDataSlotId_ = INVALID_MAIN_CARD_SLOTID;
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    defaultCellularDataSlotId_ = proxy->GetDefaultCellularDataSlotId();
+    return defaultCellularDataSlotId_;
 }
 
 int32_t CellularDataClient::EnableCellularData(bool enable)

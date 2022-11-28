@@ -17,13 +17,12 @@
 
 #include <string_ex.h>
 
-#include "ipc_skeleton.h"
-
-#include "telephony_errors.h"
-#include "telephony_log_wrapper.h"
-
 #include "cellular_data_controller.h"
 #include "cellular_data_service.h"
+#include "ipc_skeleton.h"
+#include "sim_account_callback_proxy.h"
+#include "telephony_errors.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -168,6 +167,27 @@ int32_t CellularDataServiceStub::OnClearCellularDataConnections(MessageParcel &d
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
+    return result;
+}
+
+int32_t CellularDataServiceStub::OnRegisterSimAccountCallback(MessageParcel &data, MessageParcel &reply)
+{
+    sptr<SimAccountCallback> callback = iface_cast<SimAccountCallback>(data.ReadRemoteObject());
+    int32_t result;
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("callback is nullptr!");
+        result = TELEPHONY_ERR_ARGUMENT_NULL;
+    } else {
+        result = RegisterSimAccountCallback(callback);
+    }
+    reply.WriteInt32(result);
+    return result;
+}
+
+int32_t CellularDataServiceStub::OnUnregisterSimAccountCallback(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = UnregisterSimAccountCallback();
+    reply.WriteInt32(result);
     return result;
 }
 } // namespace Telephony
