@@ -141,7 +141,6 @@ static const int32_t DEFAULT_AUTH_TYPE = 0;
 static const int32_t DEFAULT_MTU = 1500;
 static const uint8_t DEFAULT_STRENGTH = 20;
 static const uint32_t DEFAULT_FREQUENCY = 50;
-static const int64_t REG_NET_MANAGER_DELAY_TIME = 2000;
 static const int64_t CORE_INIT_DELAY_TIME = 1000;
 static const int32_t MASK_BYTE_BIT = 8;
 static const int32_t IPV4_BIT = 32;
