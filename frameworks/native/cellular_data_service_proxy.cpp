@@ -240,5 +240,58 @@ int32_t CellularDataServiceProxy::ClearCellularDataConnections(int32_t slotId)
     int32_t result = reply.ReadInt32();
     return result;
 }
+
+int32_t CellularDataServiceProxy::RegisterSimAccountCallback(const sptr<SimAccountCallback> &callback)
+{
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("callback is nullptr!");
+        return TELEPHONY_ERR_ARGUMENT_NULL;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write interface token failed!");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!data.WriteRemoteObject(callback->AsObject().GetRefPtr())) {
+        TELEPHONY_LOGE("write remote object failed!");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    sptr<OHOS::IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("remote is nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(FuncCode::REG_SIM_ACCOUNT_CALLBACK), data, reply, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("error! errCode:%{public}d", error);
+        return error;
+    }
+    return reply.ReadInt32();
+}
+
+int32_t CellularDataServiceProxy::UnregisterSimAccountCallback()
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write interface token failed!");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    sptr<OHOS::IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("remote is nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error =
+        remote->SendRequest(static_cast<uint32_t>(FuncCode::UN_REG_SIM_ACCOUNT_CALLBACK), data, reply, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("error! errCode:%{public}d", error);
+        return error;
+    }
+    return reply.ReadInt32();
+}
 } // namespace Telephony
 } // namespace OHOS
