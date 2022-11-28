@@ -174,22 +174,6 @@ void CellularDataController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer 
     }
     int32_t eventId = event->GetInnerEventId();
     switch (eventId) {
-        case CellularDataEventCode::MSG_REG_NET_MANAGER: {
-            int32_t simState = CoreManagerInner::GetInstance().GetSimState(slotId_);
-            if (simState == static_cast<int32_t>(SimState::SIM_STATE_NOT_PRESENT)) {
-                return;
-            }
-            if (!CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_)) {
-                SendEvent(CellularDataEventCode::MSG_REG_NET_MANAGER, REG_NET_MANAGER_DELAY_TIME, Priority::LOW);
-            }
-            break;
-        }
-        case CellularDataEventCode::MSG_REG_POLICY_CALL_BACK: {
-            if (!CellularDataNetAgent::GetInstance().RegisterPolicyCallback()) {
-                SendEvent(CellularDataEventCode::MSG_REG_POLICY_CALL_BACK, REG_NET_MANAGER_DELAY_TIME, Priority::LOW);
-            }
-            break;
-        }
         case CellularDataEventCode::MSG_ASYNCHRONOUS_REGISTER_EVENT_ID:
             AsynchronousRegister();
             break;
@@ -221,18 +205,12 @@ void CellularDataController::RegisterEvents()
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_EMERGENCY_STATE_CLOSE, nullptr);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_NR_STATE_CHANGED, nullptr);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_NR_FREQUENCY_CHANGED, nullptr);
-    if (!CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_)) {
-        SendEvent(CellularDataEventCode::MSG_REG_NET_MANAGER, REG_NET_MANAGER_DELAY_TIME, Priority::LOW);
-    }
     if (slotId_ == 0) {
         sptr<NetworkSearchCallback> networkSearchCallback = std::make_unique<NetworkSearchCallback>().release();
         if (networkSearchCallback != nullptr) {
             coreInner.RegisterCellularDataObject(networkSearchCallback);
         } else {
             TELEPHONY_LOGE("Slot%{public}d: networkSearchCallback is null", slotId_);
-        }
-        if (!CellularDataNetAgent::GetInstance().RegisterPolicyCallback()) {
-            SendEvent(CellularDataEventCode::MSG_REG_POLICY_CALL_BACK, REG_NET_MANAGER_DELAY_TIME, Priority::LOW);
         }
     }
 }
@@ -367,6 +345,8 @@ void CellularDataController::SystemAbilityStatusChangeListener::OnAddSystemAbili
                 CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
                 handler_->EstablishAllApnsIfConnectable();
                 isNetStopped_ = false;
+            } else {
+                CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
             }
             break;
         case COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID:
