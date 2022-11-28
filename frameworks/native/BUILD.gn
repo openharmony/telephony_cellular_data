@@ -36,6 +36,8 @@ ohos_shared_library("tel_cellular_data_api") {
   sources = [
     "$SUBSYSTEM_DIR/frameworks/native/cellular_data_client.cpp",
     "$SUBSYSTEM_DIR/frameworks/native/cellular_data_service_proxy.cpp",
+    "$SUBSYSTEM_DIR/frameworks/native/data_sim_account_call_back.cpp",
+    "$SUBSYSTEM_DIR/frameworks/native/sim_account_callback_stub.cpp",
   ]
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
@@ -49,6 +51,7 @@ ohos_shared_library("tel_cellular_data_api") {
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
+    "init:libbegetutil",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]

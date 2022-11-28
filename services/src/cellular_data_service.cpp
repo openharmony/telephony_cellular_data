@@ -477,5 +477,15 @@ int64_t CellularDataService::GetSpendTime()
 {
     return endTime_ - beginTime_;
 }
+
+int32_t CellularDataService::RegisterSimAccountCallback(const sptr<SimAccountCallback> &callback)
+{
+    return CoreManagerInner::GetInstance().RegisterSimAccountCallback(GetBundleName(), callback);
+}
+
+int32_t CellularDataService::UnregisterSimAccountCallback()
+{
+    return CoreManagerInner::GetInstance().UnregisterSimAccountCallback(GetBundleName());
+}
 } // namespace Telephony
 } // namespace OHOS

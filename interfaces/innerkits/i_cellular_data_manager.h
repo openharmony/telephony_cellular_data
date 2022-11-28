@@ -17,6 +17,7 @@
 #define I_CELLULAR_DATA_MANAGER_H
 
 #include "iremote_broker.h"
+#include "sim_account_callback.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -33,7 +34,9 @@ public:
         GET_FLOW_TYPE_ID,
         HAS_CAPABILITY,
         CLEAR_ALL_CONNECTIONS,
-        APN_DATA_CHANGED
+        APN_DATA_CHANGED,
+        REG_SIM_ACCOUNT_CALLBACK,
+        UN_REG_SIM_ACCOUNT_CALLBACK
     };
 
     /**
@@ -118,6 +121,10 @@ public:
     virtual int32_t HasInternetCapability(int32_t slotId, int32_t cid) = 0;
 
     virtual int32_t ClearCellularDataConnections(int32_t slotId) = 0;
+
+    virtual int32_t RegisterSimAccountCallback(const sptr<SimAccountCallback> &callback) = 0;
+
+    virtual int32_t UnregisterSimAccountCallback() = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.telephony.ICellularDataManager");

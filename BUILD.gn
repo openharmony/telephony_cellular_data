@@ -32,6 +32,7 @@ ohos_shared_library("tel_cellular_data") {
     "$SOURCE_DIR/services/src/data_connection_manager.cpp",
     "$SOURCE_DIR/services/src/data_connection_monitor.cpp",
     "$SOURCE_DIR/services/src/data_switch_settings.cpp",
+    "$SOURCE_DIR/services/src/sim_account_callback_proxy.cpp",
     "$SOURCE_DIR/services/src/state_machine/activating.cpp",
     "$SOURCE_DIR/services/src/state_machine/active.cpp",
     "$SOURCE_DIR/services/src/state_machine/cellular_data_state_machine.cpp",
