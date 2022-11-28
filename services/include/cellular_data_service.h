@@ -70,6 +70,8 @@ public:
     int32_t ReleaseNet(const NetRequest &request);
     int32_t GetServiceRunningState();
     int64_t GetSpendTime();
+    int32_t RegisterSimAccountCallback(const sptr<SimAccountCallback> &callback) override;
+    int32_t UnregisterSimAccountCallback() override;
 
 private:
     bool Init();
