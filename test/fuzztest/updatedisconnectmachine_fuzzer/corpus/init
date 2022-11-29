@@ -13,19 +13,7 @@
  * limitations under the License.
  */
 
-#ifndef ADD_DATA_TOKEN_FUZZER_H
-#define ADD_DATA_TOKEN_FUZZER_H
-
-#include "accesstoken_kit.h"
-
-namespace OHOS {
-class AddDataTokenFuzzer {
-public:
-    AddDataTokenFuzzer();
-    ~AddDataTokenFuzzer();
-
-private:
-    Security::AccessToken::AccessTokenID currentID_ = 0;
-};
-} // namespace OHOS
-#endif // ADD_DATA_TOKEN_FUZZER_H
+/*
+ * corpus is necessary
+ */
+FUZZ

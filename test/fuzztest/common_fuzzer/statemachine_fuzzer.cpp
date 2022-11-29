@@ -1,0 +1,43 @@
+/*
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "statemachine_fuzzer.h"
+
+namespace OHOS {
+namespace Telephony {
+using namespace AppExecFwk;
+
+std::shared_ptr<CellularDataStateMachine> StateMachineFuzzer::CreateCellularDataConnect(int32_t slotId)
+{
+    if (cellularDataStateMachine != nullptr) {
+        return cellularDataStateMachine;
+    }
+    stateMachineEventLoop = AppExecFwk::EventRunner::Create("CellularDataStateMachine");
+    if (stateMachineEventLoop == nullptr) {
+        return nullptr;
+    }
+    stateMachineEventLoop->Run();
+
+    sptr<DataConnectionManager> connectionManager =
+        std::make_unique<DataConnectionManager>(GetEventRunner(), slotId).release();
+    if (connectionManager == nullptr) {
+        return nullptr;
+    }
+    std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine =
+        std::make_shared<CellularDataStateMachine>(connectionManager, shared_from_this(), stateMachineEventLoop);
+    return cellularDataStateMachine;
+}
+} // namespace Telephony
+} // namespace OHOS
