@@ -42,21 +42,19 @@ public:
     static const int32_t MSG_STATE_MACHINE_INIT = BASE + 15;
     static const int32_t MSG_STATE_MACHINE_QUIT = BASE + 16;
     static const int32_t MSG_SETTING_SWITCH = BASE + 17;
-    static const uint32_t MSG_REG_NET_MANAGER = BASE + 18;
-    static const uint32_t MSG_ASYNCHRONOUS_REGISTER_EVENT_ID = BASE + 19;
-    static const uint32_t MSG_RUN_MONITOR_TASK = BASE + 20;
-    static const uint32_t MSG_STALL_DETECTION_EVENT_ID = BASE + 21;
-    static const uint32_t MSG_REQUEST_NETWORK = BASE + 22;
-    static const uint32_t MSG_APN_CHANGED = BASE + 23;
-    static const uint32_t MSG_SET_RIL_ATTACH_APN = BASE + 24;
-    static const uint32_t MSG_GET_RIL_BANDWIDTH = BASE + 25;
-    static const uint32_t MSG_SET_RIL_BANDWIDTH = BASE + 26;
-    static const uint32_t MSG_CONNECT_TIMEOUT_CHECK = BASE + 27;
-    static const uint32_t MSG_DISCONNECT_TIMEOUT_CHECK = BASE + 28;
-    static const uint32_t MSG_DB_SETTING_ENABLE_CHANGED = BASE + 29;
-    static const uint32_t MSG_DB_SETTING_ROAMING_CHANGED = BASE + 30;
-    static const uint32_t MSG_REG_POLICY_CALL_BACK = BASE + 31;
-    static const uint32_t MSG_SET_DATA_PERMITTED = BASE + 32;
+    static const uint32_t MSG_ASYNCHRONOUS_REGISTER_EVENT_ID = BASE + 18;
+    static const uint32_t MSG_RUN_MONITOR_TASK = BASE + 19;
+    static const uint32_t MSG_STALL_DETECTION_EVENT_ID = BASE + 20;
+    static const uint32_t MSG_REQUEST_NETWORK = BASE + 21;
+    static const uint32_t MSG_APN_CHANGED = BASE + 22;
+    static const uint32_t MSG_SET_RIL_ATTACH_APN = BASE + 23;
+    static const uint32_t MSG_GET_RIL_BANDWIDTH = BASE + 24;
+    static const uint32_t MSG_SET_RIL_BANDWIDTH = BASE + 25;
+    static const uint32_t MSG_CONNECT_TIMEOUT_CHECK = BASE + 26;
+    static const uint32_t MSG_DISCONNECT_TIMEOUT_CHECK = BASE + 27;
+    static const uint32_t MSG_DB_SETTING_ENABLE_CHANGED = BASE + 28;
+    static const uint32_t MSG_DB_SETTING_ROAMING_CHANGED = BASE + 29;
+    static const uint32_t MSG_SET_DATA_PERMITTED = BASE + 30;
 };
 } // namespace Telephony
 } // namespace OHOS

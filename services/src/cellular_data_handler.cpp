@@ -892,6 +892,10 @@ void CellularDataHandler::HandleSimAccountLoaded(const InnerEvent::Pointer &even
         TELEPHONY_LOGE("Slot%{public}d: event or dataSwitchSettings_ is null", slotId_);
         return;
     }
+    CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
+    if (slotId_ == 0) {
+        CellularDataNetAgent::GetInstance().RegisterPolicyCallback();
+    }
     RegisterDataSettingObserver();
     dataSwitchSettings_->LoadSwitchValue();
     int32_t defaultSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
