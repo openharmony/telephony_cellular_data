@@ -13,19 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef ADD_DATA_TOKEN_FUZZER_H
-#define ADD_DATA_TOKEN_FUZZER_H
+#ifndef UPDATDISCONNECTMACHINE_FUZZER_H
+#define UPDATDISCONNECTMACHINE_FUZZER_H
 
-#include "accesstoken_kit.h"
+#define FUZZ_PROJECT_NAME "updatedisconnectmachine_fuzzer"
 
-namespace OHOS {
-class AddDataTokenFuzzer {
-public:
-    AddDataTokenFuzzer();
-    ~AddDataTokenFuzzer();
-
-private:
-    Security::AccessToken::AccessTokenID currentID_ = 0;
-};
-} // namespace OHOS
-#endif // ADD_DATA_TOKEN_FUZZER_H
+#endif // UPDATDISCONNECTMACHINE_FUZZER_H
