@@ -15,8 +15,6 @@
 
 #include "adddatatoken_fuzzer.h"
 
-#include <iostream>
-
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
 
