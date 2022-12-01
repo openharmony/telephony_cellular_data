@@ -34,6 +34,7 @@ declare namespace data {
    * Checks whether cellular data services are enabled.
    *
    * @return Returns default cellular data slot id.
+   * @since 9
    */
   function getDefaultCellularDataSlotIdSync(): number;
 
@@ -76,9 +77,8 @@ declare namespace data {
   /**
    * Checks whether cellular data services are enabled.
    *
-   * <p>Requires Permission: {@code ohos.permission.GET_NETWORK_INFO}.
-   *
    * @param callback Returns {@code true} if cellular data services are enabled; returns {@code false} otherwise.
+   * @permission ohos.permission.GET_NETWORK_INFO
    */
   function isCellularDataEnabled(callback: AsyncCallback<boolean>): void;
   function isCellularDataEnabled(): Promise<boolean>;
@@ -103,8 +103,6 @@ declare namespace data {
 
   /**
    * Checks whether roaming is enabled for cellular data services.
-   *
-   * <p>Requires Permission: {@code ohos.permission.GET_NETWORK_INFO}.
    *
    * @param slotId Indicates the ID of a card slot.
    *      The value {@code 0} indicates card 1, and the value {@code 1} indicates card 2.
