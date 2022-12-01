@@ -38,7 +38,7 @@ ohos_unittest("tel_cellular_data_test") {
     "$SOURCE_DIR/interfaces/innerkits",
     "$SOURCE_DIR/frameworks/native",
     "${ability_runtime_inner_api_path}/dataobs_manager/include",
-    "//base/telephony/telephony_data/pdp_profile/include",
+    "//base/telephony/data_storage/pdp_profile/include",
   ]
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
   deps = [
