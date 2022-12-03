@@ -172,7 +172,7 @@ void CellularDataController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer 
         TELEPHONY_LOGE("Slot%{public}d: ProcessEvent event is null.", slotId_);
         return;
     }
-    int32_t eventId = event->GetInnerEventId();
+    size_t eventId = event->GetInnerEventId();
     switch (eventId) {
         case CellularDataEventCode::MSG_ASYNCHRONOUS_REGISTER_EVENT_ID:
             AsynchronousRegister();
