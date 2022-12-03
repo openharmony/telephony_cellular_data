@@ -19,16 +19,19 @@
 #include "token_setproc.h"
 
 namespace OHOS {
+const int PERMS_NUM = 3;
+
 AddDataTokenFuzzer::AddDataTokenFuzzer()
 {
-    const char **perms = new const char *[3];
-    perms[0] = "ohos.permission.GET_NETWORK_INFO";
-    perms[1] = "ohos.permission.GET_TELEPHONY_STATE";
-    perms[2] = "ohos.permission.SET_TELEPHONY_STATE";
+    const char *perms[PERMS_NUM] = {
+        "ohos.permission.GET_NETWORK_INFO",
+        "ohos.permission.GET_TELEPHONY_STATE",
+        "ohos.permission.SET_TELEPHONY_STATE",
+    };
 
     NativeTokenInfoParams testDataInfoParams = {
         .dcapsNum = 0,
-        .permsNum = 3,
+        .permsNum = PERMS_NUM,
         .aclsNum = 0,
         .dcaps = nullptr,
         .perms = perms,
