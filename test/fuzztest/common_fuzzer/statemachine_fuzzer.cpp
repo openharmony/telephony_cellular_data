@@ -21,23 +21,23 @@ using namespace AppExecFwk;
 
 std::shared_ptr<CellularDataStateMachine> StateMachineFuzzer::CreateCellularDataConnect(int32_t slotId)
 {
-    if (cellularDataStateMachine != nullptr) {
-        return cellularDataStateMachine;
+    if (cellularDataStateMachine_ != nullptr) {
+        return cellularDataStateMachine_;
     }
-    stateMachineEventLoop = AppExecFwk::EventRunner::Create("CellularDataStateMachine");
-    if (stateMachineEventLoop == nullptr) {
+    stateMachineEventLoop_ = AppExecFwk::EventRunner::Create("CellularDataStateMachine");
+    if (stateMachineEventLoop_ == nullptr) {
         return nullptr;
     }
-    stateMachineEventLoop->Run();
+    stateMachineEventLoop_->Run();
 
     sptr<DataConnectionManager> connectionManager =
         std::make_unique<DataConnectionManager>(GetEventRunner(), slotId).release();
     if (connectionManager == nullptr) {
         return nullptr;
     }
-    std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine =
-        std::make_shared<CellularDataStateMachine>(connectionManager, shared_from_this(), stateMachineEventLoop);
-    return cellularDataStateMachine;
+    cellularDataStateMachine_ =
+        std::make_shared<CellularDataStateMachine>(connectionManager, shared_from_this(), stateMachineEventLoop_);
+    return cellularDataStateMachine_;
 }
 } // namespace Telephony
 } // namespace OHOS
