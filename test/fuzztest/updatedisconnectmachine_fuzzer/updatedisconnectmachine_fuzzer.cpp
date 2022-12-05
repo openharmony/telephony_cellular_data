@@ -73,8 +73,8 @@ void UpdateActiveMachineFuzz(const uint8_t *data, size_t size)
         defaultStatus->ProcessDataConnectionRoamOff(event);
     }
 
-    if (machine->stateMachineEventLoop != nullptr) {
-        machine->stateMachineEventLoop->Stop();
+    if (machine->stateMachineEventLoop_ != nullptr) {
+        machine->stateMachineEventLoop_->Stop();
     }
 }
 
