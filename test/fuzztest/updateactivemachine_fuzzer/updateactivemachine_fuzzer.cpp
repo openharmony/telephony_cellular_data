@@ -67,8 +67,8 @@ void UpdateActiveMachineFuzz(const uint8_t *data, size_t size)
         active->RefreshConnectionBandwidths();
     }
 
-    if (machine->stateMachineEventLoop != nullptr) {
-        machine->stateMachineEventLoop->Stop();
+    if (machine->stateMachineEventLoop_ != nullptr) {
+        machine->stateMachineEventLoop_->Stop();
     }
 }
 
