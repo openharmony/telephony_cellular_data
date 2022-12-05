@@ -143,7 +143,7 @@ public:
     static int32_t GetCellularDataFlowTypeTest();
     static void WaitTestTimeout(const int32_t status);
     static sptr<ICellularDataManager> GetProxy();
-    static string GetCmdResult(const string &strCmd);
+    static string GetCmdResult();
     static int32_t PingTest();
     static int32_t HasInternetCapability(int32_t slotId, int32_t cid);
     static int32_t ClearCellularDataConnections(int32_t slotId);
@@ -194,8 +194,9 @@ void CellularDataTest::WaitTestTimeout(const int32_t status)
     }
 }
 
-string CellularDataTest::GetCmdResult(const string &strCmd)
+string CellularDataTest::GetCmdResult()
 {
+    string strCmd = "ping -c3 www.openharmony.cn";
     char buf[CMD_BUF_SIZE] = { 0 };
     FILE *pf;
 
@@ -216,8 +217,7 @@ string CellularDataTest::GetCmdResult(const string &strCmd)
 
 int32_t CellularDataTest::PingTest()
 {
-    string strCmd = "ping -c3 www.openharmony.cn";
-    string strRe = GetCmdResult(strCmd);
+    string strRe = GetCmdResult();
     std::cout << strRe << std::endl;
 
     // if ping succeed, the result should contains something like:
