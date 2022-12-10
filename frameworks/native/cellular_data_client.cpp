@@ -157,7 +157,7 @@ int32_t CellularDataClient::SetDefaultCellularDataSlotId(int32_t slotId)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = proxy->SetDefaultCellularDataSlotId(slotId);
-    if (result == DataRespondCode::SET_SUCCESS) {
+    if (result == static_cast<int32_t>(DataRespondCode::SET_SUCCESS)) {
         defaultCellularDataSlotId_ = slotId;
     }
     return result;
