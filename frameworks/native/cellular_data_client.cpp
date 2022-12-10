@@ -14,8 +14,9 @@
  */
 
 #include "cellular_data_client.h"
-#include "cellular_data_types.h"
+
 #include "__mutex_base"
+#include "cellular_data_types.h"
 #include "i_cellular_data_manager.h"
 #include "if_system_ability_manager.h"
 #include "iremote_broker.h"
