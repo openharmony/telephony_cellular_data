@@ -16,6 +16,7 @@
 #include "cellular_data_client.h"
 
 #include "__mutex_base"
+#include "cellular_data_types.h"
 #include "i_cellular_data_manager.h"
 #include "if_system_ability_manager.h"
 #include "iremote_broker.h"
@@ -156,7 +157,7 @@ int32_t CellularDataClient::SetDefaultCellularDataSlotId(int32_t slotId)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = proxy->SetDefaultCellularDataSlotId(slotId);
-    if (result == TELEPHONY_ERR_SUCCESS) {
+    if (result == static_cast<int32_t>(DataRespondCode::SET_SUCCESS)) {
         defaultCellularDataSlotId_ = slotId;
     }
     return result;
