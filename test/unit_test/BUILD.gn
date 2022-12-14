@@ -29,6 +29,9 @@ ohos_executable("tel_cellular_data_ui_test") {
   deps = [ "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native" ]
 
   external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
     "c_utils:utils",
     "cellular_data:tel_cellular_data_api",
     "core_service:tel_core_service_api",
