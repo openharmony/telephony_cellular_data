@@ -14,13 +14,109 @@
  */
 
 #include <iostream>
-#include <unistd.h>
 #include <map>
 #include <string>
+#include <unistd.h>
 
-#include "telephony_types.h"
-
+#include "ability_context.h"
+#include "accesstoken_kit.h"
 #include "cellular_data_client.h"
+#include "telephony_types.h"
+#include "token_setproc.h"
+
+using namespace OHOS::Security::AccessToken;
+using OHOS::Security::AccessToken::AccessTokenID;
+
+HapInfoParams testInfoParams = {
+    .bundleName = "tel_cellular_data_ui_test",
+    .userID = 1,
+    .instIndex = 0,
+    .appIDDesc = "test",
+};
+
+PermissionDef testPermGetTelephonyStateDef = {
+    .permissionName = "ohos.permission.GET_TELEPHONY_STATE",
+    .bundleName = "tel_cellular_data_ui_test",
+    .grantMode = 1, // SYSTEM_GRANT
+    .label = "label",
+    .labelId = 1,
+    .description = "Test cellular data",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+
+PermissionStateFull testGetTelephonyState = {
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.GET_TELEPHONY_STATE",
+    .resDeviceID = { "local" },
+};
+
+PermissionDef testPermSetTelephonyStateDef = {
+    .permissionName = "ohos.permission.SET_TELEPHONY_STATE",
+    .bundleName = "tel_cellular_data_ui_test",
+    .grantMode = 1, // SYSTEM_GRANT
+    .label = "label",
+    .labelId = 1,
+    .description = "Test cellular data",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+
+PermissionStateFull testSetTelephonyState = {
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.SET_TELEPHONY_STATE",
+    .resDeviceID = { "local" },
+};
+
+PermissionDef testPermGetNetworkInfoDef = {
+    .permissionName = "ohos.permission.GET_NETWORK_INFO",
+    .bundleName = "tel_core_service_gtest",
+    .grantMode = 1, // SYSTEM_GRANT
+    .label = "label",
+    .labelId = 1,
+    .description = "Test cellular data",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+
+PermissionStateFull testPermGetNetworkInfo = {
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.GET_NETWORK_INFO",
+    .resDeviceID = { "local" },
+};
+
+HapPolicyParams testPolicyParams = {
+    .apl = APL_SYSTEM_BASIC,
+    .domain = "test.domain",
+    .permList = { testPermGetTelephonyStateDef, testPermSetTelephonyStateDef, testPermGetNetworkInfoDef },
+    .permStateList = { testGetTelephonyState, testSetTelephonyState, testPermGetNetworkInfo },
+};
+
+class AccessToken {
+public:
+    AccessToken()
+    {
+        currentID_ = GetSelfTokenID();
+        AccessTokenIDEx tokenIdEx = AccessTokenKit::AllocHapToken(testInfoParams, testPolicyParams);
+        accessID_ = tokenIdEx.tokenIdExStruct.tokenID;
+        SetSelfTokenID(accessID_);
+    }
+    ~AccessToken()
+    {
+        AccessTokenKit::DeleteToken(accessID_);
+        SetSelfTokenID(currentID_);
+    }
+
+private:
+    AccessTokenID currentID_ = 0;
+    AccessTokenID accessID_ = 0;
+};
 
 namespace OHOS {
 namespace Telephony {
@@ -33,12 +129,14 @@ public:
 
     static void IsCellularDataEnabledTest()
     {
+        AccessToken token;
         int32_t result = CellularDataClient::GetInstance().IsCellularDataEnabled();
         std::cout << "TelephonyTestService Remote IsCellularDataEnabled result [" << result << "]" << std::endl;
     }
 
     static void EnableCellularDataTest()
     {
+        AccessToken token;
         const int32_t maxTestCount = 61;
         const uint32_t spaceTime = 1000 * 100 * 2.6;
         const int32_t useMaxType = 1;
@@ -80,6 +178,7 @@ public:
 
     static void IsCellularDataRoamingEnabledTest()
     {
+        AccessToken token;
         int32_t slotId = DEFAULT_SIM_SLOT_ID;
         std::cout << "please input parameter int slotId" << std::endl;
         std::cin >> slotId;
@@ -89,6 +188,7 @@ public:
 
     static void EnableCellularDataRoamingTest()
     {
+        AccessToken token;
         int32_t slotId = DEFAULT_SIM_SLOT_ID;
         int32_t type = 0;
         std::cout << "please input parameter int slotId " << std::endl;
@@ -102,6 +202,7 @@ public:
 
     static void HandleApnChangedTest()
     {
+        AccessToken token;
         int32_t slotId = DEFAULT_SIM_SLOT_ID;
         sptr<ICellularDataManager> proxy = CellularDataClient::GetInstance().GetProxy();
         if (proxy != nullptr) {
@@ -125,6 +226,7 @@ public:
 
     static void SetDefaultSlotId()
     {
+        AccessToken token;
         int32_t slotId = DEFAULT_SIM_SLOT_ID;
         std::cout << "please input parameter int slot" << std::endl;
         std::cin >> slotId;
