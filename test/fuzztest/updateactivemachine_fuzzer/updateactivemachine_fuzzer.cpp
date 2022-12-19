@@ -27,8 +27,7 @@ using namespace OHOS::Telephony;
 using namespace AppExecFwk;
 using namespace OHOS::EventFwk;
 static int32_t SIM_COUNT = 2;
-static int32_t REMAIN = 2;
-static int32_t NUM = 10;
+bool g_flag = false;
 
 void UpdateActiveMachineFuzz(const uint8_t *data, size_t size)
 {
@@ -54,18 +53,16 @@ void UpdateActiveMachineFuzz(const uint8_t *data, size_t size)
         return;
     }
 
-    if (intValue % NUM == REMAIN) {
-        InnerEvent::Pointer event = InnerEvent::Get(intValue, object);
-        active->ProcessConnectDone(event);
-        active->ProcessDisconnectDone(event);
-        active->ProcessLostConnection(event);
-        active->ProcessDataConnectionRoamOn(event);
-        active->ProcessDataConnectionRoamOff(event);
-        active->ProcessDataConnectionVoiceCallStartedOrEnded(event);
-        active->ProcessDataConnectionComplete(event);
-        active->RefreshTcpBufferSizes();
-        active->RefreshConnectionBandwidths();
-    }
+    InnerEvent::Pointer event = InnerEvent::Get(intValue, object);
+    active->ProcessConnectDone(event);
+    active->ProcessDisconnectDone(event);
+    active->ProcessLostConnection(event);
+    active->ProcessDataConnectionRoamOn(event);
+    active->ProcessDataConnectionRoamOff(event);
+    active->ProcessDataConnectionVoiceCallStartedOrEnded(event);
+    active->ProcessDataConnectionComplete(event);
+    active->RefreshTcpBufferSizes();
+    active->RefreshConnectionBandwidths();
 
     if (machine->stateMachineEventLoop_ != nullptr) {
         machine->stateMachineEventLoop_->Stop();
@@ -78,8 +75,10 @@ void UpdateActiveMachineWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    UpdateActiveMachineFuzz(data, size);
-    return;
+    if (!g_flag) {
+        UpdateActiveMachineFuzz(data, size);
+        g_flag = true;
+    }
 }
 } // namespace OHOS
 
