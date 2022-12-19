@@ -28,10 +28,9 @@ using namespace OHOS::Telephony;
 using namespace AppExecFwk;
 using namespace OHOS::EventFwk;
 static int32_t SIM_COUNT = 2;
-static int32_t REMAIN = 2;
-static int32_t NUM = 10;
+bool g_flag = false;
 
-void UpdateActiveMachineFuzz(const uint8_t *data, size_t size)
+void UpdateDisconnectMachineFuzz(const uint8_t *data, size_t size)
 {
     std::shared_ptr<StateMachineFuzzer> machine = std::make_shared<StateMachineFuzzer>();
     if (machine == nullptr) {
@@ -60,18 +59,16 @@ void UpdateActiveMachineFuzz(const uint8_t *data, size_t size)
         return;
     }
 
-    if (intValue % NUM == REMAIN) {
-        InnerEvent::Pointer event = InnerEvent::Get(intValue, object);
-        disconnecting->StateProcess(event);
-        disconnecting->ProcessDisconnectTimeout(event);
+    InnerEvent::Pointer event = InnerEvent::Get(intValue, object);
+    disconnecting->StateProcess(event);
+    disconnecting->ProcessDisconnectTimeout(event);
 
-        defaultStatus->StateProcess(event);
-        defaultStatus->ProcessConnectDone(event);
-        defaultStatus->ProcessDisconnectAllDone(event);
-        defaultStatus->ProcessDataConnectionDrsOrRatChanged(event);
-        defaultStatus->ProcessDataConnectionRoamOn(event);
-        defaultStatus->ProcessDataConnectionRoamOff(event);
-    }
+    defaultStatus->StateProcess(event);
+    defaultStatus->ProcessConnectDone(event);
+    defaultStatus->ProcessDisconnectAllDone(event);
+    defaultStatus->ProcessDataConnectionDrsOrRatChanged(event);
+    defaultStatus->ProcessDataConnectionRoamOn(event);
+    defaultStatus->ProcessDataConnectionRoamOff(event);
 
     if (machine->stateMachineEventLoop_ != nullptr) {
         machine->stateMachineEventLoop_->Stop();
@@ -83,9 +80,10 @@ void UpdateActiveMachineWithMyAPI(const uint8_t *data, size_t size)
     if (data == nullptr || size == 0) {
         return;
     }
-
-    UpdateActiveMachineFuzz(data, size);
-    return;
+    if (!g_flag) {
+        UpdateDisconnectMachineFuzz(data, size);
+        g_flag = true;
+    }
 }
 } // namespace OHOS
 
