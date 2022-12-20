@@ -16,9 +16,11 @@
 #include <cstdint>
 #include <string>
 
+#define private public
 #include "accesstoken_kit.h"
 #include "cellular_data_client.h"
 #include "cellular_data_error.h"
+#include "cellular_data_service.h"
 #include "cellular_data_types.h"
 #include "core_service_client.h"
 #include "cstdio"
@@ -779,6 +781,21 @@ HWTEST_F(CellularDataTest, ClearCellularDataConnections_Test_02, TestSize.Level3
     int32_t result = CellularDataTest::ClearCellularDataConnections(DEFAULT_SIM_SLOT_ID);
     ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
 }
+
+/**
+ * @tc.number   CellularDataDump_Test_01
+ * @tc.name    TestDump
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, CellularDataDump_Test_01, Function | MediumTest | Level3)
+{
+    std::vector<std::u16string> emptyArgs = {};
+    std::vector<std::u16string> args = { u"test", u"test1" };
+    EXPECT_EQ(DelayedSingleton<CellularDataService>::GetInstance()->Dump(-1, args), TELEPHONY_ERR_FAIL);
+    EXPECT_EQ(DelayedSingleton<CellularDataService>::GetInstance()->Dump(0, emptyArgs), 0);
+    EXPECT_EQ(DelayedSingleton<CellularDataService>::GetInstance()->Dump(0, args), 0);
+}
+
 #else // TEL_TEST_UNSUPPORT
 /**
  * @tc.number   DataMock_Test_01
