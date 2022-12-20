@@ -29,6 +29,10 @@ std::vector<AddressInfo> CellularDataUtils::ParseIpAddr(const std::string &addre
         AddressInfo ipInfo;
         std::string flag = (ipItem.find('.') == std::string::npos) ? ":" : ".";
         std::vector<std::string> ipData = Split(ipItem, "/");
+        if (ipData.size() == 0) {
+            TELEPHONY_LOGE("ParseIpAddr ipData is empty");
+            continue;
+        }
         ipInfo.ip = ipData[0];
         if (flag == ".") {
             std::vector<std::string> ipSubData = Split(ipInfo.ip, flag);
