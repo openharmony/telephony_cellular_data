@@ -16,6 +16,7 @@
 #include "data_switch_settings.h"
 
 #include "cellular_data_constant.h"
+#include "cellular_data_error.h"
 #include "cellular_data_settings_rdb_helper.h"
 #include "core_manager_inner.h"
 #include "telephony_log_wrapper.h"
@@ -42,19 +43,22 @@ void DataSwitchSettings::SetInternalDataOn(bool internalDataOn)
     internalDataOn_ = internalDataOn;
 }
 
-void DataSwitchSettings::SetUserDataOn(bool userDataOn)
+int32_t DataSwitchSettings::SetUserDataOn(bool userDataOn)
 {
     std::shared_ptr<CellularDataSettingsRdbHelper> settingsRdbHelper = CellularDataSettingsRdbHelper::GetInstance();
     if (settingsRdbHelper == nullptr) {
         TELEPHONY_LOGE("SetUserDataOn settingsRdbHelper == nullptr!");
-        return;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     int value = (userDataOn ? static_cast<int>(DataSwitchCode::CELLULAR_DATA_ENABLED)
                             : static_cast<int>(DataSwitchCode::CELLULAR_DATA_DISABLED));
     TELEPHONY_LOGI("SetUserDataOn value:%{public}d", value);
     Uri userDataEnableUri(CELLULAR_DATA_SETTING_DATA_ENABLE_URI);
-    settingsRdbHelper->PutValue(userDataEnableUri, CELLULAR_DATA_COLUMN_ENABLE, value);
-    userDataOn_ = userDataOn;
+    int32_t result = settingsRdbHelper->PutValue(userDataEnableUri, CELLULAR_DATA_COLUMN_ENABLE, value);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        userDataOn_ = userDataOn;
+    }
+    return result;
 }
 
 bool DataSwitchSettings::IsUserDataOn()
@@ -70,25 +74,28 @@ bool DataSwitchSettings::IsUserDataOn()
     return userDataOn_;
 }
 
-void DataSwitchSettings::SetUserDataRoamingOn(bool dataRoamingEnabled)
+int32_t DataSwitchSettings::SetUserDataRoamingOn(bool dataRoamingEnabled)
 {
     std::shared_ptr<CellularDataSettingsRdbHelper> settingsRdbHelper = CellularDataSettingsRdbHelper::GetInstance();
     if (settingsRdbHelper == nullptr) {
-        TELEPHONY_LOGE("SetUserDataRoamingOn settingsRdbHelper == nullptr!");
-        return;
+        TELEPHONY_LOGE("SetUserDataRoamingOn settingsRdbHelper is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId_);
     if (simId <= INVALID_SIM_ID) {
         TELEPHONY_LOGE("Slot%{public}d: failed due to invalid sim id %{public}d", slotId_, simId);
-        return;
+        return TELEPHONY_ERR_SLOTID_INVALID;
     }
     int value = (dataRoamingEnabled ? static_cast<int>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_ENABLED)
                                     : static_cast<int>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_DISABLED));
     TELEPHONY_LOGI("SetUserDataRoamingOn value:%{public}d", value);
     Uri userDataRoamingUri(std::string(CELLULAR_DATA_SETTING_DATA_ROAMING_URI) + std::to_string(simId));
-    settingsRdbHelper->PutValue(
+    int32_t result = settingsRdbHelper->PutValue(
         userDataRoamingUri, std::string(CELLULAR_DATA_COLUMN_ROAMING) + std::to_string(simId), value);
-    userDataRoaming_ = dataRoamingEnabled;
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        userDataRoaming_ = dataRoamingEnabled;
+    }
+    return result;
 }
 
 bool DataSwitchSettings::IsUserDataRoamingOn()

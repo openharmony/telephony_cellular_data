@@ -90,10 +90,10 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_001, Function | MediumTest | 
     cellularDataHandler.ProcessEvent(event);
     EventFwk::CommonEventData data;
     cellularDataHandler.OnReceiveEvent(data);
-    ASSERT_FALSE(cellularDataHandler.SetCellularDataEnable(true));
+    ASSERT_NE(cellularDataHandler.SetCellularDataEnable(true), TELEPHONY_ERR_SUCCESS);
     ASSERT_FALSE(cellularDataHandler.IsCellularDataEnabled());
     ASSERT_FALSE(cellularDataHandler.IsCellularDataRoamingEnabled());
-    ASSERT_FALSE(cellularDataHandler.SetCellularDataRoamingEnabled(true));
+    ASSERT_NE(cellularDataHandler.SetCellularDataRoamingEnabled(true), TELEPHONY_ERR_SUCCESS);
     ASSERT_EQ(ApnProfileState::PROFILE_STATE_IDLE, cellularDataHandler.GetCellularDataState());
     ASSERT_EQ(ApnProfileState::PROFILE_STATE_IDLE, cellularDataHandler.GetCellularDataState(""));
     sptr<ApnHolder> apnHolder;
@@ -242,9 +242,9 @@ HWTEST_F(BranchTest, Telephony_CellularDataController_001, Function | MediumTest
     NetRequest request;
     ASSERT_FALSE(controller.ReleaseNet(request));
     ASSERT_FALSE(controller.RequestNet(request));
-    ASSERT_FALSE(controller.SetCellularDataEnable(true));
+    ASSERT_NE(controller.SetCellularDataEnable(true), TELEPHONY_ERR_SUCCESS);
     ASSERT_FALSE(controller.IsCellularDataEnabled());
-    ASSERT_FALSE(controller.SetCellularDataRoamingEnabled(true));
+    ASSERT_NE(controller.SetCellularDataRoamingEnabled(true), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(ApnProfileState::PROFILE_STATE_FAILED, controller.GetCellularDataState());
     EXPECT_EQ(ApnProfileState::PROFILE_STATE_FAILED, controller.GetCellularDataState(""));
     ASSERT_FALSE(controller.IsCellularDataRoamingEnabled());

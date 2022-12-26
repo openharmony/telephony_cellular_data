@@ -33,9 +33,9 @@ public:
     void SetCarrierDataOn(bool carrierDataOn);
     bool IsAllowActiveData() const;
     bool IsUserDataOn();
-    void SetUserDataOn(bool userDataOn);
+    int32_t SetUserDataOn(bool userDataOn);
     bool IsUserDataRoamingOn();
-    void SetUserDataRoamingOn(bool dataRoamingEnabled);
+    int32_t SetUserDataRoamingOn(bool dataRoamingEnabled);
 
 private:
     bool internalDataOn_ = false;

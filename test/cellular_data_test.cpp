@@ -176,11 +176,11 @@ void CellularDataTest::SetUpTestCase()
     }
     // Set the default slot
     int32_t result = CellularDataClient::GetInstance().SetDefaultCellularDataSlotId(slotId);
-    if (result != static_cast<int32_t>(DataRespondCode::SET_SUCCESS)) {
+    if (result != TELEPHONY_ERR_SUCCESS) {
         return;
     }
     int32_t enable = CellularDataClient::GetInstance().EnableCellularData(true);
-    ASSERT_TRUE(enable == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
+    ASSERT_TRUE(enable == TELEPHONY_ERR_SUCCESS);
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_CONNECTED));
 }
 
@@ -233,26 +233,22 @@ int32_t CellularDataTest::PingTest()
 
 int32_t CellularDataTest::IsCellularDataRoamingEnabledTest(int32_t slotId)
 {
-    int32_t result = CellularDataClient::GetInstance().IsCellularDataRoamingEnabled(slotId);
-    return result;
+    return CellularDataClient::GetInstance().IsCellularDataRoamingEnabled(slotId);
 }
 
 int32_t CellularDataTest::IsCellularDataEnabledTest()
 {
-    int32_t result = CellularDataClient::GetInstance().IsCellularDataEnabled();
-    return result;
+    return CellularDataClient::GetInstance().IsCellularDataEnabled();
 }
 
 int32_t CellularDataTest::EnableCellularDataTest(bool enable)
 {
-    int32_t result = CellularDataClient::GetInstance().EnableCellularData(enable);
-    return result;
+    return CellularDataClient::GetInstance().EnableCellularData(enable);
 }
 
 int32_t CellularDataTest::GetCellularDataStateTest()
 {
-    int32_t result = CellularDataClient::GetInstance().GetCellularDataState();
-    return result;
+    return CellularDataClient::GetInstance().GetCellularDataState();
 }
 
 int32_t CellularDataTest::EnableCellularDataRoamingTest(int32_t slotId, bool enable)
@@ -314,12 +310,12 @@ HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test, TestSize.Level2)
         return;
     }
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
-    ASSERT_TRUE(result == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     // Multiple cards will need to be optimized again
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID - 1);
-    ASSERT_TRUE(result == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(DATA_SLOT_ID_INVALID);
-    ASSERT_TRUE(result == static_cast<int32_t>(DataRespondCode::SET_FAILED));
+    ASSERT_TRUE(result != TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -338,9 +334,9 @@ HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test_01, TestSize.Level2)
         return;
     }
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
-    ASSERT_TRUE(result == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(DATA_SLOT_ID_INVALID);
-    ASSERT_TRUE(result == static_cast<int32_t>(DataRespondCode::SET_FAILED));
+    ASSERT_TRUE(result != TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -359,7 +355,7 @@ HWTEST_F(CellularDataTest, EnableCellularData_Test_01, TestSize.Level2)
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED));
     sleep(SLEEP_TIME);
     int32_t result = CellularDataTest::EnableCellularDataTest(true);
-    ASSERT_TRUE(result == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_CONNECTED));
     sleep(SLEEP_TIME);
     std::cout << "Cellular Data Connected Ping..." << std::endl;
@@ -389,7 +385,7 @@ HWTEST_F(CellularDataTest, EnableCellularData_Test_02, TestSize.Level2)
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED));
     sleep(SLEEP_TIME);
     int32_t result = CellularDataTest::EnableCellularDataTest(true);
-    ASSERT_TRUE(result == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_CONNECTED));
     sleep(SLEEP_TIME);
     std::cout << "Cellular Data Connected Ping..." << std::endl;
@@ -416,28 +412,28 @@ HWTEST_F(CellularDataTest, DataRoamingState_ValidSlot_Test_01, TestSize.Level3)
     AccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
     int32_t disabled = CellularDataTest::EnableCellularDataTest(false);
-    ASSERT_TRUE(disabled == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
+    ASSERT_TRUE(disabled == TELEPHONY_ERR_SUCCESS);
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED));
 
     // slot0 enable data roaming
     int32_t enabled = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID, true);
-    ASSERT_TRUE(enabled == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
+    ASSERT_TRUE(enabled == TELEPHONY_ERR_SUCCESS);
     int32_t result = CellularDataTest::IsCellularDataRoamingEnabledTest(DEFAULT_SIM_SLOT_ID);
     ASSERT_TRUE(result == static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_ENABLED));
     // slot0 close
     int32_t enable = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID, false);
-    ASSERT_TRUE(enable == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
+    ASSERT_TRUE(enable == TELEPHONY_ERR_SUCCESS);
     result = CellularDataTest::IsCellularDataRoamingEnabledTest(DEFAULT_SIM_SLOT_ID);
     ASSERT_TRUE(result == static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_DISABLED));
 
     // At present, multiple card problems, the subsequent need to continue to deal with
     enable = CellularDataTest::EnableCellularDataRoamingTest(DATA_SLOT_ID_INVALID, true);
-    ASSERT_TRUE(enable == CELLULAR_DATA_INVALID_PARAM);
+    ASSERT_TRUE(enable != TELEPHONY_ERR_SUCCESS);
     result = CellularDataTest::IsCellularDataRoamingEnabledTest(DATA_SLOT_ID_INVALID);
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
     enable = CellularDataTest::EnableCellularDataRoamingTest(DATA_SLOT_ID_INVALID, false);
     // At present, multiple card problems, the subsequent need to continue to deal with
-    ASSERT_TRUE(enable == CELLULAR_DATA_INVALID_PARAM);
+    ASSERT_TRUE(enable != TELEPHONY_ERR_SUCCESS);
     result = CellularDataTest::IsCellularDataRoamingEnabledTest(DATA_SLOT_ID_INVALID);
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
 }
@@ -455,28 +451,28 @@ HWTEST_F(CellularDataTest, DataRoamingState_ValidSlot_Test_02, TestSize.Level3)
     AccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
     int32_t disabled = CellularDataTest::EnableCellularDataTest(false);
-    ASSERT_TRUE(disabled == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
+    ASSERT_TRUE(disabled == TELEPHONY_ERR_SUCCESS);
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED));
 
     // slot1 enable data roaming
     int32_t enabled = CellularDataTest::EnableCellularDataRoamingTest(SIM_SLOT_ID_1, true);
-    ASSERT_TRUE(enabled == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
+    ASSERT_TRUE(enabled == TELEPHONY_ERR_SUCCESS);
     int32_t result = CellularDataTest::IsCellularDataRoamingEnabledTest(SIM_SLOT_ID_1);
     ASSERT_TRUE(result == static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_ENABLED));
     // slot1 close
     int32_t enable = CellularDataTest::EnableCellularDataRoamingTest(SIM_SLOT_ID_1, false);
-    ASSERT_TRUE(enable == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
+    ASSERT_TRUE(enable == TELEPHONY_ERR_SUCCESS);
     result = CellularDataTest::IsCellularDataRoamingEnabledTest(SIM_SLOT_ID_1);
     ASSERT_TRUE(result == static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_DISABLED));
 
     // At present, multiple card problems, the subsequent need to continue to deal with
     enable = CellularDataTest::EnableCellularDataRoamingTest(DATA_SLOT_ID_INVALID, true);
-    ASSERT_TRUE(enable == CELLULAR_DATA_INVALID_PARAM);
+    ASSERT_TRUE(enable != TELEPHONY_ERR_SUCCESS);
     result = CellularDataTest::IsCellularDataRoamingEnabledTest(DATA_SLOT_ID_INVALID);
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
     enable = CellularDataTest::EnableCellularDataRoamingTest(DATA_SLOT_ID_INVALID, false);
     // At present, multiple card problems, the subsequent need to continue to deal with
-    ASSERT_TRUE(enable == CELLULAR_DATA_INVALID_PARAM);
+    ASSERT_TRUE(enable != TELEPHONY_ERR_SUCCESS);
     result = CellularDataTest::IsCellularDataRoamingEnabledTest(DATA_SLOT_ID_INVALID);
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
 }
@@ -494,25 +490,25 @@ HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_01, TestSize
     AccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
     int32_t disabled = CellularDataTest::EnableCellularDataTest(false);
-    ASSERT_TRUE(disabled == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
+    ASSERT_TRUE(disabled == TELEPHONY_ERR_SUCCESS);
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED));
 
     int32_t isDataRoaming = CellularDataTest::IsCellularDataRoamingEnabledTest(DEFAULT_SIM_SLOT_ID);
     if (isDataRoaming == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED)) {
         int32_t result = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID, false);
-        ASSERT_TRUE(result == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
+        ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     } else {
         int32_t result = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID, true);
-        ASSERT_TRUE(result == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
+        ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     }
     // At present, multiple card problems, the subsequent need to continue to deal with
     isDataRoaming = CellularDataTest::IsCellularDataRoamingEnabledTest(DEFAULT_SIM_SLOT_ID);
     if (isDataRoaming == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED)) {
         int32_t result = CellularDataTest::EnableCellularDataRoamingTest(DATA_SLOT_ID_INVALID, false);
-        ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
+        ASSERT_TRUE(result != TELEPHONY_ERR_SUCCESS);
     } else {
         int32_t result = CellularDataTest::EnableCellularDataRoamingTest(DATA_SLOT_ID_INVALID, true);
-        ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
+        ASSERT_TRUE(result != TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -529,25 +525,25 @@ HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_02, TestSize
     AccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
     int32_t disabled = CellularDataTest::EnableCellularDataTest(false);
-    ASSERT_TRUE(disabled == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
+    ASSERT_TRUE(disabled == TELEPHONY_ERR_SUCCESS);
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED));
 
     int32_t isDataRoaming = CellularDataTest::IsCellularDataRoamingEnabledTest(SIM_SLOT_ID_1);
     if (isDataRoaming == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED)) {
         int32_t result = CellularDataTest::EnableCellularDataRoamingTest(SIM_SLOT_ID_1, false);
-        ASSERT_TRUE(result == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
+        ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     } else {
         int32_t result = CellularDataTest::EnableCellularDataRoamingTest(SIM_SLOT_ID_1, true);
-        ASSERT_TRUE(result == static_cast<int32_t>(DataRespondCode::SET_SUCCESS));
+        ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     }
     // At present, multiple card problems, the subsequent need to continue to deal with
     isDataRoaming = CellularDataTest::IsCellularDataRoamingEnabledTest(SIM_SLOT_ID_1);
     if (isDataRoaming == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED)) {
         int32_t result = CellularDataTest::EnableCellularDataRoamingTest(DATA_SLOT_ID_INVALID, false);
-        ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
+        ASSERT_TRUE(result != TELEPHONY_ERR_SUCCESS);
     } else {
         int32_t result = CellularDataTest::EnableCellularDataRoamingTest(DATA_SLOT_ID_INVALID, true);
-        ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
+        ASSERT_TRUE(result != TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -632,20 +628,20 @@ HWTEST_F(CellularDataTest, DataRoamingState_InValidSlot_Test_01, TestSize.Level3
     AccessToken token;
     // invalid slot turn on data roaming
     int32_t enable = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID - 1, true);
-    ASSERT_TRUE(enable == CELLULAR_DATA_INVALID_PARAM);
+    ASSERT_TRUE(enable != TELEPHONY_ERR_SUCCESS);
     int32_t result = CellularDataTest::IsCellularDataRoamingEnabledTest(DEFAULT_SIM_SLOT_ID - 1);
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
     enable = CellularDataTest::EnableCellularDataRoamingTest(DATA_SLOT_ID_INVALID, true);
-    ASSERT_TRUE(enable == CELLULAR_DATA_INVALID_PARAM);
+    ASSERT_TRUE(enable != TELEPHONY_ERR_SUCCESS);
     result = CellularDataTest::IsCellularDataRoamingEnabledTest(DATA_SLOT_ID_INVALID);
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
     // invalid slot disable roaming
     enable = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID - 1, false);
-    ASSERT_TRUE(enable == CELLULAR_DATA_INVALID_PARAM);
+    ASSERT_TRUE(enable != TELEPHONY_ERR_SUCCESS);
     result = CellularDataTest::IsCellularDataRoamingEnabledTest(DEFAULT_SIM_SLOT_ID - 1);
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
     enable = CellularDataTest::EnableCellularDataRoamingTest(DATA_SLOT_ID_INVALID, false);
-    ASSERT_TRUE(enable == CELLULAR_DATA_INVALID_PARAM);
+    ASSERT_TRUE(enable != TELEPHONY_ERR_SUCCESS);
     result = CellularDataTest::IsCellularDataRoamingEnabledTest(DATA_SLOT_ID_INVALID);
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
 }

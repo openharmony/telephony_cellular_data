@@ -145,22 +145,19 @@ int32_t CellularDataService::EnableCellularData(bool enable)
             slotId, enable, CellularDataErrorCode::DATA_ERROR_PERMISSION_ERROR, Permission::SET_TELEPHONY_STATE);
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    bool result = false;
+    int32_t result = TELEPHONY_ERR_SUCCESS;
     for (const std::pair<const int32_t, std::shared_ptr<CellularDataController>> &it : cellularDataControllers_) {
         if (it.second != nullptr) {
-            bool itemResult = it.second->SetCellularDataEnable(enable);
-            if (itemResult) {
+            result = it.second->SetCellularDataEnable(enable);
+            if (result != TELEPHONY_ERR_SUCCESS) {
                 CellularDataHiSysEvent::WriteDataConnectStateBehaviorEvent(enable);
-            }
-            if (!result) {
-                result = itemResult;
             }
         } else {
             TELEPHONY_LOGE("CellularDataController is null");
         }
     }
-    return result ? static_cast<int32_t>(DataRespondCode::SET_SUCCESS)
-                  : static_cast<int32_t>(DataRespondCode::SET_FAILED);
+
+    return result;
 }
 
 int32_t CellularDataService::GetCellularDataState()
@@ -201,14 +198,13 @@ int32_t CellularDataService::EnableCellularDataRoaming(const int32_t slotId, boo
     }
     if (!CheckParamValid(slotId)) {
         TELEPHONY_LOGE("cellularDataControllers_[%{public}d] is null", slotId);
-        return CELLULAR_DATA_INVALID_PARAM;
+        return TELEPHONY_ERR_SLOTID_INVALID;
     }
-    bool result = cellularDataControllers_[slotId]->SetCellularDataRoamingEnabled(enable);
-    if (result) {
+    int32_t result = cellularDataControllers_[slotId]->SetCellularDataRoamingEnabled(enable);
+    if (result != TELEPHONY_ERR_SUCCESS) {
         CellularDataHiSysEvent::WriteRoamingConnectStateBehaviorEvent(enable);
     }
-    return result ? static_cast<int32_t>(DataRespondCode::SET_SUCCESS)
-                  : static_cast<int32_t>(DataRespondCode::SET_FAILED);
+    return result;
 }
 
 void CellularDataService::InitModule()
@@ -325,10 +321,10 @@ int32_t CellularDataService::SetDefaultCellularDataSlotId(const int32_t slotId)
     if (formerSlotId < 0) {
         TELEPHONY_LOGI("No old card slot id.");
     }
-    bool result = CoreManagerInner::GetInstance().SetDefaultCellularDataSlotId(slotId);
-    if (!result) {
+    int32_t result = CoreManagerInner::GetInstance().SetDefaultCellularDataSlotId(slotId);
+    if (result != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("set slot id fail");
-        return static_cast<int32_t>(DataRespondCode::SET_FAILED);
+        return result;
     }
     if (formerSlotId >= 0 && formerSlotId != slotId) {
         std::map<int32_t, std::shared_ptr<CellularDataController>>::iterator itController =
@@ -351,7 +347,7 @@ int32_t CellularDataService::SetDefaultCellularDataSlotId(const int32_t slotId)
     if (IsCellularDataEnabled() && CheckParamValid(slotId)) {
         cellularDataControllers_[slotId]->EstablishDataConnection();
     }
-    return static_cast<int32_t>(DataRespondCode::SET_SUCCESS);
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CellularDataService::GetCellularDataFlowType()
