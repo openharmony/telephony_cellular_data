@@ -16,6 +16,7 @@
 #include "cellular_data_settings_rdb_helper.h"
 
 #include "cellular_data_constant.h"
+#include "cellular_data_error.h"
 #include "cellular_data_hisysevent.h"
 #include "telephony_log_wrapper.h"
 
@@ -103,12 +104,12 @@ int CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &column)
     return resultValue.empty() ? NULL_POINTER_EXCEPTION : atoi(resultValue.c_str());
 }
 
-void CellularDataSettingsRdbHelper::PutValue(Uri &uri, const std::string &column, int value)
+int32_t CellularDataSettingsRdbHelper::PutValue(Uri &uri, const std::string &column, int value)
 {
     std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
     if (settingHelper == nullptr) {
         TELEPHONY_LOGE("helper_ is null");
-        return;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     int existValue = GetValue(uri, column);
     DataShare::DataShareValueObject keyObj(column);
@@ -139,9 +140,12 @@ void CellularDataSettingsRdbHelper::PutValue(Uri &uri, const std::string &column
         } else {
             TELEPHONY_LOGI("result is %{public}d, do not handle.", result);
         }
+        settingHelper->Release();
+        return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
     settingHelper->NotifyChange(uri);
     settingHelper->Release();
+    return TELEPHONY_ERR_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

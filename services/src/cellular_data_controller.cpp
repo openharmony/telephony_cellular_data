@@ -74,11 +74,11 @@ void CellularDataController::Init()
     samgrProxy->SubscribeSystemAbility(COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID, netManagerListener_);
 }
 
-bool CellularDataController::SetCellularDataEnable(bool userDataEnabled)
+int32_t CellularDataController::SetCellularDataEnable(bool userDataEnabled)
 {
     if (cellularDataHandler_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: SetCellularDataEnable cellularDataHandler_ is null", slotId_);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return cellularDataHandler_->SetCellularDataEnable(userDataEnabled);
 }
@@ -119,11 +119,11 @@ bool CellularDataController::IsCellularDataRoamingEnabled() const
     return cellularDataHandler_->IsCellularDataRoamingEnabled();
 }
 
-bool CellularDataController::SetCellularDataRoamingEnabled(bool dataRoamingEnabled)
+int32_t CellularDataController::SetCellularDataRoamingEnabled(bool dataRoamingEnabled)
 {
     if (cellularDataHandler_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: SetCellularDataRoamingEnabled cellularDataHandler is null", slotId_);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return cellularDataHandler_->SetCellularDataRoamingEnabled(dataRoamingEnabled);
 }

@@ -33,7 +33,9 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int32_t DEFAULT_REF_COUNT = 1;
+static constexpr int32_t DEFAULT_REF_COUNT = 1;
+static constexpr const char *SET_TELEPHONY_STATE = "ohos.permission.SET_TELEPHONY_STATE";
+
 static bool IsCellularDataManagerInited()
 {
     return CellularDataClient::GetInstance().IsConnect();
@@ -247,15 +249,16 @@ static void NativeEnableCellularData(napi_env env, void *data)
 {
     auto asyncContext = static_cast<AsyncContext *>(data);
     if (asyncContext == nullptr) {
+        NapiUtil::ThrowParameterError(env);
         return;
     }
     if (IsCellularDataManagerInited()) {
         asyncContext->result = CellularDataClient::GetInstance().EnableCellularData(true);
-        if (asyncContext->result == static_cast<int32_t>(DataRespondCode::SET_SUCCESS)) {
+        if (asyncContext->result == TELEPHONY_ERR_SUCCESS) {
             asyncContext->resolved = true;
         } else {
             asyncContext->resolved = false;
-            asyncContext->errorCode = ERROR_NATIVE_API_EXECUTE_FAIL;
+            asyncContext->errorCode = asyncContext->result;
         }
     } else {
         asyncContext->resolved = false;
@@ -263,10 +266,11 @@ static void NativeEnableCellularData(napi_env env, void *data)
     }
 }
 
-static void VoidValueCallback(napi_env env, napi_status status, void *data)
+static void EnableCellularDataCallback(napi_env env, napi_status status, void *data)
 {
     auto context = static_cast<AsyncContext *>(data);
     if (context == nullptr) {
+        NapiUtil::ThrowParameterError(env);
         return;
     }
     std::unique_ptr<AsyncContext> asyncContext(context);
@@ -274,20 +278,72 @@ static void VoidValueCallback(napi_env env, napi_status status, void *data)
     if (asyncContext->resolved) {
         callbackValue = NapiUtil::CreateUndefined(env);
     } else {
-        std::string errorMessage = "unknown error";
-        if (asyncContext->errorCode == ERROR_SERVICE_UNAVAILABLE) {
-            errorMessage = "cellular data service unavailable";
-        }
-        if (asyncContext->errorCode == ERROR_NATIVE_API_EXECUTE_FAIL) {
-            errorMessage = "api execute failed";
-        }
-        if (asyncContext->errorCode == ERROR_SLOT_ID_INVALID) {
-            errorMessage = "slotId is invalid";
-        }
-        callbackValue = NapiUtil::CreateErrorMessage(env, errorMessage, asyncContext->errorCode);
+        JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+            asyncContext->errorCode, "enableCellularData", SET_TELEPHONY_STATE);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle1ValueCallback(env, asyncContext.release(), callbackValue);
-    TELEPHONY_LOGI("VoidValueCallback end");
+    TELEPHONY_LOGI("EnableCellularDataCallback end");
+}
+
+static void DisableCellularDataCallback(napi_env env, napi_status status, void *data)
+{
+    auto context = static_cast<AsyncContext *>(data);
+    if (context == nullptr) {
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    std::unique_ptr<AsyncContext> asyncContext(context);
+    napi_value callbackValue = nullptr;
+    if (asyncContext->resolved) {
+        callbackValue = NapiUtil::CreateUndefined(env);
+    } else {
+        JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+            asyncContext->errorCode, "disableCellularData", SET_TELEPHONY_STATE);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
+    }
+    NapiUtil::Handle1ValueCallback(env, asyncContext.release(), callbackValue);
+    TELEPHONY_LOGI("DisableCellularDataCallback end");
+}
+
+static void EnableCellularDataRoamingCallback(napi_env env, napi_status status, void *data)
+{
+    auto context = static_cast<AsyncContext *>(data);
+    if (context == nullptr) {
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    std::unique_ptr<AsyncContext> asyncContext(context);
+    napi_value callbackValue = nullptr;
+    if (asyncContext->resolved) {
+        callbackValue = NapiUtil::CreateUndefined(env);
+    } else {
+        JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+            asyncContext->errorCode, "enableCellularDataRoaming", SET_TELEPHONY_STATE);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
+    }
+    NapiUtil::Handle1ValueCallback(env, asyncContext.release(), callbackValue);
+    TELEPHONY_LOGI("EnableCellularDataRoamingCallback end");
+}
+
+static void DisableCellularDataRoamingCallback(napi_env env, napi_status status, void *data)
+{
+    auto context = static_cast<AsyncContext *>(data);
+    if (context == nullptr) {
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    std::unique_ptr<AsyncContext> asyncContext(context);
+    napi_value callbackValue = nullptr;
+    if (asyncContext->resolved) {
+        callbackValue = NapiUtil::CreateUndefined(env);
+    } else {
+        JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+            asyncContext->errorCode, "disableCellularDataRoaming", SET_TELEPHONY_STATE);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
+    }
+    NapiUtil::Handle1ValueCallback(env, asyncContext.release(), callbackValue);
+    TELEPHONY_LOGI("DisableCellularDataRoamingCallback end");
 }
 
 static napi_value EnableCellularData(napi_env env, napi_callback_info info)
@@ -297,34 +353,36 @@ static napi_value EnableCellularData(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
-    NAPI_ASSERT(env, MatchCellularDataParameters(env, parameters, parameterCount), "type mismatch");
+    if (!MatchCellularDataParameters(env, parameters, parameterCount)) {
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
-        std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
-        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
+        NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
     if (parameterCount == 1) {
         NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &(asyncContext->callbackRef)));
     }
     return NapiUtil::HandleAsyncWork(
-        env, asyncContext.release(), "EnableCellularData", NativeEnableCellularData, VoidValueCallback);
+        env, asyncContext.release(), "EnableCellularData", NativeEnableCellularData, EnableCellularDataCallback);
 }
 
 static void NativeDisableCellularData(napi_env env, void *data)
 {
     auto asyncContext = static_cast<AsyncContext *>(data);
     if (asyncContext == nullptr) {
+        NapiUtil::ThrowParameterError(env);
         return;
     }
     if (IsCellularDataManagerInited()) {
-        int32_t disableResult = CellularDataClient::GetInstance().EnableCellularData(false);
-        if (disableResult == static_cast<int32_t>(DataRespondCode::SET_SUCCESS)) {
+        asyncContext->result = CellularDataClient::GetInstance().EnableCellularData(false);
+        if (asyncContext->result == TELEPHONY_ERR_SUCCESS) {
             asyncContext->resolved = true;
         } else {
             asyncContext->resolved = false;
-            asyncContext->errorCode = ERROR_NATIVE_API_EXECUTE_FAIL;
+            asyncContext->errorCode = asyncContext->result;
         }
     } else {
         asyncContext->resolved = false;
@@ -339,25 +397,27 @@ static napi_value DisableCellularData(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
-    NAPI_ASSERT(env, MatchCellularDataParameters(env, parameters, parameterCount), "type mismatch");
+    if (!MatchCellularDataParameters(env, parameters, parameterCount)) {
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
-        std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
-        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
+        NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
     if (parameterCount == 1) {
         NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &(asyncContext->callbackRef)));
     }
     return NapiUtil::HandleAsyncWork(
-        env, asyncContext.release(), "DisableCellularData", NativeDisableCellularData, VoidValueCallback);
+        env, asyncContext.release(), "DisableCellularData", NativeDisableCellularData, DisableCellularDataCallback);
 }
 
 static void NativeEnableCellularDataRoaming(napi_env env, void *data)
 {
     auto asyncContext = static_cast<AsyncContext *>(data);
     if (asyncContext == nullptr) {
+        NapiUtil::ThrowParameterError(env);
         return;
     }
     if (!IsValidSlotId(asyncContext->slotId)) {
@@ -366,13 +426,12 @@ static void NativeEnableCellularDataRoaming(napi_env env, void *data)
         return;
     }
     if (IsCellularDataManagerInited()) {
-        int32_t disableResult =
-            CellularDataClient::GetInstance().EnableCellularDataRoaming(asyncContext->slotId, true);
-        if (disableResult == static_cast<int32_t>(DataRespondCode::SET_SUCCESS)) {
+        asyncContext->result = CellularDataClient::GetInstance().EnableCellularDataRoaming(asyncContext->slotId, true);
+        if (asyncContext->result == TELEPHONY_ERR_SUCCESS) {
             asyncContext->resolved = true;
         } else {
             asyncContext->resolved = false;
-            asyncContext->errorCode = ERROR_NATIVE_API_EXECUTE_FAIL;
+            asyncContext->errorCode = asyncContext->result;
         }
     } else {
         asyncContext->resolved = false;
@@ -385,16 +444,17 @@ static napi_value EnableCellularDataRoaming(napi_env env, napi_callback_info inf
 {
     const size_t paramLimitTwo = 2;
     size_t parameterCount = paramLimitTwo;
-    napi_value parameters[paramLimitTwo] = {0};
+    napi_value parameters[paramLimitTwo] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
-    NAPI_ASSERT(env, MatchEnableCellularDataRoamingParameters(env, parameters, parameterCount), "type mismatch");
+    if (!MatchEnableCellularDataRoamingParameters(env, parameters, parameterCount)) {
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
-        std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
-        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
+        NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
@@ -402,13 +462,14 @@ static napi_value EnableCellularDataRoaming(napi_env env, napi_callback_info inf
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
     return NapiUtil::HandleAsyncWork(env, asyncContext.release(), "EnableCellularDataRoaming",
-        NativeEnableCellularDataRoaming, VoidValueCallback);
+        NativeEnableCellularDataRoaming, EnableCellularDataRoamingCallback);
 }
 
 static void NativeDisableCellularDataRoaming(napi_env env, void *data)
 {
     auto asyncContext = static_cast<AsyncContext *>(data);
     if (asyncContext == nullptr) {
+        NapiUtil::ThrowParameterError(env);
         return;
     }
     if (!IsValidSlotId(asyncContext->slotId)) {
@@ -417,13 +478,12 @@ static void NativeDisableCellularDataRoaming(napi_env env, void *data)
         return;
     }
     if (IsCellularDataManagerInited()) {
-        int32_t enableResult =
-            CellularDataClient::GetInstance().EnableCellularDataRoaming(asyncContext->slotId, false);
-        if (enableResult == static_cast<int32_t>(DataRespondCode::SET_SUCCESS)) {
+        asyncContext->result = CellularDataClient::GetInstance().EnableCellularDataRoaming(asyncContext->slotId, false);
+        if (asyncContext->result == TELEPHONY_ERR_SUCCESS) {
             asyncContext->resolved = true;
         } else {
             asyncContext->resolved = false;
-            asyncContext->errorCode = ERROR_NATIVE_API_EXECUTE_FAIL;
+            asyncContext->errorCode = asyncContext->result;
         }
     } else {
         asyncContext->resolved = false;
@@ -435,16 +495,17 @@ static napi_value DisableCellularDataRoaming(napi_env env, napi_callback_info in
 {
     const size_t paramLimitTwo = 2;
     size_t parameterCount = paramLimitTwo;
-    napi_value parameters[paramLimitTwo] = {0};
+    napi_value parameters[paramLimitTwo] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
-    NAPI_ASSERT(env, MatchEnableCellularDataRoamingParameters(env, parameters, parameterCount), "type mismatch");
+    if (!MatchEnableCellularDataRoamingParameters(env, parameters, parameterCount)) {
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
-        std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
-        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
+        NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
     NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
@@ -452,7 +513,7 @@ static napi_value DisableCellularDataRoaming(napi_env env, napi_callback_info in
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
     return NapiUtil::HandleAsyncWork(env, asyncContext.release(), "DisableCellularDataRoaming",
-        NativeDisableCellularDataRoaming, VoidValueCallback);
+        NativeDisableCellularDataRoaming, DisableCellularDataRoamingCallback);
 }
 
 static void NativeIsCellularDataRoamingEnabled(napi_env env, void *data)
@@ -627,6 +688,7 @@ static void NativeSetDefaultCellularDataSlotId(napi_env env, void *data)
 {
     auto asyncContext = static_cast<AsyncContext *>(data);
     if (asyncContext == nullptr) {
+        NapiUtil::ThrowParameterError(env);
         return;
     }
     if (!IsValidSlotId(asyncContext->slotId) && (asyncContext->slotId != DEFAULT_SIM_SLOT_ID_REMOVE)) {
@@ -635,12 +697,11 @@ static void NativeSetDefaultCellularDataSlotId(napi_env env, void *data)
         return;
     }
     if (IsCellularDataManagerInited()) {
-        int32_t setResult = CellularDataClient::GetInstance().SetDefaultCellularDataSlotId(asyncContext->slotId);
-        if (setResult == static_cast<int32_t>(DataRespondCode::SET_SUCCESS)) {
+        asyncContext->errorCode = CellularDataClient::GetInstance().SetDefaultCellularDataSlotId(asyncContext->slotId);
+        if (asyncContext->errorCode == TELEPHONY_ERR_SUCCESS) {
             asyncContext->resolved = true;
         } else {
             asyncContext->resolved = false;
-            asyncContext->errorCode = ERROR_NATIVE_API_EXECUTE_FAIL;
         }
     } else {
         asyncContext->resolved = false;
@@ -652,21 +713,16 @@ static void SetDefaultCellularDataSlotIdCallback(napi_env env, napi_status statu
 {
     auto asyncContext = static_cast<AsyncContext *>(data);
     if (asyncContext == nullptr) {
+        NapiUtil::ThrowParameterError(env);
         return;
     }
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {
-        NAPI_CALL_RETURN_VOID(env, napi_get_undefined(env, &callbackValue));
+        callbackValue = NapiUtil::CreateUndefined(env);
     } else {
-        if (asyncContext->errorCode == ERROR_NATIVE_API_EXECUTE_FAIL) {
-            callbackValue = NapiUtil::CreateErrorMessage(
-                env, "SetDefaultCellularDataSlotId api execute failed", ERROR_NATIVE_API_EXECUTE_FAIL);
-        } else if (asyncContext->errorCode == ERROR_SLOT_ID_INVALID) {
-            callbackValue = NapiUtil::CreateErrorMessage(env, "slotId is invalid", ERROR_SLOT_ID_INVALID);
-        } else {
-            callbackValue =
-                NapiUtil::CreateErrorMessage(env, "cellular data service unavailable", ERROR_SERVICE_UNAVAILABLE);
-        }
+        JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+            asyncContext->errorCode, "setDefaultCellularDataSlotId", SET_TELEPHONY_STATE);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle1ValueCallback(env, asyncContext, callbackValue);
 }
@@ -675,16 +731,17 @@ static napi_value SetDefaultCellularDataSlotId(napi_env env, napi_callback_info 
 {
     const size_t paramLimitTwo = 2;
     size_t parameterCount = paramLimitTwo;
-    napi_value parameters[] = {nullptr, nullptr};
+    napi_value parameters[] = { nullptr, nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
-    NAPI_ASSERT(env, MatchEnableCellularDataRoamingParameters(env, parameters, parameterCount), "type mismatch");
+    if (!MatchEnableCellularDataRoamingParameters(env, parameters, parameterCount)) {
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
-        std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
-        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
+        NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
     napi_get_value_int32(env, parameters[0], &asyncContext->slotId);
