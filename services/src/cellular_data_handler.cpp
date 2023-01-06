@@ -852,6 +852,7 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
     if (event == nullptr) {
         return;
     }
+    std::u16string iccId;
     uint32_t eventId = event->GetInnerEventId();
     switch (eventId) {
         case RadioEvent::RADIO_SIM_STATE_CHANGE: {
@@ -864,25 +865,26 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
                 }
             } else {
                 dataSwitchSettings_->LoadSwitchValue();
-                if (lastIccID_ != u"" && lastIccID_ == CoreManagerInner::GetInstance().GetSimIccId(slotId_)) {
+                CoreManagerInner::GetInstance().GetSimIccId(slotId_, iccId);
+                if (lastIccId_ != u"" && lastIccId_ == iccId) {
                     EstablishAllApnsIfConnectable();
                 }
             }
             break;
         }
         case RadioEvent::RADIO_SIM_RECORDS_LOADED: {
-            std::u16string iccID = CoreManagerInner::GetInstance().GetSimIccId(slotId_);
+            CoreManagerInner::GetInstance().GetSimIccId(slotId_, iccId);
             int32_t simState = CoreManagerInner::GetInstance().GetSimState(slotId_);
             TELEPHONY_LOGI("Slot%{public}d: sim records loaded state is :%{public}d", slotId_, simState);
-            if (simState == static_cast<int32_t>(SimState::SIM_STATE_READY) && iccID != u"") {
-                if (iccID != lastIccID_) {
+            if (simState == static_cast<int32_t>(SimState::SIM_STATE_READY) && iccId != u"") {
+                if (iccId != lastIccId_) {
                     dataSwitchSettings_->SetPolicyDataOn(true);
                     GetConfigurationFor5G();
-                    lastIccID_ = iccID;
+                    lastIccId_ = iccId;
                     InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_APN_CHANGED);
                     SendEvent(event);
-                } else if (lastIccID_ == iccID) {
-                    TELEPHONY_LOGI("Slot%{public}d: sim state changed, but iccID not changed.", slotId_);
+                } else if (lastIccId_ == iccId) {
+                    TELEPHONY_LOGI("Slot%{public}d: sim state changed, but iccId not changed.", slotId_);
                     // the sim card status has changed to ready, so try to connect
                     EstablishAllApnsIfConnectable();
                 }
