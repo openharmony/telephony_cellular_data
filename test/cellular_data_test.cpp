@@ -135,6 +135,7 @@ public:
     static void TearDownTestCase();
     virtual void SetUp();
     virtual void TearDown();
+    static bool HasSimCard(const int32_t slotId);
     static int32_t IsCellularDataEnabledTest();
     static int32_t EnableCellularDataTest(bool enable);
     static int32_t GetCellularDataStateTest();
@@ -151,6 +152,13 @@ public:
     static int32_t ClearCellularDataConnections(int32_t slotId);
 };
 
+bool CellularDataTest::HasSimCard(const int32_t slotId)
+{
+    bool hasSimCard = false;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId, hasSimCard);
+    return hasSimCard;
+}
+
 void CellularDataTest::TearDownTestCase() {}
 
 void CellularDataTest::SetUp() {}
@@ -166,9 +174,9 @@ void CellularDataTest::SetUpTestCase()
 
     AccessToken token;
     int32_t slotId = DATA_SLOT_ID_INVALID;
-    if (CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+    if (HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         slotId = DEFAULT_SIM_SLOT_ID;
-    } else if (CoreServiceClient::GetInstance().HasSimCard(SIM_SLOT_ID_1)) {
+    } else if (HasSimCard(SIM_SLOT_ID_1)) {
         slotId = SIM_SLOT_ID_1;
     }
     if (slotId == DATA_SLOT_ID_INVALID) {
@@ -301,7 +309,7 @@ HWTEST_F(CellularDataTest, IsCellularDataEnabled_Test, TestSize.Level1)
  */
 HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test, TestSize.Level2)
 {
-    if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
     AccessToken token;
@@ -325,7 +333,7 @@ HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test, TestSize.Level2)
  */
 HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test_01, TestSize.Level2)
 {
-    if (!CoreServiceClient::GetInstance().HasSimCard(SIM_SLOT_ID_1)) {
+    if (!HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
     AccessToken token;
@@ -346,7 +354,7 @@ HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test_01, TestSize.Level2)
  */
 HWTEST_F(CellularDataTest, EnableCellularData_Test_01, TestSize.Level2)
 {
-    if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
     AccessToken token;
@@ -376,7 +384,7 @@ HWTEST_F(CellularDataTest, EnableCellularData_Test_01, TestSize.Level2)
  */
 HWTEST_F(CellularDataTest, EnableCellularData_Test_02, TestSize.Level2)
 {
-    if (!CoreServiceClient::GetInstance().HasSimCard(SIM_SLOT_ID_1)) {
+    if (!HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
     AccessToken token;
@@ -406,7 +414,7 @@ HWTEST_F(CellularDataTest, EnableCellularData_Test_02, TestSize.Level2)
  */
 HWTEST_F(CellularDataTest, DataRoamingState_ValidSlot_Test_01, TestSize.Level3)
 {
-    if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
     AccessToken token;
@@ -445,7 +453,7 @@ HWTEST_F(CellularDataTest, DataRoamingState_ValidSlot_Test_01, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, DataRoamingState_ValidSlot_Test_02, TestSize.Level3)
 {
-    if (!CoreServiceClient::GetInstance().HasSimCard(SIM_SLOT_ID_1)) {
+    if (!HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
     AccessToken token;
@@ -484,7 +492,7 @@ HWTEST_F(CellularDataTest, DataRoamingState_ValidSlot_Test_02, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_01, TestSize.Level3)
 {
-    if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
     AccessToken token;
@@ -519,7 +527,7 @@ HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_01, TestSize
  */
 HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_02, TestSize.Level3)
 {
-    if (!CoreServiceClient::GetInstance().HasSimCard(SIM_SLOT_ID_1)) {
+    if (!HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
     AccessToken token;
@@ -554,7 +562,7 @@ HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_02, TestSize
  */
 HWTEST_F(CellularDataTest, GetCellularDataState_ValidityTest_01, TestSize.Level3)
 {
-    if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
     AccessToken token;
@@ -588,7 +596,7 @@ HWTEST_F(CellularDataTest, GetCellularDataState_ValidityTest_01, TestSize.Level3
  */
 HWTEST_F(CellularDataTest, GetCellularDataState_ValidityTest_02, TestSize.Level3)
 {
-    if (!CoreServiceClient::GetInstance().HasSimCard(SIM_SLOT_ID_1)) {
+    if (!HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
     AccessToken token;
@@ -622,7 +630,7 @@ HWTEST_F(CellularDataTest, GetCellularDataState_ValidityTest_02, TestSize.Level3
  */
 HWTEST_F(CellularDataTest, DataRoamingState_InValidSlot_Test_01, TestSize.Level3)
 {
-    if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
     AccessToken token;
@@ -653,7 +661,7 @@ HWTEST_F(CellularDataTest, DataRoamingState_InValidSlot_Test_01, TestSize.Level3
  */
 HWTEST_F(CellularDataTest, DataFlowType_Test_01, TestSize.Level3)
 {
-    if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
     AccessToken token;
@@ -688,7 +696,7 @@ HWTEST_F(CellularDataTest, DataFlowType_Test_01, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, DataFlowType_Test_02, TestSize.Level3)
 {
-    if (!CoreServiceClient::GetInstance().HasSimCard(SIM_SLOT_ID_1)) {
+    if (!HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
     AccessToken token;
@@ -723,7 +731,7 @@ HWTEST_F(CellularDataTest, DataFlowType_Test_02, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, HasInternetCapability_Test_01, TestSize.Level3)
 {
-    if (!CoreServiceClient::GetInstance().HasSimCard(SIM_SLOT_ID_1)) {
+    if (!HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
 
@@ -739,7 +747,7 @@ HWTEST_F(CellularDataTest, HasInternetCapability_Test_01, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, HasInternetCapability_Test_02, TestSize.Level3)
 {
-    if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
 
@@ -755,7 +763,7 @@ HWTEST_F(CellularDataTest, HasInternetCapability_Test_02, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, ClearCellularDataConnections_Test_01, TestSize.Level3)
 {
-    if (!CoreServiceClient::GetInstance().HasSimCard(SIM_SLOT_ID_1)) {
+    if (!HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
     AccessToken token;
@@ -770,7 +778,7 @@ HWTEST_F(CellularDataTest, ClearCellularDataConnections_Test_01, TestSize.Level3
  */
 HWTEST_F(CellularDataTest, ClearCellularDataConnections_Test_02, TestSize.Level3)
 {
-    if (!CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
     AccessToken token;
