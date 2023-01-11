@@ -32,9 +32,9 @@ class CellularDataClient : public DelayedRefSingleton<CellularDataClient> {
 public:
     bool IsConnect() const;
     int32_t EnableCellularData(bool enable);
-    int32_t IsCellularDataEnabled();
+    int32_t IsCellularDataEnabled(bool &dataEnabled);
     int32_t GetCellularDataState();
-    int32_t IsCellularDataRoamingEnabled(int32_t slotId);
+    int32_t IsCellularDataRoamingEnabled(int32_t slotId, bool &dataRoamingEnabled);
     int32_t EnableCellularDataRoaming(int32_t slotId, bool enable);
     int32_t GetDefaultCellularDataSlotId();
     int32_t SetDefaultCellularDataSlotId(int32_t slotId);

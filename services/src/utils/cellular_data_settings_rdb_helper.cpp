@@ -78,12 +78,12 @@ void CellularDataSettingsRdbHelper::NotifyChange(const Uri &uri)
     settingHelper->Release();
 }
 
-int CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &column)
+int32_t CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &column, int32_t &value)
 {
     std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
     if (settingHelper == nullptr) {
         TELEPHONY_LOGE("helper_ is null");
-        return NULL_POINTER_EXCEPTION;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     DataShare::DataSharePredicates predicates;
     std::vector<std::string> columns;
@@ -91,17 +91,22 @@ int CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &column)
     auto result = settingHelper->Query(uri, predicates, columns);
     if (result == nullptr) {
         TELEPHONY_LOGE("setting DB: query error");
-        return NULL_POINTER_EXCEPTION;
+        return TELEPHONY_ERR_DATABASE_READ_FAIL;
     }
     settingHelper->Release();
     result->GoToFirstRow();
-    int columnIndex;
+    int32_t columnIndex;
     std::string resultValue;
     result->GetColumnIndex(CELLULAR_DATA_COLUMN_VALUE, columnIndex);
     result->GetString(columnIndex, resultValue);
     result->Close();
     TELEPHONY_LOGI("Query end resultValue is %{public}s", resultValue.c_str());
-    return resultValue.empty() ? NULL_POINTER_EXCEPTION : atoi(resultValue.c_str());
+    if (resultValue.empty()) {
+        TELEPHONY_LOGE("resultValue is empty");
+        return TELEPHONY_ERR_DATABASE_READ_FAIL;
+    }
+    value = atoi(resultValue.c_str());
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CellularDataSettingsRdbHelper::PutValue(Uri &uri, const std::string &column, int value)
@@ -111,14 +116,15 @@ int32_t CellularDataSettingsRdbHelper::PutValue(Uri &uri, const std::string &col
         TELEPHONY_LOGE("helper_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int existValue = GetValue(uri, column);
+    int32_t existValue = 0;
+    int32_t getValueRet = GetValue(uri, column, existValue);
     DataShare::DataShareValueObject keyObj(column);
     DataShare::DataShareValueObject valueObj(std::to_string(value));
     DataShare::DataShareValuesBucket bucket;
     bucket.Put(CELLULAR_DATA_COLUMN_VALUE, valueObj);
     bucket.Put(CELLULAR_DATA_COLUMN_KEYWORD, keyObj);
     int32_t result;
-    if (existValue <= NULL_POINTER_EXCEPTION) {
+    if (getValueRet != TELEPHONY_ERR_SUCCESS) {
         result = settingHelper->Insert(uri, bucket);
     } else {
         DataShare::DataSharePredicates predicates;

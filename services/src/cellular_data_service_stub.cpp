@@ -53,12 +53,20 @@ int32_t CellularDataServiceStub::OnRemoteRequest(
 
 int32_t CellularDataServiceStub::OnIsCellularDataEnabled(MessageParcel &data, MessageParcel &reply)
 {
-    int32_t result = IsCellularDataEnabled();
+    bool dataEnabled = false;
+    int32_t result = IsCellularDataEnabled(dataEnabled);
     if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("fail to write parcel");
+        TELEPHONY_LOGE("OnIsCellularDataEnabled write int32 reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteBool(dataEnabled)) {
+        TELEPHONY_LOGE("OnIsCellularDataEnabled write bool reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CellularDataServiceStub::OnEnableCellularData(MessageParcel &data, MessageParcel &reply)
@@ -85,12 +93,21 @@ int32_t CellularDataServiceStub::OnGetCellularDataState(MessageParcel &data, Mes
 int32_t CellularDataServiceStub::OnIsCellularDataRoamingEnabled(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    int32_t result = IsCellularDataRoamingEnabled(slotId);
+    bool dataRoamingEnabled = false;
+    int32_t result = IsCellularDataRoamingEnabled(slotId, dataRoamingEnabled);
     if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("fail to write parcel");
+        TELEPHONY_LOGE("OnIsCellularDataRoamingEnabled write int32 reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return (int32_t)result;
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteBool(dataRoamingEnabled)) {
+        TELEPHONY_LOGE("OnIsCellularDataRoamingEnabled write bool reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CellularDataServiceStub::OnEnableCellularDataRoaming(MessageParcel &data, MessageParcel &reply)

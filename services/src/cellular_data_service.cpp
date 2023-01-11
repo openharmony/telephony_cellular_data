@@ -123,7 +123,7 @@ bool CellularDataService::Init()
     return true;
 }
 
-int32_t CellularDataService::IsCellularDataEnabled()
+int32_t CellularDataService::IsCellularDataEnabled(bool &dataEnabled)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -132,9 +132,7 @@ int32_t CellularDataService::IsCellularDataEnabled()
         TELEPHONY_LOGE("cellularDataControllers_[0] is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    bool result = cellularDataControllers_[DEFAULT_SIM_SLOT_ID]->IsCellularDataEnabled();
-    return result ? static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED)
-                  : static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_DISABLED);
+    return cellularDataControllers_[DEFAULT_SIM_SLOT_ID]->IsCellularDataEnabled(dataEnabled);
 }
 
 int32_t CellularDataService::EnableCellularData(bool enable)
@@ -177,7 +175,7 @@ int32_t CellularDataService::GetCellularDataState()
     return dataState;
 }
 
-int32_t CellularDataService::IsCellularDataRoamingEnabled(const int32_t slotId)
+int32_t CellularDataService::IsCellularDataRoamingEnabled(const int32_t slotId, bool &dataRoamingEnabled)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -186,9 +184,7 @@ int32_t CellularDataService::IsCellularDataRoamingEnabled(const int32_t slotId)
         TELEPHONY_LOGE("cellularDataControllers_[%{public}d] is null", slotId);
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    bool result = cellularDataControllers_[slotId]->IsCellularDataRoamingEnabled();
-    return result ? static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_ENABLED)
-                  : static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_DISABLED);
+    return cellularDataControllers_[slotId]->IsCellularDataRoamingEnabled(dataRoamingEnabled);
 }
 
 int32_t CellularDataService::EnableCellularDataRoaming(const int32_t slotId, bool enable)
@@ -344,7 +340,9 @@ int32_t CellularDataService::SetDefaultCellularDataSlotId(const int32_t slotId)
             cellularDataControllers_[newSlotId]->SetDataPermitted(true);
         }
     }
-    if (IsCellularDataEnabled() && CheckParamValid(slotId)) {
+    bool dataEnabled = false;
+    IsCellularDataEnabled(dataEnabled);
+    if (dataEnabled && CheckParamValid(slotId)) {
         cellularDataControllers_[slotId]->EstablishDataConnection();
     }
     return TELEPHONY_ERR_SUCCESS;

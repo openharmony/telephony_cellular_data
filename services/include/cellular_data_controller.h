@@ -33,11 +33,11 @@ public:
     bool ReleaseNet(const NetRequest &request);
     bool RequestNet(const NetRequest &request);
     int32_t SetCellularDataEnable(bool userDataEnabled);
-    bool IsCellularDataEnabled() const;
+    int32_t IsCellularDataEnabled(bool &dataEnabled) const;
     int32_t SetCellularDataRoamingEnabled(bool dataRoamingEnabled);
     ApnProfileState GetCellularDataState() const;
     ApnProfileState GetCellularDataState(const std::string &apnType) const;
-    bool IsCellularDataRoamingEnabled() const;
+    int32_t IsCellularDataRoamingEnabled(bool &dataRoamingEnabled) const;
     void SetDataPermitted(bool dataPermitted) const;
     void AsynchronousRegister();
     bool HandleApnChanged();

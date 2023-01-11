@@ -126,7 +126,9 @@ int32_t CellularDataHandler::SetCellularDataEnable(bool userDataOn)
         TELEPHONY_LOGE("Slot%{public}d: SetCellularDataEnable dataSwitchSettings_ is null.", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (dataSwitchSettings_->IsUserDataOn() != userDataOn) {
+    bool dataEnabled = false;
+    dataSwitchSettings_->IsUserDataOn(dataEnabled);
+    if (dataEnabled != userDataOn) {
         int32_t result = dataSwitchSettings_->SetUserDataOn(userDataOn);
         if (result != TELEPHONY_ERR_SUCCESS) {
             TELEPHONY_LOGE("Slot%{public}d: SetUserDataOn %{public}d fail.", slotId_, userDataOn);
@@ -164,22 +166,22 @@ int32_t CellularDataHandler::SetCellularDataEnable(bool userDataOn)
     return TELEPHONY_ERR_SUCCESS;
 }
 
-bool CellularDataHandler::IsCellularDataEnabled() const
+int32_t CellularDataHandler::IsCellularDataEnabled(bool &dataEnabled) const
 {
     if (dataSwitchSettings_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: IsCellularDataEnabled dataSwitchSettings_ is null", slotId_);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return dataSwitchSettings_->IsUserDataOn();
+    return dataSwitchSettings_->IsUserDataOn(dataEnabled);
 }
 
-bool CellularDataHandler::IsCellularDataRoamingEnabled() const
+int32_t CellularDataHandler::IsCellularDataRoamingEnabled(bool &dataRoamingEnabled) const
 {
     if (dataSwitchSettings_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: IsCellularDataRoamingEnabled dataSwitchSettings_ is null", slotId_);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return dataSwitchSettings_->IsUserDataRoamingOn();
+    return dataSwitchSettings_->IsUserDataRoamingOn(dataRoamingEnabled);
 }
 
 int32_t CellularDataHandler::SetCellularDataRoamingEnabled(bool dataRoamingEnabled)
@@ -188,7 +190,9 @@ int32_t CellularDataHandler::SetCellularDataRoamingEnabled(bool dataRoamingEnabl
         TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ or apnManager_ is null", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (dataSwitchSettings_->IsUserDataRoamingOn() == dataRoamingEnabled) {
+    bool currentDataEnabled = false;
+    dataSwitchSettings_->IsUserDataRoamingOn(currentDataEnabled);
+    if (currentDataEnabled == dataRoamingEnabled) {
         TELEPHONY_LOGI("Slot%{public}d: The roaming switch status has not changed", slotId_);
         return TELEPHONY_ERR_SUCCESS;
     }
@@ -238,7 +242,9 @@ void CellularDataHandler::ClearAllConnections(DisConnectionReason reason)
         TELEPHONY_LOGE("Slot%{public}d: in ClearAllConnections dataSwitchSettings_ is null", slotId_);
         return;
     }
-    if (!dataSwitchSettings_->IsUserDataOn()) {
+    bool dataEnabled = false;
+    dataSwitchSettings_->IsUserDataOn(dataEnabled);
+    if (!dataEnabled) {
         connectionManager_->SetDataFlowType(CellDataFlowType::DATA_FLOW_TYPE_NONE);
     }
 }
@@ -446,7 +452,9 @@ bool CellularDataHandler::CheckRoamingState(sptr<ApnHolder> &apnHolder)
     bool isEmergencyApn = apnHolder->IsEmergencyType();
     bool isAllowActiveData = dataSwitchSettings_->IsAllowActiveData();
     bool roamingState = coreInner.GetPsRoamingState(slotId_) > 0;
-    if (roamingState && !dataSwitchSettings_->IsUserDataRoamingOn()) {
+    bool dataRoamingEnabled = false;
+    dataSwitchSettings_->IsUserDataRoamingOn(dataRoamingEnabled);
+    if (roamingState && !dataRoamingEnabled) {
         isAllowActiveData = false;
     }
     if (isEmergencyApn) {
@@ -591,7 +599,8 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
     apnHolder->SetApnState(PROFILE_STATE_CONNECTING);
     apnHolder->SetCellularDataStateMachine(cellularDataStateMachine);
     bool roamingState = CoreManagerInner::GetInstance().GetPsRoamingState(slotId_) > 0;
-    bool userDataRoaming = dataSwitchSettings_->IsUserDataRoamingOn();
+    bool userDataRoaming = false;
+    dataSwitchSettings_->IsUserDataRoamingOn(userDataRoaming);
     StateNotification::GetInstance().UpdateCellularDataConnectState(slotId_, PROFILE_STATE_CONNECTING, radioTech);
     std::unique_ptr<DataConnectionParams> object =
         std::make_unique<DataConnectionParams>(apnHolder, profileId, radioTech, roamingState, userDataRoaming, true);
@@ -1024,7 +1033,9 @@ void CellularDataHandler::PsDataRatChanged(const InnerEvent::Pointer &event)
         TELEPHONY_LOGE("Slot%{public}d: event is null", slotId_);
         return;
     }
-    if (!IsCellularDataEnabled()) {
+    bool dataEnabled = false;
+    IsCellularDataEnabled(dataEnabled);
+    if (!dataEnabled) {
         TELEPHONY_LOGE("Slot%{public}d: data enable is close", slotId_);
         return;
     }
@@ -1314,7 +1325,9 @@ void CellularDataHandler::HandleDBSettingEnableChanged(const AppExecFwk::InnerEv
         return;
     }
     int64_t value = event->GetParam();
-    if (dataSwitchSettings_->IsUserDataOn() != value) {
+    bool dataEnabled = false;
+    dataSwitchSettings_->IsUserDataOn(dataEnabled);
+    if (dataEnabled != value) {
         dataSwitchSettings_->SetUserDataOn(value);
         if (value) {
             EstablishAllApnsIfConnectable();
@@ -1355,7 +1368,9 @@ void CellularDataHandler::HandleDBSettingRoamingChanged(const AppExecFwk::InnerE
         return;
     }
     int64_t value = event->GetParam();
-    if (dataSwitchSettings_->IsUserDataRoamingOn() != value) {
+    bool dataRoamingEnabled = false;
+    dataSwitchSettings_->IsUserDataRoamingOn(dataRoamingEnabled);
+    if (dataRoamingEnabled != value) {
         dataSwitchSettings_->SetUserDataRoamingOn(value);
         bool roamingState = false;
         if (CoreManagerInner::GetInstance().GetPsRoamingState(slotId_) > 0) {

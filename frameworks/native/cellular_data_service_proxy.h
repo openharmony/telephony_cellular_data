@@ -36,9 +36,9 @@ public:
     /**
      * Whether the cellular data user switch is enabled
      *
-     * @return return 84082688 invalid parameter, 1 enabled, 0 not enable
+     * @return return errorCode of is cellulardata enabled
      */
-    virtual int32_t IsCellularDataEnabled();
+    virtual int32_t IsCellularDataEnabled(bool &dataEnabled);
 
     /**
      * Whether to enable cellular data user switch
@@ -65,7 +65,7 @@ public:
      * @param slotId card slot identification
      * @return return 84082688 invalid parameter, 0 roaming is not allowed, 1 roaming is allowed
      */
-    int32_t IsCellularDataRoamingEnabled(int32_t slotId);
+    int32_t IsCellularDataRoamingEnabled(int32_t slotId, bool &dataRoamingEnabled);
 
     /**
      * Whether roaming switches are allowed
