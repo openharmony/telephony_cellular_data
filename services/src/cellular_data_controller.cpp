@@ -83,13 +83,13 @@ int32_t CellularDataController::SetCellularDataEnable(bool userDataEnabled)
     return cellularDataHandler_->SetCellularDataEnable(userDataEnabled);
 }
 
-bool CellularDataController::IsCellularDataEnabled() const
+int32_t CellularDataController::IsCellularDataEnabled(bool &dataEnabled) const
 {
     if (cellularDataHandler_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: IsCellularDataEnabled cellularDataHandler_ is null", slotId_);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return cellularDataHandler_->IsCellularDataEnabled();
+    return cellularDataHandler_->IsCellularDataEnabled(dataEnabled);
 }
 
 ApnProfileState CellularDataController::GetCellularDataState() const
@@ -110,13 +110,13 @@ ApnProfileState CellularDataController::GetCellularDataState(const std::string &
     return cellularDataHandler_->GetCellularDataState(apnType);
 }
 
-bool CellularDataController::IsCellularDataRoamingEnabled() const
+int32_t CellularDataController::IsCellularDataRoamingEnabled(bool &dataRoamingEnabled) const
 {
     if (cellularDataHandler_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: IsCellularDataRoamingEnabled cellularDataHandler_ is null", slotId_);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return cellularDataHandler_->IsCellularDataRoamingEnabled();
+    return cellularDataHandler_->IsCellularDataRoamingEnabled(dataRoamingEnabled);
 }
 
 int32_t CellularDataController::SetCellularDataRoamingEnabled(bool dataRoamingEnabled)

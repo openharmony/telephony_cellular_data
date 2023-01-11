@@ -130,8 +130,10 @@ public:
     static void IsCellularDataEnabledTest()
     {
         AccessToken token;
-        int32_t result = CellularDataClient::GetInstance().IsCellularDataEnabled();
-        std::cout << "TelephonyTestService Remote IsCellularDataEnabled result [" << result << "]" << std::endl;
+        bool enabled = false;
+        int32_t result = CellularDataClient::GetInstance().IsCellularDataEnabled(enabled);
+        std::cout << "TelephonyTestService Remote IsCellularDataEnabled result [" << result << "]"
+                  << " enabled [" << enabled << "]" << std::endl;
     }
 
     static void EnableCellularDataTest()
@@ -182,8 +184,10 @@ public:
         int32_t slotId = DEFAULT_SIM_SLOT_ID;
         std::cout << "please input parameter int slotId" << std::endl;
         std::cin >> slotId;
-        int32_t result = CellularDataClient::GetInstance().IsCellularDataRoamingEnabled(slotId);
-        std::cout << "Remote IsCellularDataRoamingEnabled result [" << result << "]" << std::endl;
+        bool isDataRoaming = false;
+        int32_t result = CellularDataClient::GetInstance().IsCellularDataRoamingEnabled(slotId, isDataRoaming);
+        std::cout << "Remote IsCellularDataRoamingEnabled result [" << result << "]"
+                  << " isDataRoaming [" << isDataRoaming << "]" << std::endl;
     }
 
     static void EnableCellularDataRoamingTest()

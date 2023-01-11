@@ -52,10 +52,10 @@ public:
     std::string GetCellularDataSlotIdDump();
     std::string GetStateMachineCurrentStatusDump();
     std::string GetFlowDataInfoDump();
-    int32_t IsCellularDataEnabled() override;
+    int32_t IsCellularDataEnabled(bool &dataEnabled) override;
     int32_t EnableCellularData(bool enable) override;
     int32_t GetCellularDataState() override;
-    int32_t IsCellularDataRoamingEnabled(const int32_t slotId) override;
+    int32_t IsCellularDataRoamingEnabled(const int32_t slotId, bool &dataRoamingEnabled) override;
     int32_t EnableCellularDataRoaming(const int32_t slotId, bool enable) override;
     int32_t HandleApnChanged(const int32_t slotId) override;
     int32_t GetDefaultCellularDataSlotId() override;

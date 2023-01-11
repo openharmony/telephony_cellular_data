@@ -46,8 +46,8 @@ public:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
     int32_t SetCellularDataEnable(bool userDataEnabled);
-    bool IsCellularDataEnabled() const;
-    bool IsCellularDataRoamingEnabled() const;
+    int32_t IsCellularDataEnabled(bool &dataEnabled) const;
+    int32_t IsCellularDataRoamingEnabled(bool &dataRoamingEnabled) const;
     int32_t SetCellularDataRoamingEnabled(bool dataRoamingEnabled);
     ApnProfileState GetCellularDataState() const;
     ApnProfileState GetCellularDataState(const std::string &apnType) const;

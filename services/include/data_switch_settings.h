@@ -32,9 +32,9 @@ public:
     bool IsCarrierDataOn() const;
     void SetCarrierDataOn(bool carrierDataOn);
     bool IsAllowActiveData() const;
-    bool IsUserDataOn();
+    int32_t IsUserDataOn(bool &dataEnabled);
     int32_t SetUserDataOn(bool userDataOn);
-    bool IsUserDataRoamingOn();
+    int32_t IsUserDataRoamingOn(bool &dataRoamingEnabled);
     int32_t SetUserDataRoamingOn(bool dataRoamingEnabled);
 
 private:

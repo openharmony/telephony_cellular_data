@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace Telephony {
-int32_t CellularDataServiceProxy::IsCellularDataEnabled()
+int32_t CellularDataServiceProxy::IsCellularDataEnabled(bool &dataEnabled)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -39,6 +39,10 @@ int32_t CellularDataServiceProxy::IsCellularDataEnabled()
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_SUCCESS) {
+        dataEnabled = reply.ReadBool();
+    }
+
     return result;
 }
 
@@ -81,7 +85,7 @@ int32_t CellularDataServiceProxy::GetCellularDataState()
     return result;
 }
 
-int32_t CellularDataServiceProxy::IsCellularDataRoamingEnabled(int32_t slotId)
+int32_t CellularDataServiceProxy::IsCellularDataRoamingEnabled(int32_t slotId, bool &dataRoamingEnabled)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -98,6 +102,10 @@ int32_t CellularDataServiceProxy::IsCellularDataRoamingEnabled(int32_t slotId)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_SUCCESS) {
+        dataRoamingEnabled = reply.ReadBool();
+    }
+
     return result;
 }
 
