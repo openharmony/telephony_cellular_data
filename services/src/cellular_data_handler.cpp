@@ -419,7 +419,8 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
     }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     bool attached = coreInner.GetPsRegState(slotId_) == (int32_t)RegServiceState::REG_STATE_IN_SERVICE;
-    int32_t simState = coreInner.GetSimState(slotId_);
+    SimState simState = SimState::SIM_STATE_UNKNOWN;
+    coreInner.GetSimState(slotId_, simState);
     TELEPHONY_LOGI("Slot%{public}d: attached: %{public}d simState: %{public}d", slotId_, attached, simState);
     bool isEmergencyApn = apnHolder->IsEmergencyType();
     if (!isEmergencyApn && !attached) {
@@ -427,7 +428,7 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
             CellularDataErrorCode::DATA_ERROR_PS_NOT_ATTACH, "It is not emergencyApn and not attached");
         return false;
     }
-    if (!isEmergencyApn && (simState != (int32_t)SimState::SIM_STATE_READY)) {
+    if (!isEmergencyApn && (simState != SimState::SIM_STATE_READY)) {
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
             CellularDataErrorCode::DATA_ERROR_SIM_NOT_READY, "It is not emergencyApn and sim not ready");
         return false;
@@ -856,11 +857,12 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
     uint32_t eventId = event->GetInnerEventId();
     switch (eventId) {
         case RadioEvent::RADIO_SIM_STATE_CHANGE: {
-            int32_t simState = CoreManagerInner::GetInstance().GetSimState(slotId_);
+            SimState simState = SimState::SIM_STATE_UNKNOWN;
+            CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
             TELEPHONY_LOGI("Slot%{public}d: sim state is :%{public}d", slotId_, simState);
-            if (simState != static_cast<int32_t>(SimState::SIM_STATE_READY)) {
+            if (simState != SimState::SIM_STATE_READY) {
                 ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
-                if (simState == static_cast<int32_t>(SimState::SIM_STATE_NOT_PRESENT)) {
+                if (simState == SimState::SIM_STATE_NOT_PRESENT) {
                     UnRegisterDataSettingObserver();
                 }
             } else {
@@ -874,9 +876,10 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
         }
         case RadioEvent::RADIO_SIM_RECORDS_LOADED: {
             CoreManagerInner::GetInstance().GetSimIccId(slotId_, iccId);
-            int32_t simState = CoreManagerInner::GetInstance().GetSimState(slotId_);
+            SimState simState = SimState::SIM_STATE_UNKNOWN;
+            CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
             TELEPHONY_LOGI("Slot%{public}d: sim records loaded state is :%{public}d", slotId_, simState);
-            if (simState == static_cast<int32_t>(SimState::SIM_STATE_READY) && iccId != u"") {
+            if (simState == SimState::SIM_STATE_READY && iccId != u"") {
                 if (iccId != lastIccId_) {
                     dataSwitchSettings_->SetPolicyDataOn(true);
                     GetConfigurationFor5G();
@@ -943,7 +946,9 @@ void CellularDataHandler::HandleApnChanged(const InnerEvent::Pointer &event)
         TELEPHONY_LOGE("Slot%{public}d: apnManager_ is null", slotId_);
         return;
     }
-    std::string numeric = Str16ToStr8(CoreManagerInner::GetInstance().GetSimOperatorNumeric(slotId_));
+    std::u16string operatorNumeric;
+    CoreManagerInner::GetInstance().GetSimOperatorNumeric(slotId_, operatorNumeric);
+    std::string numeric = Str16ToStr8(operatorNumeric);
     int32_t result = 0;
     for (int32_t i = 0; i < DEFAULT_READ_APN_TIME; ++i) {
         result = apnManager_->CreateAllApnItemByDatabase(numeric);
