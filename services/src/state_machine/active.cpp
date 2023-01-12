@@ -257,7 +257,8 @@ void Active::RefreshTcpBufferSizes()
         return;
     }
     int32_t slotId = shareStateMachine->GetSlotId();
-    int32_t radioTech = CoreManagerInner::GetInstance().GetPsRadioTech(slotId);
+    int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+    CoreManagerInner::GetInstance().GetPsRadioTech(slotId, radioTech);
     if (shareStateMachine->cdConnectionManager_ == nullptr) {
         TELEPHONY_LOGE("cdConnectionManager_ is null");
         return;
@@ -275,7 +276,8 @@ void Active::RefreshConnectionBandwidths()
         return;
     }
     int32_t slotId = shareStateMachine->GetSlotId();
-    int32_t radioTech = CoreManagerInner::GetInstance().GetPsRadioTech(slotId);
+    int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+    CoreManagerInner::GetInstance().GetPsRadioTech(slotId, radioTech);
     if (shareStateMachine->cdConnectionManager_ == nullptr) {
         TELEPHONY_LOGE("cdConnectionManager_ is null");
         return;

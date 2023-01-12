@@ -84,7 +84,8 @@ void CellularDataStateMachine::DoConnect(const DataConnectionParams &connectionP
         return;
     }
     const int32_t slotId = GetSlotId();
-    int32_t radioTech = CoreManagerInner::GetInstance().GetPsRadioTech(slotId);
+    int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+    CoreManagerInner::GetInstance().GetPsRadioTech(slotId, radioTech);
     ActivateDataParam activeDataParam;
     activeDataParam.param = connectId_;
     activeDataParam.radioTechnology = radioTech;
