@@ -223,7 +223,8 @@ void CellularDataHandler::ClearAllConnections(DisConnectionReason reason)
     ApnProfileState currentState = apnManager_->GetOverallApnState();
     if (currentState == ApnProfileState::PROFILE_STATE_CONNECTED ||
         currentState == ApnProfileState::PROFILE_STATE_CONNECTING) {
-        int32_t networkType = CoreManagerInner::GetInstance().GetPsRadioTech(slotId_);
+        int32_t networkType = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+        CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, networkType);
         StateNotification::GetInstance().UpdateCellularDataConnectState(
             slotId_, PROFILE_STATE_DISCONNECTING, networkType);
     }
@@ -514,7 +515,8 @@ void CellularDataHandler::AttemptEstablishDataConnection(sptr<ApnHolder> &apnHol
         return;
     }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
-    int32_t radioTech = coreInner.GetPsRadioTech(slotId_);
+    int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+    coreInner.GetPsRadioTech(slotId_, radioTech);
     if (!EstablishDataConnection(apnHolder, radioTech)) {
         TELEPHONY_LOGE("Slot%{public}d: Establish data connection fail", slotId_);
     }
@@ -630,7 +632,8 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
         }
         apnHolder->SetApnState(PROFILE_STATE_CONNECTED);
         apnHolder->InitialApnRetryCount();
-        int32_t networkType = CoreManagerInner::GetInstance().GetPsRadioTech(slotId_);
+        int32_t networkType = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+        CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, networkType);
         StateNotification::GetInstance().UpdateCellularDataConnectState(slotId_, PROFILE_STATE_CONNECTED, networkType);
         std::shared_ptr<CellularDataStateMachine> stateMachine = apnHolder->GetCellularDataStateMachine();
         if (stateMachine != nullptr) {
@@ -674,7 +677,8 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
     }
     DisConnectionReason reason = object->GetReason();
     apnHolder->SetApnState(PROFILE_STATE_IDLE);
-    int32_t networkType = CoreManagerInner::GetInstance().GetPsRadioTech(slotId_);
+    int32_t networkType = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+    CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, networkType);
     StateNotification::GetInstance().UpdateCellularDataConnectState(slotId_, PROFILE_STATE_IDLE, networkType);
     TELEPHONY_LOGI("Slot%{public}d: apn type: %{public}s call:%{public}d", slotId_, apnHolder->GetApnType().c_str(),
         apnHolder->IsDataCallEnabled());
@@ -833,7 +837,9 @@ void CellularDataHandler::HandleVoiceCallChanged(int32_t state)
     TELEPHONY_LOGI("Slot%{public}d: handle voice call changed lastState:%{public}d, state:%{public}d", slotId_,
         lastCallState_, state);
     // next to check if radio technology support voice and data at same time.
-    bool support = CoreManagerInner::GetInstance().GetPsRadioTech(slotId_) == (int32_t)RadioTech::RADIO_TECHNOLOGY_GSM;
+    int32_t psRadioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+    CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, psRadioTech);
+    bool support = (psRadioTech == static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_GSM));
     if (lastCallState_ != state) {
         // call is busy
         lastCallState_ = state;
@@ -1027,7 +1033,8 @@ void CellularDataHandler::HandleRadioStateChanged(const AppExecFwk::InnerEvent::
 void CellularDataHandler::PsDataRatChanged(const InnerEvent::Pointer &event)
 {
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
-    int32_t radioTech = coreInner.GetPsRadioTech(slotId_);
+    int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+    coreInner.GetPsRadioTech(slotId_, radioTech);
     TELEPHONY_LOGI("Slot%{public}d: radioTech is %{public}d", slotId_, radioTech);
     if (event == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: event is null", slotId_);
@@ -1070,7 +1077,9 @@ void CellularDataHandler::SetPolicyDataOn(bool enable)
 
 bool CellularDataHandler::IsRestrictedMode() const
 {
-    bool support = CoreManagerInner::GetInstance().GetPsRadioTech(slotId_) == (int32_t)RadioTech::RADIO_TECHNOLOGY_GSM;
+    int32_t networkType = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+    CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, networkType);
+    bool support = (networkType == (int32_t)RadioTech::RADIO_TECHNOLOGY_GSM);
     bool inCall = (lastCallState_ != TelCallStatus::CALL_STATUS_IDLE &&
                    lastCallState_ != TelCallStatus::CALL_STATUS_DISCONNECTED);
     TELEPHONY_LOGI("Slot%{public}d: radio technology is gsm only:%{public}d and call is busy:%{public}d", slotId_,
@@ -1301,7 +1310,7 @@ void CellularDataHandler::GetDefaultDownLinkThresholdsConfig()
 void CellularDataHandler::SetRilLinkBandwidths()
 {
     LinkBandwidthRule linkBandwidth;
-    linkBandwidth.rat = CoreManagerInner::GetInstance().GetPsRadioTech(slotId_);
+    CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, linkBandwidth.rat);
     linkBandwidth.delayMs = DELAY_SET_RIL_BANDWIDTH_MS;
     linkBandwidth.delayUplinkKbps = DELAY_SET_RIL_UP_DOWN_BANDWIDTH_MS;
     linkBandwidth.delayDownlinkKbps = DELAY_SET_RIL_UP_DOWN_BANDWIDTH_MS;
