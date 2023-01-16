@@ -61,7 +61,7 @@ bool CellularDataNetAgent::RegisterNetSupplier(const int32_t slotId)
         uint32_t supplierId = 0;
         int32_t result = netManager->RegisterNetSupplier(
             NetBearType::BEARER_CELLULAR, std::string(IDENT_PREFIX) + std::to_string(simId), netCap, supplierId);
-        if (result == 0) {
+        if (result == NETMANAGER_SUCCESS) {
             TELEPHONY_LOGI("Register network successful, supplierId[%{public}d]", supplierId);
             flag = true;
             netSupplier.supplierId = supplierId;
