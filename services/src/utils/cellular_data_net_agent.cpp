@@ -94,7 +94,7 @@ bool CellularDataNetAgent::RegisterPolicyCallback()
         return false;
     }
     int32_t registerResult = netPolicy->RegisterNetPolicyCallback(tacticsCallBack_);
-    if (registerResult == 0) {
+    if (registerResult == NETMANAGER_SUCCESS) {
         TELEPHONY_LOGI("Register NetPolicy Callback successful");
         return true;
     }
