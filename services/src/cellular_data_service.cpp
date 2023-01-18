@@ -147,7 +147,7 @@ int32_t CellularDataService::EnableCellularData(bool enable)
     for (const std::pair<const int32_t, std::shared_ptr<CellularDataController>> &it : cellularDataControllers_) {
         if (it.second != nullptr) {
             result = it.second->SetCellularDataEnable(enable);
-            if (result != TELEPHONY_ERR_SUCCESS) {
+            if (result == TELEPHONY_ERR_SUCCESS) {
                 CellularDataHiSysEvent::WriteDataConnectStateBehaviorEvent(enable);
             }
         } else {
@@ -197,7 +197,7 @@ int32_t CellularDataService::EnableCellularDataRoaming(const int32_t slotId, boo
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     int32_t result = cellularDataControllers_[slotId]->SetCellularDataRoamingEnabled(enable);
-    if (result != TELEPHONY_ERR_SUCCESS) {
+    if (result == TELEPHONY_ERR_SUCCESS) {
         CellularDataHiSysEvent::WriteRoamingConnectStateBehaviorEvent(enable);
     }
     return result;
