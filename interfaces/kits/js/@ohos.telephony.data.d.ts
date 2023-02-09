@@ -23,15 +23,15 @@ import {AsyncCallback} from "./basic";
  */
 declare namespace data {
   /**
-   * Checks whether cellular data services are enabled.
+   * Get the default cellular data card.
    *
-   * @returns Returns {@code true} if cellular data services are enabled; returns {@code false} otherwise.
+   * @returns Returns default cellular data slot id.
    */
   function getDefaultCellularDataSlotId(callback: AsyncCallback<number>): void;
   function getDefaultCellularDataSlotId(): Promise<number>;
 
   /**
-   * Checks whether cellular data services are enabled.
+   * Get the default cellular data card.
    *
    * @returns Returns default cellular data slot id.
    * @since 9
@@ -68,8 +68,6 @@ declare namespace data {
   /**
    * Obtains the connection state of the PS domain.
    *
-   * @param slotId Indicates the ID of a card slot.
-   *      The value {@code 0} indicates card 1, and the value {@code 1} indicates card 2.
    * @param callback Returns the connection state, which can be any of the following:
    * <ul>
    * <li>{@code DataConnectState#DATA_STATE_UNKNOWN}
@@ -86,13 +84,13 @@ declare namespace data {
    * Checks whether cellular data services are enabled.
    *
    * @param callback Returns {@code true} if cellular data services are enabled; returns {@code false} otherwise.
+   * @permission ohos.permission.GET_NETWORK_INFO
    * @throws {BusinessError} 201 - Permission denied.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
    * @throws {BusinessError} 8300999 - Unknown error code.
-   * @permission ohos.permission.GET_NETWORK_INFO
    */
   function isCellularDataEnabled(callback: AsyncCallback<boolean>): void;
   function isCellularDataEnabled(): Promise<boolean>;
@@ -106,7 +104,6 @@ declare namespace data {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    */
@@ -114,7 +111,7 @@ declare namespace data {
   function enableCellularData(): Promise<void>;
 
   /**
-   * Diables cellular data services.
+   * Disables cellular data services.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @throws {BusinessError} 201 - Permission denied.
@@ -122,7 +119,6 @@ declare namespace data {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    */
@@ -157,7 +153,6 @@ declare namespace data {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    */
@@ -175,7 +170,6 @@ declare namespace data {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    */
