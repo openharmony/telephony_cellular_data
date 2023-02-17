@@ -39,7 +39,9 @@ bool CellularDataDumpHelper::Dump(const std::vector<std::string> &args, std::str
 
 bool CellularDataDumpHelper::HasSimCard(const int32_t slotId) const
 {
-    return DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId);
+    bool hasSimCard = false;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId, hasSimCard);
+    return hasSimCard;
 }
 
 void CellularDataDumpHelper::ShowHelp(std::string &result) const
@@ -88,18 +90,22 @@ void CellularDataDumpHelper::ShowCellularDataInfo(std::string &result) const
     result.append("ServiceRunningState          : ");
     result.append(std::to_string(dataService.GetServiceRunningState()));
     result.append("\n");
+    bool dataRoamingEnabled = false;
     for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
         if (HasSimCard(i)) {
             result.append("SlotId                       : ");
             result.append(std::to_string(i));
             result.append("\n");
             result.append("CellularDataRoamingEnabled   : ");
-            result.append(GetBoolValue(dataService.IsCellularDataRoamingEnabled(i)));
+            dataService.IsCellularDataRoamingEnabled(i, dataRoamingEnabled);
+            result.append(GetBoolValue(dataRoamingEnabled));
             result.append("\n");
         }
     }
+    bool dataEnabled = false;
     result.append("CellularDataEnabled          : ");
-    result.append(GetBoolValue(dataService.IsCellularDataEnabled()));
+    dataService.IsCellularDataEnabled(dataEnabled);
+    result.append(GetBoolValue(dataEnabled));
     result.append("\n");
     result.append("CellularDataState            : ");
     result.append(GetCellularDataConnectionState(dataService.GetCellularDataState()));

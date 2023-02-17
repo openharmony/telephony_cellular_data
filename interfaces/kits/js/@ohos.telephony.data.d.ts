@@ -23,17 +23,17 @@ import {AsyncCallback} from "./basic";
  */
 declare namespace data {
   /**
-   * Checks whether cellular data services are enabled.
+   * Get the default cellular data card.
    *
-   * @return Returns {@code true} if cellular data services are enabled; returns {@code false} otherwise.
+   * @returns Returns default cellular data slot id.
    */
   function getDefaultCellularDataSlotId(callback: AsyncCallback<number>): void;
   function getDefaultCellularDataSlotId(): Promise<number>;
 
   /**
-   * Checks whether cellular data services are enabled.
+   * Get the default cellular data card.
    *
-   * @return Returns default cellular data slot id.
+   * @returns Returns default cellular data slot id.
    * @since 9
    */
   function getDefaultCellularDataSlotIdSync(): number;
@@ -44,6 +44,14 @@ declare namespace data {
    * @param slotId Indicates the ID of the target card slot.
    *      The value {@code 0} indicates card 1, and the value {@code 1} indicates card 2.
    * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @throws {BusinessError} 201 - Permission denied.
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300004 - Do not have sim card.
+   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @throws {BusinessError} 8301001 - SIM card is not activated.
    * @systemapi Hide this for inner system use.
    */
   function setDefaultCellularDataSlotId(slotId: number, callback: AsyncCallback<void>): void;
@@ -60,8 +68,6 @@ declare namespace data {
   /**
    * Obtains the connection state of the PS domain.
    *
-   * @param slotId Indicates the ID of a card slot.
-   *      The value {@code 0} indicates card 1, and the value {@code 1} indicates card 2.
    * @param callback Returns the connection state, which can be any of the following:
    * <ul>
    * <li>{@code DataConnectState#DATA_STATE_UNKNOWN}
@@ -79,6 +85,12 @@ declare namespace data {
    *
    * @param callback Returns {@code true} if cellular data services are enabled; returns {@code false} otherwise.
    * @permission ohos.permission.GET_NETWORK_INFO
+   * @throws {BusinessError} 201 - Permission denied.
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    */
   function isCellularDataEnabled(callback: AsyncCallback<boolean>): void;
   function isCellularDataEnabled(): Promise<boolean>;
@@ -87,15 +99,27 @@ declare namespace data {
    * Enables cellular data services.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @throws {BusinessError} 201 - Permission denied.
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    */
   function enableCellularData(callback: AsyncCallback<void>): void;
   function enableCellularData(): Promise<void>;
 
   /**
-   * Diables cellular data services.
+   * Disables cellular data services.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @throws {BusinessError} 201 - Permission denied.
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    */
   function disableCellularData(callback: AsyncCallback<void>): void;
@@ -108,6 +132,12 @@ declare namespace data {
    *      The value {@code 0} indicates card 1, and the value {@code 1} indicates card 2.
    * @param callback Returns {@code true} if roaming is enabled for cellular data services; returns {@code false} otherwise.
    * @permission ohos.permission.GET_NETWORK_INFO
+   * @throws {BusinessError} 201 - Permission denied.
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    */
   function isCellularDataRoamingEnabled(slotId: number, callback: AsyncCallback<boolean>): void;
   function isCellularDataRoamingEnabled(slotId: number): Promise<boolean>;
@@ -118,6 +148,12 @@ declare namespace data {
    * @param slotId Indicates the ID of a card slot.
    *      The value {@code 0} indicates card 1, and the value {@code 1} indicates card 2.
    * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @throws {BusinessError} 201 - Permission denied.
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    */
   function enableCellularDataRoaming(slotId: number, callback: AsyncCallback<void>): void;
@@ -129,6 +165,12 @@ declare namespace data {
    * @param slotId Indicates the ID of a card slot.
    *      The value {@code 0} indicates card 1, and the value {@code 1} indicates card 2.
    * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @throws {BusinessError} 201 - Permission denied.
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    */
   function disableCellularDataRoaming(slotId: number, callback: AsyncCallback<void>): void;
