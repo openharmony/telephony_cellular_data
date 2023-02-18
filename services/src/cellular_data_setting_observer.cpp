@@ -18,6 +18,7 @@
 #include "cellular_data_constant.h"
 #include "cellular_data_event_code.h"
 #include "cellular_data_settings_rdb_helper.h"
+#include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -36,7 +37,11 @@ void CellularDataSettingObserver::OnChange()
         return;
     }
     Uri uri(CELLULAR_DATA_SETTING_DATA_ENABLE_URI);
-    int value = settingHelper->GetValue(uri, CELLULAR_DATA_COLUMN_ENABLE);
+    int value = static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_DISABLED);
+    if (settingHelper->GetValue(uri, CELLULAR_DATA_COLUMN_ENABLE, value) != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("OnChange GetValue failed!");
+        return;
+    }
     TELEPHONY_LOGI("cellular data switch is %{public}d", value);
     if (cellularDataHandler_ != nullptr) {
         cellularDataHandler_->SendEvent(CellularDataEventCode::MSG_DB_SETTING_ENABLE_CHANGED, value, 0);

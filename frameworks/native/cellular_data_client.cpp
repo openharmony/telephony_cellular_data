@@ -157,7 +157,7 @@ int32_t CellularDataClient::SetDefaultCellularDataSlotId(int32_t slotId)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = proxy->SetDefaultCellularDataSlotId(slotId);
-    if (result == static_cast<int32_t>(DataRespondCode::SET_SUCCESS)) {
+    if (result == TELEPHONY_ERR_SUCCESS) {
         defaultCellularDataSlotId_ = slotId;
     }
     return result;
@@ -185,14 +185,14 @@ int32_t CellularDataClient::EnableCellularData(bool enable)
     return proxy->EnableCellularData(enable);
 }
 
-int32_t CellularDataClient::IsCellularDataEnabled()
+int32_t CellularDataClient::IsCellularDataEnabled(bool &dataEnabled)
 {
     sptr<ICellularDataManager> proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->IsCellularDataEnabled();
+    return proxy->IsCellularDataEnabled(dataEnabled);
 }
 
 int32_t CellularDataClient::GetCellularDataState()
@@ -205,14 +205,14 @@ int32_t CellularDataClient::GetCellularDataState()
     return proxy->GetCellularDataState();
 }
 
-int32_t CellularDataClient::IsCellularDataRoamingEnabled(int32_t slotId)
+int32_t CellularDataClient::IsCellularDataRoamingEnabled(int32_t slotId, bool &dataRoamingEnabled)
 {
     sptr<ICellularDataManager> proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->IsCellularDataRoamingEnabled(slotId);
+    return proxy->IsCellularDataRoamingEnabled(slotId, dataRoamingEnabled);
 }
 
 int32_t CellularDataClient::EnableCellularDataRoaming(int32_t slotId, bool enable)

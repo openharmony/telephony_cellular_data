@@ -74,22 +74,22 @@ void CellularDataController::Init()
     samgrProxy->SubscribeSystemAbility(COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID, netManagerListener_);
 }
 
-bool CellularDataController::SetCellularDataEnable(bool userDataEnabled)
+int32_t CellularDataController::SetCellularDataEnable(bool userDataEnabled)
 {
     if (cellularDataHandler_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: SetCellularDataEnable cellularDataHandler_ is null", slotId_);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return cellularDataHandler_->SetCellularDataEnable(userDataEnabled);
 }
 
-bool CellularDataController::IsCellularDataEnabled() const
+int32_t CellularDataController::IsCellularDataEnabled(bool &dataEnabled) const
 {
     if (cellularDataHandler_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: IsCellularDataEnabled cellularDataHandler_ is null", slotId_);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return cellularDataHandler_->IsCellularDataEnabled();
+    return cellularDataHandler_->IsCellularDataEnabled(dataEnabled);
 }
 
 ApnProfileState CellularDataController::GetCellularDataState() const
@@ -110,20 +110,20 @@ ApnProfileState CellularDataController::GetCellularDataState(const std::string &
     return cellularDataHandler_->GetCellularDataState(apnType);
 }
 
-bool CellularDataController::IsCellularDataRoamingEnabled() const
+int32_t CellularDataController::IsCellularDataRoamingEnabled(bool &dataRoamingEnabled) const
 {
     if (cellularDataHandler_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: IsCellularDataRoamingEnabled cellularDataHandler_ is null", slotId_);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return cellularDataHandler_->IsCellularDataRoamingEnabled();
+    return cellularDataHandler_->IsCellularDataRoamingEnabled(dataRoamingEnabled);
 }
 
-bool CellularDataController::SetCellularDataRoamingEnabled(bool dataRoamingEnabled)
+int32_t CellularDataController::SetCellularDataRoamingEnabled(bool dataRoamingEnabled)
 {
     if (cellularDataHandler_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: SetCellularDataRoamingEnabled cellularDataHandler is null", slotId_);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return cellularDataHandler_->SetCellularDataRoamingEnabled(dataRoamingEnabled);
 }

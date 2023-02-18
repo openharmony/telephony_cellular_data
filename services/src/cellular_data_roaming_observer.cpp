@@ -42,7 +42,13 @@ void CellularDataRoamingObserver::OnChange()
         return;
     }
     Uri uri(std::string(CELLULAR_DATA_SETTING_DATA_ROAMING_URI) + std::to_string(simId));
-    int value = settingHelper->GetValue(uri, std::string(CELLULAR_DATA_COLUMN_ROAMING) + std::to_string(simId));
+    int value = static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_DISABLED);
+    if (settingHelper->GetValue(uri, std::string(CELLULAR_DATA_COLUMN_ROAMING) + std::to_string(simId), value) !=
+        TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("OnChange GetValue failed!");
+        return;
+    }
+
     TELEPHONY_LOGI("cellular data roaming switch is %{public}d", value);
     if (cellularDataHandler_ != nullptr) {
         cellularDataHandler_->SendEvent(CellularDataEventCode::MSG_DB_SETTING_ROAMING_CHANGED, value, 0);

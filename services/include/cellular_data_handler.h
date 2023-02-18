@@ -45,10 +45,10 @@ public:
     bool RequestNet(const NetRequest &request);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
-    bool SetCellularDataEnable(bool userDataEnabled);
-    bool IsCellularDataEnabled() const;
-    bool IsCellularDataRoamingEnabled() const;
-    bool SetCellularDataRoamingEnabled(bool dataRoamingEnabled);
+    int32_t SetCellularDataEnable(bool userDataEnabled);
+    int32_t IsCellularDataEnabled(bool &dataEnabled) const;
+    int32_t IsCellularDataRoamingEnabled(bool &dataRoamingEnabled) const;
+    int32_t SetCellularDataRoamingEnabled(bool dataRoamingEnabled);
     ApnProfileState GetCellularDataState() const;
     ApnProfileState GetCellularDataState(const std::string &apnType) const;
     void ClearConnection(const sptr<ApnHolder> &apnHolder, DisConnectionReason reason);
@@ -112,7 +112,7 @@ private:
     sptr<ApnManager> apnManager_;
     std::unique_ptr<DataSwitchSettings> dataSwitchSettings_;
     sptr<DataConnectionManager> connectionManager_;
-    std::u16string lastIccID_;
+    std::u16string lastIccId_;
     int32_t lastCallState_ = (int32_t)TelCallStatus::CALL_STATUS_IDLE;
     const int32_t slotId_;
     DisConnectionReason disconnectionReason_ = DisConnectionReason::REASON_NORMAL;

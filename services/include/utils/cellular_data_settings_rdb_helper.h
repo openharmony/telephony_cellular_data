@@ -56,8 +56,8 @@ public:
      * @param uri, Indicates the path of the data to operate.
      */
     void NotifyChange(const Uri &uri);
-    int GetValue(Uri &uri, const std::string &column);
-    void PutValue(Uri &uri, const std::string &column, int value);
+    int32_t GetValue(Uri &uri, const std::string &column, int32_t &value);
+    int32_t PutValue(Uri &uri, const std::string &column, int value);
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper();
 };
 } // namespace Telephony

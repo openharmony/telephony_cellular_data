@@ -16,6 +16,7 @@
 #include "cellular_data_handler.h"
 
 #include "cellular_data_constant.h"
+#include "cellular_data_error.h"
 #include "cellular_data_hisysevent.h"
 #include "cellular_data_settings_rdb_helper.h"
 #include "cellular_data_types.h"
@@ -119,26 +120,32 @@ bool CellularDataHandler::RequestNet(const NetRequest &request)
     return SendEvent(event);
 }
 
-bool CellularDataHandler::SetCellularDataEnable(bool userDataOn)
+int32_t CellularDataHandler::SetCellularDataEnable(bool userDataOn)
 {
     if (dataSwitchSettings_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: SetCellularDataEnable dataSwitchSettings_ is null.", slotId_);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (dataSwitchSettings_->IsUserDataOn() != userDataOn) {
-        dataSwitchSettings_->SetUserDataOn(userDataOn);
+    bool dataEnabled = false;
+    dataSwitchSettings_->IsUserDataOn(dataEnabled);
+    if (dataEnabled != userDataOn) {
+        int32_t result = dataSwitchSettings_->SetUserDataOn(userDataOn);
+        if (result != TELEPHONY_ERR_SUCCESS) {
+            TELEPHONY_LOGE("Slot%{public}d: SetUserDataOn %{public}d fail.", slotId_, userDataOn);
+            return result;
+        }
         int32_t defaultSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
         if (userDataOn && defaultSlotId == slotId_) {
             EstablishAllApnsIfConnectable();
             if (apnManager_ == nullptr) {
                 TELEPHONY_LOGE("Slot%{public}d: apnManager is null.", slotId_);
-                return true;
+                return TELEPHONY_ERR_SUCCESS;
             }
             const int32_t id = DATA_CONTEXT_ROLE_DEFAULT_ID;
             sptr<ApnHolder> apnHolder = apnManager_->FindApnHolderById(id);
             if (apnHolder == nullptr) {
                 TELEPHONY_LOGE("Slot%{public}d: apnHolder is null.", slotId_);
-                return true;
+                return TELEPHONY_ERR_SUCCESS;
             }
             if (!apnHolder->IsDataCallEnabled()) {
                 NetRequest netRequest;
@@ -147,7 +154,7 @@ bool CellularDataHandler::SetCellularDataEnable(bool userDataOn)
                 netRequest.capability = NetCap::NET_CAPABILITY_INTERNET;
                 apnHolder->RequestCellularData(netRequest);
                 AttemptEstablishDataConnection(apnHolder);
-                return true;
+                return TELEPHONY_ERR_SUCCESS;
             }
         } else {
             CellularDataHiSysEvent::WriteDataDeactiveBehaviorEvent(slotId_, DataDisconnectCause::BY_USER);
@@ -156,50 +163,55 @@ bool CellularDataHandler::SetCellularDataEnable(bool userDataOn)
     } else {
         TELEPHONY_LOGI("Slot%{public}d: The status of the cellular data switch has not changed", slotId_);
     }
-    return true;
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-bool CellularDataHandler::IsCellularDataEnabled() const
+int32_t CellularDataHandler::IsCellularDataEnabled(bool &dataEnabled) const
 {
     if (dataSwitchSettings_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: IsCellularDataEnabled dataSwitchSettings_ is null", slotId_);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return dataSwitchSettings_->IsUserDataOn();
+    return dataSwitchSettings_->IsUserDataOn(dataEnabled);
 }
 
-bool CellularDataHandler::IsCellularDataRoamingEnabled() const
+int32_t CellularDataHandler::IsCellularDataRoamingEnabled(bool &dataRoamingEnabled) const
 {
     if (dataSwitchSettings_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: IsCellularDataRoamingEnabled dataSwitchSettings_ is null", slotId_);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return dataSwitchSettings_->IsUserDataRoamingOn();
+    return dataSwitchSettings_->IsUserDataRoamingOn(dataRoamingEnabled);
 }
 
-bool CellularDataHandler::SetCellularDataRoamingEnabled(bool dataRoamingEnabled)
+int32_t CellularDataHandler::SetCellularDataRoamingEnabled(bool dataRoamingEnabled)
 {
     if (dataSwitchSettings_ == nullptr || apnManager_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ or apnManager_ is null", slotId_);
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (dataSwitchSettings_->IsUserDataRoamingOn() != dataRoamingEnabled) {
-        dataSwitchSettings_->SetUserDataRoamingOn(dataRoamingEnabled);
-        bool roamingState = CoreManagerInner::GetInstance().GetPsRoamingState(slotId_) > 0;
-        if (roamingState) {
-            ApnProfileState apnState = apnManager_->GetOverallApnState();
-            if (apnState == ApnProfileState::PROFILE_STATE_CONNECTING ||
-                apnState == ApnProfileState::PROFILE_STATE_CONNECTED) {
-                ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
-            }
-            EstablishAllApnsIfConnectable();
-        } else {
-            TELEPHONY_LOGI("Slot%{public}d: Not roaming(%{public}d), not doing anything", slotId_, roamingState);
-        }
-    } else {
+    bool currentDataEnabled = false;
+    dataSwitchSettings_->IsUserDataRoamingOn(currentDataEnabled);
+    if (currentDataEnabled == dataRoamingEnabled) {
         TELEPHONY_LOGI("Slot%{public}d: The roaming switch status has not changed", slotId_);
+        return TELEPHONY_ERR_SUCCESS;
     }
-    return true;
+    int32_t result = dataSwitchSettings_->SetUserDataRoamingOn(dataRoamingEnabled);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    bool roamingState = CoreManagerInner::GetInstance().GetPsRoamingState(slotId_) > 0;
+    if (roamingState) {
+        ApnProfileState apnState = apnManager_->GetOverallApnState();
+        if (apnState == ApnProfileState::PROFILE_STATE_CONNECTING ||
+            apnState == ApnProfileState::PROFILE_STATE_CONNECTED) {
+            ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
+        }
+        EstablishAllApnsIfConnectable();
+    } else {
+        TELEPHONY_LOGI("Slot%{public}d: Not roaming(%{public}d), not doing anything", slotId_, roamingState);
+    }
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 void CellularDataHandler::ClearAllConnections(DisConnectionReason reason)
@@ -211,7 +223,8 @@ void CellularDataHandler::ClearAllConnections(DisConnectionReason reason)
     ApnProfileState currentState = apnManager_->GetOverallApnState();
     if (currentState == ApnProfileState::PROFILE_STATE_CONNECTED ||
         currentState == ApnProfileState::PROFILE_STATE_CONNECTING) {
-        int32_t networkType = CoreManagerInner::GetInstance().GetPsRadioTech(slotId_);
+        int32_t networkType = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+        CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, networkType);
         StateNotification::GetInstance().UpdateCellularDataConnectState(
             slotId_, PROFILE_STATE_DISCONNECTING, networkType);
     }
@@ -230,7 +243,9 @@ void CellularDataHandler::ClearAllConnections(DisConnectionReason reason)
         TELEPHONY_LOGE("Slot%{public}d: in ClearAllConnections dataSwitchSettings_ is null", slotId_);
         return;
     }
-    if (!dataSwitchSettings_->IsUserDataOn()) {
+    bool dataEnabled = false;
+    dataSwitchSettings_->IsUserDataOn(dataEnabled);
+    if (!dataEnabled) {
         connectionManager_->SetDataFlowType(CellDataFlowType::DATA_FLOW_TYPE_NONE);
     }
 }
@@ -411,7 +426,8 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
     }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     bool attached = coreInner.GetPsRegState(slotId_) == (int32_t)RegServiceState::REG_STATE_IN_SERVICE;
-    int32_t simState = coreInner.GetSimState(slotId_);
+    SimState simState = SimState::SIM_STATE_UNKNOWN;
+    coreInner.GetSimState(slotId_, simState);
     TELEPHONY_LOGI("Slot%{public}d: attached: %{public}d simState: %{public}d", slotId_, attached, simState);
     bool isEmergencyApn = apnHolder->IsEmergencyType();
     if (!isEmergencyApn && !attached) {
@@ -419,7 +435,7 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
             CellularDataErrorCode::DATA_ERROR_PS_NOT_ATTACH, "It is not emergencyApn and not attached");
         return false;
     }
-    if (!isEmergencyApn && (simState != (int32_t)SimState::SIM_STATE_READY)) {
+    if (!isEmergencyApn && (simState != SimState::SIM_STATE_READY)) {
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
             CellularDataErrorCode::DATA_ERROR_SIM_NOT_READY, "It is not emergencyApn and sim not ready");
         return false;
@@ -437,7 +453,9 @@ bool CellularDataHandler::CheckRoamingState(sptr<ApnHolder> &apnHolder)
     bool isEmergencyApn = apnHolder->IsEmergencyType();
     bool isAllowActiveData = dataSwitchSettings_->IsAllowActiveData();
     bool roamingState = coreInner.GetPsRoamingState(slotId_) > 0;
-    if (roamingState && !dataSwitchSettings_->IsUserDataRoamingOn()) {
+    bool dataRoamingEnabled = false;
+    dataSwitchSettings_->IsUserDataRoamingOn(dataRoamingEnabled);
+    if (roamingState && !dataRoamingEnabled) {
         isAllowActiveData = false;
     }
     if (isEmergencyApn) {
@@ -497,7 +515,8 @@ void CellularDataHandler::AttemptEstablishDataConnection(sptr<ApnHolder> &apnHol
         return;
     }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
-    int32_t radioTech = coreInner.GetPsRadioTech(slotId_);
+    int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+    coreInner.GetPsRadioTech(slotId_, radioTech);
     if (!EstablishDataConnection(apnHolder, radioTech)) {
         TELEPHONY_LOGE("Slot%{public}d: Establish data connection fail", slotId_);
     }
@@ -582,7 +601,8 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
     apnHolder->SetApnState(PROFILE_STATE_CONNECTING);
     apnHolder->SetCellularDataStateMachine(cellularDataStateMachine);
     bool roamingState = CoreManagerInner::GetInstance().GetPsRoamingState(slotId_) > 0;
-    bool userDataRoaming = dataSwitchSettings_->IsUserDataRoamingOn();
+    bool userDataRoaming = false;
+    dataSwitchSettings_->IsUserDataRoamingOn(userDataRoaming);
     StateNotification::GetInstance().UpdateCellularDataConnectState(slotId_, PROFILE_STATE_CONNECTING, radioTech);
     std::unique_ptr<DataConnectionParams> object =
         std::make_unique<DataConnectionParams>(apnHolder, profileId, radioTech, roamingState, userDataRoaming, true);
@@ -612,7 +632,8 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
         }
         apnHolder->SetApnState(PROFILE_STATE_CONNECTED);
         apnHolder->InitialApnRetryCount();
-        int32_t networkType = CoreManagerInner::GetInstance().GetPsRadioTech(slotId_);
+        int32_t networkType = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+        CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, networkType);
         StateNotification::GetInstance().UpdateCellularDataConnectState(slotId_, PROFILE_STATE_CONNECTED, networkType);
         std::shared_ptr<CellularDataStateMachine> stateMachine = apnHolder->GetCellularDataStateMachine();
         if (stateMachine != nullptr) {
@@ -656,7 +677,8 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
     }
     DisConnectionReason reason = object->GetReason();
     apnHolder->SetApnState(PROFILE_STATE_IDLE);
-    int32_t networkType = CoreManagerInner::GetInstance().GetPsRadioTech(slotId_);
+    int32_t networkType = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+    CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, networkType);
     StateNotification::GetInstance().UpdateCellularDataConnectState(slotId_, PROFILE_STATE_IDLE, networkType);
     TELEPHONY_LOGI("Slot%{public}d: apn type: %{public}s call:%{public}d", slotId_, apnHolder->GetApnType().c_str(),
         apnHolder->IsDataCallEnabled());
@@ -815,7 +837,9 @@ void CellularDataHandler::HandleVoiceCallChanged(int32_t state)
     TELEPHONY_LOGI("Slot%{public}d: handle voice call changed lastState:%{public}d, state:%{public}d", slotId_,
         lastCallState_, state);
     // next to check if radio technology support voice and data at same time.
-    bool support = CoreManagerInner::GetInstance().GetPsRadioTech(slotId_) == (int32_t)RadioTech::RADIO_TECHNOLOGY_GSM;
+    int32_t psRadioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+    CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, psRadioTech);
+    bool support = (psRadioTech == static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_GSM));
     if (lastCallState_ != state) {
         // call is busy
         lastCallState_ = state;
@@ -844,37 +868,41 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
     if (event == nullptr) {
         return;
     }
+    std::u16string iccId;
     uint32_t eventId = event->GetInnerEventId();
     switch (eventId) {
         case RadioEvent::RADIO_SIM_STATE_CHANGE: {
-            int32_t simState = CoreManagerInner::GetInstance().GetSimState(slotId_);
+            SimState simState = SimState::SIM_STATE_UNKNOWN;
+            CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
             TELEPHONY_LOGI("Slot%{public}d: sim state is :%{public}d", slotId_, simState);
-            if (simState != static_cast<int32_t>(SimState::SIM_STATE_READY)) {
+            if (simState != SimState::SIM_STATE_READY) {
                 ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
-                if (simState == static_cast<int32_t>(SimState::SIM_STATE_NOT_PRESENT)) {
+                if (simState == SimState::SIM_STATE_NOT_PRESENT) {
                     UnRegisterDataSettingObserver();
                 }
             } else {
                 dataSwitchSettings_->LoadSwitchValue();
-                if (lastIccID_ != u"" && lastIccID_ == CoreManagerInner::GetInstance().GetSimIccId(slotId_)) {
+                CoreManagerInner::GetInstance().GetSimIccId(slotId_, iccId);
+                if (lastIccId_ != u"" && lastIccId_ == iccId) {
                     EstablishAllApnsIfConnectable();
                 }
             }
             break;
         }
         case RadioEvent::RADIO_SIM_RECORDS_LOADED: {
-            std::u16string iccID = CoreManagerInner::GetInstance().GetSimIccId(slotId_);
-            int32_t simState = CoreManagerInner::GetInstance().GetSimState(slotId_);
+            CoreManagerInner::GetInstance().GetSimIccId(slotId_, iccId);
+            SimState simState = SimState::SIM_STATE_UNKNOWN;
+            CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
             TELEPHONY_LOGI("Slot%{public}d: sim records loaded state is :%{public}d", slotId_, simState);
-            if (simState == static_cast<int32_t>(SimState::SIM_STATE_READY) && iccID != u"") {
-                if (iccID != lastIccID_) {
+            if (simState == SimState::SIM_STATE_READY && iccId != u"") {
+                if (iccId != lastIccId_) {
                     dataSwitchSettings_->SetPolicyDataOn(true);
                     GetConfigurationFor5G();
-                    lastIccID_ = iccID;
+                    lastIccId_ = iccId;
                     InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_APN_CHANGED);
                     SendEvent(event);
-                } else if (lastIccID_ == iccID) {
-                    TELEPHONY_LOGI("Slot%{public}d: sim state changed, but iccID not changed.", slotId_);
+                } else if (lastIccId_ == iccId) {
+                    TELEPHONY_LOGI("Slot%{public}d: sim state changed, but iccId not changed.", slotId_);
                     // the sim card status has changed to ready, so try to connect
                     EstablishAllApnsIfConnectable();
                 }
@@ -933,7 +961,9 @@ void CellularDataHandler::HandleApnChanged(const InnerEvent::Pointer &event)
         TELEPHONY_LOGE("Slot%{public}d: apnManager_ is null", slotId_);
         return;
     }
-    std::string numeric = Str16ToStr8(CoreManagerInner::GetInstance().GetSimOperatorNumeric(slotId_));
+    std::u16string operatorNumeric;
+    CoreManagerInner::GetInstance().GetSimOperatorNumeric(slotId_, operatorNumeric);
+    std::string numeric = Str16ToStr8(operatorNumeric);
     int32_t result = 0;
     for (int32_t i = 0; i < DEFAULT_READ_APN_TIME; ++i) {
         result = apnManager_->CreateAllApnItemByDatabase(numeric);
@@ -1003,13 +1033,16 @@ void CellularDataHandler::HandleRadioStateChanged(const AppExecFwk::InnerEvent::
 void CellularDataHandler::PsDataRatChanged(const InnerEvent::Pointer &event)
 {
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
-    int32_t radioTech = coreInner.GetPsRadioTech(slotId_);
+    int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+    coreInner.GetPsRadioTech(slotId_, radioTech);
     TELEPHONY_LOGI("Slot%{public}d: radioTech is %{public}d", slotId_, radioTech);
     if (event == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: event is null", slotId_);
         return;
     }
-    if (!IsCellularDataEnabled()) {
+    bool dataEnabled = false;
+    IsCellularDataEnabled(dataEnabled);
+    if (!dataEnabled) {
         TELEPHONY_LOGE("Slot%{public}d: data enable is close", slotId_);
         return;
     }
@@ -1044,7 +1077,9 @@ void CellularDataHandler::SetPolicyDataOn(bool enable)
 
 bool CellularDataHandler::IsRestrictedMode() const
 {
-    bool support = CoreManagerInner::GetInstance().GetPsRadioTech(slotId_) == (int32_t)RadioTech::RADIO_TECHNOLOGY_GSM;
+    int32_t networkType = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+    CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, networkType);
+    bool support = (networkType == (int32_t)RadioTech::RADIO_TECHNOLOGY_GSM);
     bool inCall = (lastCallState_ != TelCallStatus::CALL_STATUS_IDLE &&
                    lastCallState_ != TelCallStatus::CALL_STATUS_DISCONNECTED);
     TELEPHONY_LOGI("Slot%{public}d: radio technology is gsm only:%{public}d and call is busy:%{public}d", slotId_,
@@ -1275,7 +1310,7 @@ void CellularDataHandler::GetDefaultDownLinkThresholdsConfig()
 void CellularDataHandler::SetRilLinkBandwidths()
 {
     LinkBandwidthRule linkBandwidth;
-    linkBandwidth.rat = CoreManagerInner::GetInstance().GetPsRadioTech(slotId_);
+    CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, linkBandwidth.rat);
     linkBandwidth.delayMs = DELAY_SET_RIL_BANDWIDTH_MS;
     linkBandwidth.delayUplinkKbps = DELAY_SET_RIL_UP_DOWN_BANDWIDTH_MS;
     linkBandwidth.delayDownlinkKbps = DELAY_SET_RIL_UP_DOWN_BANDWIDTH_MS;
@@ -1299,7 +1334,9 @@ void CellularDataHandler::HandleDBSettingEnableChanged(const AppExecFwk::InnerEv
         return;
     }
     int64_t value = event->GetParam();
-    if (dataSwitchSettings_->IsUserDataOn() != value) {
+    bool dataEnabled = false;
+    dataSwitchSettings_->IsUserDataOn(dataEnabled);
+    if (dataEnabled != value) {
         dataSwitchSettings_->SetUserDataOn(value);
         if (value) {
             EstablishAllApnsIfConnectable();
@@ -1340,7 +1377,9 @@ void CellularDataHandler::HandleDBSettingRoamingChanged(const AppExecFwk::InnerE
         return;
     }
     int64_t value = event->GetParam();
-    if (dataSwitchSettings_->IsUserDataRoamingOn() != value) {
+    bool dataRoamingEnabled = false;
+    dataSwitchSettings_->IsUserDataRoamingOn(dataRoamingEnabled);
+    if (dataRoamingEnabled != value) {
         dataSwitchSettings_->SetUserDataRoamingOn(value);
         bool roamingState = false;
         if (CoreManagerInner::GetInstance().GetPsRoamingState(slotId_) > 0) {

@@ -36,7 +36,7 @@ int32_t NetManagerTacticsCallBack::NetStrategySwitch(const std::string &simId, b
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     for (int32_t  i = 0; i < SIM_SLOT_COUNT; ++i) {
         IccAccountInfo accountInfo;
-        if (!coreInner.GetSimAccountInfo(i, accountInfo)) {
+        if (coreInner.GetSimAccountInfo(i, accountInfo) != TELEPHONY_ERR_SUCCESS) {
             continue;
         }
         if (netSimId == accountInfo.simId) {
