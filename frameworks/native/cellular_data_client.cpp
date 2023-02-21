@@ -160,6 +160,9 @@ int32_t CellularDataClient::SetDefaultCellularDataSlotId(int32_t slotId)
     if (result == TELEPHONY_ERR_SUCCESS) {
         defaultCellularDataSlotId_ = slotId;
     }
+    if (slotId == DEFAULT_SIM_SLOT_ID_REMOVE) {
+        UpdateDefaultCellularDataSlotId();
+    }
     return result;
 }
 
