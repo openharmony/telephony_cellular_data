@@ -21,14 +21,14 @@
 
 namespace OHOS {
 namespace Telephony {
-CellularDataRdbHelper::CellularDataRdbHelper() : cellularDataUri_(CELLULAR_DATA_RDB_URI)
+CellularDataRdbHelper::CellularDataRdbHelper() : cellularDataUri_(CELLULAR_DATA_RDB_SELECTION)
 {
     helper_ = CreateDataAbilityHelper();
 }
 
 CellularDataRdbHelper::~CellularDataRdbHelper() = default;
 
-std::shared_ptr<AppExecFwk::DataAbilityHelper> CellularDataRdbHelper::CreateDataAbilityHelper()
+std::shared_ptr<DataShare::DataShareHelper> CellularDataRdbHelper::CreateDataAbilityHelper()
 {
     TELEPHONY_LOGI("Create data ability helper");
     sptr<ISystemAbilityManager> saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -41,23 +41,23 @@ std::shared_ptr<AppExecFwk::DataAbilityHelper> CellularDataRdbHelper::CreateData
         TELEPHONY_LOGE("CellularDataRdbHelper GetSystemAbility Service Failed.");
         return nullptr;
     }
-    return AppExecFwk::DataAbilityHelper::Creator(remoteObj);
+    return DataShare::DataShareHelper::Creator(remoteObj, CELLULAR_DATA_RDB_URI);
 }
 
 int CellularDataRdbHelper::Update(
-    const NativeRdb::ValuesBucket &value, const NativeRdb::DataAbilityPredicates &predicates)
+    const DataShare::DataShareValuesBucket &value, const DataShare::DataSharePredicates &predicates)
 {
     if (helper_ == nullptr) {
         TELEPHONY_LOGE("helper_ is null");
         return NULL_POINTER_EXCEPTION;
     }
     TELEPHONY_LOGI("Cellular data RDB helper update");
-    int32_t result = helper_->Update(cellularDataUri_, value, predicates);
+    int32_t result = helper_->Update(cellularDataUri_, predicates, value);
     helper_->NotifyChange(cellularDataUri_);
     return result;
 }
 
-int CellularDataRdbHelper::Insert(const NativeRdb::ValuesBucket &values)
+int CellularDataRdbHelper::Insert(const DataShare::DataShareValuesBucket &values)
 {
     if (helper_ == nullptr) {
         TELEPHONY_LOGE("helper_ is null");
@@ -76,9 +76,9 @@ bool CellularDataRdbHelper::QueryApns(const std::string &mcc, const std::string 
         return false;
     }
     std::vector<std::string> columns;
-    NativeRdb::DataAbilityPredicates predicates;
+    DataShare::DataSharePredicates predicates;
     predicates.EqualTo(PdpProfileData::MCC, mcc)->And()->EqualTo(PdpProfileData::MNC, mnc);
-    std::shared_ptr<NativeRdb::AbsSharedResultSet> result = helper_->Query(cellularDataUri_, columns, predicates);
+    std::shared_ptr<DataShare::DataShareResultSet> result = helper_->Query(cellularDataUri_, columns, predicates);
     if (result == nullptr) {
         TELEPHONY_LOGE("CellularDataRdbHelper: query apns error");
         return false;
@@ -88,7 +88,7 @@ bool CellularDataRdbHelper::QueryApns(const std::string &mcc, const std::string 
 }
 
 void CellularDataRdbHelper::ReadApnResult(
-    const std::shared_ptr<NativeRdb::AbsSharedResultSet> &result, std::vector<PdpProfile> &apnVec)
+    const std::shared_ptr<DataShare::DataShareResultSet> &result, std::vector<PdpProfile> &apnVec)
 {
     if (result == nullptr) {
         TELEPHONY_LOGI("ReadApnResult result is nullptr");

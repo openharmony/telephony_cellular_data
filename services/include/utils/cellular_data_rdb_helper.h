@@ -20,14 +20,14 @@
 #include <singleton.h>
 #include <utility>
 
-#include "abs_shared_result_set.h"
-#include "data_ability_helper.h"
-#include "data_ability_predicates.h"
+#include "datashare_helper.h"
+#include "datashare_predicates.h"
+#include "datashare_result_set.h"
+#include "datashare_values_bucket.h"
 #include "iservice_registry.h"
 #include "refbase.h"
 #include "system_ability_definition.h"
 #include "uri.h"
-#include "values_bucket.h"
 
 #include "pdp_profile_data.h"
 
@@ -42,13 +42,13 @@ public:
     void UnRegisterObserver(const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
 
 private:
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> CreateDataAbilityHelper();
-    int Update(const NativeRdb::ValuesBucket &value, const NativeRdb::DataAbilityPredicates &predicates);
-    int Insert(const NativeRdb::ValuesBucket &values);
-    void ReadApnResult(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &result, std::vector<PdpProfile> &apnVec);
+    std::shared_ptr<DataShare::DataShareHelper> CreateDataAbilityHelper();
+    int Update(const DataShare::DataShareValuesBucket &value, const DataShare::DataSharePredicates &predicates);
+    int Insert(const DataShare::DataShareValuesBucket &values);
+    void ReadApnResult(const std::shared_ptr<DataShare::DataShareResultSet> &result, std::vector<PdpProfile> &apnVec);
 
 private:
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> helper_;
+    std::shared_ptr<DataShare::DataShareHelper> helper_;
     Uri cellularDataUri_;
 };
 } // namespace Telephony
