@@ -22,9 +22,4 @@ group("fuzztest") {
   deps += [ "updateactivemachine_fuzzer:fuzztest" ]
   deps += [ "updatedisconnectmachine_fuzzer:fuzztest" ]
   deps += [ "updateinactivemachine_fuzzer:fuzztest" ]
-
-  external_deps = [
-    "data_share:datashare_common",
-    "data_share:datashare_consumer",
-  ]
 }
