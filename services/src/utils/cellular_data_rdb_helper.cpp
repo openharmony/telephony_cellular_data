@@ -78,7 +78,7 @@ bool CellularDataRdbHelper::QueryApns(const std::string &mcc, const std::string 
     std::vector<std::string> columns;
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(PdpProfileData::MCC, mcc)->And()->EqualTo(PdpProfileData::MNC, mnc);
-    std::shared_ptr<DataShare::DataShareResultSet> result = helper_->Query(cellularDataUri_, columns, predicates);
+    std::shared_ptr<DataShare::DataShareResultSet> result = helper_->Query(cellularDataUri_, predicates, columns);
     if (result == nullptr) {
         TELEPHONY_LOGE("CellularDataRdbHelper: query apns error");
         return false;
