@@ -47,7 +47,7 @@ std::shared_ptr<DataShare::DataShareHelper> CellularDataRdbHelper::CreateDataAbi
 int CellularDataRdbHelper::Update(
     const DataShare::DataShareValuesBucket &value, const DataShare::DataSharePredicates &predicates)
 {
-
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAbilityHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("dataShareHelper is null");
         return NULL_POINTER_EXCEPTION;
