@@ -21,10 +21,7 @@
 
 namespace OHOS {
 namespace Telephony {
-CellularDataRdbHelper::CellularDataRdbHelper() : cellularDataUri_(CELLULAR_DATA_RDB_SELECTION)
-{
-    helper_ = CreateDataAbilityHelper();
-}
+CellularDataRdbHelper::CellularDataRdbHelper() : cellularDataUri_(CELLULAR_DATA_RDB_SELECTION) {}
 
 CellularDataRdbHelper::~CellularDataRdbHelper() = default;
 
@@ -41,44 +38,51 @@ std::shared_ptr<DataShare::DataShareHelper> CellularDataRdbHelper::CreateDataAbi
         TELEPHONY_LOGE("CellularDataRdbHelper GetSystemAbility Service Failed.");
         return nullptr;
     }
-    return DataShare::DataShareHelper::Creator(remoteObj, CELLULAR_DATA_RDB_URI);
+    if (helper_ == nullptr) {
+        helper_ = DataShare::DataShareHelper::Creator(remoteObj, CELLULAR_DATA_RDB_URI);
+    }
+    return helper_;
 }
 
 int CellularDataRdbHelper::Update(
     const DataShare::DataShareValuesBucket &value, const DataShare::DataSharePredicates &predicates)
 {
-    if (helper_ == nullptr) {
-        TELEPHONY_LOGE("helper_ is null");
+
+    if (dataShareHelper == nullptr) {
+        TELEPHONY_LOGE("dataShareHelper is null");
         return NULL_POINTER_EXCEPTION;
     }
     TELEPHONY_LOGI("Cellular data RDB helper update");
-    int32_t result = helper_->Update(cellularDataUri_, predicates, value);
-    helper_->NotifyChange(cellularDataUri_);
+    int32_t result = dataShareHelper->Update(cellularDataUri_, predicates, value);
+    dataShareHelper->NotifyChange(cellularDataUri_);
     return result;
 }
 
 int CellularDataRdbHelper::Insert(const DataShare::DataShareValuesBucket &values)
 {
-    if (helper_ == nullptr) {
-        TELEPHONY_LOGE("helper_ is null");
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAbilityHelper();
+    if (dataShareHelper == nullptr) {
+        TELEPHONY_LOGE("dataShareHelper is null");
         return NULL_POINTER_EXCEPTION;
     }
     TELEPHONY_LOGI("Cellular data RDB helper insert");
-    int32_t result = helper_->Insert(cellularDataUri_, values);
-    helper_->NotifyChange(cellularDataUri_);
+    int32_t result = dataShareHelper->Insert(cellularDataUri_, values);
+    dataShareHelper->NotifyChange(cellularDataUri_);
     return result;
 }
 
 bool CellularDataRdbHelper::QueryApns(const std::string &mcc, const std::string &mnc, std::vector<PdpProfile> &apnVec)
 {
-    if (helper_ == nullptr) {
-        TELEPHONY_LOGE("helper_ is null");
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAbilityHelper();
+    if (dataShareHelper == nullptr) {
+        TELEPHONY_LOGE("dataShareHelper is null");
         return false;
     }
     std::vector<std::string> columns;
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(PdpProfileData::MCC, mcc)->And()->EqualTo(PdpProfileData::MNC, mnc);
-    std::shared_ptr<DataShare::DataShareResultSet> result = helper_->Query(cellularDataUri_, predicates, columns);
+    std::shared_ptr<DataShare::DataShareResultSet> result =
+        dataShareHelper->Query(cellularDataUri_, predicates, columns);
     if (result == nullptr) {
         TELEPHONY_LOGE("CellularDataRdbHelper: query apns error");
         return false;
@@ -136,21 +140,23 @@ void CellularDataRdbHelper::ReadApnResult(
 
 void CellularDataRdbHelper::RegisterObserver(const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    if (helper_ == nullptr) {
-        TELEPHONY_LOGE("helper_ is null");
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAbilityHelper();
+    if (dataShareHelper == nullptr) {
+        TELEPHONY_LOGE("dataShareHelper is null");
         return;
     }
-    helper_->RegisterObserver(cellularDataUri_, dataObserver);
+    dataShareHelper->RegisterObserver(cellularDataUri_, dataObserver);
     TELEPHONY_LOGI("CellularDataRdbHelper::RegisterObserver Success");
 }
 
 void CellularDataRdbHelper::UnRegisterObserver(const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    if (helper_ == nullptr) {
-        TELEPHONY_LOGE("helper_ is null");
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAbilityHelper();
+    if (dataShareHelper == nullptr) {
+        TELEPHONY_LOGE("dataShareHelper is null");
         return;
     }
-    helper_->UnregisterObserver(cellularDataUri_, dataObserver);
+    dataShareHelper->UnregisterObserver(cellularDataUri_, dataObserver);
     TELEPHONY_LOGI("CellularDataRdbHelper::UnRegisterObserver Success");
 }
 } // namespace Telephony
