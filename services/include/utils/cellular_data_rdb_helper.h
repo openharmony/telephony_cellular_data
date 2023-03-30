@@ -48,7 +48,6 @@ private:
     void ReadApnResult(const std::shared_ptr<DataShare::DataShareResultSet> &result, std::vector<PdpProfile> &apnVec);
 
 private:
-    std::shared_ptr<DataShare::DataShareHelper> helper_;
     Uri cellularDataUri_;
 };
 } // namespace Telephony

@@ -38,10 +38,7 @@ std::shared_ptr<DataShare::DataShareHelper> CellularDataRdbHelper::CreateDataAbi
         TELEPHONY_LOGE("CellularDataRdbHelper GetSystemAbility Service Failed.");
         return nullptr;
     }
-    if (helper_ == nullptr) {
-        helper_ = DataShare::DataShareHelper::Creator(remoteObj, CELLULAR_DATA_RDB_URI);
-    }
-    return helper_;
+    return DataShare::DataShareHelper::Creator(remoteObj, CELLULAR_DATA_RDB_URI);
 }
 
 int CellularDataRdbHelper::Update(
@@ -55,6 +52,8 @@ int CellularDataRdbHelper::Update(
     TELEPHONY_LOGI("Cellular data RDB helper update");
     int32_t result = dataShareHelper->Update(cellularDataUri_, predicates, value);
     dataShareHelper->NotifyChange(cellularDataUri_);
+    dataShareHelper->Release();
+    dataShareHelper = nullptr;
     return result;
 }
 
@@ -68,6 +67,8 @@ int CellularDataRdbHelper::Insert(const DataShare::DataShareValuesBucket &values
     TELEPHONY_LOGI("Cellular data RDB helper insert");
     int32_t result = dataShareHelper->Insert(cellularDataUri_, values);
     dataShareHelper->NotifyChange(cellularDataUri_);
+    dataShareHelper->Release();
+    dataShareHelper = nullptr;
     return result;
 }
 
@@ -87,6 +88,8 @@ bool CellularDataRdbHelper::QueryApns(const std::string &mcc, const std::string 
         TELEPHONY_LOGE("CellularDataRdbHelper: query apns error");
         return false;
     }
+    dataShareHelper->Release();
+    dataShareHelper = nullptr;
     ReadApnResult(result, apnVec);
     return true;
 }
@@ -146,6 +149,8 @@ void CellularDataRdbHelper::RegisterObserver(const sptr<AAFwk::IDataAbilityObser
         return;
     }
     dataShareHelper->RegisterObserver(cellularDataUri_, dataObserver);
+    dataShareHelper->Release();
+    dataShareHelper = nullptr;
     TELEPHONY_LOGI("CellularDataRdbHelper::RegisterObserver Success");
 }
 
@@ -157,6 +162,8 @@ void CellularDataRdbHelper::UnRegisterObserver(const sptr<AAFwk::IDataAbilityObs
         return;
     }
     dataShareHelper->UnregisterObserver(cellularDataUri_, dataObserver);
+    dataShareHelper->Release();
+    dataShareHelper = nullptr;
     TELEPHONY_LOGI("CellularDataRdbHelper::UnRegisterObserver Success");
 }
 } // namespace Telephony
