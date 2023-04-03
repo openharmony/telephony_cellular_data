@@ -53,6 +53,7 @@ void CellularDataSettingsRdbHelper::UnRegisterSettingsObserver(
     }
     settingHelper->UnregisterObserver(uri, dataObserver);
     settingHelper->Release();
+    settingHelper = nullptr;
 }
 
 void CellularDataSettingsRdbHelper::RegisterSettingsObserver(
@@ -65,6 +66,7 @@ void CellularDataSettingsRdbHelper::RegisterSettingsObserver(
     }
     settingHelper->RegisterObserver(uri, dataObserver);
     settingHelper->Release();
+    settingHelper = nullptr;
 }
 
 void CellularDataSettingsRdbHelper::NotifyChange(const Uri &uri)
@@ -76,6 +78,7 @@ void CellularDataSettingsRdbHelper::NotifyChange(const Uri &uri)
     }
     settingHelper->NotifyChange(uri);
     settingHelper->Release();
+    settingHelper = nullptr;
 }
 
 int32_t CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &column, int32_t &value)
@@ -94,6 +97,7 @@ int32_t CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &col
         return TELEPHONY_ERR_DATABASE_READ_FAIL;
     }
     settingHelper->Release();
+    settingHelper = nullptr;
     result->GoToFirstRow();
     int32_t columnIndex;
     std::string resultValue;
@@ -147,10 +151,12 @@ int32_t CellularDataSettingsRdbHelper::PutValue(Uri &uri, const std::string &col
             TELEPHONY_LOGI("result is %{public}d, do not handle.", result);
         }
         settingHelper->Release();
+        settingHelper = nullptr;
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
     settingHelper->NotifyChange(uri);
     settingHelper->Release();
+    settingHelper = nullptr;
     return TELEPHONY_ERR_SUCCESS;
 }
 } // namespace Telephony
