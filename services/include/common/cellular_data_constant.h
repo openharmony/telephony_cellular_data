@@ -41,27 +41,27 @@ enum class RecoveryState : int32_t {
 };
 
 struct AddressInfo {
-    std::string ip;
-    std::string netMask;
-    uint8_t type;
-    uint8_t prefixLen;
+    std::string ip = "";
+    std::string netMask = "";
+    uint8_t type = 0;
+    uint8_t prefixLen = 0;
 };
 
 struct RouteInfo {
-    std::string ip;
-    uint8_t type;
-    std::string destination;
+    std::string ip = "";
+    uint8_t type = 0;
+    std::string destination = "";
 };
 
 struct NetSupplier {
-    uint32_t supplierId;
-    uint64_t capability;
-    int32_t slotId;
+    uint32_t supplierId = 0;
+    uint64_t capability = 0;
+    int32_t slotId = 0;
 };
 
 struct NetRequest {
-    uint64_t capability;
-    std::string ident;
+    uint64_t capability = 0;
+    std::string ident = "";
 };
 
 static const uint32_t DEFAULT_BANDWIDTH = 14;

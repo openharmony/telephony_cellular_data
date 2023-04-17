@@ -41,16 +41,16 @@ public:
 public:
     constexpr static int ALL_APN_ITEM_CHAR_LENGTH = 256;
     struct attribute {
-        char types_[ALL_APN_ITEM_CHAR_LENGTH];
-        char numeric_[ALL_APN_ITEM_CHAR_LENGTH];
-        int32_t profileId_;
-        char protocol_[ALL_APN_ITEM_CHAR_LENGTH];
-        char roamingProtocol_[ALL_APN_ITEM_CHAR_LENGTH];
-        int32_t authType_;
-        char apn_[ALL_APN_ITEM_CHAR_LENGTH];
-        char apnName_[ALL_APN_ITEM_CHAR_LENGTH];
-        char user_[ALL_APN_ITEM_CHAR_LENGTH];
-        char password_[ALL_APN_ITEM_CHAR_LENGTH];
+        char types_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
+        char numeric_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
+        int32_t profileId_ = 0;
+        char protocol_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
+        char roamingProtocol_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
+        int32_t authType_ = 0;
+        char apn_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
+        char apnName_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
+        char user_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
+        char password_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
     } attr_;
 
 private:
