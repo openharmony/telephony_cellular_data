@@ -28,6 +28,7 @@
 #include "hril_call_parcel.h"
 #include "net_specifier.h"
 #include "radio_event.h"
+#include "runner_pool.h"
 #include "str_convert.h"
 #include "string_ex.h"
 #include "telephony_log_wrapper.h"
@@ -546,12 +547,11 @@ std::shared_ptr<CellularDataStateMachine> CellularDataHandler::FindIdleCellularD
 std::shared_ptr<CellularDataStateMachine> CellularDataHandler::CreateCellularDataConnect()
 {
     if (stateMachineEventLoop_ == nullptr) {
-        stateMachineEventLoop_ = AppExecFwk::EventRunner::Create("CellularDataStateMachine");
+        stateMachineEventLoop_ = RunnerPool::GetInstance().GetCommonRunner();
         if (stateMachineEventLoop_ == nullptr) {
             TELEPHONY_LOGE("Slot%{public}d: failed to create EventRunner", slotId_);
             return nullptr;
         }
-        stateMachineEventLoop_->Run();
     }
     std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine =
         std::make_shared<CellularDataStateMachine>(connectionManager_, shared_from_this(), stateMachineEventLoop_);
