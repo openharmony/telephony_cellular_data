@@ -28,6 +28,8 @@
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
 
+#include "telephony_state_registry_client.h"
+
 namespace OHOS {
 namespace Telephony {
 using namespace NetManagerStandard;
@@ -137,6 +139,10 @@ int32_t CellularDataService::IsCellularDataEnabled(bool &dataEnabled)
 
 int32_t CellularDataService::EnableCellularData(bool enable)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         int32_t slotId = CellularDataService::GetDefaultCellularDataSlotId();
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(
@@ -189,6 +195,10 @@ int32_t CellularDataService::IsCellularDataRoamingEnabled(const int32_t slotId, 
 
 int32_t CellularDataService::EnableCellularDataRoaming(const int32_t slotId, bool enable)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
@@ -310,6 +320,10 @@ int32_t CellularDataService::GetDefaultCellularDataSlotId()
 
 int32_t CellularDataService::SetDefaultCellularDataSlotId(const int32_t slotId)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
