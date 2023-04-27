@@ -88,9 +88,9 @@ bool CellularDataRdbHelper::QueryApns(const std::string &mcc, const std::string 
         TELEPHONY_LOGE("CellularDataRdbHelper: query apns error");
         return false;
     }
+    ReadApnResult(result, apnVec);
     dataShareHelper->Release();
     dataShareHelper = nullptr;
-    ReadApnResult(result, apnVec);
     return true;
 }
 

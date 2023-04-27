@@ -96,14 +96,14 @@ int32_t CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &col
         TELEPHONY_LOGE("setting DB: query error");
         return TELEPHONY_ERR_DATABASE_READ_FAIL;
     }
-    settingHelper->Release();
-    settingHelper = nullptr;
     result->GoToFirstRow();
     int32_t columnIndex;
     std::string resultValue;
     result->GetColumnIndex(CELLULAR_DATA_COLUMN_VALUE, columnIndex);
     result->GetString(columnIndex, resultValue);
     result->Close();
+    settingHelper->Release();
+    settingHelper = nullptr;
     TELEPHONY_LOGI("Query end resultValue is %{public}s", resultValue.c_str());
     if (resultValue.empty()) {
         TELEPHONY_LOGE("resultValue is empty");
