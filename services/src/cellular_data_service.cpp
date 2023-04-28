@@ -22,6 +22,7 @@
 #include "core_manager_inner.h"
 #include "data_connection_monitor.h"
 #include "net_specifier.h"
+#include "runner_pool.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
 #include "telephony_common_utils.h"
@@ -49,6 +50,7 @@ void CellularDataService::OnStart()
         TELEPHONY_LOGE("CellularDataService has already started.");
         return;
     }
+    RunnerPool::GetInstance().Init();
     if (!Init()) {
         TELEPHONY_LOGE("failed to init CellularDataService");
         return;
@@ -98,13 +100,12 @@ int32_t CellularDataService::Dump(std::int32_t fd, const std::vector<std::u16str
 
 bool CellularDataService::Init()
 {
-    eventLoop_ = AppExecFwk::EventRunner::Create("CellularDataService");
+    eventLoop_ = RunnerPool::GetInstance().GetCommonRunner();
     if (eventLoop_ == nullptr) {
         TELEPHONY_LOGE("failed to create EventRunner");
         return false;
     }
     InitModule();
-    eventLoop_->Run();
     if (!registerToService_) {
         bool ret = Publish(DelayedRefSingleton<CellularDataService>::GetInstance().AsObject());
         if (!ret) {
