@@ -10,75 +10,63 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import("//base/telephony/cellular_data/cellular_data_ability_runtime.gni")
-import("//base/telephony/core_service/telephony.gni")
 import("//build/ohos.gni")
-
-SOURCE_DIR = "//base/telephony/cellular_data"
 
 ohos_shared_library("tel_cellular_data") {
   sources = [
-    "$SOURCE_DIR/services/src/apn_manager/apn_holder.cpp",
-    "$SOURCE_DIR/services/src/apn_manager/apn_item.cpp",
-    "$SOURCE_DIR/services/src/apn_manager/apn_manager.cpp",
-    "$SOURCE_DIR/services/src/apn_manager/connection_retry_policy.cpp",
-    "$SOURCE_DIR/services/src/cellular_data_controller.cpp",
-    "$SOURCE_DIR/services/src/cellular_data_handler.cpp",
-    "$SOURCE_DIR/services/src/cellular_data_rdb_observer.cpp",
-    "$SOURCE_DIR/services/src/cellular_data_roaming_observer.cpp",
-    "$SOURCE_DIR/services/src/cellular_data_service.cpp",
-    "$SOURCE_DIR/services/src/cellular_data_service_stub.cpp",
-    "$SOURCE_DIR/services/src/cellular_data_setting_observer.cpp",
-    "$SOURCE_DIR/services/src/data_connection_manager.cpp",
-    "$SOURCE_DIR/services/src/data_connection_monitor.cpp",
-    "$SOURCE_DIR/services/src/data_switch_settings.cpp",
-    "$SOURCE_DIR/services/src/runner_pool.cpp",
-    "$SOURCE_DIR/services/src/sim_account_callback_proxy.cpp",
-    "$SOURCE_DIR/services/src/state_machine/activating.cpp",
-    "$SOURCE_DIR/services/src/state_machine/active.cpp",
-    "$SOURCE_DIR/services/src/state_machine/cellular_data_state_machine.cpp",
-    "$SOURCE_DIR/services/src/state_machine/default.cpp",
-    "$SOURCE_DIR/services/src/state_machine/disconnecting.cpp",
-    "$SOURCE_DIR/services/src/state_machine/inactive.cpp",
-    "$SOURCE_DIR/services/src/state_notification.cpp",
-    "$SOURCE_DIR/services/src/traffic_management.cpp",
-    "$SOURCE_DIR/services/src/utils/cellular_data_dump_helper.cpp",
-    "$SOURCE_DIR/services/src/utils/cellular_data_hisysevent.cpp",
-    "$SOURCE_DIR/services/src/utils/cellular_data_net_agent.cpp",
-    "$SOURCE_DIR/services/src/utils/cellular_data_rdb_helper.cpp",
-    "$SOURCE_DIR/services/src/utils/cellular_data_settings_rdb_helper.cpp",
-    "$SOURCE_DIR/services/src/utils/cellular_data_utils.cpp",
-    "$SOURCE_DIR/services/src/utils/net_manager_call_back.cpp",
-    "$SOURCE_DIR/services/src/utils/net_manager_tactics_call_back.cpp",
-    "$SOURCE_DIR/services/src/utils/network_search_callback.cpp",
+    "services/src/apn_manager/apn_holder.cpp",
+    "services/src/apn_manager/apn_item.cpp",
+    "services/src/apn_manager/apn_manager.cpp",
+    "services/src/apn_manager/connection_retry_policy.cpp",
+    "services/src/cellular_data_controller.cpp",
+    "services/src/cellular_data_handler.cpp",
+    "services/src/cellular_data_rdb_observer.cpp",
+    "services/src/cellular_data_roaming_observer.cpp",
+    "services/src/cellular_data_service.cpp",
+    "services/src/cellular_data_service_stub.cpp",
+    "services/src/cellular_data_setting_observer.cpp",
+    "services/src/data_connection_manager.cpp",
+    "services/src/data_connection_monitor.cpp",
+    "services/src/data_switch_settings.cpp",
+    "services/src/runner_pool.cpp",
+    "services/src/sim_account_callback_proxy.cpp",
+    "services/src/state_machine/activating.cpp",
+    "services/src/state_machine/active.cpp",
+    "services/src/state_machine/cellular_data_state_machine.cpp",
+    "services/src/state_machine/default.cpp",
+    "services/src/state_machine/disconnecting.cpp",
+    "services/src/state_machine/inactive.cpp",
+    "services/src/state_notification.cpp",
+    "services/src/traffic_management.cpp",
+    "services/src/utils/cellular_data_dump_helper.cpp",
+    "services/src/utils/cellular_data_hisysevent.cpp",
+    "services/src/utils/cellular_data_net_agent.cpp",
+    "services/src/utils/cellular_data_rdb_helper.cpp",
+    "services/src/utils/cellular_data_settings_rdb_helper.cpp",
+    "services/src/utils/cellular_data_utils.cpp",
+    "services/src/utils/net_manager_call_back.cpp",
+    "services/src/utils/net_manager_tactics_call_back.cpp",
+    "services/src/utils/network_search_callback.cpp",
   ]
 
   include_dirs = [
-    "$SOURCE_DIR/services/include",
-    "$SOURCE_DIR/services/include/common",
-    "$SOURCE_DIR/services/include/state_machine",
-    "$SOURCE_DIR/services/include/utils",
-    "$SOURCE_DIR/services/include/apn_manager",
-    "$SOURCE_DIR/interfaces/innerkits",
-    "//base/telephony/telephony_data/pdp_profile/include",
-    "${ability_runtime_inner_api_path}/dataobs_manager/include",
-  ]
-
-  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
-
-  deps = [
-    "${ability_runtime_inner_api_path}/dataobs_manager:dataobs_manager",
-    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
-    "${ability_runtime_path}/frameworks/native/ability/native:data_ability_helper",
-    "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
-    "//base/telephony/core_service/utils:libtel_common",
+    "services/include",
+    "services/include/common",
+    "services/include/state_machine",
+    "services/include/utils",
+    "services/include/apn_manager",
+    "interfaces/innerkits",
   ]
 
   external_deps = [
     "ability_base:want",
     "ability_base:zuri",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:data_ability_helper",
+    "ability_runtime:dataobs_manager",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
+    "core_service:libtel_common",
     "core_service:tel_core_service_api",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
@@ -94,8 +82,9 @@ ohos_shared_library("tel_cellular_data") {
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "telephony_data:tel_telephony_data",
   ]
-  defines += [
+  defines = [
     "TELEPHONY_LOG_TAG = \"CellularData\"",
     "LOG_DOMAIN = 0xD001F03",
   ]

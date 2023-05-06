@@ -12,7 +12,7 @@
 # limitations under the License.
 import("//build/ohos.gni")
 
-SUBSYSTEM_DIR = "//base/telephony/cellular_data"
+SUBSYSTEM_DIR = "../.."
 config("cellular_data_util_config") {
   # header file path
   include_dirs = [ "$SUBSYSTEM_DIR/interfaces/innerkits" ]
@@ -40,16 +40,12 @@ ohos_shared_library("tel_cellular_data_api") {
     "$SUBSYSTEM_DIR/frameworks/native/sim_account_callback_stub.cpp",
   ]
 
-  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
-
   public_configs = [ ":cellular_data_util_config" ]
-
-  deps = [
-    "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
-  ]
 
   external_deps = [
     "c_utils:utils",
+    "core_service:libtel_common",
+    "core_service:tel_core_service_api",
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
     "ipc:ipc_core",
