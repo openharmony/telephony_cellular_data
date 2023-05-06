@@ -131,6 +131,7 @@ void CellularDataRdbHelper::ReadApnResult(
         result->GetString(index, apnBean.pdpProtocol);
         result->GetColumnIndex(PdpProfileData::APN_ROAM_PROTOCOL, index);
         result->GetString(index, apnBean.roamPdpProtocol);
+        result->Close();
         if (apnBean.pdpProtocol.empty()) {
             apnBean.pdpProtocol = "IPV4V6";
         }
