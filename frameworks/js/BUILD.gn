@@ -11,30 +11,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build/ohos.gni")
-SUBSYSTEM_DIR = "//base/telephony"
+SUBSYSTEM_DIR = "../../.."
 ohos_shared_library("data") {
   include_dirs = [
     "//third_party/node/src",
-    "include",
-    "$SUBSYSTEM_DIR/core_service/frameworks/js/napi",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/include",
-    "$SUBSYSTEM_DIR/core_service/utils/log/include",
     "$SUBSYSTEM_DIR/cellular_data/include/utils",
-    "$SUBSYSTEM_DIR/core_service/frameworks/js/cellular_data",
     "$SUBSYSTEM_DIR/cellular_data/frameworks/js/napi/include",
   ]
 
-  sources = [
-    "$SUBSYSTEM_DIR/cellular_data/frameworks/js/napi/src/napi_cellular_data.cpp",
-    "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/napi_util.cpp",
-  ]
-
-  deps = [ "//foundation/arkui/napi:ace_napi" ]
+  sources = [ "$SUBSYSTEM_DIR/cellular_data/frameworks/js/napi/src/napi_cellular_data.cpp" ]
 
   external_deps = [
     "c_utils:utils",
     "cellular_data:tel_cellular_data_api",
+    "core_service:libtel_common",
+    "core_service:tel_core_service_api",
     "init:libbegetutil",
+    "napi:ace_napi",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CellularDataJsApi\"",

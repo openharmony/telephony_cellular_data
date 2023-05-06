@@ -10,11 +10,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import("//base/telephony/cellular_data/cellular_data_ability_runtime.gni")
-import("//base/telephony/core_service/telephony.gni")
 import("//build/ohos.gni")
 
-SOURCE_DIR = "//base/telephony/cellular_data"
+SOURCE_DIR = "../.."
 ohos_executable("tel_cellular_data_ui_test") {
   sources = [ "cellular_data_code_test.cpp" ]
 
@@ -24,22 +22,20 @@ ohos_executable("tel_cellular_data_ui_test") {
     "$SOURCE_DIR/services/include/common",
   ]
 
-  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
-
-  deps = [ "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native" ]
-
   external_deps = [
+    "ability_runtime:abilitykit_native",
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "c_utils:utils",
     "cellular_data:tel_cellular_data_api",
+    "core_service:libtel_common",
     "core_service:tel_core_service_api",
     "eventhandler:libeventhandler",
     "init:libbegetutil",
   ]
 
-  defines += [
+  defines = [
     "TELEPHONY_LOG_TAG = \"CelllularDataUiTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]

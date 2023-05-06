@@ -12,7 +12,6 @@
 # limitations under the License.
 
 #####################hydra-fuzz###################
-import("//base/telephony/core_service/telephony.gni")
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
@@ -21,20 +20,18 @@ import("//build/test.gni")
 ohos_fuzztest("UpdateDisconnectMachineFuzzTest") {
   module_output_path = "cellular_data/UpdateDisconnectMachineFuzzTest"
   module_out_path = module_output_path
-  fuzz_config_file = "//base/telephony/cellular_data/test/fuzztest/updatedisconnectmachine_fuzzer"
+  SOURCE_DIR = "../../.."
+  fuzz_config_file = "$SOURCE_DIR/test/fuzztest/updatedisconnectmachine_fuzzer"
   include_dirs = [
-    "//base/telephony/cellular_data/services/include",
-    "//base/telephony/cellular_data/services/include/apn_manager",
-    "//base/telephony/cellular_data/services/include/common",
-    "//base/telephony/cellular_data/services/include/state_machine",
-    "//base/telephony/cellular_data/services/include/utils",
-    "//base/telephony/cellular_data/test/fuzztest/common_fuzzer",
-    "//base/telephony/telephony_data/pdp_profile/include",
+    "$SOURCE_DIR/services/include",
+    "$SOURCE_DIR/services/include/apn_manager",
+    "$SOURCE_DIR/services/include/common",
+    "$SOURCE_DIR/services/include/state_machine",
+    "$SOURCE_DIR/services/include/utils",
+    "$SOURCE_DIR/test/fuzztest/common_fuzzer",
   ]
 
-  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
-
-  deps = [ "//base/telephony/cellular_data:tel_cellular_data" ]
+  deps = [ "$SOURCE_DIR:tel_cellular_data" ]
 
   external_deps = [
     "ability_runtime:ability_manager",
@@ -54,9 +51,10 @@ ohos_fuzztest("UpdateDisconnectMachineFuzzTest") {
     "netmanager_base:net_policy_manager_if",
     "netmanager_base:net_stats_manager_if",
     "relational_store:native_rdb",
+    "telephony_data:tel_telephony_data",
   ]
 
-  defines += [
+  defines = [
     "TELEPHONY_LOG_TAG = \"CellularDataFuzzTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
@@ -69,8 +67,8 @@ ohos_fuzztest("UpdateDisconnectMachineFuzzTest") {
   ]
 
   sources = [
-    "//base/telephony/cellular_data/test/fuzztest/common_fuzzer/adddatatoken_fuzzer.cpp",
-    "//base/telephony/cellular_data/test/fuzztest/common_fuzzer/statemachine_fuzzer.cpp",
+    "$SOURCE_DIR/test/fuzztest/common_fuzzer/adddatatoken_fuzzer.cpp",
+    "$SOURCE_DIR/test/fuzztest/common_fuzzer/statemachine_fuzzer.cpp",
     "updatedisconnectmachine_fuzzer.cpp",
   ]
 
