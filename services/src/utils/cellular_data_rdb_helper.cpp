@@ -89,6 +89,7 @@ bool CellularDataRdbHelper::QueryApns(const std::string &mcc, const std::string 
         return false;
     }
     ReadApnResult(result, apnVec);
+    result->Close();
     dataShareHelper->Release();
     dataShareHelper = nullptr;
     return true;
@@ -131,7 +132,6 @@ void CellularDataRdbHelper::ReadApnResult(
         result->GetString(index, apnBean.pdpProtocol);
         result->GetColumnIndex(PdpProfileData::APN_ROAM_PROTOCOL, index);
         result->GetString(index, apnBean.roamPdpProtocol);
-        result->Close();
         if (apnBean.pdpProtocol.empty()) {
             apnBean.pdpProtocol = "IPV4V6";
         }
