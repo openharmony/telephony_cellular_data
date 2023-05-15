@@ -57,6 +57,7 @@ void UpdateActiveMachineFuzz(const uint8_t *data, size_t size)
     active->ProcessConnectDone(event);
     active->ProcessDisconnectDone(event);
     active->ProcessLostConnection(event);
+    active->ProcessLinkCapabilityChanged(event);
     active->ProcessDataConnectionRoamOn(event);
     active->ProcessDataConnectionRoamOff(event);
     active->ProcessDataConnectionVoiceCallStartedOrEnded(event);

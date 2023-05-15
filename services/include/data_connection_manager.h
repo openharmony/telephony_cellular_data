@@ -36,6 +36,7 @@ public:
     std::shared_ptr<CellularDataStateMachine> GetActiveConnectionByCid(int32_t cid) const;
     bool isNoActiveConnection() const;
     std::map<int32_t, std::shared_ptr<CellularDataStateMachine>> GetActiveConnection() const;
+    bool IsBandwidthSourceModem() const;
     void RemoveActiveConnectionByCid(int32_t cid);
     void StartStallDetectionTimer();
     void StopStallDetectionTimer();
@@ -47,10 +48,13 @@ public:
     void SetDataFlowType(CellDataFlowType dataFlowType);
     int32_t GetSlotId() const;
     std::vector<std::shared_ptr<CellularDataStateMachine>> GetAllConnectionMachine();
-    std::string GetDefaultBandWidthsConfig();
-    std::string GetDefaultTcpBufferConfig();
+    void GetDefaultBandWidthsConfig();
+    void GetDefaultTcpBufferConfig();
     LinkBandwidthInfo GetBandwidthsByRadioTech(const int32_t radioTech);
     std::string GetTcpBufferByRadioTech(const int32_t radioTech);
+
+private:
+    void UpdateBandWidthsUseLte();
 
 private:
     std::shared_ptr<DataConnectionMonitor> connectionMonitor_;
@@ -60,6 +64,8 @@ private:
     const int32_t slotId_;
     std::map<std::string, LinkBandwidthInfo> bandwidthConfigMap_;
     std::map<std::string, std::string> tcpBufferConfigMap_;
+    bool bandwidthSourceModem_ = true;
+    bool uplinkUseLte_ = false;
 };
 
 class CcmDefaultState : public State {
@@ -74,6 +80,7 @@ public:
 
 protected:
     void RadioDataCallListChanged(const AppExecFwk::InnerEvent::Pointer &event);
+    void RadioLinkCapabilityChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void UpdateNetworkInfo(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:

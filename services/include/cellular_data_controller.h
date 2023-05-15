@@ -38,11 +38,9 @@ public:
     ApnProfileState GetCellularDataState() const;
     ApnProfileState GetCellularDataState(const std::string &apnType) const;
     int32_t IsCellularDataRoamingEnabled(bool &dataRoamingEnabled) const;
-    void SetDataPermitted(bool dataPermitted) const;
     void AsynchronousRegister();
     bool HandleApnChanged();
     int32_t GetCellularDataFlowType();
-    void EstablishDataConnection();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t SetPolicyDataOn(bool enable);
     bool IsRestrictedMode() const;
@@ -59,7 +57,7 @@ private:
 private:
     std::shared_ptr<CellularDataHandler> cellularDataHandler_;
     sptr<CellularDataRdbObserver> cellularDataRdbObserver_;
-    sptr<ISystemAbilityStatusChange> netManagerListener_ = nullptr;
+    sptr<ISystemAbilityStatusChange> systemAbilityListener_ = nullptr;
     const int32_t slotId_;
 
 private:

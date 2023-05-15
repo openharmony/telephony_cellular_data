@@ -149,6 +149,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | 
     cellularDataHandler.HandleSimStateOrRecordsChanged(event);
     cellularDataHandler.HandleSimAccountLoaded(event);
     cellularDataHandler.HandleRadioStateChanged(event);
+    cellularDataHandler.HandleDsdsModeChanged(event);
     cellularDataHandler.SetRilAttachApnResponse(event);
     cellularDataHandler.GetDefaultConfiguration();
     cellularDataHandler.HandleRadioNrStateChanged(event);
@@ -258,9 +259,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataController_001, Function | MediumTest
     bool dataRoamingEnabled = false;
     controller.IsCellularDataRoamingEnabled(dataRoamingEnabled);
     ASSERT_FALSE(dataRoamingEnabled);
-    controller.SetDataPermitted(true);
     ASSERT_FALSE(controller.HandleApnChanged());
-    controller.EstablishDataConnection();
     auto event = AppExecFwk::InnerEvent::Get(0);
     controller.ProcessEvent(event);
     event = nullptr;
@@ -299,11 +298,16 @@ HWTEST_F(BranchTest, Telephony_CellularDataConnectionManager_001, Function | Med
     ASSERT_TRUE(ccmDefaultState.StateProcess(event));
     event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_DATA_CALL_LIST_CHANGED);
     ASSERT_TRUE(ccmDefaultState.StateProcess(event));
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_LINK_CAPABILITY_CHANGED);
+    ASSERT_TRUE(ccmDefaultState.StateProcess(event));
     event = AppExecFwk::InnerEvent::Get(0);
     ASSERT_FALSE(ccmDefaultState.StateProcess(event));
     ccmDefaultState.RadioDataCallListChanged(event);
     ccmDefaultState.UpdateNetworkInfo(event);
+    ccmDefaultState.RadioLinkCapabilityChanged(event);
     con.GetDataFlowType();
+    con.GetDefaultBandWidthsConfig();
+    con.GetDefaultTcpBufferConfig();
     con.SetDataFlowType(CellDataFlowType::DATA_FLOW_TYPE_NONE);
     ASSERT_EQ("", con.GetTcpBufferByRadioTech(0));
     ASSERT_TRUE(con.GetBandwidthsByRadioTech(0).upBandwidth == DEFAULT_BANDWIDTH);

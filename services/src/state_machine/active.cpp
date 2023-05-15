@@ -125,6 +125,34 @@ bool Active::ProcessLostConnection(const AppExecFwk::InnerEvent::Pointer &event)
     return PROCESSED;
 }
 
+bool Active::ProcessLinkCapabilityChanged(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("Active::MSG_SM_LINK_CAPABILITY_CHANGED");
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is null");
+        return false;
+    }
+    std::shared_ptr<DataLinkCapability> dataLinkCapability = event->GetSharedObject<DataLinkCapability>();
+    if (dataLinkCapability == nullptr) {
+        TELEPHONY_LOGE("result info is null");
+        return false;
+    }
+    uint32_t upBandwidth = dataLinkCapability->primaryUplinkKbps;
+    uint32_t downBandwidth = dataLinkCapability->primaryDownlinkKbps;
+    std::shared_ptr<CellularDataStateMachine> shareStateMachine = stateMachine_.lock();
+    if (shareStateMachine == nullptr) {
+        TELEPHONY_LOGE("shareStateMachine is null");
+        return false;
+    }
+    if (upBandwidth == 0 || downBandwidth == 0) {
+        RefreshConnectionBandwidths();
+    } else {
+        shareStateMachine->SetConnectionBandwidth(upBandwidth, downBandwidth);
+    }
+    shareStateMachine->UpdateNetworkInfo();
+    return true;
+}
+
 bool Active::ProcessDataConnectionRoamOn(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("Active::EVENT_DATA_CONNECTION_ROAM_ON");
@@ -164,29 +192,6 @@ bool Active::ProcessDataConnectionVoiceCallStartedOrEnded(const AppExecFwk::Inne
     int32_t supplierId = netAgent.GetSupplierId(stateMachine->GetSlotId(), stateMachine->GetCapability());
     netAgent.UpdateNetSupplierInfo(supplierId, stateMachine->netSupplierInfo_);
     return PROCESSED;
-}
-
-bool Active::ProcessGetBandwidthsFromRil(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    if (event == nullptr) {
-        TELEPHONY_LOGE("event is null");
-        return false;
-    }
-    std::shared_ptr<DataLinkBandwidthInfo> dataLinkBandwidthInfo = event->GetSharedObject<DataLinkBandwidthInfo>();
-    if (dataLinkBandwidthInfo == nullptr) {
-        TELEPHONY_LOGE("result info is null");
-        return false;
-    }
-    uint32_t upBandwidth = dataLinkBandwidthInfo->ulMfbr;
-    uint32_t downBandwidth = dataLinkBandwidthInfo->dlMfbr;
-    std::shared_ptr<CellularDataStateMachine> shareStateMachine = stateMachine_.lock();
-    if (shareStateMachine == nullptr) {
-        TELEPHONY_LOGE("shareStateMachine is null");
-        return false;
-    }
-    shareStateMachine->SetConnectionBandwidth(upBandwidth, downBandwidth);
-    shareStateMachine->UpdateNetworkInfo();
-    return true;
 }
 
 bool Active::ProcessDataConnectionComplete(const AppExecFwk::InnerEvent::Pointer &event)

@@ -144,19 +144,11 @@ int32_t CellularDataService::EnableCellularData(bool enable)
             slotId, enable, CellularDataErrorCode::DATA_ERROR_PERMISSION_ERROR, Permission::SET_TELEPHONY_STATE);
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    int32_t result = TELEPHONY_ERR_SUCCESS;
-    for (const std::pair<const int32_t, std::shared_ptr<CellularDataController>> &it : cellularDataControllers_) {
-        if (it.second != nullptr) {
-            result = it.second->SetCellularDataEnable(enable);
-            if (result == TELEPHONY_ERR_SUCCESS) {
-                CellularDataHiSysEvent::WriteDataConnectStateBehaviorEvent(enable);
-            }
-        } else {
-            TELEPHONY_LOGE("CellularDataController is null");
-        }
+    if (cellularDataControllers_[DEFAULT_SIM_SLOT_ID] == nullptr) {
+        TELEPHONY_LOGE("cellularDataControllers_[0] is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-
-    return result;
+    return cellularDataControllers_[DEFAULT_SIM_SLOT_ID]->SetCellularDataEnable(enable);
 }
 
 int32_t CellularDataService::GetCellularDataState()
@@ -322,29 +314,6 @@ int32_t CellularDataService::SetDefaultCellularDataSlotId(const int32_t slotId)
     if (result != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("set slot id fail");
         return result;
-    }
-    if (formerSlotId >= 0 && formerSlotId != slotId) {
-        std::map<int32_t, std::shared_ptr<CellularDataController>>::iterator itController =
-            cellularDataControllers_.find(formerSlotId);
-        if (itController != cellularDataControllers_.end() && (itController->second != nullptr)) {
-            itController->second->ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
-        } else {
-            TELEPHONY_LOGI("Not find old slot[%{public}d] object", formerSlotId);
-        }
-    }
-    int32_t newSlotId = GetDefaultCellularDataSlotId();
-    if (formerSlotId != newSlotId) {
-        if (CheckParamValid(formerSlotId)) {
-            cellularDataControllers_[formerSlotId]->SetDataPermitted(false);
-        }
-        if (CheckParamValid(newSlotId)) {
-            cellularDataControllers_[newSlotId]->SetDataPermitted(true);
-        }
-    }
-    bool dataEnabled = false;
-    IsCellularDataEnabled(dataEnabled);
-    if (dataEnabled && CheckParamValid(slotId)) {
-        cellularDataControllers_[slotId]->EstablishDataConnection();
     }
     return TELEPHONY_ERR_SUCCESS;
 }

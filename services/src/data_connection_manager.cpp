@@ -15,15 +15,15 @@
 
 #include "data_connection_manager.h"
 
-#include "core_manager_inner.h"
-#include "hril_data_parcel.h"
-#include "radio_event.h"
-#include "telephony_log_wrapper.h"
-
 #include "cellular_data_event_code.h"
 #include "cellular_data_handler.h"
 #include "cellular_data_state_machine.h"
 #include "cellular_data_utils.h"
+#include "core_manager_inner.h"
+#include "hril_data_parcel.h"
+#include "operator_config_types.h"
+#include "radio_event.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -95,6 +95,11 @@ std::map<int32_t, std::shared_ptr<CellularDataStateMachine>> DataConnectionManag
     return cidActiveConnectionMap_;
 }
 
+bool DataConnectionManager::IsBandwidthSourceModem() const
+{
+    return bandwidthSourceModem_;
+}
+
 bool DataConnectionManager::isNoActiveConnection() const
 {
     if (cidActiveConnectionMap_.empty()) {
@@ -128,8 +133,9 @@ void DataConnectionManager::RegisterRadioObserver()
 {
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     coreInner.RegisterCoreNotify(slotId_, stateMachineEventHandler_, RadioEvent::RADIO_CONNECTED, nullptr);
-    coreInner.RegisterCoreNotify(slotId_, stateMachineEventHandler_,
-        RadioEvent::RADIO_DATA_CALL_LIST_CHANGED, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, stateMachineEventHandler_, RadioEvent::RADIO_DATA_CALL_LIST_CHANGED, nullptr);
+    coreInner.RegisterCoreNotify(
+        slotId_, stateMachineEventHandler_, RadioEvent::RADIO_LINK_CAPABILITY_CHANGED, nullptr);
 }
 
 void DataConnectionManager::UnRegisterRadioObserver() const
@@ -137,6 +143,7 @@ void DataConnectionManager::UnRegisterRadioObserver() const
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     coreInner.UnRegisterCoreNotify(slotId_, stateMachineEventHandler_, RadioEvent::RADIO_CONNECTED);
     coreInner.UnRegisterCoreNotify(slotId_, stateMachineEventHandler_, RadioEvent::RADIO_DATA_CALL_LIST_CHANGED);
+    coreInner.UnRegisterCoreNotify(slotId_, stateMachineEventHandler_, RadioEvent::RADIO_LINK_CAPABILITY_CHANGED);
 }
 
 void CcmDefaultState::StateBegin()
@@ -162,6 +169,9 @@ bool CcmDefaultState::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
             break;
         case RadioEvent::RADIO_DATA_CALL_LIST_CHANGED:
             RadioDataCallListChanged(event);
+            break;
+        case RadioEvent::RADIO_LINK_CAPABILITY_CHANGED:
+            RadioLinkCapabilityChanged(event);
             break;
         default:
             TELEPHONY_LOGE("StateProcess handle nothing!");
@@ -207,6 +217,28 @@ void CcmDefaultState::RadioDataCallListChanged(const AppExecFwk::InnerEvent::Poi
         AppExecFwk::InnerEvent::Pointer event =
             AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_LOST_CONNECTION);
         it->SendEvent(event);
+    }
+}
+
+void CcmDefaultState::RadioLinkCapabilityChanged(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::shared_ptr<DataLinkCapability> linkCapability = event->GetSharedObject<DataLinkCapability>();
+    if (linkCapability == nullptr) {
+        TELEPHONY_LOGE("linkCapability is null");
+        return;
+    }
+    if (connectManager_.IsBandwidthSourceModem()) {
+        std::map<int32_t, std::shared_ptr<CellularDataStateMachine>> idActiveConnectionMap =
+            connectManager_.GetActiveConnection();
+        for (const std::pair<const int32_t, std::shared_ptr<CellularDataStateMachine>> &it : idActiveConnectionMap) {
+            if (it.second == nullptr) {
+                TELEPHONY_LOGI("The activation item is null(%{public}d)", it.first);
+                continue;
+            }
+            AppExecFwk::InnerEvent::Pointer smEvent =
+                AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_LINK_CAPABILITY_CHANGED, linkCapability);
+            it.second->SendEvent(smEvent);
+        }
     }
 }
 
@@ -265,12 +297,25 @@ void DataConnectionManager::SetDataFlowType(CellDataFlowType dataFlowType)
     connectionMonitor_->SetDataFlowType(dataFlowType);
 }
 
-std::string DataConnectionManager::GetDefaultBandWidthsConfig()
+void DataConnectionManager::GetDefaultBandWidthsConfig()
 {
+    OperatorConfig operatorConfig;
+    CoreManagerInner::GetInstance().GetOperatorConfigs(slotId_, operatorConfig);
+    if (operatorConfig.boolValue.find(KEY_BANDWIDTH_SOURCE_USE_MODEM_BOOL) != operatorConfig.boolValue.end()) {
+        bandwidthSourceModem_ = operatorConfig.boolValue[KEY_BANDWIDTH_SOURCE_USE_MODEM_BOOL];
+    }
+    if (operatorConfig.boolValue.find(KEY_UPLINK_BANDWIDTH_NR_NSA_USE_LTE_VALUE_BOOL) !=
+        operatorConfig.boolValue.end()) {
+        uplinkUseLte_ = operatorConfig.boolValue[KEY_UPLINK_BANDWIDTH_NR_NSA_USE_LTE_VALUE_BOOL];
+    }
+    std::vector<std::string> linkBandwidthVec;
+    if (operatorConfig.stringArrayValue.find(KEY_BANDWIDTH_STRING_ARRAY) != operatorConfig.stringArrayValue.end()) {
+        linkBandwidthVec = operatorConfig.stringArrayValue[KEY_BANDWIDTH_STRING_ARRAY];
+    }
+    if (linkBandwidthVec.empty()) {
+        linkBandwidthVec = CellularDataUtils::Split(DEFAULT_BANDWIDTH_CONFIG, ";");
+    }
     bandwidthConfigMap_.clear();
-    char bandWidthBuffer[MAX_BUFFER_SIZE] = {0};
-    GetParameter(CONFIG_BANDWIDTH, DEFAULT_BANDWIDTH_CONFIG, bandWidthBuffer, MAX_BUFFER_SIZE);
-    std::vector<std::string> linkBandwidthVec = CellularDataUtils::Split(bandWidthBuffer, ";");
     for (std::string temp : linkBandwidthVec) {
         std::vector<std::string> linkBandwidths = CellularDataUtils::Split(temp, ":");
         if (linkBandwidths.size() == VALID_VECTOR_SIZE) {
@@ -279,17 +324,38 @@ std::string DataConnectionManager::GetDefaultBandWidthsConfig()
             std::vector<std::string> upDownBandwidthValue = CellularDataUtils::Split(linkUpDownBandwidth, ",");
             if (upDownBandwidthValue.size() == VALID_VECTOR_SIZE) {
                 LinkBandwidthInfo linkBandwidthInfo;
-                linkBandwidthInfo.upBandwidth = (atoi)(upDownBandwidthValue.front().c_str());
-                linkBandwidthInfo.downBandwidth = (atoi)(upDownBandwidthValue.back().c_str());
+                linkBandwidthInfo.downBandwidth = (atoi)(upDownBandwidthValue.front().c_str());
+                linkBandwidthInfo.upBandwidth = (atoi)(upDownBandwidthValue.back().c_str());
                 bandwidthConfigMap_.emplace(key, linkBandwidthInfo);
             }
         }
     }
     TELEPHONY_LOGI("Slot%{public}d: BANDWIDTH_CONFIG_MAP size is %{public}zu", slotId_, bandwidthConfigMap_.size());
-    return "bandWidth";
+    UpdateBandWidthsUseLte();
 }
 
-std::string DataConnectionManager::GetDefaultTcpBufferConfig()
+void DataConnectionManager::UpdateBandWidthsUseLte()
+{
+    if (!uplinkUseLte_) {
+        return;
+    }
+    std::map<std::string, LinkBandwidthInfo>::iterator iter = bandwidthConfigMap_.find("LTE");
+    if (iter != bandwidthConfigMap_.end()) {
+        LinkBandwidthInfo lteLinkBandwidthInfo = iter->second;
+        TELEPHONY_LOGI("Slot%{public}d: name is %{public}s upBandwidth = %{public}u downBandwidth = %{public}u",
+            slotId_, iter->first.c_str(), lteLinkBandwidthInfo.upBandwidth, lteLinkBandwidthInfo.downBandwidth);
+        iter = bandwidthConfigMap_.find("NR_NSA");
+        if (iter != bandwidthConfigMap_.end()) {
+            iter->second.upBandwidth = lteLinkBandwidthInfo.upBandwidth;
+        }
+        iter = bandwidthConfigMap_.find("NR_NSA_MMWAVE");
+        if (iter != bandwidthConfigMap_.end()) {
+            iter->second.upBandwidth = lteLinkBandwidthInfo.upBandwidth;
+        }
+    }
+}
+
+void DataConnectionManager::GetDefaultTcpBufferConfig()
 {
     tcpBufferConfigMap_.clear();
     char tcpBufferConfig[MAX_BUFFER_SIZE] = {0};
@@ -300,7 +366,6 @@ std::string DataConnectionManager::GetDefaultTcpBufferConfig()
         tcpBufferConfigMap_.emplace(str.front(), str.back());
     }
     TELEPHONY_LOGI("Slot%{public}d: TCP_BUFFER_CONFIG_MAP size is %{public}zu", slotId_, tcpBufferConfigMap_.size());
-    return tcpBufferConfig;
 }
 
 LinkBandwidthInfo DataConnectionManager::GetBandwidthsByRadioTech(const int32_t radioTech)

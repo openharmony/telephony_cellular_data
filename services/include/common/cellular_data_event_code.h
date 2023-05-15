@@ -55,6 +55,7 @@ public:
     static const uint32_t MSG_DB_SETTING_ENABLE_CHANGED = BASE + 28;
     static const uint32_t MSG_DB_SETTING_ROAMING_CHANGED = BASE + 29;
     static const uint32_t MSG_SET_DATA_PERMITTED = BASE + 30;
+    static const uint32_t MSG_SM_LINK_CAPABILITY_CHANGED = BASE + 31;
 };
 } // namespace Telephony
 } // namespace OHOS
