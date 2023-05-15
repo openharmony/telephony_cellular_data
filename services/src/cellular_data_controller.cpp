@@ -38,12 +38,13 @@ CellularDataController::~CellularDataController()
 {
     UnRegisterEvents();
     UnRegisterDatabaseObserver();
-    if (netManagerListener_ != nullptr) {
+    if (systemAbilityListener_ != nullptr) {
         auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (samgrProxy != nullptr) {
-            samgrProxy->UnSubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID, netManagerListener_);
-            samgrProxy->UnSubscribeSystemAbility(COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID, netManagerListener_);
-            netManagerListener_ = nullptr;
+            samgrProxy->UnSubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID, systemAbilityListener_);
+            samgrProxy->UnSubscribeSystemAbility(COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID, systemAbilityListener_);
+            samgrProxy->UnSubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, systemAbilityListener_);
+            systemAbilityListener_ = nullptr;
         }
     }
 }
@@ -52,6 +53,8 @@ void CellularDataController::Init()
 {
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_DATA_SUBSCRIPTION_CHANGED);
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     cellularDataHandler_ = std::make_shared<CellularDataHandler>(GetEventRunner(), subscriberInfo, slotId_);
@@ -66,13 +69,14 @@ void CellularDataController::Init()
         TELEPHONY_LOGE("samgrProxy is nullptr");
         return;
     }
-    netManagerListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(slotId_, cellularDataHandler_);
-    if (netManagerListener_ == nullptr) {
-        TELEPHONY_LOGE("netManagerListener_ is nullptr");
+    systemAbilityListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(slotId_, cellularDataHandler_);
+    if (systemAbilityListener_ == nullptr) {
+        TELEPHONY_LOGE("systemAbilityListener_ is nullptr");
         return;
     }
-    samgrProxy->SubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID, netManagerListener_);
-    samgrProxy->SubscribeSystemAbility(COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID, netManagerListener_);
+    samgrProxy->SubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID, systemAbilityListener_);
+    samgrProxy->SubscribeSystemAbility(COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID, systemAbilityListener_);
+    samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, systemAbilityListener_);
 }
 
 int32_t CellularDataController::SetCellularDataEnable(bool userDataEnabled)
@@ -127,15 +131,6 @@ int32_t CellularDataController::SetCellularDataRoamingEnabled(bool dataRoamingEn
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return cellularDataHandler_->SetCellularDataRoamingEnabled(dataRoamingEnabled);
-}
-
-void CellularDataController::SetDataPermitted(bool dataPermitted) const
-{
-    if (cellularDataHandler_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: SetDataPermitted cellularDataHandler is null", slotId_);
-        return;
-    }
-    cellularDataHandler_->SetDataPermitted(dataPermitted);
 }
 
 bool CellularDataController::ReleaseNet(const NetRequest &request)
@@ -200,6 +195,7 @@ void CellularDataController::RegisterEvents()
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_ROAMING_OPEN, nullptr);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_ROAMING_CLOSE, nullptr);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_STATE_CHANGED, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_DSDS_MODE_CHANGED, nullptr);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_RAT_CHANGED, nullptr);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_CALL_STATUS_INFO, nullptr);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_EMERGENCY_STATE_OPEN, nullptr);
@@ -232,6 +228,7 @@ void CellularDataController::UnRegisterEvents()
     coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_ROAMING_OPEN);
     coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_ROAMING_CLOSE);
     coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_STATE_CHANGED);
+    coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_DSDS_MODE_CHANGED);
     coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_RAT_CHANGED);
     coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_CALL_STATUS_INFO);
     coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_EMERGENCY_STATE_OPEN);
@@ -278,13 +275,6 @@ int32_t CellularDataController::GetCellularDataFlowType()
         return static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_NONE);
     }
     return cellularDataHandler_->GetCellularDataFlowType();
-}
-
-void CellularDataController::EstablishDataConnection()
-{
-    if (cellularDataHandler_ != nullptr) {
-        cellularDataHandler_->EstablishAllApnsIfConnectable();
-    }
 }
 
 int32_t CellularDataController::SetPolicyDataOn(bool enable)
@@ -356,6 +346,13 @@ void CellularDataController::SystemAbilityStatusChangeListener::OnAddSystemAbili
                 CellularDataNetAgent::GetInstance().RegisterPolicyCallback();
             }
             break;
+        case COMMON_EVENT_SERVICE_ID:
+            TELEPHONY_LOGI("COMMON_EVENT_SERVICE_ID running");
+            if (handler_ != nullptr) {
+                bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(handler_);
+                TELEPHONY_LOGI("subscribeResult = %{public}d", subscribeResult);
+            }
+            break;
         default:
             TELEPHONY_LOGE("systemAbilityId is invalid");
             break;
@@ -372,6 +369,13 @@ void CellularDataController::SystemAbilityStatusChangeListener::OnRemoveSystemAb
             break;
         case COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID:
             TELEPHONY_LOGE("COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID stopped");
+            break;
+        case COMMON_EVENT_SERVICE_ID:
+            TELEPHONY_LOGE("COMMON_EVENT_SERVICE_ID stopped");
+            if (handler_ != nullptr) {
+                bool unSubscribeResult = EventFwk::CommonEventManager::UnSubscribeCommonEvent(handler_);
+                TELEPHONY_LOGI("unSubscribeResult = %{public}d", unSubscribeResult);
+            }
             break;
         default:
             TELEPHONY_LOGE("systemAbilityId is invalid");

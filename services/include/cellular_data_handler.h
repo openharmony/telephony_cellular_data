@@ -62,7 +62,6 @@ public:
     bool IsRestrictedMode() const;
     DisConnectionReason GetDisConnectionReason();
     bool HasInternetCapability(const int32_t cid) const;
-    void SetDataPermitted(bool dataPermitted);
 
 private:
     std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect();
@@ -85,6 +84,8 @@ private:
     void MsgRequestNetwork(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleSettingSwitchChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleVoiceCallChanged(int32_t state);
+    void HandleDefaultDataSubscriptionChanged();
+    void HandleDsdsModeChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleSimStateOrRecordsChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleSimAccountLoaded(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleRadioStateChanged(const AppExecFwk::InnerEvent::Pointer &event);
@@ -104,9 +105,9 @@ private:
     void HandleDBSettingRoamingChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleSortConnection();
     void SetDataPermittedResponse(const AppExecFwk::InnerEvent::Pointer &event);
-    void SyncDataPermitted();
     void RegisterDataSettingObserver();
     void UnRegisterDataSettingObserver();
+    void SetDataPermitted(int32_t slotId, bool dataPermitted);
 
 private:
     sptr<ApnManager> apnManager_;
@@ -135,29 +136,30 @@ private:
 
     using Fun = void (CellularDataHandler::*)(const AppExecFwk::InnerEvent::Pointer &event);
     std::map<uint32_t, Fun> eventIdMap_ {
-        {RadioEvent::RADIO_PS_CONNECTION_ATTACHED, &CellularDataHandler::RadioPsConnectionAttached},
-        {RadioEvent::RADIO_PS_CONNECTION_DETACHED, &CellularDataHandler::RadioPsConnectionDetached},
-        {RadioEvent::RADIO_PS_ROAMING_OPEN, &CellularDataHandler::RoamingStateOn},
-        {RadioEvent::RADIO_PS_ROAMING_CLOSE, &CellularDataHandler::RoamingStateOff},
-        {RadioEvent::RADIO_EMERGENCY_STATE_OPEN, &CellularDataHandler::PsRadioEmergencyStateOpen},
-        {RadioEvent::RADIO_EMERGENCY_STATE_CLOSE, &CellularDataHandler::PsRadioEmergencyStateClose},
-        {CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION_COMPLETE,
-            &CellularDataHandler::EstablishDataConnectionComplete},
-        {CellularDataEventCode::MSG_DISCONNECT_DATA_COMPLETE, &CellularDataHandler::DisconnectDataComplete},
-        {CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, &CellularDataHandler::MsgEstablishDataConnection},
-        {CellularDataEventCode::MSG_SETTING_SWITCH, &CellularDataHandler::HandleSettingSwitchChanged},
-        {CellularDataEventCode::MSG_REQUEST_NETWORK, &CellularDataHandler::MsgRequestNetwork},
-        {RadioEvent::RADIO_STATE_CHANGED, &CellularDataHandler::HandleRadioStateChanged},
-        {RadioEvent::RADIO_SIM_STATE_CHANGE, &CellularDataHandler::HandleSimStateOrRecordsChanged},
-        {RadioEvent::RADIO_SIM_RECORDS_LOADED, &CellularDataHandler::HandleSimStateOrRecordsChanged},
-        {RadioEvent::RADIO_SIM_ACCOUNT_LOADED, &CellularDataHandler::HandleSimAccountLoaded},
-        {RadioEvent::RADIO_PS_RAT_CHANGED, &CellularDataHandler::PsDataRatChanged},
-        {CellularDataEventCode::MSG_APN_CHANGED, &CellularDataHandler::HandleApnChanged},
-        {CellularDataEventCode::MSG_SET_RIL_ATTACH_APN, &CellularDataHandler::SetRilAttachApnResponse},
-        {RadioEvent::RADIO_NR_STATE_CHANGED, &CellularDataHandler::HandleRadioNrStateChanged},
-        {RadioEvent::RADIO_NR_FREQUENCY_CHANGED, &CellularDataHandler::HandleRadioNrFrequencyChanged},
-        {CellularDataEventCode::MSG_DB_SETTING_ENABLE_CHANGED, &CellularDataHandler::HandleDBSettingEnableChanged},
-        {CellularDataEventCode::MSG_DB_SETTING_ROAMING_CHANGED, &CellularDataHandler::HandleDBSettingRoamingChanged},
+        { RadioEvent::RADIO_PS_CONNECTION_ATTACHED, &CellularDataHandler::RadioPsConnectionAttached },
+        { RadioEvent::RADIO_PS_CONNECTION_DETACHED, &CellularDataHandler::RadioPsConnectionDetached },
+        { RadioEvent::RADIO_PS_ROAMING_OPEN, &CellularDataHandler::RoamingStateOn },
+        { RadioEvent::RADIO_PS_ROAMING_CLOSE, &CellularDataHandler::RoamingStateOff },
+        { RadioEvent::RADIO_EMERGENCY_STATE_OPEN, &CellularDataHandler::PsRadioEmergencyStateOpen },
+        { RadioEvent::RADIO_EMERGENCY_STATE_CLOSE, &CellularDataHandler::PsRadioEmergencyStateClose },
+        { CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION_COMPLETE,
+            &CellularDataHandler::EstablishDataConnectionComplete },
+        { CellularDataEventCode::MSG_DISCONNECT_DATA_COMPLETE, &CellularDataHandler::DisconnectDataComplete },
+        { CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, &CellularDataHandler::MsgEstablishDataConnection },
+        { CellularDataEventCode::MSG_SETTING_SWITCH, &CellularDataHandler::HandleSettingSwitchChanged },
+        { CellularDataEventCode::MSG_REQUEST_NETWORK, &CellularDataHandler::MsgRequestNetwork },
+        { RadioEvent::RADIO_STATE_CHANGED, &CellularDataHandler::HandleRadioStateChanged },
+        { RadioEvent::RADIO_DSDS_MODE_CHANGED, &CellularDataHandler::HandleDsdsModeChanged },
+        { RadioEvent::RADIO_SIM_STATE_CHANGE, &CellularDataHandler::HandleSimStateOrRecordsChanged },
+        { RadioEvent::RADIO_SIM_RECORDS_LOADED, &CellularDataHandler::HandleSimStateOrRecordsChanged },
+        { RadioEvent::RADIO_SIM_ACCOUNT_LOADED, &CellularDataHandler::HandleSimAccountLoaded },
+        { RadioEvent::RADIO_PS_RAT_CHANGED, &CellularDataHandler::PsDataRatChanged },
+        { CellularDataEventCode::MSG_APN_CHANGED, &CellularDataHandler::HandleApnChanged },
+        { CellularDataEventCode::MSG_SET_RIL_ATTACH_APN, &CellularDataHandler::SetRilAttachApnResponse },
+        { RadioEvent::RADIO_NR_STATE_CHANGED, &CellularDataHandler::HandleRadioNrStateChanged },
+        { RadioEvent::RADIO_NR_FREQUENCY_CHANGED, &CellularDataHandler::HandleRadioNrFrequencyChanged },
+        { CellularDataEventCode::MSG_DB_SETTING_ENABLE_CHANGED, &CellularDataHandler::HandleDBSettingEnableChanged },
+        { CellularDataEventCode::MSG_DB_SETTING_ROAMING_CHANGED, &CellularDataHandler::HandleDBSettingRoamingChanged },
     };
 };
 } // namespace Telephony

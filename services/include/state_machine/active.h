@@ -43,10 +43,10 @@ private:
     bool ProcessDisconnectDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessDisconnectAllDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessLostConnection(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessLinkCapabilityChanged(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessDataConnectionRoamOn(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessDataConnectionRoamOff(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessDataConnectionVoiceCallStartedOrEnded(const AppExecFwk::InnerEvent::Pointer &event);
-    bool ProcessGetBandwidthsFromRil(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessNrStateChanged(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessNrFrequencyChanged(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessDataConnectionComplete(const AppExecFwk::InnerEvent::Pointer &event);
@@ -56,18 +56,18 @@ private:
 private:
     using Fun = bool (Active::*)(const AppExecFwk::InnerEvent::Pointer &data);
     std::map<uint32_t, Fun> eventIdFunMap_ {
-        {CellularDataEventCode::MSG_SM_CONNECT, &Active::ProcessConnectDone},
-        {CellularDataEventCode::MSG_SM_DISCONNECT, &Active::ProcessDisconnectDone},
-        {CellularDataEventCode::MSG_SM_DISCONNECT_ALL, &Active::ProcessDisconnectAllDone},
-        {CellularDataEventCode::MSG_SM_LOST_CONNECTION, &Active::ProcessLostConnection},
-        {CellularDataEventCode::MSG_SM_DATA_ROAM_ON, &Active::ProcessDataConnectionRoamOn},
-        {CellularDataEventCode::MSG_SM_DATA_ROAM_OFF, &Active::ProcessDataConnectionRoamOff},
-        {CellularDataEventCode::MSG_SM_VOICE_CALL_STARTED, &Active::ProcessDataConnectionVoiceCallStartedOrEnded},
-        {CellularDataEventCode::MSG_SM_VOICE_CALL_ENDED, &Active::ProcessDataConnectionVoiceCallStartedOrEnded},
-        {RadioEvent::RADIO_NR_STATE_CHANGED, &Active::ProcessNrStateChanged},
-        {RadioEvent::RADIO_NR_FREQUENCY_CHANGED, &Active::ProcessNrFrequencyChanged},
-        {CellularDataEventCode::MSG_GET_RIL_BANDWIDTH, &Active::ProcessGetBandwidthsFromRil},
-        {RadioEvent::RADIO_RIL_SETUP_DATA_CALL, &Active::ProcessDataConnectionComplete},
+        { CellularDataEventCode::MSG_SM_CONNECT, &Active::ProcessConnectDone },
+        { CellularDataEventCode::MSG_SM_DISCONNECT, &Active::ProcessDisconnectDone },
+        { CellularDataEventCode::MSG_SM_DISCONNECT_ALL, &Active::ProcessDisconnectAllDone },
+        { CellularDataEventCode::MSG_SM_LOST_CONNECTION, &Active::ProcessLostConnection },
+        { CellularDataEventCode::MSG_SM_LINK_CAPABILITY_CHANGED, &Active::ProcessLinkCapabilityChanged },
+        { CellularDataEventCode::MSG_SM_DATA_ROAM_ON, &Active::ProcessDataConnectionRoamOn },
+        { CellularDataEventCode::MSG_SM_DATA_ROAM_OFF, &Active::ProcessDataConnectionRoamOff },
+        { CellularDataEventCode::MSG_SM_VOICE_CALL_STARTED, &Active::ProcessDataConnectionVoiceCallStartedOrEnded },
+        { CellularDataEventCode::MSG_SM_VOICE_CALL_ENDED, &Active::ProcessDataConnectionVoiceCallStartedOrEnded },
+        { RadioEvent::RADIO_NR_STATE_CHANGED, &Active::ProcessNrStateChanged },
+        { RadioEvent::RADIO_NR_FREQUENCY_CHANGED, &Active::ProcessNrFrequencyChanged },
+        { RadioEvent::RADIO_RIL_SETUP_DATA_CALL, &Active::ProcessDataConnectionComplete },
     };
     std::weak_ptr<CellularDataStateMachine> stateMachine_;
 };
