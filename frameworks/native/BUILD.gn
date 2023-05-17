@@ -55,6 +55,7 @@ ohos_shared_library("tel_cellular_data_api") {
     "TELEPHONY_LOG_TAG = \"CellularDataApi\"",
     "LOG_DOMAIN = 0xD001F03",
   ]
+  innerapi_tags = [ "platformsdk" ]
   part_name = "cellular_data"
   subsystem_name = "telephony"
 }
