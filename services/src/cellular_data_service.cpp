@@ -287,6 +287,10 @@ void CellularDataService::UnRegisterAllNetSpecifier()
 
 int32_t CellularDataService::HandleApnChanged(const int32_t slotId)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (!CheckParamValid(slotId)) {
         TELEPHONY_LOGE("cellularDataControllers_[%{public}d] is null", slotId);
         return CELLULAR_DATA_INVALID_PARAM;
