@@ -16,6 +16,7 @@
 #define protected public
 #include "apn_holder.h"
 #include "apn_item.h"
+#include "cellular_data_client.h"
 #include "cellular_data_controller.h"
 #include "cellular_data_dump_helper.h"
 #include "cellular_data_handler.h"
@@ -374,6 +375,11 @@ HWTEST_F(BranchTest, Telephony_CellularDataUtils_001, Function | MediumTest | Le
         "a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11.a12.a13.a14.a15.a16.m1.m2.m3.m4.m5.m6.m7.m8.m9.m10.m11.m12.m13.m14.m15.m16",
         info));
     ASSERT_TRUE(CellularDataUtils::ParseDotIpData("a1.a2.a3.a4.m1.m2.m3.m4", info));
+    EXPECT_GE(DelayedSingleton<CellularDataClient>::GetInstance()->GetCellularDataFlowType(), 0);
+    auto recipient =
+        std::make_shared<CellularDataClient::CellularDataDeathRecipient>(CellularDataClient::GetInstance());
+    recipient->OnRemoteDied(nullptr);
+    EXPECT_GE(DelayedSingleton<CellularDataClient>::GetInstance()->GetCellularDataFlowType(), 0);
 }
 
 } // namespace Telephony
