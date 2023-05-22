@@ -21,7 +21,6 @@
 #include "iosfwd"
 #include "telephony_hisysevent.h"
 
-
 namespace OHOS {
 namespace Telephony {
 static const int32_t DATA_ACTIVATE_TIME = 1000;
