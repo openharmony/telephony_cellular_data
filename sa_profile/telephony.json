@@ -1,0 +1,16 @@
+{
+    "process": "telephony",
+    "systemability": [
+        {
+            "name": 4007,
+            "libpath": "libtel_cellular_data.z.so",
+            "run-on-create": true,
+            "depend": [
+                4010
+            ],
+            "depend_time_out": 60000,
+            "distributed": false,
+            "dump_level": 1
+        }
+    ]
+}
