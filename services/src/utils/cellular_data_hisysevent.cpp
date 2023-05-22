@@ -19,7 +19,6 @@
 #include "string"
 #include "type_traits"
 
-
 namespace OHOS {
 namespace Telephony {
 // EVENT
