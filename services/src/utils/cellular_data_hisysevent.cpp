@@ -15,6 +15,11 @@
 
 #include "cellular_data_hisysevent.h"
 
+#include "chrono"
+#include "string"
+#include "type_traits"
+
+
 namespace OHOS {
 namespace Telephony {
 // EVENT
