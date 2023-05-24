@@ -24,6 +24,8 @@
 #include "telephony_types.h"
 #include "token_setproc.h"
 
+namespace OHOS {
+namespace Telephony {
 using namespace OHOS::Security::AccessToken;
 using OHOS::Security::AccessToken::AccessTokenID;
 
@@ -118,8 +120,6 @@ private:
     AccessTokenID accessID_ = 0;
 };
 
-namespace OHOS {
-namespace Telephony {
 class CellularDataCodeTest {
     using Fun = void (*)();
 public:
