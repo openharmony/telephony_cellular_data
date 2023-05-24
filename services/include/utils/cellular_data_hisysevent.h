@@ -16,8 +16,9 @@
 #ifndef CELLULAR_DATA_HISYSEVENT_H
 #define CELLULAR_DATA_HISYSEVENT_H
 
-#include <string>
+#include <stdint.h>
 
+#include "iosfwd"
 #include "telephony_hisysevent.h"
 
 namespace OHOS {
