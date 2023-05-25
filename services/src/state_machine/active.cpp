@@ -137,8 +137,8 @@ bool Active::ProcessLinkCapabilityChanged(const AppExecFwk::InnerEvent::Pointer 
         TELEPHONY_LOGE("result info is null");
         return false;
     }
-    uint32_t upBandwidth = dataLinkCapability->primaryUplinkKbps;
-    uint32_t downBandwidth = dataLinkCapability->primaryDownlinkKbps;
+    uint32_t upBandwidth = static_cast<uint32_t>(dataLinkCapability->primaryUplinkKbps);
+    uint32_t downBandwidth = static_cast<uint32_t>(dataLinkCapability->primaryDownlinkKbps);
     std::shared_ptr<CellularDataStateMachine> shareStateMachine = stateMachine_.lock();
     if (shareStateMachine == nullptr) {
         TELEPHONY_LOGE("shareStateMachine is null");
