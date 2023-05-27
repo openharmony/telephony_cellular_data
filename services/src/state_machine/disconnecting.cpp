@@ -76,8 +76,7 @@ bool Disconnecting::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
         return false;
     }
     bool retVal = false;
-    uint32_t eventCode = event->GetInnerEventId();
-    switch (eventCode) {
+    switch (event->GetInnerEventId()) {
         case CellularDataEventCode::MSG_SM_CONNECT:
             TELEPHONY_LOGI("Disconnecting::MSG_SM_CONNECT");
             stateMachine->DeferEvent(std::move(event));
