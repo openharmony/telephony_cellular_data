@@ -290,7 +290,7 @@ void CellularDataHandler::RadioPsConnectionDetached(const InnerEvent::Pointer &e
         TELEPHONY_LOGE("Slot%{public}d: event is null", slotId_);
         return;
     }
-    ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
+    ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
 }
 
 void CellularDataHandler::RoamingStateOn(const InnerEvent::Pointer &event)
