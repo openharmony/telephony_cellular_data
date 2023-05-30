@@ -541,8 +541,6 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
         TELEPHONY_LOGE("Slot%{public}d: apnItem is null", slotId_);
         return false;
     }
-    int32_t profileId = apnItem->attr_.profileId_;
-    profileId == INVALID_PROFILE_ID ? apnHolder->GetProfileId(apnHolder->GetApnType()) : profileId;
     if (!multipleConnectionsEnabled_) {
         if (HasAnyHigherPriorityConnection(apnHolder)) {
             TELEPHONY_LOGE("Slot%{public}d: has higher priority connection", slotId_);
@@ -576,14 +574,10 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
     bool userDataRoaming = false;
     dataSwitchSettings_->IsUserDataRoamingOn(userDataRoaming);
     StateNotification::GetInstance().UpdateCellularDataConnectState(slotId_, PROFILE_STATE_CONNECTING, radioTech);
-    std::unique_ptr<DataConnectionParams> object =
-        std::make_unique<DataConnectionParams>(apnHolder, profileId, radioTech, roamingState, userDataRoaming, true);
-    if (object == nullptr) {
-        TELEPHONY_LOGE("DataConnectionParams is nullptr");
-        return false;
-    }
+    std::unique_ptr<DataConnectionParams> object = std::make_unique<DataConnectionParams>(
+        apnHolder, apnItem->attr_.profileId_, radioTech, roamingState, userDataRoaming, true);
     TELEPHONY_LOGI("Slot%{public}d: MSG_SM_CONNECT profileId:%{public}d type:%{public}s networkType:%{public}d",
-        slotId_, profileId, apnHolder->GetApnType().c_str(), radioTech);
+        slotId_, apnItem->attr_.profileId_, apnHolder->GetApnType().c_str(), radioTech);
     InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT, object);
     cellularDataStateMachine->SendEvent(event);
     return true;
