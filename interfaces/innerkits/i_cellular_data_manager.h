@@ -30,6 +30,7 @@ public:
         IS_DATA_ROAMING_ENABLED,
         ENABLE_DATA_ROAMING,
         GET_DEFAULT_SLOT_ID,
+        GET_DEFAULT_SIM_ID,
         SET_DEFAULT_SLOT_ID,
         GET_FLOW_TYPE_ID,
         HAS_CAPABILITY,
@@ -98,6 +99,14 @@ public:
      * @return default settings data card, -1 error code
      */
     virtual int32_t GetDefaultCellularDataSlotId() = 0;
+
+    /**
+     * Get the slotId that uses the data traffic by default
+     *
+     * @param simId  Returns default settings data sim id
+     * @return  Returns 0 on success, others on failure.
+     */
+    virtual int32_t GetDefaultCellularDataSimId(int32_t &simId) = 0;
 
     /**
      * set the slotId that uses the data traffic by default

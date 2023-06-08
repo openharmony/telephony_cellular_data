@@ -143,6 +143,24 @@ int32_t CellularDataServiceStub::OnGetDefaultCellularDataSlotId(MessageParcel &d
     return result;
 }
 
+int32_t CellularDataServiceStub::OnGetDefaultCellularDataSimId(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t simId = 0;
+    int32_t result = GetDefaultCellularDataSimId(simId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("write int32 reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteInt32(simId)) {
+        TELEPHONY_LOGE("write int32 reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CellularDataServiceStub::OnSetDefaultCellularDataSlotId(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();

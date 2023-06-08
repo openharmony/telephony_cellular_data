@@ -37,6 +37,7 @@ public:
     int32_t IsCellularDataRoamingEnabled(int32_t slotId, bool &dataRoamingEnabled);
     int32_t EnableCellularDataRoaming(int32_t slotId, bool enable);
     int32_t GetDefaultCellularDataSlotId();
+    int32_t GetDefaultCellularDataSimId(int32_t &simId);
     int32_t SetDefaultCellularDataSlotId(int32_t slotId);
     int32_t GetCellularDataFlowType();
     int32_t HasInternetCapability(int32_t slotId, int32_t cid);
@@ -64,10 +65,11 @@ private:
 
 private:
     std::mutex mutexProxy_;
-    sptr<ICellularDataManager> proxy_ {nullptr};
+    sptr<ICellularDataManager> proxy_ { nullptr };
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ { nullptr };
     sptr<SimAccountCallback> callback_ { nullptr };
     int32_t defaultCellularDataSlotId_;
+    int32_t defaultCellularDataSimId_;
     bool registerStatus_ = false;
 };
 } // namespace Telephony
