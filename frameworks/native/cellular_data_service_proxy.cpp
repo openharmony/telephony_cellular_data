@@ -176,7 +176,7 @@ int32_t CellularDataServiceProxy::GetDefaultCellularDataSimId(int32_t &simId)
     MessageOption option;
     data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor());
     if (Remote() == nullptr) {
-        TELEPHONY_LOGE("remote is null");
+        TELEPHONY_LOGE("failed: remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t error = Remote()->SendRequest((uint32_t)FuncCode::GET_DEFAULT_SIM_ID, data, reply, option);
