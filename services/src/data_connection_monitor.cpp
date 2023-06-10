@@ -148,7 +148,10 @@ void DataConnectionMonitor::EndNetStatistics()
 {
     RemoveEvent(CellularDataEventCode::MSG_RUN_MONITOR_TASK);
     updateNetStat_ = false;
-    dataFlowType_ = CellDataFlowType::DATA_FLOW_TYPE_NONE;
+    if (dataFlowType_ != CellDataFlowType::DATA_FLOW_TYPE_NONE) {
+        dataFlowType_ = CellDataFlowType::DATA_FLOW_TYPE_NONE;
+        StateNotification::GetInstance().OnUpDataFlowtype(slotId_, dataFlowType_);
+    }
 }
 
 void DataConnectionMonitor::UpdateNetTrafficState()

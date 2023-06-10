@@ -42,6 +42,7 @@ private:
     int32_t OnEnableCellularDataRoaming(MessageParcel &data, MessageParcel &reply);
     int32_t OnHandleApnChanged(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetDefaultCellularDataSlotId(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetDefaultCellularDataSimId(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetDefaultCellularDataSlotId(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetCellularDataFlowType(MessageParcel &data, MessageParcel &reply);
     int32_t OnHasInternetCapability(MessageParcel &data, MessageParcel &reply);
@@ -63,6 +64,8 @@ private:
         { (uint32_t)ICellularDataManager::FuncCode::APN_DATA_CHANGED, &CellularDataServiceStub::OnHandleApnChanged },
         { (uint32_t)ICellularDataManager::FuncCode::GET_DEFAULT_SLOT_ID,
             &CellularDataServiceStub::OnGetDefaultCellularDataSlotId },
+        { (uint32_t)ICellularDataManager::FuncCode::GET_DEFAULT_SIM_ID,
+            &CellularDataServiceStub::OnGetDefaultCellularDataSimId },
         { (uint32_t)ICellularDataManager::FuncCode::SET_DEFAULT_SLOT_ID,
             &CellularDataServiceStub::OnSetDefaultCellularDataSlotId },
         { (uint32_t)ICellularDataManager::FuncCode::GET_FLOW_TYPE_ID,

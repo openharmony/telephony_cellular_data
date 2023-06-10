@@ -59,6 +59,7 @@ public:
     int32_t EnableCellularDataRoaming(const int32_t slotId, bool enable) override;
     int32_t HandleApnChanged(const int32_t slotId) override;
     int32_t GetDefaultCellularDataSlotId() override;
+    int32_t GetDefaultCellularDataSimId(int32_t &simId) override;
     int32_t SetDefaultCellularDataSlotId(const int32_t slotId) override;
     int32_t GetCellularDataFlowType() override;
     void DispatchEvent(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);

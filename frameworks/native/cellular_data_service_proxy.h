@@ -92,6 +92,14 @@ public:
     int32_t GetDefaultCellularDataSlotId();
 
     /**
+     * Get the sim id that uses the data traffic by default
+     *
+     * @param simId Returns default settings data sim id
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t GetDefaultCellularDataSimId(int32_t &simId);
+
+    /**
       * set the slotId that uses the data traffic by default
       *
       * @param slotId card slot identification

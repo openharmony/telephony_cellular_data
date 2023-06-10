@@ -142,6 +142,7 @@ public:
     static int32_t IsCellularDataRoamingEnabledTest(int32_t slotId, bool &dataRoamingEnabled);
     static int32_t EnableCellularDataRoamingTest(int32_t slotId, bool enable);
     static int32_t GetDefaultCellularDataSlotIdTest();
+    static int32_t GetDefaultCellularDataSimIdTest();
     static int32_t SetDefaultCellularDataSlotIdTest(int32_t slotId);
     static int32_t GetCellularDataFlowTypeTest();
     static void WaitTestTimeout(const int32_t status);
@@ -269,6 +270,12 @@ int32_t CellularDataTest::GetDefaultCellularDataSlotIdTest()
     return CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
 }
 
+int32_t CellularDataTest::GetDefaultCellularDataSimIdTest()
+{
+    int32_t simId = 0;
+    return CellularDataClient::GetInstance().GetDefaultCellularDataSimId(simId);
+}
+
 int32_t CellularDataTest::SetDefaultCellularDataSlotIdTest(int32_t slotId)
 {
     return CellularDataClient::GetInstance().SetDefaultCellularDataSlotId(slotId);
@@ -325,6 +332,20 @@ HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test, TestSize.Level2)
     ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(DATA_SLOT_ID_INVALID);
     ASSERT_TRUE(result != TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   GetDefaultCellularDataSimId
+ * @tc.name     Test get default data sim id
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, DefaultCellularDataSimId_Test, TestSize.Level2)
+{
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+    int32_t result = CellularDataTest::GetDefaultCellularDataSimIdTest();
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
 }
 
 /**

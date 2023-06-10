@@ -305,6 +305,11 @@ int32_t CellularDataService::GetDefaultCellularDataSlotId()
     return CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
 }
 
+int32_t CellularDataService::GetDefaultCellularDataSimId(int32_t &simId)
+{
+    return CoreManagerInner::GetInstance().GetDefaultCellularDataSimId(simId);
+}
+
 int32_t CellularDataService::SetDefaultCellularDataSlotId(const int32_t slotId)
 {
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
