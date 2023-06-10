@@ -103,8 +103,8 @@ public:
     /**
      * Get the slotId that uses the data traffic by default
      *
-     * @param simId  Returns default settings data sim id
-     * @return  Returns 0 on success, others on failure.
+     * @param simId Returns default settings data sim id
+     * @return Returns 0 on success, others on failure.
      */
     virtual int32_t GetDefaultCellularDataSimId(int32_t &simId) = 0;
 

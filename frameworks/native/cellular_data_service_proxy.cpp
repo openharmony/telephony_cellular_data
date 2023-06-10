@@ -181,7 +181,7 @@ int32_t CellularDataServiceProxy::GetDefaultCellularDataSimId(int32_t &simId)
     }
     int32_t error = Remote()->SendRequest((uint32_t)FuncCode::GET_DEFAULT_SIM_ID, data, reply, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("call failed! errCode:%{public}d", error);
+        TELEPHONY_LOGE("SendRequest failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
