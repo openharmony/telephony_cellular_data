@@ -74,7 +74,7 @@ ohos_shared_library("tel_cellular_data") {
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "init:libbegetutil",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",
     "netmanager_base:net_policy_manager_if",
     "netmanager_base:net_stats_manager_if",
