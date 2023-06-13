@@ -369,7 +369,7 @@ declare namespace data {
   /**
    * Obtains the default cellular data SIM ID.
    *
-   * @returns Returns the SIM ID of the default cellular data sim and SIM ID will increase from 1.
+   * @returns { number } Returns the SIM ID of the default cellular data sim and SIM ID will increase from 1.
    * @syscap SystemCapability.Telephony.CellularData
    * @since 10
    */
