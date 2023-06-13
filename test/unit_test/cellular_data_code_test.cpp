@@ -34,6 +34,7 @@ HapInfoParams testInfoParams = {
     .userID = 1,
     .instIndex = 0,
     .appIDDesc = "test",
+    .isSystemApp = true,
 };
 
 PermissionDef testPermGetTelephonyStateDef = {
@@ -107,7 +108,7 @@ public:
         currentID_ = GetSelfTokenID();
         AccessTokenIDEx tokenIdEx = AccessTokenKit::AllocHapToken(testInfoParams, testPolicyParams);
         accessID_ = tokenIdEx.tokenIdExStruct.tokenID;
-        SetSelfTokenID(accessID_);
+        SetSelfTokenID(tokenIdEx.tokenIDEx);
     }
     ~AccessToken()
     {
