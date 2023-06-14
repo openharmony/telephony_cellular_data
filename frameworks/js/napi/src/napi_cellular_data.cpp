@@ -681,7 +681,7 @@ static napi_value GetDefaultCellularDataSimId(napi_env env, napi_callback_info i
     napi_value parameters[] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    int32_t simId = -1;
+    int32_t simId = 0;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     if (parameterCount == 0) {
         CellularDataClient::GetInstance().GetDefaultCellularDataSimId(simId);

@@ -178,7 +178,11 @@ int32_t CellularDataClient::SetDefaultCellularDataSlotId(int32_t slotId)
     int32_t result = proxy->SetDefaultCellularDataSlotId(slotId);
     if (result == TELEPHONY_ERR_SUCCESS) {
         defaultCellularDataSlotId_ = slotId;
-        proxy->GetDefaultCellularDataSimId(defaultCellularDataSimId_);
+        int32_t simId = 0;
+        int32_t ret = proxy->GetDefaultCellularDataSimId(simId);
+        if (ret == TELEPHONY_ERR_SUCCESS) {
+            defaultCellularDataSimId_ = simId;
+        }
     }
     if (slotId == DEFAULT_SIM_SLOT_ID_REMOVE) {
         UpdateDefaultCellularDataSlotId();
@@ -195,7 +199,11 @@ int32_t CellularDataClient::UpdateDefaultCellularDataSlotId()
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     defaultCellularDataSlotId_ = proxy->GetDefaultCellularDataSlotId();
-    proxy->GetDefaultCellularDataSimId(defaultCellularDataSimId_);
+    int32_t simId = 0;
+    int32_t ret = proxy->GetDefaultCellularDataSimId(simId);
+    if (ret == TELEPHONY_ERR_SUCCESS) {
+        defaultCellularDataSimId_ = simId;
+    }
     return defaultCellularDataSlotId_;
 }
 

@@ -172,13 +172,13 @@ int32_t CellularDataServiceProxy::GetDefaultCellularDataSlotId()
 int32_t CellularDataServiceProxy::GetDefaultCellularDataSimId(int32_t &simId)
 {
     MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
     data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor());
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("failed: remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
+    MessageParcel reply;
+    MessageOption option;
     int32_t error = Remote()->SendRequest((uint32_t)FuncCode::GET_DEFAULT_SIM_ID, data, reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SendRequest failed! errCode:%{public}d", error);
