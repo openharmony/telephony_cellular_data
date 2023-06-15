@@ -59,7 +59,7 @@ void Disconnecting::ProcessDisconnectTimeout(const AppExecFwk::InnerEvent::Point
     }
     Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
     inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
-    inActive->SetReason(DisConnectionReason::REASON_CLEAR_CONNECTION);
+    inActive->SetReason(DisConnectionReason::REASON_RETRY_CONNECTION);
     stateMachine->TransitionTo(stateMachine->inActiveState_);
     TELEPHONY_LOGI("ProcessDisconnectTimeout");
 }
