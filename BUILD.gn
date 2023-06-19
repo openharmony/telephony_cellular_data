@@ -72,7 +72,7 @@ ohos_shared_library("tel_cellular_data") {
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
     "hisysevent_native:libhisysevent",
-    "hitrace_native:hitrace_meter",
+    "hitrace:hitrace_meter",
     "init:libbegetutil",
     "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",
