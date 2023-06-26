@@ -49,6 +49,7 @@ ohos_fuzztest("GetCellularDataStateFuzzTest") {
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
     "init:libbegetutil",
+    "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",
     "netmanager_base:net_policy_manager_if",
     "netmanager_base:net_stats_manager_if",
