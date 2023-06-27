@@ -37,6 +37,7 @@
                 "core_service",
                 "data_share",
                 "eventhandler",
+                "hilog",
                 "hisysevent_native",
                 "hitrace",
                 "hiviewdfx_hilog_native",
