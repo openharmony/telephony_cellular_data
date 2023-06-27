@@ -151,6 +151,7 @@ int32_t CellularDataClient::GetDefaultCellularDataSlotId()
 
 int32_t CellularDataClient::GetDefaultCellularDataSimId(int32_t &simId)
 {
+    RegisterSimAccountCallback();
     if (defaultCellularDataSimId_ > 0) {
         simId = defaultCellularDataSimId_;
         return TELEPHONY_ERR_SUCCESS;
