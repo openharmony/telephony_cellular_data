@@ -18,6 +18,7 @@
 
 #include <cstdint>
 
+#include "cellular_data_ipc_interface_code.h"
 #include "functional"
 #include "i_cellular_data_manager.h"
 #include "iremote_broker.h"

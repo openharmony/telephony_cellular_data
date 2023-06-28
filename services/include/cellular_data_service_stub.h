@@ -21,6 +21,7 @@
 #include "iremote_object.h"
 #include "iremote_stub.h"
 
+#include "cellular_data_ipc_interface_code.h"
 #include "i_cellular_data_manager.h"
 
 namespace OHOS {
@@ -51,31 +52,31 @@ private:
 private:
     using Fun = int32_t (CellularDataServiceStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, Fun> eventIdFunMap_ {
-        { (uint32_t)ICellularDataManager::FuncCode::IS_CELLULAR_DATA_ENABLED,
+        { (uint32_t)CellularDataInterfaceCode::IS_CELLULAR_DATA_ENABLED,
             &CellularDataServiceStub::OnIsCellularDataEnabled },
-        { (uint32_t)ICellularDataManager::FuncCode::ENABLE_CELLULAR_DATA,
+        { (uint32_t)CellularDataInterfaceCode::ENABLE_CELLULAR_DATA,
             &CellularDataServiceStub::OnEnableCellularData },
-        { (uint32_t)ICellularDataManager::FuncCode::GET_CELLULAR_DATA_STATE,
+        { (uint32_t)CellularDataInterfaceCode::GET_CELLULAR_DATA_STATE,
             &CellularDataServiceStub::OnGetCellularDataState },
-        { (uint32_t)ICellularDataManager::FuncCode::IS_DATA_ROAMING_ENABLED,
+        { (uint32_t)CellularDataInterfaceCode::IS_DATA_ROAMING_ENABLED,
             &CellularDataServiceStub::OnIsCellularDataRoamingEnabled },
-        { (uint32_t)ICellularDataManager::FuncCode::ENABLE_DATA_ROAMING,
+        { (uint32_t)CellularDataInterfaceCode::ENABLE_DATA_ROAMING,
             &CellularDataServiceStub::OnEnableCellularDataRoaming },
-        { (uint32_t)ICellularDataManager::FuncCode::APN_DATA_CHANGED, &CellularDataServiceStub::OnHandleApnChanged },
-        { (uint32_t)ICellularDataManager::FuncCode::GET_DEFAULT_SLOT_ID,
+        { (uint32_t)CellularDataInterfaceCode::APN_DATA_CHANGED, &CellularDataServiceStub::OnHandleApnChanged },
+        { (uint32_t)CellularDataInterfaceCode::GET_DEFAULT_SLOT_ID,
             &CellularDataServiceStub::OnGetDefaultCellularDataSlotId },
-        { (uint32_t)ICellularDataManager::FuncCode::GET_DEFAULT_SIM_ID,
+        { (uint32_t)CellularDataInterfaceCode::GET_DEFAULT_SIM_ID,
             &CellularDataServiceStub::OnGetDefaultCellularDataSimId },
-        { (uint32_t)ICellularDataManager::FuncCode::SET_DEFAULT_SLOT_ID,
+        { (uint32_t)CellularDataInterfaceCode::SET_DEFAULT_SLOT_ID,
             &CellularDataServiceStub::OnSetDefaultCellularDataSlotId },
-        { (uint32_t)ICellularDataManager::FuncCode::GET_FLOW_TYPE_ID,
+        { (uint32_t)CellularDataInterfaceCode::GET_FLOW_TYPE_ID,
             &CellularDataServiceStub::OnGetCellularDataFlowType },
-        { (uint32_t)ICellularDataManager::FuncCode::HAS_CAPABILITY, &CellularDataServiceStub::OnHasInternetCapability },
-        { (uint32_t)ICellularDataManager::FuncCode::CLEAR_ALL_CONNECTIONS,
+        { (uint32_t)CellularDataInterfaceCode::HAS_CAPABILITY, &CellularDataServiceStub::OnHasInternetCapability },
+        { (uint32_t)CellularDataInterfaceCode::CLEAR_ALL_CONNECTIONS,
             &CellularDataServiceStub::OnClearCellularDataConnections },
-        { (uint32_t)ICellularDataManager::FuncCode::REG_SIM_ACCOUNT_CALLBACK,
+        { (uint32_t)CellularDataInterfaceCode::REG_SIM_ACCOUNT_CALLBACK,
             &CellularDataServiceStub::OnRegisterSimAccountCallback },
-        { (uint32_t)ICellularDataManager::FuncCode::UN_REG_SIM_ACCOUNT_CALLBACK,
+        { (uint32_t)CellularDataInterfaceCode::UN_REG_SIM_ACCOUNT_CALLBACK,
             &CellularDataServiceStub::OnUnregisterSimAccountCallback },
     };
 };
