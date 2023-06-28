@@ -26,6 +26,7 @@ ohos_shared_library("data") {
     "cellular_data:tel_cellular_data_api",
     "core_service:libtel_common",
     "core_service:tel_core_service_api",
+    "hilog:libhilog",
     "init:libbegetutil",
     "napi:ace_napi",
   ]
@@ -33,11 +34,6 @@ ohos_shared_library("data") {
     "TELEPHONY_LOG_TAG = \"CellularDataJsApi\"",
     "LOG_DOMAIN = 0xD001F03",
   ]
-  if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps += [ "hilog:libhilog" ]
-  }
 
   part_name = "cellular_data"
   subsystem_name = "telephony"

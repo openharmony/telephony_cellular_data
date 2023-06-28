@@ -48,6 +48,7 @@ ohos_fuzztest("GetCellularDataStateFuzzTest") {
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
+    "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",
@@ -73,12 +74,6 @@ ohos_fuzztest("GetCellularDataStateFuzzTest") {
     "$SOURCE_DIR/test/fuzztest/common_fuzzer/adddatatoken_fuzzer.cpp",
     "getcellulardatastate_fuzzer.cpp",
   ]
-
-  if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps += [ "hilog:libhilog" ]
-  }
 }
 
 ###############################################################################

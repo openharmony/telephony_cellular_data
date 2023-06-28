@@ -71,7 +71,8 @@ ohos_shared_library("tel_cellular_data") {
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
-    "hisysevent_native:libhisysevent",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "init:libbegetutil",
     "ipc:ipc_single",
@@ -88,11 +89,6 @@ ohos_shared_library("tel_cellular_data") {
     "TELEPHONY_LOG_TAG = \"CellularData\"",
     "LOG_DOMAIN = 0xD001F03",
   ]
-  if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps += [ "hilog:libhilog" ]
-  }
 
   part_name = "cellular_data"
   subsystem_name = "telephony"
