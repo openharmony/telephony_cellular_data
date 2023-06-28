@@ -199,7 +199,7 @@ void CcmDefaultState::RadioDataCallListChanged(const AppExecFwk::InnerEvent::Poi
         }
         int32_t cid = it.second->GetCid();
         for (size_t i = 0; i < infos->dcList.size(); ++i) {
-            if (infos->dcList[i].cid == cid) {
+            if (infos->dcList[i].cid == cid && infos->dcList[i].active > 0) {
                 isPush = false;
                 break;
             }
