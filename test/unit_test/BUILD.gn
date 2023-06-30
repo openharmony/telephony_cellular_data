@@ -32,6 +32,7 @@ ohos_executable("tel_cellular_data_ui_test") {
     "core_service:libtel_common",
     "core_service:tel_core_service_api",
     "eventhandler:libeventhandler",
+    "hilog:libhilog",
     "init:libbegetutil",
   ]
 
@@ -39,12 +40,6 @@ ohos_executable("tel_cellular_data_ui_test") {
     "TELEPHONY_LOG_TAG = \"CelllularDataUiTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
-
-  if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps += [ "hilog:libhilog" ]
-  }
 
   part_name = "cellular_data"
   subsystem_name = "telephony"
