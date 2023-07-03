@@ -197,7 +197,6 @@ void CellularDataStateMachine::UpdateNetworkInfo(const SetupDataCallResultInfo &
     std::vector<AddressInfo> routeInfoArray = CellularDataUtils::ParseNormalIpAddr(dataCallInfo.gateway);
     if (ipInfoArray.empty() || dnsInfoArray.empty() || routeInfoArray.empty()) {
         TELEPHONY_LOGE("Verifying network Information(ipInfoArray or dnsInfoArray or routeInfoArray empty)");
-        return;
     }
     if (netLinkInfo_ == nullptr || netSupplierInfo_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: start update net info,but netLinkInfo or netSupplierInfo is null!", slotId);
@@ -220,7 +219,9 @@ void CellularDataStateMachine::UpdateNetworkInfo(const SetupDataCallResultInfo &
     CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
     int32_t supplierId = netAgent.GetSupplierId(slotId, capability_);
     netAgent.UpdateNetSupplierInfo(supplierId, netSupplierInfo_);
-    netAgent.UpdateNetLinkInfo(supplierId, netLinkInfo_);
+    if (netSupplierInfo_->isAvailable_) {
+        netAgent.UpdateNetLinkInfo(supplierId, netLinkInfo_);
+    }
 }
 
 void CellularDataStateMachine::UpdateNetworkInfo()
@@ -232,7 +233,9 @@ void CellularDataStateMachine::UpdateNetworkInfo()
     netSupplierInfo_->linkDownBandwidthKbps_ = downBandwidth_;
     int32_t supplierId = netAgent.GetSupplierId(slotId, capability_);
     netAgent.UpdateNetSupplierInfo(supplierId, netSupplierInfo_);
-    netAgent.UpdateNetLinkInfo(supplierId, netLinkInfo_);
+    if (netSupplierInfo_->isAvailable_) {
+        netAgent.UpdateNetLinkInfo(supplierId, netLinkInfo_);
+    }
 }
 
 void CellularDataStateMachine::ResolveIp(std::vector<AddressInfo> &ipInfoArray)
