@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef I_CELLULAR_DATA_IPC_INTERFACE_CODE_H
-#define I_CELLULAR_DATA_IPC_INTERFACE_CODE_H
+#ifndef CELLULAR_DATA_IPC_INTERFACE_CODE_H
+#define CELLULAR_DATA_IPC_INTERFACE_CODE_H
 
 #include "sim_account_callback.h"
 
@@ -39,4 +39,4 @@ enum class CellularDataInterfaceCode {
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // I_CELLULAR_DATA_IPC_INTERFACE_CODE_H
+#endif // CELLULAR_DATA_IPC_INTERFACE_CODE_H
