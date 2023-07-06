@@ -326,7 +326,7 @@ int32_t CellularDataServiceProxy::UnregisterSimAccountCallback()
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t error = remote->SendRequest(static_cast<uint32_t>(CellularDataInterfaceCode::UN_REG_SIM_ACCOUNT_CALLBACK),
-        data,reply, option);
+        data, reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("error! errCode:%{public}d", error);
         return error;
