@@ -21,6 +21,11 @@
 #include "ability_context.h"
 #include "accesstoken_kit.h"
 #include "cellular_data_client.h"
+#include "core_service_client.h"
+#include "net_conn_callback_stub.h"
+#include "net_conn_client.h"
+#include "net_handle.h"
+#include "net_specifier.h"
 #include "telephony_types.h"
 #include "token_setproc.h"
 
@@ -28,6 +33,7 @@ namespace OHOS {
 namespace Telephony {
 using namespace OHOS::Security::AccessToken;
 using OHOS::Security::AccessToken::AccessTokenID;
+using namespace OHOS::NetManagerStandard;
 
 HapInfoParams testInfoParams = {
     .bundleName = "tel_cellular_data_ui_test",
@@ -121,8 +127,69 @@ private:
     AccessTokenID accessID_ = 0;
 };
 
+class TestCallback : public NetManagerStandard::NetConnCallbackStub {
+    int32_t NetAvailable(sptr<NetManagerStandard::NetHandle> &netHandle) override
+    {
+        std::cout << "TestCallback::NetAvailable" << std::endl;
+        return 0;
+    }
+
+    int32_t NetCapabilitiesChange(sptr<NetManagerStandard::NetHandle> &netHandle,
+        const sptr<NetManagerStandard::NetAllCapabilities> &netAllCap) override
+    {
+        std::cout << "TestCallback::NetCapabilitiesChange" << std::endl;
+        return 0;
+    }
+
+    int32_t NetConnectionPropertiesChange(
+        sptr<NetManagerStandard::NetHandle> &netHandle, const sptr<NetManagerStandard::NetLinkInfo> &info) override
+    {
+        std::cout << "TestCallback::NetConnectionPropertiesChange" << std::endl;
+        return 0;
+    }
+
+    int32_t NetLost(sptr<NetManagerStandard::NetHandle> &netHandle) override
+    {
+        std::cout << "TestCallback::NetLost" << std::endl;
+        return 0;
+    }
+
+    int32_t NetUnavailable() override
+    {
+        std::cout << "TestCallback::NetUnavailable" << std::endl;
+        return 0;
+    }
+
+    int32_t NetBlockStatusChange(sptr<NetManagerStandard::NetHandle> &netHandle, bool blocked) override
+    {
+        std::cout << "TestCallback::NetBlockStatusChange" << std::endl;
+        return 0;
+    }
+};
+
+static const int32_t IS_CELLULAR_DATA_ENABLED_TEST = 0;
+static const int32_t ENABLE_CELLULAR_DATA_TEST = 1;
+static const int32_t GET_CELLULAR_DATA_STATE_TEST = 2;
+static const int32_t IS_DATA_ROAMING_ENABLED_TEST = 3;
+static const int32_t ENABLE_DATA_ROAMING_TEST = 4;
+static const int32_t APN_CHANGED_TEST = 5;
+static const int32_t GET_DEFAULT_SLOT_ID = 6;
+static const int32_t SET_DEFAULT_SLOT_ID = 7;
+static const int32_t GET_DATA_FLOW_TYPE = 8;
+static const int32_t TOUCH_OR_RM_DATA_PACKAGE = 9;
+static const int32_t ACQUIRE_MMS_NETWORK = 10;
+static const int32_t RELEASE_MMS_NETWORK = 11;
+static const int32_t EXIT_CELLULAR_DATA_TEST = 1000;
+static const int32_t TEST_DATA_PACKAGE_UP = 0;
+static const int32_t TEST_DATA_PACKAGE_DOWN = 1;
+static const int32_t TEST_DATA_PACKAGE_UP_DOWN = 2;
+static const int32_t TEST_DATA_PACKAGE_EXIT = 100;
+static const int32_t NET_REGISTER_TIMEOUT_MS = 20000;
+static sptr<INetConnCallback> g_callback;
+
 class CellularDataCodeTest {
     using Fun = void (*)();
+
 public:
     CellularDataCodeTest() = default;
 
@@ -294,10 +361,9 @@ public:
     static bool DataPackageTest(const int32_t testId)
     {
         std::map<int32_t, Fun> testFunMap {
-            {TEST_DATA_PACKAGE_UP, &CellularDataCodeTest::TestDataPackageUp},
-            {TEST_DATA_PACKAGE_DOWN, &CellularDataCodeTest::TestDataPackageDown},
-            {TEST_DATA_PACKAGE_UP_DOWN, &CellularDataCodeTest::TestDataPackageUpDown},
-
+            { TEST_DATA_PACKAGE_UP, &CellularDataCodeTest::TestDataPackageUp },
+            { TEST_DATA_PACKAGE_DOWN, &CellularDataCodeTest::TestDataPackageDown },
+            { TEST_DATA_PACKAGE_UP_DOWN, &CellularDataCodeTest::TestDataPackageUpDown },
         };
         std::map<int32_t, Fun>::iterator it = testFunMap.find(testId);
         if (it != testFunMap.end()) {
@@ -329,24 +395,71 @@ public:
         }
     }
 
+    static void AcquireMmsNetwork()
+    {
+        AccessToken token;
+        int32_t slotId = DEFAULT_SIM_SLOT_ID;
+        std::cout << "please input parameter int slotId" << std::endl;
+        std::cin >> slotId;
+        if (g_callback == nullptr) {
+            g_callback = new (std::nothrow) TestCallback();
+        }
+        if (g_callback == nullptr) {
+            std::cout << "g_callback is null" << std::endl;
+            return;
+        }
+
+        NetSpecifier netSpecifier;
+        NetAllCapabilities netAllCapabilities;
+        netAllCapabilities.netCaps_.insert(NetCap::NET_CAPABILITY_MMS);
+        netAllCapabilities.bearerTypes_.insert(NetBearType::BEARER_CELLULAR);
+        int32_t simId = CoreServiceClient::GetInstance().GetSimId(slotId);
+        netSpecifier.ident_ = "simId" + std::to_string(simId);
+        netSpecifier.netCapabilities_ = netAllCapabilities;
+        sptr<NetSpecifier> specifier = new (std::nothrow) NetSpecifier(netSpecifier);
+        if (specifier == nullptr) {
+            std::cout << "specifier is null" << std::endl;
+            return;
+        }
+
+        int32_t result = DelayedSingleton<NetConnClient>::GetInstance()->RegisterNetConnCallback(
+            specifier, g_callback, NET_REGISTER_TIMEOUT_MS);
+        std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
+    }
+
+    static void ReleaseMmsNetwork()
+    {
+        AccessToken token;
+        if (g_callback == nullptr) {
+            std::cout << "g_callback is null" << std::endl;
+            return;
+        }
+        int32_t result =
+            DelayedSingleton<NetManagerStandard::NetConnClient>::GetInstance()->UnregisterNetConnCallback(g_callback);
+        std::cout << "UnregisterNetConnCallback result [" << result << "]" << std::endl;
+        g_callback = nullptr;
+    }
+
     bool UnitTest(const int32_t testId) const
     {
         std::map<int32_t, Fun> testFunMap {
-            {IS_CELLULAR_DATA_ENABLED_TEST, &IsCellularDataEnabledTest},
-            {ENABLE_CELLULAR_DATA_TEST, &EnableCellularDataTest},
-            {GET_CELLULAR_DATA_STATE_TEST, &GetCellularDataStateTest},
-            {IS_DATA_ROAMING_ENABLED_TEST, &IsCellularDataRoamingEnabledTest},
-            {ENABLE_DATA_ROAMING_TEST, &EnableCellularDataRoamingTest},
-            {APN_CHANGED_TEST, &HandleApnChangedTest},
-            {GET_DEFAULT_SLOT_ID, &GetDefaultSlotId},
-            {SET_DEFAULT_SLOT_ID, &SetDefaultSlotId},
-            {GET_DATA_FLOW_TYPE, &GetDataFlowType},
-            {TOUCH_OR_RM_DATA_PACKAGE, &TouchOrRmDataPackage},
+            { IS_CELLULAR_DATA_ENABLED_TEST, &IsCellularDataEnabledTest },
+            { ENABLE_CELLULAR_DATA_TEST, &EnableCellularDataTest },
+            { GET_CELLULAR_DATA_STATE_TEST, &GetCellularDataStateTest },
+            { IS_DATA_ROAMING_ENABLED_TEST, &IsCellularDataRoamingEnabledTest },
+            { ENABLE_DATA_ROAMING_TEST, &EnableCellularDataRoamingTest },
+            { APN_CHANGED_TEST, &HandleApnChangedTest },
+            { GET_DEFAULT_SLOT_ID, &GetDefaultSlotId },
+            { SET_DEFAULT_SLOT_ID, &SetDefaultSlotId },
+            { GET_DATA_FLOW_TYPE, &GetDataFlowType },
+            { TOUCH_OR_RM_DATA_PACKAGE, &TouchOrRmDataPackage },
+            { ACQUIRE_MMS_NETWORK, &AcquireMmsNetwork },
+            { RELEASE_MMS_NETWORK, &ReleaseMmsNetwork },
         };
         std::map<int32_t, Fun>::iterator it = testFunMap.find(testId);
         if (it != testFunMap.end()) {
             (*(it->second))();
-        } else if (EXIT_CELLULAR_DATA_TEST == testId) {
+        } else if (testId == EXIT_CELLULAR_DATA_TEST) {
             std::cout << "exit..." << std::endl;
             return false;
         } else {
@@ -354,23 +467,6 @@ public:
         }
         return true;
     }
-
-private:
-    const int32_t IS_CELLULAR_DATA_ENABLED_TEST = 0;
-    const int32_t ENABLE_CELLULAR_DATA_TEST = 1;
-    const int32_t GET_CELLULAR_DATA_STATE_TEST = 2;
-    const int32_t IS_DATA_ROAMING_ENABLED_TEST = 3;
-    const int32_t ENABLE_DATA_ROAMING_TEST = 4;
-    const int32_t APN_CHANGED_TEST = 5;
-    const int32_t GET_DEFAULT_SLOT_ID = 6;
-    const int32_t SET_DEFAULT_SLOT_ID = 7;
-    const int32_t GET_DATA_FLOW_TYPE = 8;
-    const int32_t TOUCH_OR_RM_DATA_PACKAGE = 9;
-    const int32_t EXIT_CELLULAR_DATA_TEST = 1000;
-    static const int32_t TEST_DATA_PACKAGE_UP = 0;
-    static const int32_t TEST_DATA_PACKAGE_DOWN = 1;
-    static const int32_t TEST_DATA_PACKAGE_UP_DOWN = 2;
-    static const int32_t TEST_DATA_PACKAGE_EXIT = 100;
 };
 } // namespace Telephony
 } // namespace OHOS
@@ -386,18 +482,20 @@ int main()
     OHOS::Telephony::CellularDataCodeTest cellularDataCodeTest;
     while (true) {
         std::cout << "\n-----------start--------------\nusage:please input a cmd num:\n"
-            "0:IsCellularDataEnabledTest\n"
-            "1:EnableCellularDataTest\n"
-            "2:GetCellularDataStateTest\n"
-            "3:IsCellularDataRoamingEnabledTest\n"
-            "4:EnableCellularDataRoamingTest\n"
-            "5:ApnChangedTest\n"
-            "6:GetDefaultSlotId\n"
-            "7:SetDefaultSlotId\n"
-            "8:GetCellularDataFlowType\n"
-            "9:TouchOrRmDataPackage\n"
-            "1000:exit\n"
-            << std::endl;
+                     "0:IsCellularDataEnabledTest\n"
+                     "1:EnableCellularDataTest\n"
+                     "2:GetCellularDataStateTest\n"
+                     "3:IsCellularDataRoamingEnabledTest\n"
+                     "4:EnableCellularDataRoamingTest\n"
+                     "5:ApnChangedTest\n"
+                     "6:GetDefaultSlotId\n"
+                     "7:SetDefaultSlotId\n"
+                     "8:GetCellularDataFlowType\n"
+                     "9:TouchOrRmDataPackage\n"
+                     "10:AcquireMmsNetwork\n"
+                     "11:ReleaseMmsNetwork\n"
+                     "1000:exit\n"
+                  << std::endl;
         std::cin >> inputCMD;
         std::cout << "inputCMD is [" << inputCMD << "]" << std::endl;
         if (!cellularDataCodeTest.UnitTest(inputCMD)) {

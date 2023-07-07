@@ -34,6 +34,8 @@ ohos_executable("tel_cellular_data_ui_test") {
     "eventhandler:libeventhandler",
     "hilog:libhilog",
     "init:libbegetutil",
+    "ipc:ipc_single",
+    "netmanager_base:net_conn_manager_if",
   ]
 
   defines = [

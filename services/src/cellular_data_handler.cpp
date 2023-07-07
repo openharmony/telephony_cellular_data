@@ -549,7 +549,8 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
         ApnProfileState apnState = apnManager_->GetOverallApnState();
         if (apnState == ApnProfileState::PROFILE_STATE_CONNECTING ||
             apnState == ApnProfileState::PROFILE_STATE_CONNECTED) {
-            ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
+            ClearAllConnections(DisConnectionReason::REASON_CHANGE_CONNECTION);
+            return false;
         }
     }
     std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine = FindIdleCellularDataConnection();
