@@ -162,8 +162,8 @@ private:
     sptr<ICellularDataManager> proxy_ { nullptr };
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ { nullptr };
     sptr<SimAccountCallback> callback_ { nullptr };
-    int32_t defaultCellularDataSlotId_;
-    int32_t defaultCellularDataSimId_;
+    static int32_t defaultCellularDataSlotId_;
+    static int32_t defaultCellularDataSimId_;
     bool registerStatus_ = false;
 };
 } // namespace Telephony
