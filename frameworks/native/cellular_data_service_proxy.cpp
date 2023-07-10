@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,7 +33,8 @@ int32_t CellularDataServiceProxy::IsCellularDataEnabled(bool &dataEnabled)
         TELEPHONY_LOGE("remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest((uint32_t)FuncCode::IS_CELLULAR_DATA_ENABLED, data, reply, option);
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::IS_CELLULAR_DATA_ENABLED, data,
+        reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function IsCellularDataEnabled call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -57,7 +58,8 @@ int32_t CellularDataServiceProxy::EnableCellularData(bool enable)
         TELEPHONY_LOGE("remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest((uint32_t)FuncCode::ENABLE_CELLULAR_DATA, data, reply, option);
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::ENABLE_CELLULAR_DATA, data,
+        reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function EnableCellularData call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -76,7 +78,8 @@ int32_t CellularDataServiceProxy::GetCellularDataState()
         TELEPHONY_LOGE("remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest((uint32_t)FuncCode::GET_CELLULAR_DATA_STATE, data, reply, option);
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::GET_CELLULAR_DATA_STATE, data,
+        reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function GetCellularDataState call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -96,7 +99,8 @@ int32_t CellularDataServiceProxy::IsCellularDataRoamingEnabled(int32_t slotId, b
         TELEPHONY_LOGE("remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest((uint32_t)FuncCode::IS_DATA_ROAMING_ENABLED, data, reply, option);
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::IS_DATA_ROAMING_ENABLED, data,
+        reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function IsCellularDataRoamingEnabled call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -121,7 +125,8 @@ int32_t CellularDataServiceProxy::EnableCellularDataRoaming(int32_t slotId, bool
         TELEPHONY_LOGE("remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest((uint32_t)FuncCode::ENABLE_DATA_ROAMING, data, reply, option);
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::ENABLE_DATA_ROAMING, data,
+        reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function EnableCellularDataRoaming call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -141,7 +146,7 @@ int32_t CellularDataServiceProxy::HandleApnChanged(int32_t slotId)
         TELEPHONY_LOGE("remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest((uint32_t)FuncCode::APN_DATA_CHANGED, data, reply, option);
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::APN_DATA_CHANGED, data, reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("HandleApnChanged call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -160,7 +165,8 @@ int32_t CellularDataServiceProxy::GetDefaultCellularDataSlotId()
         TELEPHONY_LOGE("remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest((uint32_t)FuncCode::GET_DEFAULT_SLOT_ID, data, reply, option);
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::GET_DEFAULT_SLOT_ID, data,
+        reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function GetDefaultCellularDataSlotId call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -179,7 +185,7 @@ int32_t CellularDataServiceProxy::GetDefaultCellularDataSimId(int32_t &simId)
     }
     MessageParcel reply;
     MessageOption option;
-    int32_t error = Remote()->SendRequest((uint32_t)FuncCode::GET_DEFAULT_SIM_ID, data, reply, option);
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::GET_DEFAULT_SIM_ID, data, reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SendRequest failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -203,7 +209,8 @@ int32_t CellularDataServiceProxy::SetDefaultCellularDataSlotId(int32_t slotId)
         TELEPHONY_LOGE("remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest((uint32_t)FuncCode::SET_DEFAULT_SLOT_ID, data, reply, option);
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::SET_DEFAULT_SLOT_ID, data,
+        reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function SetDefaultCellularDataSlotId call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -222,7 +229,7 @@ int32_t CellularDataServiceProxy::GetCellularDataFlowType()
         TELEPHONY_LOGE("remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest((uint32_t)FuncCode::GET_FLOW_TYPE_ID, data, reply, option);
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::GET_FLOW_TYPE_ID, data, reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function GetCellularDataFlowType call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -243,7 +250,7 @@ int32_t CellularDataServiceProxy::HasInternetCapability(int32_t slotId, int32_t 
         TELEPHONY_LOGE("remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest((uint32_t)FuncCode::HAS_CAPABILITY, data, reply, option);
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::HAS_CAPABILITY, data, reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Strategy switch fail! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -263,7 +270,8 @@ int32_t CellularDataServiceProxy::ClearCellularDataConnections(int32_t slotId)
         TELEPHONY_LOGE("remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest((uint32_t)FuncCode::CLEAR_ALL_CONNECTIONS, data, reply, option);
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::CLEAR_ALL_CONNECTIONS, data,
+        reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Strategy switch fail! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -294,7 +302,8 @@ int32_t CellularDataServiceProxy::RegisterSimAccountCallback(const sptr<SimAccou
         TELEPHONY_LOGE("remote is nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = remote->SendRequest(static_cast<uint32_t>(FuncCode::REG_SIM_ACCOUNT_CALLBACK), data, reply, option);
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(CellularDataInterfaceCode::REG_SIM_ACCOUNT_CALLBACK),
+        data, reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("error! errCode:%{public}d", error);
         return error;
@@ -316,8 +325,8 @@ int32_t CellularDataServiceProxy::UnregisterSimAccountCallback()
         TELEPHONY_LOGE("remote is nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error =
-        remote->SendRequest(static_cast<uint32_t>(FuncCode::UN_REG_SIM_ACCOUNT_CALLBACK), data, reply, option);
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(CellularDataInterfaceCode::UN_REG_SIM_ACCOUNT_CALLBACK),
+        data, reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("error! errCode:%{public}d", error);
         return error;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,23 +23,6 @@ namespace OHOS {
 namespace Telephony {
 class ICellularDataManager : public IRemoteBroker {
 public:
-    enum class FuncCode {
-        IS_CELLULAR_DATA_ENABLED = 0,
-        ENABLE_CELLULAR_DATA,
-        GET_CELLULAR_DATA_STATE,
-        IS_DATA_ROAMING_ENABLED,
-        ENABLE_DATA_ROAMING,
-        GET_DEFAULT_SLOT_ID,
-        GET_DEFAULT_SIM_ID,
-        SET_DEFAULT_SLOT_ID,
-        GET_FLOW_TYPE_ID,
-        HAS_CAPABILITY,
-        CLEAR_ALL_CONNECTIONS,
-        APN_DATA_CHANGED,
-        REG_SIM_ACCOUNT_CALLBACK,
-        UN_REG_SIM_ACCOUNT_CALLBACK
-    };
-
     /**
      * Whether the cellular data user switch is enabled
      *
