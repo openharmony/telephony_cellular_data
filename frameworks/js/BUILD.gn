@@ -21,9 +21,11 @@ ohos_shared_library("data") {
 
   sources = [ "$SUBSYSTEM_DIR/cellular_data/frameworks/js/napi/src/napi_cellular_data.cpp" ]
 
+  deps =
+      [ "$SUBSYSTEM_DIR/cellular_data/frameworks/native:tel_cellular_data_api" ]
+
   external_deps = [
     "c_utils:utils",
-    "cellular_data:tel_cellular_data_api",
     "core_service:libtel_common",
     "core_service:tel_core_service_api",
     "hilog:libhilog",
