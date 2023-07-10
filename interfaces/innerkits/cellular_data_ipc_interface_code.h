@@ -16,8 +16,6 @@
 #ifndef CELLULAR_DATA_IPC_INTERFACE_CODE_H
 #define CELLULAR_DATA_IPC_INTERFACE_CODE_H
 
-#include "sim_account_callback.h"
-
 /* SAID:4007 */
 namespace OHOS {
 namespace Telephony {
