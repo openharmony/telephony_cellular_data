@@ -31,10 +31,10 @@
 
 namespace OHOS {
 namespace Telephony {
+int32_t CellularDataClient::defaultCellularDataSlotId_ = INVALID_MAIN_CARD_SLOTID;
+int32_t CellularDataClient::defaultCellularDataSimId_ = 0;
 CellularDataClient::CellularDataClient()
 {
-    defaultCellularDataSlotId_ = INVALID_MAIN_CARD_SLOTID;
-    defaultCellularDataSimId_ = 0;
     if (callback_ == nullptr) {
         callback_ = new DataSimAccountCallback();
     }
