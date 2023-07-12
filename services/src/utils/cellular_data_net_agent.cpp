@@ -44,11 +44,7 @@ bool CellularDataNetAgent::RegisterNetSupplier(const int32_t slotId)
         if (netSupplier.slotId != slotId) {
             continue;
         }
-        std::shared_ptr<NetManagerStandard::NetConnClient> netManager = DelayedSingleton<NetConnClient>::GetInstance();
-        if (netManager == nullptr) {
-            TELEPHONY_LOGE("NetConnClient is null");
-            return false;
-        }
+        auto& netManager = NetConnClient::GetInstance();
         if (netSupplier.capability > NetCap::NET_CAPABILITY_INTERNAL_DEFAULT) {
             TELEPHONY_LOGE("capabilities(%{public}" PRIu64 ") not support", netSupplier.capability);
             continue;
@@ -59,13 +55,13 @@ bool CellularDataNetAgent::RegisterNetSupplier(const int32_t slotId)
         }
         std::set<NetCap> netCap { static_cast<NetCap>(netSupplier.capability) };
         uint32_t supplierId = 0;
-        int32_t result = netManager->RegisterNetSupplier(
+        int32_t result = netManager.RegisterNetSupplier(
             NetBearType::BEARER_CELLULAR, std::string(IDENT_PREFIX) + std::to_string(simId), netCap, supplierId);
         if (result == NETMANAGER_SUCCESS) {
             TELEPHONY_LOGI("Register network successful, supplierId[%{public}d]", supplierId);
             flag = true;
             netSupplier.supplierId = supplierId;
-            int32_t regCallback = netManager->RegisterNetSupplierCallback(netSupplier.supplierId, callBack_);
+            int32_t regCallback = netManager.RegisterNetSupplierCallback(netSupplier.supplierId, callBack_);
             TELEPHONY_LOGI("Register supplier callback(%{public}d)", regCallback);
         }
     }
@@ -75,12 +71,7 @@ bool CellularDataNetAgent::RegisterNetSupplier(const int32_t slotId)
 void CellularDataNetAgent::UnregisterNetSupplier()
 {
     for (const NetSupplier &netSupplier : netSuppliers_) {
-        std::shared_ptr<NetManagerStandard::NetConnClient> netManager = DelayedSingleton<NetConnClient>::GetInstance();
-        if (netManager == nullptr) {
-            TELEPHONY_LOGE("NetConnClient is null");
-            return;
-        }
-        int32_t result = netManager->UnregisterNetSupplier(netSupplier.supplierId);
+        int32_t result = NetConnClient::GetInstance().UnregisterNetSupplier(netSupplier.supplierId);
         TELEPHONY_LOGI("Unregister network result:%{public}d", result);
     }
     netSuppliers_.clear();
@@ -115,23 +106,13 @@ void CellularDataNetAgent::UnregisterPolicyCallback()
 void CellularDataNetAgent::UpdateNetSupplierInfo(
     int32_t supplierId, sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
 {
-    std::shared_ptr<NetManagerStandard::NetConnClient> netManager = DelayedSingleton<NetConnClient>::GetInstance();
-    if (netManager == nullptr) {
-        TELEPHONY_LOGE("NetConnClient is null");
-        return;
-    }
-    int32_t result = netManager->UpdateNetSupplierInfo(supplierId, netSupplierInfo);
+    int32_t result = NetConnClient::GetInstance().UpdateNetSupplierInfo(supplierId, netSupplierInfo);
     TELEPHONY_LOGI("Update network result:%{public}d", result);
 }
 
 void CellularDataNetAgent::UpdateNetLinkInfo(int32_t supplierId, sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo)
 {
-    std::shared_ptr<NetManagerStandard::NetConnClient> netManager = DelayedSingleton<NetConnClient>::GetInstance();
-    if (netManager == nullptr) {
-        TELEPHONY_LOGE("NetConnClient is null");
-        return;
-    }
-    int32_t result = netManager->UpdateNetLinkInfo(supplierId, netLinkInfo);
+    int32_t result = NetConnClient::GetInstance().UpdateNetLinkInfo(supplierId, netLinkInfo);
     TELEPHONY_LOGI("result:%{public}d", result);
 }
 

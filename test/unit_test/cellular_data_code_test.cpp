@@ -422,7 +422,7 @@ public:
             return;
         }
 
-        int32_t result = DelayedSingleton<NetConnClient>::GetInstance()->RegisterNetConnCallback(
+        int32_t result = NetConnClient::GetInstance().RegisterNetConnCallback(
             specifier, g_callback, NET_REGISTER_TIMEOUT_MS);
         std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
     }
@@ -435,7 +435,7 @@ public:
             return;
         }
         int32_t result =
-            DelayedSingleton<NetManagerStandard::NetConnClient>::GetInstance()->UnregisterNetConnCallback(g_callback);
+            NetConnClient::GetInstance().UnregisterNetConnCallback(g_callback);
         std::cout << "UnregisterNetConnCallback result [" << result << "]" << std::endl;
         g_callback = nullptr;
     }
