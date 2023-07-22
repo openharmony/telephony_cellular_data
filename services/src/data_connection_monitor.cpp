@@ -29,8 +29,8 @@ namespace Telephony {
 DataConnectionMonitor::DataConnectionMonitor(const std::shared_ptr<AppExecFwk::EventRunner> &runner, int32_t slotId)
     : AppExecFwk::EventHandler(runner), slotId_(slotId)
 {
-    trafficManager_ = std::make_unique<TrafficManagement>();
-    stallDetectionTrafficManager_ = std::make_unique<TrafficManagement>();
+    trafficManager_ = std::make_unique<TrafficManagement>(slotId);
+    stallDetectionTrafficManager_ = std::make_unique<TrafficManagement>(slotId);
     if (trafficManager_ == nullptr || stallDetectionTrafficManager_ == nullptr) {
         TELEPHONY_LOGE("TrafficManager or stallDetectionTrafficManager init failed");
     }
