@@ -94,6 +94,7 @@ int32_t CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &col
     auto result = settingHelper->Query(uri, predicates, columns);
     if (result == nullptr) {
         TELEPHONY_LOGE("setting DB: query error");
+        settingHelper->Release();
         return TELEPHONY_ERR_DATABASE_READ_FAIL;
     }
     result->GoToFirstRow();
