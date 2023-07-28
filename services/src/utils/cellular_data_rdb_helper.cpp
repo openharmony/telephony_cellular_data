@@ -86,6 +86,7 @@ bool CellularDataRdbHelper::QueryApns(const std::string &mcc, const std::string 
         dataShareHelper->Query(cellularDataUri_, predicates, columns);
     if (result == nullptr) {
         TELEPHONY_LOGE("CellularDataRdbHelper: query apns error");
+        dataShareHelper->Release();
         return false;
     }
     ReadApnResult(result, apnVec);
