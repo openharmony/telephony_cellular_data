@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Telephony {
 class TrafficManagement {
 public:
-    TrafficManagement();
+    explicit TrafficManagement(int32_t slotId);
     ~TrafficManagement();
 
     /**
@@ -39,8 +39,12 @@ public:
     void UpdatePacketData();
 
 private:
+    std::string GetIfaceName();
+
+private:
     int64_t sendPackets_ = 0;
     int64_t recvPackets_ = 0;
+    const int32_t slotId_;
 };
 } // namespace Telephony
 } // namespace OHOS
