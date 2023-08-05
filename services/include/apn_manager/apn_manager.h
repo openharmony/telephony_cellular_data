@@ -16,6 +16,7 @@
 #ifndef APN_MANAGER_H
 #define APN_MANAGER_H
 
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -33,7 +34,7 @@ public:
     std::vector<sptr<ApnHolder>> GetAllApnHolder() const;
     std::vector<sptr<ApnHolder>> GetSortApnHolder() const;
     void CreateAllApnItem();
-    std::vector<sptr<ApnItem>> FilterMatchedApns(const std::string &requestApnType) const;
+    std::vector<sptr<ApnItem>> FilterMatchedApns(const std::string &requestApnType);
     void InitApnHolders();
     sptr<ApnHolder> FindApnHolderById(const int32_t id) const;
     static int32_t FindApnIdByApnName(const std::string &type);
@@ -43,7 +44,7 @@ public:
     int32_t CreateAllApnItemByDatabase(const std::string &numeric);
     bool HasAnyConnectedState() const;
     ApnProfileState GetOverallApnState() const;
-    sptr<ApnItem> GetRilAttachApn() const;
+    sptr<ApnItem> GetRilAttachApn();
 
 private:
     void AddApnHolder(const std::string &apnType, const int32_t priority);
@@ -54,6 +55,7 @@ private:
     std::vector<sptr<ApnHolder>> apnHolders_;
     std::map<int32_t, sptr<ApnHolder>> apnIdApnHolderMap_;
     std::vector<sptr<ApnHolder>> sortedApnHolders_;
+    std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

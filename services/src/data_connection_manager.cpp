@@ -49,6 +49,7 @@ DataConnectionManager::~DataConnectionManager()
 
 void DataConnectionManager::AddConnectionStateMachine(const std::shared_ptr<CellularDataStateMachine> &stateMachine)
 {
+    std::lock_guard<std::mutex> lock(stateMachineMutex_);
     if (stateMachine != nullptr) {
         stateMachines_.push_back(stateMachine);
     }
@@ -60,6 +61,7 @@ void DataConnectionManager::RemoveConnectionStateMachine(const std::shared_ptr<C
         TELEPHONY_LOGE("Slot%{public}d: stateMachine is null", slotId_);
         return;
     }
+    std::lock_guard<std::mutex> lock(stateMachineMutex_);
     for (std::vector<std::shared_ptr<CellularDataStateMachine>>::const_iterator iter =
         stateMachines_.begin(); iter != stateMachines_.end(); iter++) {
         if (*iter.base() == stateMachine) {
@@ -71,18 +73,21 @@ void DataConnectionManager::RemoveConnectionStateMachine(const std::shared_ptr<C
 
 std::vector<std::shared_ptr<CellularDataStateMachine>> DataConnectionManager::GetAllConnectionMachine()
 {
+    std::lock_guard<std::mutex> lock(stateMachineMutex_);
     return stateMachines_;
 }
 
 void DataConnectionManager::AddActiveConnectionByCid(const std::shared_ptr<CellularDataStateMachine> &stateMachine)
 {
+    std::lock_guard<std::mutex> lock(activeConnectionMutex_);
     if (stateMachine != nullptr) {
         cidActiveConnectionMap_[stateMachine->GetCid()] = stateMachine;
     }
 }
 
-std::shared_ptr<CellularDataStateMachine> DataConnectionManager::GetActiveConnectionByCid(int32_t cid) const
+std::shared_ptr<CellularDataStateMachine> DataConnectionManager::GetActiveConnectionByCid(int32_t cid)
 {
+    std::lock_guard<std::mutex> lock(activeConnectionMutex_);
     std::map<int32_t, std::shared_ptr<CellularDataStateMachine>>::const_iterator it = cidActiveConnectionMap_.find(cid);
     if (it != cidActiveConnectionMap_.end()) {
         return it->second;
@@ -90,8 +95,9 @@ std::shared_ptr<CellularDataStateMachine> DataConnectionManager::GetActiveConnec
     return nullptr;
 }
 
-std::map<int32_t, std::shared_ptr<CellularDataStateMachine>> DataConnectionManager::GetActiveConnection() const
+std::map<int32_t, std::shared_ptr<CellularDataStateMachine>> DataConnectionManager::GetActiveConnection()
 {
+    std::lock_guard<std::mutex> lock(activeConnectionMutex_);
     return cidActiveConnectionMap_;
 }
 
@@ -100,8 +106,9 @@ bool DataConnectionManager::IsBandwidthSourceModem() const
     return bandwidthSourceModem_;
 }
 
-bool DataConnectionManager::isNoActiveConnection() const
+bool DataConnectionManager::isNoActiveConnection()
 {
+    std::lock_guard<std::mutex> lock(activeConnectionMutex_);
     if (cidActiveConnectionMap_.empty()) {
         return true;
     }
@@ -110,6 +117,7 @@ bool DataConnectionManager::isNoActiveConnection() const
 
 void DataConnectionManager::RemoveActiveConnectionByCid(int32_t cid)
 {
+    std::lock_guard<std::mutex> lock(activeConnectionMutex_);
     if (cidActiveConnectionMap_.find(cid) != cidActiveConnectionMap_.end()) {
         cidActiveConnectionMap_.erase(cid);
     }
@@ -131,6 +139,10 @@ void DataConnectionManager::StopStallDetectionTimer()
 
 void DataConnectionManager::RegisterRadioObserver()
 {
+    if (stateMachineEventHandler_ == nullptr) {
+        TELEPHONY_LOGE("stateMachineEventHandler_ is nullptr!");
+        return;
+    }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     coreInner.RegisterCoreNotify(slotId_, stateMachineEventHandler_, RadioEvent::RADIO_CONNECTED, nullptr);
     coreInner.RegisterCoreNotify(slotId_, stateMachineEventHandler_, RadioEvent::RADIO_DATA_CALL_LIST_CHANGED, nullptr);
@@ -140,6 +152,10 @@ void DataConnectionManager::RegisterRadioObserver()
 
 void DataConnectionManager::UnRegisterRadioObserver() const
 {
+    if (stateMachineEventHandler_ == nullptr) {
+        TELEPHONY_LOGE("stateMachineEventHandler_ is nullptr!");
+        return;
+    }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     coreInner.UnRegisterCoreNotify(slotId_, stateMachineEventHandler_, RadioEvent::RADIO_CONNECTED);
     coreInner.UnRegisterCoreNotify(slotId_, stateMachineEventHandler_, RadioEvent::RADIO_DATA_CALL_LIST_CHANGED);

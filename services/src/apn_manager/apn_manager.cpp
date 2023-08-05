@@ -143,14 +143,36 @@ std::vector<sptr<ApnHolder>> ApnManager::GetSortApnHolder() const
 
 void ApnManager::CreateAllApnItem()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     allApnItem_.clear();
-    allApnItem_.push_back(ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT));
-    allApnItem_.push_back(ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_MMS));
-    allApnItem_.push_back(ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_SUPL));
-    allApnItem_.push_back(ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DUN));
-    allApnItem_.push_back(ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_IMS));
-    allApnItem_.push_back(ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_IA));
-    allApnItem_.push_back(ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_EMERGENCY));
+    sptr<ApnItem> defaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
+    if (defaultApnItem != nullptr) {
+        allApnItem_.push_back(defaultApnItem);
+    }
+    sptr<ApnItem> mmsApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_MMS);
+    if (mmsApnItem != nullptr) {
+        allApnItem_.push_back(mmsApnItem);
+    }
+    sptr<ApnItem> suplApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_SUPL);
+    if (suplApnItem != nullptr) {
+        allApnItem_.push_back(suplApnItem);
+    }
+    sptr<ApnItem> dunApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DUN);
+    if (dunApnItem != nullptr) {
+        allApnItem_.push_back(dunApnItem);
+    }
+    sptr<ApnItem> imsApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_IMS);
+    if (imsApnItem != nullptr) {
+        allApnItem_.push_back(imsApnItem);
+    }
+    sptr<ApnItem> iaApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_IA);
+    if (iaApnItem != nullptr) {
+        allApnItem_.push_back(iaApnItem);
+    }
+    sptr<ApnItem> emergencyApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_EMERGENCY);
+    if (emergencyApnItem != nullptr) {
+        allApnItem_.push_back(emergencyApnItem);
+    }
 }
 
 int32_t ApnManager::CreateAllApnItemByDatabase(const std::string &numeric)
@@ -160,7 +182,6 @@ int32_t ApnManager::CreateAllApnItemByDatabase(const std::string &numeric)
         TELEPHONY_LOGE("numeric is empty!!!");
         return count;
     }
-    allApnItem_.clear();
     std::string mcc = numeric.substr(0, DEFAULT_MCC_SIZE);
     std::string mnc = numeric.substr(mcc.size(), numeric.size() - mcc.size());
     TELEPHONY_LOGI("mcc = %{public}s, mnc = %{public}s", mcc.c_str(), mnc.c_str());
@@ -174,6 +195,8 @@ int32_t ApnManager::CreateAllApnItemByDatabase(const std::string &numeric)
         TELEPHONY_LOGE("query apns from data ability fail");
         return count;
     }
+    std::lock_guard<std::mutex> lock(mutex_);
+    allApnItem_.clear();
     for (const PdpProfile &apnData : apnVec) {
         TELEPHONY_LOGI("profileId = %{public}d, profileName = %{public}s",
             apnData.profileId, apnData.profileName.c_str());
@@ -186,8 +209,9 @@ int32_t ApnManager::CreateAllApnItemByDatabase(const std::string &numeric)
     return count;
 }
 
-std::vector<sptr<ApnItem>> ApnManager::FilterMatchedApns(const std::string &requestApnType) const
+std::vector<sptr<ApnItem>> ApnManager::FilterMatchedApns(const std::string &requestApnType)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     std::vector<sptr<ApnItem>> matchApnItemList;
     for (const sptr<ApnItem> &apnItem : allApnItem_) {
         if (apnItem->CanDealWithType(requestApnType)) {
@@ -264,8 +288,9 @@ ApnProfileState ApnManager::GetOverallApnState() const
     return ApnProfileState::PROFILE_STATE_FAILED;
 }
 
-sptr<ApnItem> ApnManager::GetRilAttachApn() const
+sptr<ApnItem> ApnManager::GetRilAttachApn()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (allApnItem_.empty()) {
         TELEPHONY_LOGE("apn item is null");
         return nullptr;

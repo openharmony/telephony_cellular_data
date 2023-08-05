@@ -33,9 +33,9 @@ public:
     void AddConnectionStateMachine(const std::shared_ptr<CellularDataStateMachine> &stateMachine);
     void RemoveConnectionStateMachine(const std::shared_ptr<CellularDataStateMachine> &stateMachine);
     void AddActiveConnectionByCid(const std::shared_ptr<CellularDataStateMachine> &stateMachine);
-    std::shared_ptr<CellularDataStateMachine> GetActiveConnectionByCid(int32_t cid) const;
-    bool isNoActiveConnection() const;
-    std::map<int32_t, std::shared_ptr<CellularDataStateMachine>> GetActiveConnection() const;
+    std::shared_ptr<CellularDataStateMachine> GetActiveConnectionByCid(int32_t cid);
+    bool isNoActiveConnection();
+    std::map<int32_t, std::shared_ptr<CellularDataStateMachine>> GetActiveConnection();
     bool IsBandwidthSourceModem() const;
     void RemoveActiveConnectionByCid(int32_t cid);
     void StartStallDetectionTimer();
@@ -60,6 +60,8 @@ private:
     std::shared_ptr<DataConnectionMonitor> connectionMonitor_;
     std::vector<std::shared_ptr<CellularDataStateMachine>> stateMachines_;
     std::map<int32_t, std::shared_ptr<CellularDataStateMachine>> cidActiveConnectionMap_;
+    std::mutex stateMachineMutex_;
+    std::mutex activeConnectionMutex_;
     sptr<State> ccmDefaultState_;
     const int32_t slotId_;
     std::map<std::string, LinkBandwidthInfo> bandwidthConfigMap_;
