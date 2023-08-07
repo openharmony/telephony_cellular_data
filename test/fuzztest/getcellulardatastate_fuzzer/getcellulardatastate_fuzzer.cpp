@@ -50,8 +50,7 @@ void OnRemoteRequest(const uint8_t *data, size_t size)
     if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
         return;
     }
-    size_t dataSize = size - sizeof(uint32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(uint32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, dataSize);
     dataMessageParcel.RewindRead(0);
     uint32_t code = static_cast<uint32_t>(size);
     MessageParcel reply;
@@ -107,8 +106,7 @@ void IsCellularDataRoamingEnabled(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, dataSize);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CellularDataService>::GetInstance()->OnIsCellularDataRoamingEnabled(dataMessageParcel, reply);
@@ -136,8 +134,7 @@ void EnableCellularDataRoaming(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, dataSize);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CellularDataService>::GetInstance()->OnEnableCellularDataRoaming(dataMessageParcel, reply);
@@ -152,8 +149,7 @@ void SetDefaultCellularDataSlotId(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, dataSize);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CellularDataService>::GetInstance()->OnSetDefaultCellularDataSlotId(dataMessageParcel, reply);
@@ -168,8 +164,7 @@ void HasInternetCapability(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, dataSize);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CellularDataService>::GetInstance()->OnHasInternetCapability(dataMessageParcel, reply);
@@ -184,8 +179,7 @@ void ClearCellularDataConnections(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, dataSize);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CellularDataService>::GetInstance()->OnClearCellularDataConnections(dataMessageParcel, reply);
