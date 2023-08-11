@@ -289,7 +289,7 @@ void CellularDataService::DispatchEvent(const int32_t slotId, const AppExecFwk::
 
 void CellularDataService::UnRegisterAllNetSpecifier()
 {
-    CellularDataNetAgent::GetInstance().UnregisterNetSupplier();
+    CellularDataNetAgent::GetInstance().UnregisterAllNetSupplier();
     CellularDataNetAgent::GetInstance().UnregisterPolicyCallback();
 }
 

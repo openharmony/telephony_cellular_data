@@ -57,8 +57,9 @@ bool CellularDataNetAgent::RegisterNetSupplier(const int32_t slotId)
         uint32_t supplierId = 0;
         int32_t result = netManager.RegisterNetSupplier(
             NetBearType::BEARER_CELLULAR, std::string(IDENT_PREFIX) + std::to_string(simId), netCap, supplierId);
+        TELEPHONY_LOGI(
+            "Slot%{public}d Register network supplierId: %{public}d,result:%{public}d", slotId, supplierId, result);
         if (result == NETMANAGER_SUCCESS) {
-            TELEPHONY_LOGI("Register network successful, supplierId[%{public}d]", supplierId);
             flag = true;
             netSupplier.supplierId = supplierId;
             int32_t regCallback = netManager.RegisterNetSupplierCallback(netSupplier.supplierId, callBack_);
@@ -68,7 +69,19 @@ bool CellularDataNetAgent::RegisterNetSupplier(const int32_t slotId)
     return flag;
 }
 
-void CellularDataNetAgent::UnregisterNetSupplier()
+void CellularDataNetAgent::UnregisterNetSupplier(const int32_t slotId)
+{
+    for (const NetSupplier &netSupplier : netSuppliers_) {
+        if (netSupplier.slotId != slotId) {
+            continue;
+        }
+        auto& netManager = NetConnClient::GetInstance();
+        int32_t result = netManager.UnregisterNetSupplier(netSupplier.supplierId);
+        TELEPHONY_LOGI("Slot%{public}d unregister network result:%{public}d", slotId, result);
+    }
+}
+
+void CellularDataNetAgent::UnregisterAllNetSupplier()
 {
     for (const NetSupplier &netSupplier : netSuppliers_) {
         int32_t result = NetConnClient::GetInstance().UnregisterNetSupplier(netSupplier.supplierId);
@@ -100,7 +113,7 @@ void CellularDataNetAgent::UnregisterPolicyCallback()
         return;
     }
     int32_t registerResult = netPolicy->UnregisterNetPolicyCallback(tacticsCallBack_);
-    TELEPHONY_LOGI("Register NetPolicy Callback is :%{public}d", registerResult);
+    TELEPHONY_LOGI("Unregister NetPolicy Callback is :%{public}d", registerResult);
 }
 
 void CellularDataNetAgent::UpdateNetSupplierInfo(

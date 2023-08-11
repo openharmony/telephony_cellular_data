@@ -333,16 +333,19 @@ void CellularDataController::SystemAbilityStatusChangeListener::OnAddSystemAbili
             TELEPHONY_LOGI("COMM_NET_CONN_MANAGER_SYS_ABILITY_ID running");
             if (isNetStopped_ && handler_ != nullptr) {
                 handler_->ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
+                CellularDataNetAgent::GetInstance().UnregisterNetSupplier(slotId_);
                 CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
                 handler_->EstablishAllApnsIfConnectable();
                 isNetStopped_ = false;
             } else {
+                CellularDataNetAgent::GetInstance().UnregisterNetSupplier(slotId_);
                 CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
             }
             break;
         case COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID:
             TELEPHONY_LOGI("COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID running");
             if (slotId_ == 0) {
+                CellularDataNetAgent::GetInstance().UnregisterPolicyCallback();
                 CellularDataNetAgent::GetInstance().RegisterPolicyCallback();
             }
             break;
