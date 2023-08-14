@@ -45,8 +45,15 @@ public:
 
     /**
      * Cancel the registration information to the network management
+     *
+     * @param slotId card slot identification
      */
-    void UnregisterNetSupplier();
+    void UnregisterNetSupplier(const int32_t slotId);
+
+    /**
+     * Cancel all registration information to the network management
+     */
+    void UnregisterAllNetSupplier();
 
     bool RegisterPolicyCallback();
     void UnregisterPolicyCallback();

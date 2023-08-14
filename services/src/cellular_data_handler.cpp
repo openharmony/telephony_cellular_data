@@ -843,9 +843,14 @@ void CellularDataHandler::HandleDefaultDataSubscriptionChanged()
     TELEPHONY_LOGI("Slot%{public}d: HandleDefaultDataSubscriptionChanged", slotId_);
     if (CheckCellularDataSlotId()) {
         SetDataPermitted(slotId_, true);
-        EstablishAllApnsIfConnectable();
     } else {
         SetDataPermitted(slotId_, false);
+    }
+    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
+    const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
+    if (defSlotId == slotId_) {
+        EstablishAllApnsIfConnectable();
+    } else {
         ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
     }
 }
@@ -907,13 +912,17 @@ void CellularDataHandler::HandleSimAccountLoaded(const InnerEvent::Pointer &even
         TELEPHONY_LOGE("Slot%{public}d: event or dataSwitchSettings_ is null", slotId_);
         return;
     }
+    CellularDataNetAgent::GetInstance().UnregisterNetSupplier(slotId_);
     CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
     if (slotId_ == 0) {
+        CellularDataNetAgent::GetInstance().UnregisterPolicyCallback();
         CellularDataNetAgent::GetInstance().RegisterPolicyCallback();
     }
     RegisterDataSettingObserver();
     dataSwitchSettings_->LoadSwitchValue();
-    if (CheckCellularDataSlotId()) {
+    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
+    const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
+    if (defSlotId == slotId_) {
         EstablishAllApnsIfConnectable();
     } else {
         ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
@@ -1334,7 +1343,9 @@ void CellularDataHandler::HandleDBSettingEnableChanged(const AppExecFwk::InnerEv
     }
     bool dataEnabled = false;
     dataSwitchSettings_->IsUserDataOn(dataEnabled);
-    if (dataEnabled && CheckCellularDataSlotId()) {
+    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
+    const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
+    if (dataEnabled && defSlotId == slotId_) {
         EstablishAllApnsIfConnectable();
         if (apnManager_ == nullptr) {
             TELEPHONY_LOGE("Slot%{public}d: apnManager is null.", slotId_);
