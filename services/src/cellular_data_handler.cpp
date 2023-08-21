@@ -912,6 +912,8 @@ void CellularDataHandler::HandleSimAccountLoaded(const InnerEvent::Pointer &even
         TELEPHONY_LOGE("Slot%{public}d: event or dataSwitchSettings_ is null", slotId_);
         return;
     }
+    TELEPHONY_LOGI("Slot%{public}d: HandleSimAccountLoaded", slotId_);
+    ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
     CellularDataNetAgent::GetInstance().UnregisterNetSupplier(slotId_);
     CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
     if (slotId_ == 0) {
@@ -924,8 +926,6 @@ void CellularDataHandler::HandleSimAccountLoaded(const InnerEvent::Pointer &even
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     if (defSlotId == slotId_) {
         EstablishAllApnsIfConnectable();
-    } else {
-        ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
     }
 }
 

@@ -69,7 +69,6 @@ private:
         void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
 
     private:
-        bool isNetStopped_ = false;
         const int32_t slotId_;
         std::shared_ptr<CellularDataHandler> handler_;
     };
