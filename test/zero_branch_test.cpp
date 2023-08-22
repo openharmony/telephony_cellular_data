@@ -14,9 +14,12 @@
  */
 #define private public
 #define protected public
+#include "activating.h"
+#include "active.h"
 #include "apn_holder.h"
 #include "apn_item.h"
 #include "cellular_data_client.h"
+#include "cellular_data_constant.h"
 #include "cellular_data_controller.h"
 #include "cellular_data_dump_helper.h"
 #include "cellular_data_handler.h"
@@ -25,15 +28,20 @@
 #include "cellular_data_roaming_observer.h"
 #include "cellular_data_service.h"
 #include "cellular_data_setting_observer.h"
+#include "cellular_data_state_machine.h"
 #include "cellular_data_utils.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "data_connection_manager.h"
 #include "data_connection_monitor.h"
+#include "default.h"
+#include "disconnecting.h"
 #include "gtest/gtest.h"
+#include "inactive.h"
 #include "net_manager_call_back.h"
 #include "net_manager_tactics_call_back.h"
 #include "network_search_callback.h"
+#include "state_notification.h"
 #include "telephony_errors.h"
 #include "telephony_hisysevent.h"
 #include "telephony_log_wrapper.h"
@@ -70,6 +78,38 @@ void BranchTest::TearDownTestCase() {}
 void BranchTest::SetUp() {}
 
 void BranchTest::TearDown() {}
+
+class StateMachineTest : public AppExecFwk::EventHandler {
+public:
+    StateMachineTest() = default;
+    ~StateMachineTest() = default;
+    std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect(int32_t slotId);
+
+public:
+    std::shared_ptr<AppExecFwk::EventRunner> stateMachineEventLoop_ = nullptr;
+    std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine_ = nullptr;
+};
+
+std::shared_ptr<CellularDataStateMachine> StateMachineTest::CreateCellularDataConnect(int32_t slotId)
+{
+    if (cellularDataStateMachine_ != nullptr) {
+        return cellularDataStateMachine_;
+    }
+    stateMachineEventLoop_ = AppExecFwk::EventRunner::Create("CellularDataStateMachine");
+    if (stateMachineEventLoop_ == nullptr) {
+        return nullptr;
+    }
+    stateMachineEventLoop_->Run();
+
+    sptr<DataConnectionManager> connectionManager =
+        std::make_unique<DataConnectionManager>(GetEventRunner(), slotId).release();
+    if (connectionManager == nullptr) {
+        return nullptr;
+    }
+    cellularDataStateMachine_ =
+        std::make_shared<CellularDataStateMachine>(connectionManager, shared_from_this(), stateMachineEventLoop_);
+    return cellularDataStateMachine_;
+}
 
 /**
  * @tc.number   Telephony_CellularDataHandler_001
@@ -382,5 +422,233 @@ HWTEST_F(BranchTest, Telephony_CellularDataUtils_001, Function | MediumTest | Le
     EXPECT_GE(DelayedSingleton<CellularDataClient>::GetInstance()->GetCellularDataFlowType(), 0);
 }
 
+/**
+ * @tc.number   Telephony_ApnHolder_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_ApnHolder_001, Function | MediumTest | Level3)
+{
+    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
+    apnHolder->GetNextRetryApn();
+    std::vector<sptr<ApnItem>> matchedApns;
+    apnHolder->SetAllMatchedApns(matchedApns);
+    apnHolder->GetRetryDelay();
+    sptr<ApnItem> apnItem;
+    apnHolder->SetCurrentApn(apnItem);
+    apnHolder->GetCurrentApn();
+    apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_IDLE);
+    apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_FAILED);
+    apnHolder->GetApnState();
+    apnHolder->IsDataCallEnabled();
+    apnHolder->IsDataCallConnectable();
+    apnHolder->GetApnType();
+    apnHolder->ReleaseDataConnection();
+    apnHolder->cellularDataStateMachine_ = nullptr;
+    apnHolder->ReleaseDataConnection();
+    apnHolder->SetCellularDataStateMachine(apnHolder->cellularDataStateMachine_);
+    apnHolder->InitialApnRetryCount();
+    apnHolder->GetCellularDataStateMachine();
+    apnHolder->GetCapability();
+    apnHolder->GetPriority();
+    apnHolder->InitialApnRetryCount();
+    NetRequest request;
+    request.ident = "test";
+    request.capability = -1;
+    apnHolder->RequestCellularData(request);
+    apnHolder->ReleaseCellularData(request);
+    apnHolder->RequestCellularData(request);
+    apnHolder->ReleaseCellularData(request);
+    ASSERT_FALSE(apnHolder->IsEmergencyType());
+    EXPECT_GE(apnHolder->GetProfileId(DATA_CONTEXT_ROLE_DEFAULT), DATA_PROFILE_DEFAULT);
+    EXPECT_GE(apnHolder->GetProfileId("test"), DATA_PROFILE_DEFAULT);
+}
+
+/**
+ * @tc.number   NetworkSearchCallback_Test_01
+ * @tc.name    TestDump
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, NetworkSearchCallback_Test_01, Function | MediumTest | Level3)
+{
+    auto networkSearchCallback = std::make_shared<NetworkSearchCallback>();
+    networkSearchCallback->ClearCellularDataConnections(0);
+    networkSearchCallback->ClearCellularDataConnections(-1);
+    networkSearchCallback->HasInternetCapability(0, 0);
+    ASSERT_FALSE(networkSearchCallback->HasInternetCapability(-1, -1));
+}
+
+/**
+ * @tc.number   CellularDataRdbObserver_Test_01
+ * @tc.name    TestDump
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, CellularDataRdbObserver_Test_01, Function | MediumTest | Level3)
+{
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
+    CellularDataController controller { runner, 0 };
+    controller.RegisterDatabaseObserver();
+    controller.Init();
+    controller.RegisterDatabaseObserver();
+}
+
+/**
+ * @tc.number   StateNotification_Test_01
+ * @tc.name    TestDump
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, StateNotification_Test_01, Function | MediumTest | Level3)
+{
+    StateNotification::GetInstance().UpdateCellularDataConnectState(0, PROFILE_STATE_DISCONNECTING, 0);
+    StateNotification::GetInstance().OnUpDataFlowtype(0, CellDataFlowType::DATA_FLOW_TYPE_NONE);
+}
+
+/**
+ * @tc.number   Active_Test_01
+ * @tc.name    TestDump
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Active_Test_01, Function | MediumTest | Level3)
+{
+    std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
+    cellularMachine->Init();
+    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    std::weak_ptr<CellularDataStateMachine> stateMachine1;
+    active->stateMachine_ = stateMachine1;
+    active->StateBegin();
+    active->StateEnd();
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    event = nullptr;
+    active->RefreshTcpBufferSizes();
+    active->RefreshConnectionBandwidths();
+    active->ProcessConnectDone(event);
+    ASSERT_FALSE(active->StateProcess(event));
+    ASSERT_FALSE(active->ProcessDisconnectDone(event));
+    ASSERT_FALSE(active->ProcessDisconnectAllDone(event));
+    ASSERT_FALSE(active->ProcessLostConnection(event));
+    ASSERT_FALSE(active->ProcessLinkCapabilityChanged(event));
+    ASSERT_FALSE(active->ProcessNrStateChanged(event));
+    ASSERT_FALSE(active->ProcessNrFrequencyChanged(event));
+    ASSERT_FALSE(active->ProcessDataConnectionComplete(event));
+    ASSERT_FALSE(active->ProcessDataConnectionVoiceCallStartedOrEnded(event));
+    ASSERT_FALSE(active->ProcessDataConnectionRoamOn(event));
+    ASSERT_FALSE(active->ProcessDataConnectionRoamOff(event));
+}
+
+/**
+ * @tc.number   Activating_Test_01
+ * @tc.name    TestDump
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Activating_Test_02, Function | MediumTest | Level3)
+{
+    std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
+    cellularMachine->Init();
+    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    std::weak_ptr<CellularDataStateMachine> stateMachine1;
+    activating->stateMachine_ = stateMachine1;
+    activating->StateBegin();
+    activating->StateEnd();
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    event = nullptr;
+    activating->ProcessConnectTimeout(event);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_RETRY);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_UNKNOWN);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_SHORTAGE_RESOURCES);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_ACTIVATION_REJECTED_UNSPECIFIED);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_SERVICE_OPTION_TEMPORARILY_OUT_OF_ORDER);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_APN_NOT_SUPPORTED_IN_CURRENT_RAT_PLMN);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_APN_RESTRICTION_VALUE_INCOMPATIBLE);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_MULT_ACCESSES_PDN_NOT_ALLOWED);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_OPERATOR_DETERMINED_BARRING);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_MISSING_OR_UNKNOWN_APN);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_UNKNOWN_PDP_ADDR_OR_TYPE);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_USER_VERIFICATION);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_ACTIVATION_REJECTED_GGSN);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_SERVICE_OPTION_NOT_SUPPORTED);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_REQUESTED_SERVICE_OPTION_NOT_SUBSCRIBED);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_NSAPI_ALREADY_USED);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_IPV4_ONLY_ALLOWED);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_IPV6_ONLY_ALLOWED);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_IPV4V6_ONLY_ALLOWED);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_NON_IP_ONLY_ALLOWED);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_MAX_NUM_OF_PDP_CONTEXTS);
+    activating->DataCallPdpError(HRilPdpErrorReason::HRIL_PDP_ERR_PROTOCOL_ERRORS);
+    activating->DataCallPdpError(-1);
+    ASSERT_FALSE(activating->RilActivatePdpContextDone(event));
+    ASSERT_FALSE(activating->RilErrorResponse(event));
+    ASSERT_FALSE(activating->StateProcess(event));
+}
+
+/**
+ * @tc.number   Inactive_Test_01
+ * @tc.name    TestDump
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Inactive_Test_01, Function | MediumTest | Level3)
+{
+    std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
+    cellularMachine->Init();
+    auto inactive = static_cast<Inactive *>(cellularMachine->inActiveState_.GetRefPtr());
+    std::weak_ptr<CellularDataStateMachine> stateMachine1;
+    inactive->SetStateMachine(stateMachine1);
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    event = nullptr;
+    inactive->StateBegin();
+    inactive->StateEnd();
+    inactive->SetDeActiveApnTypeId(0);
+    inactive->SetReason(DisConnectionReason::REASON_NORMAL);
+    ASSERT_FALSE(inactive->StateProcess(event));
+}
+
+/**
+ * @tc.number   Disconnecting_Test_01
+ * @tc.name    TestDump
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Disconnecting_Test_01, Function | MediumTest | Level3)
+{
+    std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
+    cellularMachine->Init();
+    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
+    std::weak_ptr<CellularDataStateMachine> stateMachine1;
+    disconnecting->stateMachine_ = stateMachine1;
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    event = nullptr;
+    disconnecting->StateBegin();
+    disconnecting->StateEnd();
+    disconnecting->ProcessDisconnectTimeout(event);
+    ASSERT_FALSE(disconnecting->StateProcess(event));
+}
+
+/**
+ * @tc.number   Default_Test_01
+ * @tc.name    TestDump
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Default_Test_01, Function | MediumTest | Level3)
+{
+    std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
+    cellularMachine->Init();
+    auto mDefault = static_cast<Default *>(cellularMachine->defaultState_.GetRefPtr());
+    std::weak_ptr<CellularDataStateMachine> stateMachine1;
+    mDefault->stateMachine_ = stateMachine1;
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    event = nullptr;
+    mDefault->StateBegin();
+    mDefault->StateEnd();
+    ASSERT_FALSE(mDefault->StateProcess(event));
+    ASSERT_FALSE(mDefault->ProcessConnectDone(event));
+    ASSERT_FALSE(mDefault->ProcessDisconnectDone(event));
+    ASSERT_FALSE(mDefault->ProcessDisconnectAllDone(event));
+    ASSERT_FALSE(mDefault->ProcessDataConnectionDrsOrRatChanged(event));
+    ASSERT_FALSE(mDefault->ProcessDataConnectionRoamOn(event));
+    ASSERT_FALSE(mDefault->ProcessDataConnectionRoamOff(event));
+}
 } // namespace Telephony
 } // namespace OHOS
