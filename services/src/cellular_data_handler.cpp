@@ -49,8 +49,11 @@ void CellularDataHandler::Init()
     apnManager_ = std::make_unique<ApnManager>().release();
     dataSwitchSettings_ = std::make_unique<DataSwitchSettings>(slotId_);
     connectionManager_ = std::make_unique<DataConnectionManager>(GetEventRunner(), slotId_).release();
-    settingObserver_ = std::make_unique<CellularDataSettingObserver>(shared_from_this()).release();
-    roamingObserver_ = std::make_unique<CellularDataRoamingObserver>(shared_from_this(), slotId_).release();
+    settingObserver_ =
+        std::make_unique<CellularDataSettingObserver>(std::weak_ptr<AppExecFwk::EventHandler>(shared_from_this()))
+            .release();
+    roamingObserver_ = std::make_unique<CellularDataRoamingObserver>(
+        std::weak_ptr<AppExecFwk::EventHandler>(shared_from_this()), slotId_).release();
     if ((apnManager_ == nullptr) || (dataSwitchSettings_ == nullptr) || (connectionManager_ == nullptr)) {
         TELEPHONY_LOGE("Slot%{public}d: apnManager_ or dataSwitchSettings_ or connectionManager_ is null", slotId_);
         return;
@@ -926,6 +929,8 @@ void CellularDataHandler::HandleSimAccountLoaded(const InnerEvent::Pointer &even
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     if (defSlotId == slotId_) {
         EstablishAllApnsIfConnectable();
+    } else {
+        ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
     }
 }
 

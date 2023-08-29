@@ -23,12 +23,12 @@ namespace OHOS {
 namespace Telephony {
 class CellularDataSettingObserver : public AAFwk::DataAbilityObserverStub {
 public:
-    explicit CellularDataSettingObserver(std::shared_ptr<AppExecFwk::EventHandler> &&cellularDataHandler);
+    explicit CellularDataSettingObserver(std::weak_ptr<AppExecFwk::EventHandler> &&cellularDataHandler);
     ~CellularDataSettingObserver();
     void OnChange() override;
 
 private:
-    std::shared_ptr<AppExecFwk::EventHandler> cellularDataHandler_;
+    std::weak_ptr<AppExecFwk::EventHandler> cellularDataHandler_;
 };
 } // namespace Telephony
 } // namespace OHOS
