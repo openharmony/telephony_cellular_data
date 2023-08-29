@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace Telephony {
 CellularDataRoamingObserver::CellularDataRoamingObserver(
-    std::shared_ptr<AppExecFwk::EventHandler> &&cellularDataHandler, int32_t slotId)
+    std::weak_ptr<AppExecFwk::EventHandler> &&cellularDataHandler, int32_t slotId)
     : cellularDataHandler_(std::move(cellularDataHandler)), slotId_(slotId)
 {}
 
@@ -48,10 +48,10 @@ void CellularDataRoamingObserver::OnChange()
         TELEPHONY_LOGE("OnChange GetValue failed!");
         return;
     }
-
     TELEPHONY_LOGI("cellular data roaming switch is %{public}d", value);
-    if (cellularDataHandler_ != nullptr) {
-        cellularDataHandler_->SendEvent(CellularDataEventCode::MSG_DB_SETTING_ROAMING_CHANGED, value, 0);
+    auto cellularDataHandler = cellularDataHandler_.lock();
+    if (cellularDataHandler != nullptr) {
+        cellularDataHandler->SendEvent(CellularDataEventCode::MSG_DB_SETTING_ROAMING_CHANGED, value, 0);
     }
 }
 } // namespace Telephony

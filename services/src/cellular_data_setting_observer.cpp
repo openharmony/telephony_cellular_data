@@ -23,8 +23,7 @@
 
 namespace OHOS {
 namespace Telephony {
-CellularDataSettingObserver::CellularDataSettingObserver(
-    std::shared_ptr<AppExecFwk::EventHandler> &&cellularDataHandler)
+CellularDataSettingObserver::CellularDataSettingObserver(std::weak_ptr<AppExecFwk::EventHandler> &&cellularDataHandler)
     : cellularDataHandler_(std::move(cellularDataHandler))
 {}
 
@@ -43,8 +42,9 @@ void CellularDataSettingObserver::OnChange()
         return;
     }
     TELEPHONY_LOGI("cellular data switch is %{public}d", value);
-    if (cellularDataHandler_ != nullptr) {
-        cellularDataHandler_->SendEvent(CellularDataEventCode::MSG_DB_SETTING_ENABLE_CHANGED, value, 0);
+    auto cellularDataHandler = cellularDataHandler_.lock();
+    if (cellularDataHandler != nullptr) {
+        cellularDataHandler->SendEvent(CellularDataEventCode::MSG_DB_SETTING_ENABLE_CHANGED, value, 0);
     }
 }
 } // namespace Telephony
