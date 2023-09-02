@@ -358,9 +358,6 @@ void CellularDataHandler::EstablishAllApnsIfConnectable()
         TELEPHONY_LOGE("Slot%{public}d: EstablishAllApnsIfConnectable:apnManager is null", slotId_);
         return;
     }
-    if (!CheckCellularDataSlotId()) {
-        return;
-    }
     for (sptr<ApnHolder> apnHolder : apnManager_->GetSortApnHolder()) {
         if (apnHolder == nullptr) {
             TELEPHONY_LOGE("Slot%{public}d: apn is null", slotId_);
@@ -378,13 +375,30 @@ void CellularDataHandler::EstablishAllApnsIfConnectable()
     }
 }
 
-bool CellularDataHandler::CheckCellularDataSlotId()
+bool CellularDataHandler::CheckDataPermittedByDsds()
 {
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     int32_t dsdsMode = DSDS_MODE_V2;
     coreInner.GetDsdsMode(dsdsMode);
     if (defSlotId != slotId_ && dsdsMode != DSDS_MODE_V3) {
+        TELEPHONY_LOGI("Slot%{public}d: default:%{public}d, current:%{public}d, dsdsMode:%{public}d", slotId_,
+            defSlotId, slotId_, dsdsMode);
+        return false;
+    }
+    return true;
+}
+
+bool CellularDataHandler::CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder)
+{
+    if (apnHolder == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: apnHolder is null", slotId_);
+        return false;
+    }
+    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
+    const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
+    std::string apnType = apnHolder->GetApnType();
+    if (defSlotId != slotId_ && !apnType.compare(DATA_CONTEXT_ROLE_DEFAULT)) {
         TELEPHONY_LOGI("Slot%{public}d: default:%{public}d, current:%{public}d", slotId_, defSlotId, slotId_);
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
             CellularDataErrorCode::DATA_ERROR_CELLULAR_DATA_SLOT_ID_MISMATCH,
@@ -481,7 +495,7 @@ bool CellularDataHandler::CheckApnState(sptr<ApnHolder> &apnHolder)
 
 void CellularDataHandler::AttemptEstablishDataConnection(sptr<ApnHolder> &apnHolder)
 {
-    if (!CheckCellularDataSlotId() || !CheckAttachAndSimState(apnHolder) || !CheckRoamingState(apnHolder)) {
+    if (!CheckCellularDataSlotId(apnHolder) || !CheckAttachAndSimState(apnHolder) || !CheckRoamingState(apnHolder)) {
         return;
     }
     DelayedSingleton<CellularDataHiSysEvent>::GetInstance()->SetCellularDataActivateStartTime();
@@ -844,7 +858,7 @@ void CellularDataHandler::HandleVoiceCallChanged(int32_t state)
 void CellularDataHandler::HandleDefaultDataSubscriptionChanged()
 {
     TELEPHONY_LOGI("Slot%{public}d: HandleDefaultDataSubscriptionChanged", slotId_);
-    if (CheckCellularDataSlotId()) {
+    if (CheckDataPermittedByDsds()) {
         SetDataPermitted(slotId_, true);
     } else {
         SetDataPermitted(slotId_, false);
@@ -916,6 +930,11 @@ void CellularDataHandler::HandleSimAccountLoaded(const InnerEvent::Pointer &even
         return;
     }
     TELEPHONY_LOGI("Slot%{public}d: HandleSimAccountLoaded", slotId_);
+    auto slotId = event->GetParam();
+    if (slotId != slotId_) {
+        TELEPHONY_LOGE("Slot%{public}d: is not current slotId", slotId_);
+        return;
+    }
     ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
     CellularDataNetAgent::GetInstance().UnregisterNetSupplier(slotId_);
     CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);

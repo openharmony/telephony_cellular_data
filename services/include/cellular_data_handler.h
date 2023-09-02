@@ -66,7 +66,7 @@ public:
 private:
     std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect();
     std::shared_ptr<CellularDataStateMachine> FindIdleCellularDataConnection() const;
-    bool CheckCellularDataSlotId();
+    bool CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder);
     bool CheckAttachAndSimState(sptr<ApnHolder> &apnHolder);
     bool CheckRoamingState(sptr<ApnHolder> &apnHolder);
     bool CheckApnState(sptr<ApnHolder> &apnHolder);
@@ -108,6 +108,7 @@ private:
     void RegisterDataSettingObserver();
     void UnRegisterDataSettingObserver();
     void SetDataPermitted(int32_t slotId, bool dataPermitted);
+    bool CheckDataPermittedByDsds();
 
 private:
     sptr<ApnManager> apnManager_;
