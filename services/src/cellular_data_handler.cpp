@@ -930,12 +930,7 @@ void CellularDataHandler::HandleSimAccountLoaded(const InnerEvent::Pointer &even
         return;
     }
     TELEPHONY_LOGI("Slot%{public}d: HandleSimAccountLoaded", slotId_);
-    auto slotId = event->GetParam();
-    if (slotId != slotId_) {
-        TELEPHONY_LOGE("Slot%{public}d: is not current slotId", slotId_);
-        return;
-    }
-    ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
+    ClearAllConnections(DisConnectionReason::REASON_CHANGE_CONNECTION);
     CellularDataNetAgent::GetInstance().UnregisterNetSupplier(slotId_);
     CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
     if (slotId_ == 0) {
