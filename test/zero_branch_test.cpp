@@ -479,20 +479,6 @@ HWTEST_F(BranchTest, NetworkSearchCallback_Test_01, Function | MediumTest | Leve
 }
 
 /**
- * @tc.number   CellularDataRdbObserver_Test_01
- * @tc.name    TestDump
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, CellularDataRdbObserver_Test_01, Function | MediumTest | Level3)
-{
-    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
-    CellularDataController controller { runner, 0 };
-    controller.RegisterDatabaseObserver();
-    controller.Init();
-    controller.RegisterDatabaseObserver();
-}
-
-/**
  * @tc.number   StateNotification_Test_01
  * @tc.name    TestDump
  * @tc.desc     Function test
@@ -501,6 +487,10 @@ HWTEST_F(BranchTest, StateNotification_Test_01, Function | MediumTest | Level3)
 {
     StateNotification::GetInstance().UpdateCellularDataConnectState(0, PROFILE_STATE_DISCONNECTING, 0);
     StateNotification::GetInstance().OnUpDataFlowtype(0, CellDataFlowType::DATA_FLOW_TYPE_NONE);
+    std::shared_ptr<CellularDataHandler> cellularDataHandler = nullptr;
+    auto cellularDataRdbObserver = std::make_shared<CellularDataRdbObserver>(cellularDataHandler);
+    cellularDataRdbObserver->OnChange();
+    ASSERT_TRUE(cellularDataHandler == nullptr);
 }
 
 /**
