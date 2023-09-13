@@ -18,7 +18,7 @@ import("//build/test.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("GetCellularDataStateFuzzTest") {
-  module_output_path = "cellular_data/GetCellularDataStateFuzzTest"
+  module_output_path = "cellular_data/cellular_data"
   module_out_path = module_output_path
   SOURCE_DIR = "../../.."
   fuzz_config_file = "$SOURCE_DIR/test/fuzztest/getcellulardatastate_fuzzer"
