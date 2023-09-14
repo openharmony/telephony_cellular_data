@@ -18,7 +18,7 @@ import("//build/test.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("UpdateDisconnectMachineFuzzTest") {
-  module_output_path = "cellular_data/UpdateDisconnectMachineFuzzTest"
+  module_output_path = "cellular_data/cellular_data"
   module_out_path = module_output_path
   SOURCE_DIR = "../../.."
   fuzz_config_file = "$SOURCE_DIR/test/fuzztest/updatedisconnectmachine_fuzzer"
