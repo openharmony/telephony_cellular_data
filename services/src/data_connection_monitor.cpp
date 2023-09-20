@@ -96,6 +96,12 @@ void DataConnectionMonitor::UpdateFlowInfo()
 
 void DataConnectionMonitor::HandleRecovery()
 {
+    if (callState_ != static_cast<int32_t>(TelCallStatus::CALL_STATUS_IDLE) &&
+        callState_ != static_cast<int32_t>(TelCallStatus::CALL_STATUS_DISCONNECTED)) {
+        TELEPHONY_LOGI("Slot%{public}d: Stop recovery while call is busy", slotId_);
+        dataRecoveryState_ = RecoveryState::STATE_REQUEST_CONTEXT_LIST;
+        return;
+    }
     switch (dataRecoveryState_) {
         case RecoveryState::STATE_REQUEST_CONTEXT_LIST: {
             TELEPHONY_LOGI("Slot%{public}d: Handle Recovery: get data call list", slotId_);
@@ -142,6 +148,11 @@ void DataConnectionMonitor::BeginNetStatistics()
 {
     updateNetStat_ = true;
     UpdateNetTrafficState();
+}
+
+void DataConnectionMonitor::UpdateCallState(int32_t state)
+{
+    callState_ = state;
 }
 
 void DataConnectionMonitor::EndNetStatistics()

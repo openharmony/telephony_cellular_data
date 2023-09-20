@@ -234,7 +234,7 @@ int32_t CellularDataTest::PingTest()
 
     // if ping succeed, the result should contains something like:
     // 3 packets transmitted, 3 received, 0% packet loss, time 5440ms
-    if (strRe.find("3 received") != string::npos) {
+    if (strRe.find("3 packets") != string::npos) {
         return PING_CHECK_SUCCESS;
     } else {
         return PING_CHECK_FAIL;
