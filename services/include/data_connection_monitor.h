@@ -65,6 +65,11 @@ public:
     void EndNetStatistics();
 
     /**
+     * Update call state
+     */
+    void UpdateCallState(int32_t state);
+
+    /**
      * Update the up and down data status of the network
      */
     void UpdateNetTrafficState();
@@ -109,6 +114,7 @@ private:
     RecoveryState dataRecoveryState_ = RecoveryState::STATE_REQUEST_CONTEXT_LIST;
     CellDataFlowType dataFlowType_ = CellDataFlowType::DATA_FLOW_TYPE_NONE;
     const int32_t slotId_;
+    int32_t callState_ = static_cast<int32_t>(TelCallStatus::CALL_STATUS_IDLE);
 };
 } // namespace Telephony
 } // namespace OHOS

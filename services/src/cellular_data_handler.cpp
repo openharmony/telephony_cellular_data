@@ -835,6 +835,7 @@ void CellularDataHandler::HandleVoiceCallChanged(int32_t state)
     if (lastCallState_ != state) {
         // call is busy
         lastCallState_ = state;
+        connectionManager_->UpdateCallState(state);
         if (state != TelCallStatus::CALL_STATUS_IDLE && state != TelCallStatus::CALL_STATUS_DISCONNECTED) {
             if (apnManager_->HasAnyConnectedState() && support) {
                 connectionManager_->EndNetStatistics();

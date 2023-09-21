@@ -350,6 +350,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataConnectionManager_001, Function | Med
     con.GetDefaultBandWidthsConfig();
     con.GetDefaultTcpBufferConfig();
     con.SetDataFlowType(CellDataFlowType::DATA_FLOW_TYPE_NONE);
+    con.UpdateCallState(0);
     ASSERT_EQ("", con.GetTcpBufferByRadioTech(0));
     ASSERT_TRUE(con.GetBandwidthsByRadioTech(0).upBandwidth == DEFAULT_BANDWIDTH);
 }
@@ -366,6 +367,7 @@ HWTEST_F(BranchTest, Telephony_DataConnectionMonitor_001, Function | MediumTest 
     mon.trafficManager_ = nullptr;
     mon.stallDetectionTrafficManager_ = nullptr;
     mon.UpdateFlowInfo();
+    mon.UpdateCallState(0);
     auto event = AppExecFwk::InnerEvent::Get(0);
     mon.SetPreferredNetworkPara(event);
     mon.UpdateDataFlowType();

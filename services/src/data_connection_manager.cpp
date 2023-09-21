@@ -289,6 +289,13 @@ void DataConnectionManager::EndNetStatistics()
     }
 }
 
+void DataConnectionManager::UpdateCallState(int32_t state)
+{
+    if (connectionMonitor_ != nullptr) {
+        connectionMonitor_->UpdateCallState(state);
+    }
+}
+
 int32_t DataConnectionManager::GetSlotId() const
 {
     return slotId_;
