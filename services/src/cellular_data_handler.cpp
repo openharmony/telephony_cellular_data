@@ -859,12 +859,18 @@ void CellularDataHandler::HandleVoiceCallChanged(int32_t state)
 void CellularDataHandler::HandleDefaultDataSubscriptionChanged()
 {
     TELEPHONY_LOGI("Slot%{public}d: HandleDefaultDataSubscriptionChanged", slotId_);
+    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
+    bool hasSimCard = false;
+    coreInner.HasSimCard(slotId_, hasSimCard);
+    if (!hasSimCard) {
+        TELEPHONY_LOGE("Slot%{public}d: no sim card", slotId_);
+        return;
+    }
     if (CheckDataPermittedByDsds()) {
         SetDataPermitted(slotId_, true);
     } else {
         SetDataPermitted(slotId_, false);
     }
-    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     if (defSlotId == slotId_) {
         EstablishAllApnsIfConnectable();
@@ -1067,6 +1073,12 @@ void CellularDataHandler::HandleDsdsModeChanged(const AppExecFwk::InnerEvent::Po
     int32_t defaultSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
     int32_t simNum = CoreManagerInner::GetInstance().GetMaxSimCount();
     for (int32_t i = 0; i < simNum; ++i) {
+        bool hasSimCard = false;
+        CoreManagerInner::GetInstance().HasSimCard(i, hasSimCard);
+        if (!hasSimCard) {
+            TELEPHONY_LOGE("Slot%{public}d: no sim :%{public}d", slotId_, i);
+            continue;
+        }
         if (defaultSlotId != i && object->data != DSDS_MODE_V3) {
             SetDataPermitted(i, false);
         } else {
