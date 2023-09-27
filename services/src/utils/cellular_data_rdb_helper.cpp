@@ -53,7 +53,6 @@ int CellularDataRdbHelper::Update(
     int32_t result = dataShareHelper->Update(cellularDataUri_, predicates, value);
     dataShareHelper->NotifyChange(cellularDataUri_);
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
     return result;
 }
 
@@ -68,7 +67,6 @@ int CellularDataRdbHelper::Insert(const DataShare::DataShareValuesBucket &values
     int32_t result = dataShareHelper->Insert(cellularDataUri_, values);
     dataShareHelper->NotifyChange(cellularDataUri_);
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
     return result;
 }
 
@@ -81,7 +79,7 @@ bool CellularDataRdbHelper::QueryApns(const std::string &mcc, const std::string 
     }
     std::vector<std::string> columns;
     DataShare::DataSharePredicates predicates;
-    predicates.EqualTo(PdpProfileData::MCC, mcc)->And()->EqualTo(PdpProfileData::MNC, mnc);
+    predicates.EqualTo(PdpProfileData::MCC, mcc)->EqualTo(PdpProfileData::MNC, mnc);
     std::shared_ptr<DataShare::DataShareResultSet> result =
         dataShareHelper->Query(cellularDataUri_, predicates, columns);
     if (result == nullptr) {
@@ -92,7 +90,36 @@ bool CellularDataRdbHelper::QueryApns(const std::string &mcc, const std::string 
     ReadApnResult(result, apnVec);
     result->Close();
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
+    return true;
+}
+
+bool CellularDataRdbHelper::QueryMvnoApnsByType(const std::string &mcc, const std::string &mnc,
+    const std::string &mvnoType, const std::string &mvnoDataFromSim, std::vector<PdpProfile> &mvnoApnVec)
+{
+    if (mvnoDataFromSim.empty()) {
+        TELEPHONY_LOGE("mvnoDataFromSim is empty!");
+        return true;
+    }
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAbilityHelper();
+    if (dataShareHelper == nullptr) {
+        TELEPHONY_LOGE("dataShareHelper is null");
+        return false;
+    }
+    std::vector<std::string> columns;
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(PdpProfileData::MVNO_TYPE, mvnoType)
+        ->EqualTo(PdpProfileData::MCC, mcc)
+        ->EqualTo(PdpProfileData::MNC, mnc);
+    std::shared_ptr<DataShare::DataShareResultSet> result =
+        dataShareHelper->Query(cellularDataUri_, predicates, columns);
+    if (result == nullptr) {
+        TELEPHONY_LOGE("Query apns error");
+        dataShareHelper->Release();
+        return false;
+    }
+    ReadMvnoApnResult(result, mvnoDataFromSim, mvnoApnVec);
+    result->Close();
+    dataShareHelper->Release();
     return true;
 }
 
@@ -103,44 +130,94 @@ void CellularDataRdbHelper::ReadApnResult(
         TELEPHONY_LOGI("ReadApnResult result is nullptr");
         return;
     }
-
     int rowCnt = 0;
-    int index = 0;
     result->GetRowCount(rowCnt);
     TELEPHONY_LOGI("CellularDataRdbHelper::query apns rowCnt = %{public}d", rowCnt);
     for (int i = 0; i < rowCnt; ++i) {
         PdpProfile apnBean;
-        result->GoToRow(i);
-        result->GetColumnIndex(PdpProfileData::PROFILE_ID, index);
-        result->GetInt(index, apnBean.profileId);
-        result->GetColumnIndex(PdpProfileData::PROFILE_NAME, index);
-        result->GetString(index, apnBean.profileName);
-        result->GetColumnIndex(PdpProfileData::MCC, index);
-        result->GetString(index, apnBean.mcc);
-        result->GetColumnIndex(PdpProfileData::MNC, index);
-        result->GetString(index, apnBean.mnc);
-        result->GetColumnIndex(PdpProfileData::APN, index);
-        result->GetString(index, apnBean.apn);
-        result->GetColumnIndex(PdpProfileData::AUTH_TYPE, index);
-        result->GetInt(index, apnBean.authType);
-        result->GetColumnIndex(PdpProfileData::AUTH_USER, index);
-        result->GetString(index, apnBean.authUser);
-        result->GetColumnIndex(PdpProfileData::AUTH_PWD, index);
-        result->GetString(index, apnBean.authPwd);
-        result->GetColumnIndex(PdpProfileData::APN_TYPES, index);
-        result->GetString(index, apnBean.apnTypes);
-        result->GetColumnIndex(PdpProfileData::APN_PROTOCOL, index);
-        result->GetString(index, apnBean.pdpProtocol);
-        result->GetColumnIndex(PdpProfileData::APN_ROAM_PROTOCOL, index);
-        result->GetString(index, apnBean.roamPdpProtocol);
-        if (apnBean.pdpProtocol.empty()) {
-            apnBean.pdpProtocol = "IPV4V6";
+        MakePdpProfile(result, i, apnBean);
+        if (apnBean.mvnoType.empty()) {
+            apnVec.push_back(apnBean);
         }
-        if (apnBean.roamPdpProtocol.empty()) {
-            apnBean.roamPdpProtocol = "IPV4V6";
-        }
-        apnVec.push_back(apnBean);
     }
+}
+
+void CellularDataRdbHelper::ReadMvnoApnResult(const std::shared_ptr<DataShare::DataShareResultSet> &result,
+    const std::string &mvnoDataFromSim, std::vector<PdpProfile> &apnVec)
+{
+    if (result == nullptr) {
+        TELEPHONY_LOGI("ReadMvnoApnResult result is nullptr");
+        return;
+    }
+    int rowCnt = 0;
+    result->GetRowCount(rowCnt);
+    TELEPHONY_LOGI("CellularDataRdbHelper::query mvno apns rowCnt = %{public}d", rowCnt);
+    for (int i = 0; i < rowCnt; ++i) {
+        PdpProfile apnBean;
+        MakePdpProfile(result, i, apnBean);
+        if (IsMvnoDataMatched(mvnoDataFromSim, apnBean)) {
+            apnVec.push_back(apnBean);
+        }
+    }
+}
+
+void CellularDataRdbHelper::MakePdpProfile(
+    const std::shared_ptr<DataShare::DataShareResultSet> &result, int i, PdpProfile &apnBean)
+{
+    int index = 0;
+    result->GoToRow(i);
+    result->GetColumnIndex(PdpProfileData::PROFILE_ID, index);
+    result->GetInt(index, apnBean.profileId);
+    result->GetColumnIndex(PdpProfileData::PROFILE_NAME, index);
+    result->GetString(index, apnBean.profileName);
+    result->GetColumnIndex(PdpProfileData::MCC, index);
+    result->GetString(index, apnBean.mcc);
+    result->GetColumnIndex(PdpProfileData::MNC, index);
+    result->GetString(index, apnBean.mnc);
+    result->GetColumnIndex(PdpProfileData::APN, index);
+    result->GetString(index, apnBean.apn);
+    result->GetColumnIndex(PdpProfileData::AUTH_TYPE, index);
+    result->GetInt(index, apnBean.authType);
+    result->GetColumnIndex(PdpProfileData::AUTH_USER, index);
+    result->GetString(index, apnBean.authUser);
+    result->GetColumnIndex(PdpProfileData::AUTH_PWD, index);
+    result->GetString(index, apnBean.authPwd);
+    result->GetColumnIndex(PdpProfileData::APN_TYPES, index);
+    result->GetString(index, apnBean.apnTypes);
+    result->GetColumnIndex(PdpProfileData::APN_PROTOCOL, index);
+    result->GetString(index, apnBean.pdpProtocol);
+    result->GetColumnIndex(PdpProfileData::APN_ROAM_PROTOCOL, index);
+    result->GetString(index, apnBean.roamPdpProtocol);
+    result->GetColumnIndex(PdpProfileData::MVNO_TYPE, index);
+    result->GetString(index, apnBean.mvnoType);
+    result->GetColumnIndex(PdpProfileData::MVNO_MATCH_DATA, index);
+    result->GetString(index, apnBean.mvnoMatchData);
+    if (apnBean.pdpProtocol.empty()) {
+        apnBean.pdpProtocol = "IPV4V6";
+    }
+    if (apnBean.roamPdpProtocol.empty()) {
+        apnBean.roamPdpProtocol = "IPV4V6";
+    }
+}
+
+bool CellularDataRdbHelper::IsMvnoDataMatched(const std::string &mvnoDataFromSim, const PdpProfile &apnBean)
+{
+    if (mvnoDataFromSim.empty()) {
+        return false;
+    }
+    if (apnBean.mvnoType.compare(MvnoType::ICCID) == 0) {
+        return std::regex_match(mvnoDataFromSim, std::regex(apnBean.mvnoMatchData));
+    }
+    if (apnBean.mvnoType.compare(MvnoType::SPN) == 0) {
+        return std::regex_match(mvnoDataFromSim, std::regex(apnBean.mvnoMatchData));
+    }
+    if (apnBean.mvnoType.compare(MvnoType::IMSI) == 0) {
+        return std::regex_match(mvnoDataFromSim, std::regex(apnBean.mvnoMatchData));
+    }
+    if (apnBean.mvnoType.compare(MvnoType::GID1) == 0) {
+        return mvnoDataFromSim.compare(0, apnBean.mvnoMatchData.size(), apnBean.mvnoMatchData) == 0;
+    }
+    return false;
 }
 
 void CellularDataRdbHelper::RegisterObserver(const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
@@ -152,7 +229,6 @@ void CellularDataRdbHelper::RegisterObserver(const sptr<AAFwk::IDataAbilityObser
     }
     dataShareHelper->RegisterObserver(cellularDataUri_, dataObserver);
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
     TELEPHONY_LOGI("CellularDataRdbHelper::RegisterObserver Success");
 }
 
@@ -165,7 +241,6 @@ void CellularDataRdbHelper::UnRegisterObserver(const sptr<AAFwk::IDataAbilityObs
     }
     dataShareHelper->UnregisterObserver(cellularDataUri_, dataObserver);
     dataShareHelper->Release();
-    dataShareHelper = nullptr;
     TELEPHONY_LOGI("CellularDataRdbHelper::UnRegisterObserver Success");
 }
 } // namespace Telephony

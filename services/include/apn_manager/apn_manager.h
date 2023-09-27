@@ -41,13 +41,15 @@ public:
     static std::string FindApnNameByApnId(const int32_t id);
     static int32_t FindApnIdByCapability(const uint64_t capability);
     bool IsDataConnectionNotUsed(const std::shared_ptr<CellularDataStateMachine> &stateMachine) const;
-    int32_t CreateAllApnItemByDatabase(const std::string &numeric);
+    int32_t CreateAllApnItemByDatabase(int32_t slotId);
     bool HasAnyConnectedState() const;
     ApnProfileState GetOverallApnState() const;
     sptr<ApnItem> GetRilAttachApn();
 
 private:
     void AddApnHolder(const std::string &apnType, const int32_t priority);
+    int32_t CreateMvnoApnItems(int32_t slotId, const std::string &mcc, const std::string &mnc);
+    int32_t MakeAllApnItem(const std::vector<PdpProfile> &apnVec);
 
 private:
     static const std::map<std::string, int32_t> apnIdApnNameMap_;

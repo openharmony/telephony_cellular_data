@@ -18,6 +18,7 @@
 #include "active.h"
 #include "apn_holder.h"
 #include "apn_item.h"
+#include "apn_manager.h"
 #include "cellular_data_client.h"
 #include "cellular_data_constant.h"
 #include "cellular_data_controller.h"
@@ -34,6 +35,7 @@
 #include "common_event_support.h"
 #include "data_connection_manager.h"
 #include "data_connection_monitor.h"
+#include "datashare_result_set.h"
 #include "default.h"
 #include "disconnecting.h"
 #include "gtest/gtest.h"
@@ -41,6 +43,7 @@
 #include "net_manager_call_back.h"
 #include "net_manager_tactics_call_back.h"
 #include "network_search_callback.h"
+#include "pdp_profile_data.h"
 #include "state_notification.h"
 #include "telephony_errors.h"
 #include "telephony_hisysevent.h"
@@ -641,6 +644,35 @@ HWTEST_F(BranchTest, Default_Test_01, Function | MediumTest | Level3)
     ASSERT_FALSE(mDefault->ProcessDataConnectionDrsOrRatChanged(event));
     ASSERT_FALSE(mDefault->ProcessDataConnectionRoamOn(event));
     ASSERT_FALSE(mDefault->ProcessDataConnectionRoamOff(event));
+}
+
+/**
+ * @tc.number   ApnManager_Test_01
+ * @tc.name    TestDump
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, ApnManager_Test_01, Function | MediumTest | Level3)
+{
+    auto apnManager = std::make_shared<ApnManager>();
+    EXPECT_GE(apnManager->CreateAllApnItemByDatabase(0), 0);
+    EXPECT_EQ(apnManager->CreateAllApnItemByDatabase(0), 0);
+    auto helper = CellularDataRdbHelper::GetInstance();
+    std::shared_ptr<DataShare::DataShareResultSet> result = nullptr;
+    std::vector<PdpProfile> apnVec;
+    helper->ReadMvnoApnResult(result, "", apnVec);
+    PdpProfile apnBean;
+    ASSERT_FALSE(helper->IsMvnoDataMatched("", apnBean));
+    apnBean.mvnoType = MvnoType::ICCID;
+    apnBean.mvnoMatchData = "test";
+    ASSERT_TRUE(helper->IsMvnoDataMatched("test", apnBean));
+    apnBean.mvnoType = MvnoType::SPN;
+    ASSERT_TRUE(helper->IsMvnoDataMatched("test", apnBean));
+    apnBean.mvnoType = MvnoType::GID1;
+    ASSERT_TRUE(helper->IsMvnoDataMatched("test", apnBean));
+    apnBean.mvnoType = MvnoType::IMSI;
+    ASSERT_TRUE(helper->IsMvnoDataMatched("test", apnBean));
+    apnBean.mvnoType = "error";
+    ASSERT_FALSE(helper->IsMvnoDataMatched("test", apnBean));
 }
 } // namespace Telephony
 } // namespace OHOS

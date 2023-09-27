@@ -973,12 +973,9 @@ void CellularDataHandler::HandleApnChanged(const InnerEvent::Pointer &event)
         TELEPHONY_LOGE("Slot%{public}d: apnManager_ is null", slotId_);
         return;
     }
-    std::u16string operatorNumeric;
-    CoreManagerInner::GetInstance().GetSimOperatorNumeric(slotId_, operatorNumeric);
-    std::string numeric = Str16ToStr8(operatorNumeric);
     int32_t result = 0;
     for (int32_t i = 0; i < DEFAULT_READ_APN_TIME; ++i) {
-        result = apnManager_->CreateAllApnItemByDatabase(numeric);
+        result = apnManager_->CreateAllApnItemByDatabase(slotId_);
         if (result != 0) {
             break;
         }
