@@ -164,6 +164,8 @@ static constexpr const char *CELLULAR_DATA_SETTING_DATA_ENABLE_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=cellular_data_enable";
 static constexpr const char *CELLULAR_DATA_SETTING_DATA_ROAMING_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=cellular_data_roaming_enable";
+static constexpr const char *CELLULAR_DATA_SETTING_DATA_INCALL_URI =
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=cellular_data_incall_enable";
 static const int32_t DEFAULT_NET_STATISTICS_PERIOD = 3 * 1000;
 static const int32_t DEFAULT_STALL_DETECTION_PERIOD = 10 * 1000;
 static const int32_t ESTABLISH_DATA_CONNECTION_DELAY = 1 * 1000;
@@ -218,9 +220,11 @@ static const int32_t DELAY_SET_RIL_BANDWIDTH_MS = 3000;
 static const int32_t DELAY_SET_RIL_UP_DOWN_BANDWIDTH_MS = 50;
 static constexpr const char *CELLULAR_DATA_COLUMN_ENABLE = "cellular_data_enable";
 static constexpr const char *CELLULAR_DATA_COLUMN_ROAMING = "cellular_data_roaming_enable";
+static constexpr const char *CELLULAR_DATA_COLUMN_INCALL = "cellular_data_incall_enable";
 static constexpr const char *CELLULAR_DATA_COLUMN_KEYWORD = "KEYWORD";
 static constexpr const char *CELLULAR_DATA_COLUMN_VALUE = "VALUE";
-const int32_t INVALID_SIM_ID = 0;
+static const int32_t INVALID_SIM_ID = 0;
+static const int32_t INVALID_SLOT_ID = -1;
 } // namespace Telephony
 } // namespace OHOS
 #endif // CELLULAR_DATA_CONSTANT_H

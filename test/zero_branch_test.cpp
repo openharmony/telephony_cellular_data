@@ -38,6 +38,7 @@
 #include "disconnecting.h"
 #include "gtest/gtest.h"
 #include "inactive.h"
+#include "incall_data_state_machine.h"
 #include "net_manager_call_back.h"
 #include "net_manager_tactics_call_back.h"
 #include "network_search_callback.h"
@@ -109,6 +110,36 @@ std::shared_ptr<CellularDataStateMachine> StateMachineTest::CreateCellularDataCo
     cellularDataStateMachine_ =
         std::make_shared<CellularDataStateMachine>(connectionManager, shared_from_this(), stateMachineEventLoop_);
     return cellularDataStateMachine_;
+}
+
+class IncallStateMachineTest : public AppExecFwk::EventHandler {
+public:
+    IncallStateMachineTest() = default;
+    ~IncallStateMachineTest() = default;
+    std::shared_ptr<IncallDataStateMachine> CreateIncallDataStateMachine(int32_t slotId);
+
+public:
+    std::shared_ptr<AppExecFwk::EventRunner> stateMachineEventLoop_ = nullptr;
+    std::shared_ptr<IncallDataStateMachine> incallStateMachine_ = nullptr;
+};
+
+std::shared_ptr<IncallDataStateMachine> IncallStateMachineTest::CreateIncallDataStateMachine(int32_t slotId)
+{
+    if (incallStateMachine_ != nullptr) {
+        return incallStateMachine_;
+    }
+    stateMachineEventLoop_ = AppExecFwk::EventRunner::Create("IncallDataStateMachine");
+    if (stateMachineEventLoop_ == nullptr) {
+        return nullptr;
+    }
+    stateMachineEventLoop_->Run();
+    sptr<ApnManager> apnManager = std::make_unique<ApnManager>().release();
+    if (apnManager == nullptr) {
+        return nullptr;
+    }
+    incallStateMachine_ =
+        std::make_shared<IncallDataStateMachine>(slotId, shared_from_this(), stateMachineEventLoop_, apnManager);
+    return incallStateMachine_;
 }
 
 /**
@@ -186,6 +217,10 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | 
     cellularDataHandler.MsgEstablishDataConnection(event);
     cellularDataHandler.MsgRequestNetwork(event);
     cellularDataHandler.HandleSettingSwitchChanged(event);
+    cellularDataHandler.HandleDBSettingIncallChanged(event);
+    cellularDataHandler.IncallDataComplete(event);
+    cellularDataHandler.HandleCallChanged(0);
+    cellularDataHandler.HandleImsCallChanged(0);
     cellularDataHandler.HandleVoiceCallChanged(0);
     cellularDataHandler.HandleSimStateOrRecordsChanged(event);
     cellularDataHandler.HandleSimAccountLoaded(event);
@@ -641,6 +676,106 @@ HWTEST_F(BranchTest, Default_Test_01, Function | MediumTest | Level3)
     ASSERT_FALSE(mDefault->ProcessDataConnectionDrsOrRatChanged(event));
     ASSERT_FALSE(mDefault->ProcessDataConnectionRoamOn(event));
     ASSERT_FALSE(mDefault->ProcessDataConnectionRoamOff(event));
+}
+
+/**
+ * @tc.number   IdleState_Test_01
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Idle_Test_01, Function | MediumTest | Level3)
+{
+    std::shared_ptr<IncallStateMachineTest> incallStateMachineTest = std::make_shared<IncallStateMachineTest>();
+    std::shared_ptr<IncallDataStateMachine> incallStateMachine =
+        incallStateMachineTest->CreateIncallDataStateMachine(0);
+    incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
+    auto idleState = static_cast<IdleState *>(incallStateMachine->idleState_.GetRefPtr());
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    event = nullptr;
+    idleState->StateBegin();
+    ASSERT_FALSE(idleState->StateProcess(event));
+    ASSERT_TRUE(idleState->ProcessCallStarted(event));
+    ASSERT_TRUE(idleState->ProcessCallEnded(event));
+    ASSERT_TRUE(idleState->ProcessSettingsOn(event));
+    ASSERT_TRUE(idleState->ProcessDsdsChanged(event));
+    idleState->StateEnd();
+}
+
+/**
+ * @tc.number   ActivatingSlaveState_Test_01
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, ActivatingSlaveState_Test_01, Function | MediumTest | Level3)
+{
+    std::shared_ptr<IncallStateMachineTest> incallStateMachineTest = std::make_shared<IncallStateMachineTest>();
+    std::shared_ptr<IncallDataStateMachine> incallStateMachine =
+        incallStateMachineTest->CreateIncallDataStateMachine(0);
+    incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
+    incallStateMachine->TransitionTo(incallStateMachine->activatingSlaveState_);
+    auto activatingSlaveState =
+        static_cast<ActivatingSlaveState *>(incallStateMachine->activatingSlaveState_.GetRefPtr());
+    auto slaveActiveState = static_cast<SlaveActiveState *>(incallStateMachine->slaveActiveState_.GetRefPtr());
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    event = nullptr;
+    slaveActiveState->StateBegin();
+    activatingSlaveState->StateBegin();
+    ASSERT_FALSE(activatingSlaveState->StateProcess(event));
+    ASSERT_FALSE(slaveActiveState->StateProcess(event));
+    ASSERT_TRUE(slaveActiveState->ProcessCallEnded(event));
+    ASSERT_TRUE(slaveActiveState->ProcessSettingsOff(event));
+    activatingSlaveState->StateEnd();
+    slaveActiveState->StateEnd();
+}
+
+/**
+ * @tc.number   ActivatedSlaveState_Test_01
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, ActivatedSlaveState_Test_01, Function | MediumTest | Level3)
+{
+    std::shared_ptr<IncallStateMachineTest> incallStateMachineTest = std::make_shared<IncallStateMachineTest>();
+    std::shared_ptr<IncallDataStateMachine> incallStateMachine =
+        incallStateMachineTest->CreateIncallDataStateMachine(0);
+    incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
+    incallStateMachine->TransitionTo(incallStateMachine->activatingSlaveState_);
+    incallStateMachine->TransitionTo(incallStateMachine->activatedSlaveState_);
+    auto activatedSlaveState = static_cast<ActivatedSlaveState *>(incallStateMachine->activatedSlaveState_.GetRefPtr());
+    auto slaveActiveState = static_cast<SlaveActiveState *>(incallStateMachine->slaveActiveState_.GetRefPtr());
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    event = nullptr;
+    slaveActiveState->StateBegin();
+    activatedSlaveState->StateBegin();
+    ASSERT_FALSE(activatedSlaveState->StateProcess(event));
+    ASSERT_FALSE(slaveActiveState->StateProcess(event));
+    ASSERT_TRUE(slaveActiveState->ProcessCallEnded(event));
+    ASSERT_TRUE(slaveActiveState->ProcessSettingsOff(event));
+    activatedSlaveState->StateEnd();
+    slaveActiveState->StateEnd();
+}
+
+/**
+ * @tc.number   DeactivatingSlaveState_Test_01
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, DeactivatingSlaveState_Test_01, Function | MediumTest | Level3)
+{
+    std::shared_ptr<IncallStateMachineTest> incallStateMachineTest = std::make_shared<IncallStateMachineTest>();
+    std::shared_ptr<IncallDataStateMachine> incallStateMachine =
+        incallStateMachineTest->CreateIncallDataStateMachine(0);
+    incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
+    incallStateMachine->TransitionTo(incallStateMachine->activatingSlaveState_);
+    incallStateMachine->TransitionTo(incallStateMachine->activatedSlaveState_);
+    incallStateMachine->TransitionTo(incallStateMachine->deactivatingSlaveState_);
+    auto deactivatingSlaveState =
+        static_cast<DeactivatingSlaveState *>(incallStateMachine->deactivatingSlaveState_.GetRefPtr());
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    event = nullptr;
+    deactivatingSlaveState->StateBegin();
+    ASSERT_FALSE(deactivatingSlaveState->StateProcess(event));
+    deactivatingSlaveState->StateEnd();
 }
 } // namespace Telephony
 } // namespace OHOS
