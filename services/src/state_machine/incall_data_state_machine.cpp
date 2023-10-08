@@ -229,7 +229,7 @@ bool IdleState::ProcessCallEnded(const AppExecFwk::InnerEvent::Pointer &event)
         return NOT_PROCESSED;
     }
     if (stateMachine->stateMachineEventHandler_->HasInnerEvent(
-            CellularDataEventCode::MSG_SM_INCALL_DATA_DSDS_CHANGED)) {
+        CellularDataEventCode::MSG_SM_INCALL_DATA_DSDS_CHANGED)) {
         stateMachine->stateMachineEventHandler_->RemoveEvent(CellularDataEventCode::MSG_SM_INCALL_DATA_DSDS_CHANGED);
     }
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = stateMachine->cellularDataHandler_.lock();

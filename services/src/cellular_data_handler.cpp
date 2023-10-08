@@ -682,8 +682,7 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
         }
         if (reason == DisConnectionReason::REASON_RETRY_CONNECTION) {
             int64_t delayTime = apnHolder->GetRetryDelay();
-            TELEPHONY_LOGI("Slot%{public}d: Establish a data connection. The apn type is %{public}s", slotId_,
-                apnHolder->GetApnType().c_str());
+            TELEPHONY_LOGI("Slot%{public}d: Retry apn type: %{public}s", slotId_, apnHolder->GetApnType().c_str());
             SendEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, apnId, delayTime);
         }
     }
