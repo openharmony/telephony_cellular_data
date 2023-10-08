@@ -637,8 +637,8 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
             CoreManagerInner::GetInstance().DcPhysicalLinkActiveUpdate(slotId_, physicalConnectionActiveState_);
         }
         if (incallDataStateMachine_ != nullptr) {
-            InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_CONNECTED);
-            incallDataStateMachine_->SendEvent(event);
+            InnerEvent::Pointer incallEvent = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_CONNECTED);
+            incallDataStateMachine_->SendEvent(incallEvent);
         }
     }
 }
@@ -691,8 +691,9 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
         connectionManager_->StopStallDetectionTimer();
         connectionManager_->EndNetStatistics();
         if (incallDataStateMachine_ != nullptr) {
-            InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_DISCONNECTED);
-            incallDataStateMachine_->SendEvent(event);
+            InnerEvent::Pointer incallEvent =
+                InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_DISCONNECTED);
+            incallDataStateMachine_->SendEvent(incallEvent);
         }
     }
     if (reason == DisConnectionReason::REASON_CHANGE_CONNECTION) {
@@ -838,12 +839,11 @@ void CellularDataHandler::HandleDBSettingIncallChanged(const AppExecFwk::InnerEv
     }
     int64_t value = event->GetParam();
     if (value == static_cast<int64_t>(DataSwitchCode::CELLULAR_DATA_ENABLED)) {
-        InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_SETTINGS_ON);
-        incallDataStateMachine_->SendEvent(event);
-
+        InnerEvent::Pointer incallEvent = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_SETTINGS_ON);
+        incallDataStateMachine_->SendEvent(incallEvent);
     } else {
-        InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_SETTINGS_OFF);
-        incallDataStateMachine_->SendEvent(event);
+        InnerEvent::Pointer incallEvent = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_SETTINGS_OFF);
+        incallDataStateMachine_->SendEvent(incallEvent);
     }
 }
 
@@ -856,14 +856,14 @@ std::shared_ptr<IncallDataStateMachine> CellularDataHandler::CreateIncallDataSta
             return nullptr;
         }
     }
-    std::shared_ptr<IncallDataStateMachine> inCallDataStateMachine = std::make_shared<IncallDataStateMachine>(
+    std::shared_ptr<IncallDataStateMachine> incallDataStateMachine = std::make_shared<IncallDataStateMachine>(
         slotId_, std::weak_ptr<AppExecFwk::EventHandler>(shared_from_this()), stateMachineEventLoop_, apnManager_);
-    if (inCallDataStateMachine == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: inCallDataStateMachine is null", slotId_);
+    if (incallDataStateMachine == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: incallDataStateMachine is null", slotId_);
         return nullptr;
     }
-    inCallDataStateMachine->Init(callState);
-    return inCallDataStateMachine;
+    incallDataStateMachine->Init(callState);
+    return incallDataStateMachine;
 }
 
 void CellularDataHandler::IncallDataComplete(const InnerEvent::Pointer &event)
@@ -911,12 +911,12 @@ void CellularDataHandler::HandleImsCallChanged(int32_t state)
     }
     incallDataStateMachine_->UpdateCallState(state);
     if (state == TelCallStatus::CALL_STATUS_DIALING || state == TelCallStatus::CALL_STATUS_INCOMING) {
-        InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_CALL_STARTED);
-        incallDataStateMachine_->SendEvent(event);
+        InnerEvent::Pointer incallEvent = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_CALL_STARTED);
+        incallDataStateMachine_->SendEvent(incallEvent);
     }
     if (state == TelCallStatus::CALL_STATUS_DISCONNECTED || state == TelCallStatus::CALL_STATUS_IDLE) {
-        InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_CALL_ENDED);
-        incallDataStateMachine_->SendEvent(event);
+        InnerEvent::Pointer incallEvent = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_CALL_ENDED);
+        incallDataStateMachine_->SendEvent(incallEvent);
     }
 }
 
@@ -1167,8 +1167,8 @@ void CellularDataHandler::HandleDsdsModeChanged(const AppExecFwk::InnerEvent::Po
         }
     }
     if (incallDataStateMachine_ != nullptr) {
-        InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DSDS_CHANGED);
-        incallDataStateMachine_->SendEvent(event);
+        InnerEvent::Pointer incallEvent = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DSDS_CHANGED);
+        incallDataStateMachine_->SendEvent(incallEvent);
     }
 }
 
@@ -1525,8 +1525,7 @@ void CellularDataHandler::UnRegisterDataSettingObserver()
 {
     if (settingObserver_ == nullptr || roamingObserver_ == nullptr || incallObserver_ == nullptr) {
         TELEPHONY_LOGE("UnRegisterDataSettingObserver:Slot%{public}d: settingObserver_ or roamingObserver_ or "
-                       "incallObserver_ is null",
-            slotId_);
+                       "incallObserver_ is null", slotId_);
         return;
     }
     std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
@@ -1553,8 +1552,7 @@ void CellularDataHandler::RegisterDataSettingObserver()
 {
     if (settingObserver_ == nullptr || roamingObserver_ == nullptr || incallObserver_ == nullptr) {
         TELEPHONY_LOGE("RegisterDataSettingObserver:Slot%{public}d: settingObserver_ or roamingObserver_ or "
-                       "incallObserver_ is null",
-            slotId_);
+                       "incallObserver_ is null", slotId_);
         return;
     }
     std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();

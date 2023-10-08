@@ -45,23 +45,23 @@ int32_t IncallDataStateMachine::GetSlotId() const
     return slotId_;
 }
 
-bool IncallDataStateMachine::IsInCallDataSwitchOn()
+bool IncallDataStateMachine::IsIncallDataSwitchOn()
 {
     std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
     if (settingHelper == nullptr) {
-        return false;
+        return true;
     }
     Uri uri(CELLULAR_DATA_SETTING_DATA_INCALL_URI);
-    int value = static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_DISABLED);
+    int value = static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED);
     if (settingHelper->GetValue(uri, CELLULAR_DATA_COLUMN_INCALL, value) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetValue failed!");
-        return false;
+        return true;
     }
     TELEPHONY_LOGI("Slot%{public}d: value=%{public}d", slotId_, value);
     return value == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED);
 }
 
-bool IncallDataStateMachine::IsSlaveCanActiveData()
+bool IncallDataStateMachine::IsSecondaryCanActiveData()
 {
     int32_t dsdsMode = DSDS_MODE_V2;
     CoreManagerInner::GetInstance().GetDsdsMode(dsdsMode);
@@ -122,23 +122,23 @@ bool IncallDataStateMachine::CanActiveDataByRadioTech()
 void IncallDataStateMachine::Init(int32_t callState)
 {
     idleState_ = new (std::nothrow) IdleState(std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "IdleState");
-    slaveActiveState_ = new (std::nothrow)
-        SlaveActiveState(std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "SlaveActiveState");
-    activatingSlaveState_ = new (std::nothrow)
-        ActivatingSlaveState(std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "ActivatingSlaveState");
-    activatedSlaveState_ = new (std::nothrow)
-        ActivatedSlaveState(std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "ActivatedSlaveState");
-    deactivatingSlaveState_ = new (std::nothrow)
-        DeactivatingSlaveState(std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "DeactivatingSlaveState");
-    if (idleState_ == nullptr || slaveActiveState_ == nullptr || activatingSlaveState_ == nullptr ||
-        activatedSlaveState_ == nullptr || deactivatingSlaveState_ == nullptr) {
+    secondaryActiveState_ = new (std::nothrow)
+        SecondaryActiveState(std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "SecondaryActiveState");
+    activatingSecondaryState_ = new (std::nothrow)
+        ActivatingSecondaryState(std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "ActivatingSecondaryState");
+    activatedSecondaryState_ = new (std::nothrow)
+        ActivatedSecondaryState(std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "ActivatedSecondaryState");
+    deactivatingSecondaryState_ = new (std::nothrow) DeactivatingSecondaryState(
+        std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "DeactivatingSecondaryState");
+    if (idleState_ == nullptr || secondaryActiveState_ == nullptr || activatingSecondaryState_ == nullptr ||
+        activatedSecondaryState_ == nullptr || deactivatingSecondaryState_ == nullptr) {
         TELEPHONY_LOGE("memory allocation failed");
         return;
     }
-    slaveActiveState_->SetParentState(idleState_);
-    activatingSlaveState_->SetParentState(slaveActiveState_);
-    activatedSlaveState_->SetParentState(slaveActiveState_);
-    deactivatingSlaveState_->SetParentState(idleState_);
+    secondaryActiveState_->SetParentState(idleState_);
+    activatingSecondaryState_->SetParentState(secondaryActiveState_);
+    activatedSecondaryState_->SetParentState(secondaryActiveState_);
+    deactivatingSecondaryState_->SetParentState(idleState_);
     callState_ = callState;
     StateMachine::SetOriginalState(idleState_);
     StateMachine::Start();
@@ -206,10 +206,10 @@ bool IdleState::ProcessCallStarted(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGE("stateMachine is null");
         return NOT_PROCESSED;
     }
-    if (stateMachine->IsInCallDataSwitchOn() && stateMachine->IsSlaveCanActiveData()) {
+    if (stateMachine->IsIncallDataSwitchOn() && stateMachine->IsSecondaryCanActiveData()) {
         int32_t defaultSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
         if (defaultSlotId != stateMachine->GetSlotId()) {
-            stateMachine->TransitionTo(stateMachine->activatingSlaveState_);
+            stateMachine->TransitionTo(stateMachine->activatingSecondaryState_);
             CoreManagerInner::GetInstance().SetDefaultCellularDataSlotId(stateMachine->GetSlotId());
         }
     }
@@ -247,10 +247,10 @@ bool IdleState::ProcessSettingsOn(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGE("stateMachine is null");
         return NOT_PROCESSED;
     }
-    if (stateMachine->IsInCallDataSwitchOn() && stateMachine->IsSlaveCanActiveData()) {
+    if (stateMachine->IsIncallDataSwitchOn() && stateMachine->IsSecondaryCanActiveData()) {
         int32_t defaultSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
         if (defaultSlotId != stateMachine->GetSlotId()) {
-            stateMachine->TransitionTo(stateMachine->activatingSlaveState_);
+            stateMachine->TransitionTo(stateMachine->activatingSecondaryState_);
             CoreManagerInner::GetInstance().SetDefaultCellularDataSlotId(stateMachine->GetSlotId());
         }
     }
@@ -265,29 +265,29 @@ bool IdleState::ProcessDsdsChanged(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGE("stateMachine is null");
         return NOT_PROCESSED;
     }
-    if (stateMachine->IsInCallDataSwitchOn() && stateMachine->IsSlaveCanActiveData()) {
+    if (stateMachine->IsIncallDataSwitchOn() && stateMachine->IsSecondaryCanActiveData()) {
         int32_t defaultSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
         if (defaultSlotId != stateMachine->GetSlotId()) {
-            stateMachine->TransitionTo(stateMachine->activatingSlaveState_);
+            stateMachine->TransitionTo(stateMachine->activatingSecondaryState_);
             CoreManagerInner::GetInstance().SetDefaultCellularDataSlotId(stateMachine->GetSlotId());
         }
     }
     return PROCESSED;
 }
 
-void SlaveActiveState::StateBegin()
+void SecondaryActiveState::StateBegin()
 {
-    TELEPHONY_LOGI("Enter SlaveActive State");
+    TELEPHONY_LOGI("Enter SecondaryActive State");
     isActive_ = true;
 }
 
-void SlaveActiveState::StateEnd()
+void SecondaryActiveState::StateEnd()
 {
-    TELEPHONY_LOGI("Exit SlaveActive State");
+    TELEPHONY_LOGI("Exit SecondaryActive State");
     isActive_ = false;
 }
 
-bool SlaveActiveState::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
+bool SecondaryActiveState::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
         TELEPHONY_LOGE("event is null");
@@ -306,15 +306,15 @@ bool SlaveActiveState::StateProcess(const AppExecFwk::InnerEvent::Pointer &event
     return NOT_PROCESSED;
 }
 
-bool SlaveActiveState::ProcessSettingsOn(const AppExecFwk::InnerEvent::Pointer &event)
+bool SecondaryActiveState::ProcessSettingsOn(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("SlaveActiveState::MSG_SM_INCALL_DATA_SETTINGS_ON");
+    TELEPHONY_LOGI("SecondaryActiveState::MSG_SM_INCALL_DATA_SETTINGS_ON");
     return PROCESSED;
 }
 
-bool SlaveActiveState::ProcessCallEnded(const AppExecFwk::InnerEvent::Pointer &event)
+bool SecondaryActiveState::ProcessCallEnded(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("SlaveActiveState::MSG_SM_INCALL_DATA_CALL_ENDED");
+    TELEPHONY_LOGI("SecondaryActiveState::MSG_SM_INCALL_DATA_CALL_ENDED");
     std::shared_ptr<IncallDataStateMachine> stateMachine = stateMachine_.lock();
     if (stateMachine == nullptr) {
         TELEPHONY_LOGE("stateMachine is null");
@@ -326,7 +326,7 @@ bool SlaveActiveState::ProcessCallEnded(const AppExecFwk::InnerEvent::Pointer &e
         int32_t primarySlotId = INVALID_SLOT_ID;
         CoreManagerInner::GetInstance().GetPrimarySlotId(primarySlotId);
         if (defaultSlotId != primarySlotId) {
-            stateMachine->TransitionTo(stateMachine->deactivatingSlaveState_);
+            stateMachine->TransitionTo(stateMachine->deactivatingSecondaryState_);
         } else {
             stateMachine->TransitionTo(stateMachine->idleState_);
         }
@@ -334,20 +334,20 @@ bool SlaveActiveState::ProcessCallEnded(const AppExecFwk::InnerEvent::Pointer &e
     return PROCESSED;
 }
 
-bool SlaveActiveState::ProcessSettingsOff(const AppExecFwk::InnerEvent::Pointer &event)
+bool SecondaryActiveState::ProcessSettingsOff(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("SlaveActiveState::MSG_SM_INCALL_DATA_SETTINGS_OFF");
+    TELEPHONY_LOGI("SecondaryActiveState::MSG_SM_INCALL_DATA_SETTINGS_OFF");
     std::shared_ptr<IncallDataStateMachine> stateMachine = stateMachine_.lock();
     if (stateMachine == nullptr) {
         TELEPHONY_LOGE("stateMachine is null");
         return NOT_PROCESSED;
     }
-    if (!stateMachine->IsInCallDataSwitchOn()) {
+    if (!stateMachine->IsIncallDataSwitchOn()) {
         int32_t defaultSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
         int32_t primarySlotId = INVALID_SLOT_ID;
         CoreManagerInner::GetInstance().GetPrimarySlotId(primarySlotId);
         if (defaultSlotId != primarySlotId) {
-            stateMachine->TransitionTo(stateMachine->deactivatingSlaveState_);
+            stateMachine->TransitionTo(stateMachine->deactivatingSecondaryState_);
         } else {
             stateMachine->TransitionTo(stateMachine->idleState_);
         }
@@ -355,15 +355,15 @@ bool SlaveActiveState::ProcessSettingsOff(const AppExecFwk::InnerEvent::Pointer 
     return PROCESSED;
 }
 
-bool SlaveActiveState::ProcessDsdsChanged(const AppExecFwk::InnerEvent::Pointer &event)
+bool SecondaryActiveState::ProcessDsdsChanged(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("SlaveActiveState::MSG_SM_INCALL_DATA_DSDS_CHANGED");
+    TELEPHONY_LOGI("SecondaryActiveState::MSG_SM_INCALL_DATA_DSDS_CHANGED");
     return PROCESSED;
 }
 
-void ActivatingSlaveState::StateBegin()
+void ActivatingSecondaryState::StateBegin()
 {
-    TELEPHONY_LOGI("Enter ActivatingSlave State");
+    TELEPHONY_LOGI("Enter ActivatingSecondary State");
     std::shared_ptr<IncallDataStateMachine> stateMachine = stateMachine_.lock();
     if (stateMachine == nullptr) {
         TELEPHONY_LOGE("stateMachine is null");
@@ -373,13 +373,13 @@ void ActivatingSlaveState::StateBegin()
     stateMachine->SetCurrentState(sptr<State>(this));
 }
 
-void ActivatingSlaveState::StateEnd()
+void ActivatingSecondaryState::StateEnd()
 {
-    TELEPHONY_LOGI("Exit ActivatingSlave State");
+    TELEPHONY_LOGI("Exit ActivatingSecondary State");
     isActive_ = false;
 }
 
-bool ActivatingSlaveState::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
+bool ActivatingSecondaryState::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
         TELEPHONY_LOGE("event is null");
@@ -392,15 +392,15 @@ bool ActivatingSlaveState::StateProcess(const AppExecFwk::InnerEvent::Pointer &e
             TELEPHONY_LOGE("stateMachine is null");
             return NOT_PROCESSED;
         }
-        stateMachine->TransitionTo(stateMachine->activatedSlaveState_);
+        stateMachine->TransitionTo(stateMachine->activatedSecondaryState_);
         return PROCESSED;
     }
     return NOT_PROCESSED;
 }
 
-void ActivatedSlaveState::StateBegin()
+void ActivatedSecondaryState::StateBegin()
 {
-    TELEPHONY_LOGI("Enter ActivatedSlave State");
+    TELEPHONY_LOGI("Enter ActivatedSecondary State");
     std::shared_ptr<IncallDataStateMachine> stateMachine = stateMachine_.lock();
     if (stateMachine == nullptr) {
         TELEPHONY_LOGE("stateMachine is null");
@@ -410,20 +410,20 @@ void ActivatedSlaveState::StateBegin()
     stateMachine->SetCurrentState(sptr<State>(this));
 }
 
-void ActivatedSlaveState::StateEnd()
+void ActivatedSecondaryState::StateEnd()
 {
-    TELEPHONY_LOGI("Exit ActivatedSlave State");
+    TELEPHONY_LOGI("Exit ActivatedSecondary State");
     isActive_ = false;
 }
 
-bool ActivatedSlaveState::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
+bool ActivatedSecondaryState::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
 {
     return NOT_PROCESSED;
 }
 
-void DeactivatingSlaveState::StateBegin()
+void DeactivatingSecondaryState::StateBegin()
 {
-    TELEPHONY_LOGI("Enter DeactivatingSlave State");
+    TELEPHONY_LOGI("Enter DeactivatingSecondary State");
     std::shared_ptr<IncallDataStateMachine> stateMachine = stateMachine_.lock();
     if (stateMachine == nullptr) {
         TELEPHONY_LOGE("stateMachine is null");
@@ -444,13 +444,13 @@ void DeactivatingSlaveState::StateBegin()
     }
 }
 
-void DeactivatingSlaveState::StateEnd()
+void DeactivatingSecondaryState::StateEnd()
 {
-    TELEPHONY_LOGI("Exit DeactivatingSlave State");
+    TELEPHONY_LOGI("Exit DeactivatingSecondary State");
     isActive_ = false;
 }
 
-bool DeactivatingSlaveState::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
+bool DeactivatingSecondaryState::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
         TELEPHONY_LOGE("event is null");

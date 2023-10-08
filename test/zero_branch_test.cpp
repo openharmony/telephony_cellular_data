@@ -689,6 +689,14 @@ HWTEST_F(BranchTest, Idle_Test_01, Function | MediumTest | Level3)
     std::shared_ptr<IncallDataStateMachine> incallStateMachine =
         incallStateMachineTest->CreateIncallDataStateMachine(0);
     incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
+    incallStateMachine->GetCurrentState();
+    incallStateMachine->GetSlotId();
+    incallStateMachine->GetCallState();
+    incallStateMachine->HasAnyConnectedState();
+    incallStateMachine->UpdateCallState(TelCallStatus::CALL_STATUS_ALERTING);
+    incallStateMachine->IsIncallDataSwitchOn();
+    incallStateMachine->IsSecondaryCanActiveData();
+    incallStateMachine->CanActiveDataByRadioTech();
     auto idleState = static_cast<IdleState *>(incallStateMachine->idleState_.GetRefPtr());
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
@@ -702,80 +710,85 @@ HWTEST_F(BranchTest, Idle_Test_01, Function | MediumTest | Level3)
 }
 
 /**
- * @tc.number   ActivatingSlaveState_Test_01
+ * @tc.number   ActivatingSecondaryState_Test_01
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(BranchTest, ActivatingSlaveState_Test_01, Function | MediumTest | Level3)
+HWTEST_F(BranchTest, ActivatingSecondaryState_Test_01, Function | MediumTest | Level3)
 {
     std::shared_ptr<IncallStateMachineTest> incallStateMachineTest = std::make_shared<IncallStateMachineTest>();
     std::shared_ptr<IncallDataStateMachine> incallStateMachine =
         incallStateMachineTest->CreateIncallDataStateMachine(0);
     incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
-    incallStateMachine->TransitionTo(incallStateMachine->activatingSlaveState_);
-    auto activatingSlaveState =
-        static_cast<ActivatingSlaveState *>(incallStateMachine->activatingSlaveState_.GetRefPtr());
-    auto slaveActiveState = static_cast<SlaveActiveState *>(incallStateMachine->slaveActiveState_.GetRefPtr());
+    incallStateMachine->TransitionTo(incallStateMachine->activatingSecondaryState_);
+    auto activatingSecondaryState =
+        static_cast<ActivatingSecondaryState *>(incallStateMachine->activatingSecondaryState_.GetRefPtr());
+    auto secondaryActiveState =
+        static_cast<SecondaryActiveState *>(incallStateMachine->secondaryActiveState_.GetRefPtr());
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
-    slaveActiveState->StateBegin();
-    activatingSlaveState->StateBegin();
-    ASSERT_FALSE(activatingSlaveState->StateProcess(event));
-    ASSERT_FALSE(slaveActiveState->StateProcess(event));
-    ASSERT_TRUE(slaveActiveState->ProcessCallEnded(event));
-    ASSERT_TRUE(slaveActiveState->ProcessSettingsOff(event));
-    activatingSlaveState->StateEnd();
-    slaveActiveState->StateEnd();
+    secondaryActiveState->StateBegin();
+    activatingSecondaryState->StateBegin();
+    ASSERT_FALSE(activatingSecondaryState->StateProcess(event));
+    ASSERT_FALSE(secondaryActiveState->StateProcess(event));
+    ASSERT_TRUE(secondaryActiveState->ProcessSettingsOn(event));
+    ASSERT_TRUE(secondaryActiveState->ProcessCallEnded(event));
+    ASSERT_TRUE(secondaryActiveState->ProcessSettingsOff(event));
+    ASSERT_TRUE(secondaryActiveState->ProcessDsdsChanged(event));
+    activatingSecondaryState->StateEnd();
+    secondaryActiveState->StateEnd();
 }
 
 /**
- * @tc.number   ActivatedSlaveState_Test_01
+ * @tc.number   ActivatedSecondaryState_Test_01
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(BranchTest, ActivatedSlaveState_Test_01, Function | MediumTest | Level3)
+HWTEST_F(BranchTest, ActivatedSecondaryState_Test_01, Function | MediumTest | Level3)
 {
     std::shared_ptr<IncallStateMachineTest> incallStateMachineTest = std::make_shared<IncallStateMachineTest>();
     std::shared_ptr<IncallDataStateMachine> incallStateMachine =
         incallStateMachineTest->CreateIncallDataStateMachine(0);
     incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
-    incallStateMachine->TransitionTo(incallStateMachine->activatingSlaveState_);
-    incallStateMachine->TransitionTo(incallStateMachine->activatedSlaveState_);
-    auto activatedSlaveState = static_cast<ActivatedSlaveState *>(incallStateMachine->activatedSlaveState_.GetRefPtr());
-    auto slaveActiveState = static_cast<SlaveActiveState *>(incallStateMachine->slaveActiveState_.GetRefPtr());
+    incallStateMachine->TransitionTo(incallStateMachine->activatingSecondaryState_);
+    incallStateMachine->TransitionTo(incallStateMachine->activatedSecondaryState_);
+    auto activatedSecondaryState =
+        static_cast<ActivatedSecondaryState *>(incallStateMachine->activatedSecondaryState_.GetRefPtr());
+    auto secondaryActiveState =
+        static_cast<SecondaryActiveState *>(incallStateMachine->secondaryActiveState_.GetRefPtr());
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
-    slaveActiveState->StateBegin();
-    activatedSlaveState->StateBegin();
-    ASSERT_FALSE(activatedSlaveState->StateProcess(event));
-    ASSERT_FALSE(slaveActiveState->StateProcess(event));
-    ASSERT_TRUE(slaveActiveState->ProcessCallEnded(event));
-    ASSERT_TRUE(slaveActiveState->ProcessSettingsOff(event));
-    activatedSlaveState->StateEnd();
-    slaveActiveState->StateEnd();
+    secondaryActiveState->StateBegin();
+    activatedSecondaryState->StateBegin();
+    ASSERT_FALSE(activatedSecondaryState->StateProcess(event));
+    ASSERT_FALSE(secondaryActiveState->StateProcess(event));
+    ASSERT_TRUE(secondaryActiveState->ProcessCallEnded(event));
+    ASSERT_TRUE(secondaryActiveState->ProcessSettingsOff(event));
+    activatedSecondaryState->StateEnd();
+    secondaryActiveState->StateEnd();
 }
 
 /**
- * @tc.number   DeactivatingSlaveState_Test_01
+ * @tc.number   DeactivatingSecondaryState_Test_01
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(BranchTest, DeactivatingSlaveState_Test_01, Function | MediumTest | Level3)
+HWTEST_F(BranchTest, DeactivatingSecondaryState_Test_01, Function | MediumTest | Level3)
 {
     std::shared_ptr<IncallStateMachineTest> incallStateMachineTest = std::make_shared<IncallStateMachineTest>();
     std::shared_ptr<IncallDataStateMachine> incallStateMachine =
         incallStateMachineTest->CreateIncallDataStateMachine(0);
     incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
-    incallStateMachine->TransitionTo(incallStateMachine->activatingSlaveState_);
-    incallStateMachine->TransitionTo(incallStateMachine->activatedSlaveState_);
-    incallStateMachine->TransitionTo(incallStateMachine->deactivatingSlaveState_);
-    auto deactivatingSlaveState =
-        static_cast<DeactivatingSlaveState *>(incallStateMachine->deactivatingSlaveState_.GetRefPtr());
+    incallStateMachine->TransitionTo(incallStateMachine->activatingSecondaryState_);
+    incallStateMachine->TransitionTo(incallStateMachine->activatedSecondaryState_);
+    incallStateMachine->TransitionTo(incallStateMachine->deactivatingSecondaryState_);
+    auto deactivatingSecondaryState =
+        static_cast<DeactivatingSecondaryState *>(incallStateMachine->deactivatingSecondaryState_.GetRefPtr());
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
-    deactivatingSlaveState->StateBegin();
-    ASSERT_FALSE(deactivatingSlaveState->StateProcess(event));
-    deactivatingSlaveState->StateEnd();
+    deactivatingSecondaryState->StateBegin();
+    ASSERT_FALSE(deactivatingSecondaryState->StateProcess(event));
+    deactivatingSecondaryState->StateEnd();
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -45,34 +45,34 @@ public:
 
 protected:
     sptr<State> idleState_;
-    sptr<State> slaveActiveState_;
-    sptr<State> activatingSlaveState_;
-    sptr<State> activatedSlaveState_;
-    sptr<State> deactivatingSlaveState_;
+    sptr<State> secondaryActiveState_;
+    sptr<State> activatingSecondaryState_;
+    sptr<State> activatedSecondaryState_;
+    sptr<State> deactivatingSecondaryState_;
     sptr<State> currentState_;
     std::weak_ptr<AppExecFwk::EventHandler> cellularDataHandler_;
     sptr<ApnManager> apnManager_;
 
 private:
     void SetCurrentState(const sptr<State> &&state);
-    bool IsInCallDataSwitchOn();
-    bool IsSlaveCanActiveData();
+    bool IsIncallDataSwitchOn();
+    bool IsSecondaryCanActiveData();
     bool CanActiveDataByRadioTech();
 
 private:
     friend class IdleState;
-    friend class SlaveActiveState;
-    friend class ActivatingSlaveState;
-    friend class ActivatedSlaveState;
-    friend class DeactivatingSlaveState;
+    friend class SecondaryActiveState;
+    friend class ActivatingSecondaryState;
+    friend class ActivatedSecondaryState;
+    friend class DeactivatingSecondaryState;
     int32_t slotId_ = INVALID_SLOT_ID;
     int32_t callState_ = static_cast<int32_t>(TelCallStatus::CALL_STATUS_IDLE);
 };
 
 class IdleState : public State {
 public:
-    IdleState(std::weak_ptr<IncallDataStateMachine> &&inCallData, std::string &&name)
-        : State(std::move(name)), stateMachine_(std::move(inCallData))
+    IdleState(std::weak_ptr<IncallDataStateMachine> &&incallData, std::string &&name)
+        : State(std::move(name)), stateMachine_(std::move(incallData))
     {}
     virtual ~IdleState() = default;
     virtual void StateBegin();
@@ -96,12 +96,12 @@ private:
     std::weak_ptr<IncallDataStateMachine> stateMachine_;
 };
 
-class SlaveActiveState : public State {
+class SecondaryActiveState : public State {
 public:
-    SlaveActiveState(std::weak_ptr<IncallDataStateMachine> &&inCallData, std::string &&name)
-        : State(std::move(name)), stateMachine_(std::move(inCallData))
+    SecondaryActiveState(std::weak_ptr<IncallDataStateMachine> &&incallData, std::string &&name)
+        : State(std::move(name)), stateMachine_(std::move(incallData))
     {}
-    virtual ~SlaveActiveState() = default;
+    virtual ~SecondaryActiveState() = default;
     virtual void StateBegin();
     virtual void StateEnd();
     virtual bool StateProcess(const AppExecFwk::InnerEvent::Pointer &event);
@@ -113,22 +113,22 @@ private:
     bool ProcessDsdsChanged(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
-    using Fun = bool (SlaveActiveState::*)(const AppExecFwk::InnerEvent::Pointer &data);
+    using Fun = bool (SecondaryActiveState::*)(const AppExecFwk::InnerEvent::Pointer &data);
     std::map<uint32_t, Fun> eventIdFunMap_ {
-        { CellularDataEventCode::MSG_SM_INCALL_DATA_SETTINGS_ON, &SlaveActiveState::ProcessSettingsOn },
-        { CellularDataEventCode::MSG_SM_INCALL_DATA_CALL_ENDED, &SlaveActiveState::ProcessCallEnded },
-        { CellularDataEventCode::MSG_SM_INCALL_DATA_SETTINGS_OFF, &SlaveActiveState::ProcessSettingsOff },
-        { CellularDataEventCode::MSG_SM_INCALL_DATA_DSDS_CHANGED, &SlaveActiveState::ProcessDsdsChanged },
+        { CellularDataEventCode::MSG_SM_INCALL_DATA_SETTINGS_ON, &SecondaryActiveState::ProcessSettingsOn },
+        { CellularDataEventCode::MSG_SM_INCALL_DATA_CALL_ENDED, &SecondaryActiveState::ProcessCallEnded },
+        { CellularDataEventCode::MSG_SM_INCALL_DATA_SETTINGS_OFF, &SecondaryActiveState::ProcessSettingsOff },
+        { CellularDataEventCode::MSG_SM_INCALL_DATA_DSDS_CHANGED, &SecondaryActiveState::ProcessDsdsChanged },
     };
     std::weak_ptr<IncallDataStateMachine> stateMachine_;
 };
 
-class ActivatingSlaveState : public State {
+class ActivatingSecondaryState : public State {
 public:
-    ActivatingSlaveState(std::weak_ptr<IncallDataStateMachine> &&inCallData, std::string &&name)
-        : State(std::move(name)), stateMachine_(std::move(inCallData))
+    ActivatingSecondaryState(std::weak_ptr<IncallDataStateMachine> &&incallData, std::string &&name)
+        : State(std::move(name)), stateMachine_(std::move(incallData))
     {}
-    virtual ~ActivatingSlaveState() = default;
+    virtual ~ActivatingSecondaryState() = default;
     virtual void StateBegin();
     virtual void StateEnd();
     virtual bool StateProcess(const AppExecFwk::InnerEvent::Pointer &event);
@@ -137,12 +137,12 @@ private:
     std::weak_ptr<IncallDataStateMachine> stateMachine_;
 };
 
-class ActivatedSlaveState : public State {
+class ActivatedSecondaryState : public State {
 public:
-    ActivatedSlaveState(std::weak_ptr<IncallDataStateMachine> &&inCallData, std::string &&name)
-        : State(std::move(name)), stateMachine_(std::move(inCallData))
+    ActivatedSecondaryState(std::weak_ptr<IncallDataStateMachine> &&incallData, std::string &&name)
+        : State(std::move(name)), stateMachine_(std::move(incallData))
     {}
-    virtual ~ActivatedSlaveState() = default;
+    virtual ~ActivatedSecondaryState() = default;
     virtual void StateBegin();
     virtual void StateEnd();
     virtual bool StateProcess(const AppExecFwk::InnerEvent::Pointer &event);
@@ -151,12 +151,12 @@ private:
     std::weak_ptr<IncallDataStateMachine> stateMachine_;
 };
 
-class DeactivatingSlaveState : public State {
+class DeactivatingSecondaryState : public State {
 public:
-    DeactivatingSlaveState(std::weak_ptr<IncallDataStateMachine> &&inCallData, std::string &&name)
-        : State(std::move(name)), stateMachine_(std::move(inCallData))
+    DeactivatingSecondaryState(std::weak_ptr<IncallDataStateMachine> &&incallData, std::string &&name)
+        : State(std::move(name)), stateMachine_(std::move(incallData))
     {}
-    virtual ~DeactivatingSlaveState() = default;
+    virtual ~DeactivatingSecondaryState() = default;
     virtual void StateBegin();
     virtual void StateEnd();
     virtual bool StateProcess(const AppExecFwk::InnerEvent::Pointer &event);
