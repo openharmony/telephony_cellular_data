@@ -21,6 +21,7 @@
 
 #include "apn_manager.h"
 #include "cellular_data_event_code.h"
+#include "cellular_data_incall_observer.h"
 #include "cellular_data_roaming_observer.h"
 #include "cellular_data_setting_observer.h"
 #include "cellular_data_state_machine.h"
@@ -28,6 +29,7 @@
 #include "data_switch_settings.h"
 #include "event_handler.h"
 #include "hril_data_parcel.h"
+#include "incall_data_state_machine.h"
 #include "inner_event.h"
 #include "radio_event.h"
 #include "state_notification.h"
@@ -109,6 +111,11 @@ private:
     void UnRegisterDataSettingObserver();
     void SetDataPermitted(int32_t slotId, bool dataPermitted);
     bool CheckDataPermittedByDsds();
+    std::shared_ptr<IncallDataStateMachine> CreateIncallDataStateMachine(int32_t callState);
+    void HandleDBSettingIncallChanged(const AppExecFwk::InnerEvent::Pointer &event);
+    void HandleCallChanged(int32_t state);
+    void HandleImsCallChanged(int32_t state);
+    void IncallDataComplete(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     sptr<ApnManager> apnManager_;
@@ -134,6 +141,8 @@ private:
     std::vector<std::string> downLinkThresholds_;
     sptr<CellularDataSettingObserver> settingObserver_;
     sptr<CellularDataRoamingObserver> roamingObserver_;
+    sptr<CellularDataIncallObserver> incallObserver_;
+    std::shared_ptr<IncallDataStateMachine> incallDataStateMachine_;
 
     using Fun = void (CellularDataHandler::*)(const AppExecFwk::InnerEvent::Pointer &event);
     std::map<uint32_t, Fun> eventIdMap_ {
@@ -161,6 +170,8 @@ private:
         { RadioEvent::RADIO_NR_FREQUENCY_CHANGED, &CellularDataHandler::HandleRadioNrFrequencyChanged },
         { CellularDataEventCode::MSG_DB_SETTING_ENABLE_CHANGED, &CellularDataHandler::HandleDBSettingEnableChanged },
         { CellularDataEventCode::MSG_DB_SETTING_ROAMING_CHANGED, &CellularDataHandler::HandleDBSettingRoamingChanged },
+        { CellularDataEventCode::MSG_DB_SETTING_INCALL_CHANGED, &CellularDataHandler::HandleDBSettingIncallChanged },
+        { CellularDataEventCode::MSG_INCALL_DATA_COMPLETE, &CellularDataHandler::IncallDataComplete },
     };
 };
 } // namespace Telephony

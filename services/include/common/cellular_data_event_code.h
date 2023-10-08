@@ -56,6 +56,15 @@ public:
     static const uint32_t MSG_DB_SETTING_ROAMING_CHANGED = BASE + 29;
     static const uint32_t MSG_SET_DATA_PERMITTED = BASE + 30;
     static const uint32_t MSG_SM_LINK_CAPABILITY_CHANGED = BASE + 31;
+    static const uint32_t MSG_DB_SETTING_INCALL_CHANGED = BASE + 32;
+    static const uint32_t MSG_SM_INCALL_DATA_SETTINGS_ON = BASE + 33;
+    static const uint32_t MSG_SM_INCALL_DATA_SETTINGS_OFF = BASE + 34;
+    static const uint32_t MSG_SM_INCALL_DATA_CALL_STARTED = BASE + 35;
+    static const uint32_t MSG_SM_INCALL_DATA_CALL_ENDED = BASE + 36;
+    static const uint32_t MSG_SM_INCALL_DATA_DATA_DISCONNECTED = BASE + 37;
+    static const uint32_t MSG_SM_INCALL_DATA_DATA_CONNECTED = BASE + 38;
+    static const uint32_t MSG_SM_INCALL_DATA_DSDS_CHANGED = BASE + 39;
+    static const uint32_t MSG_INCALL_DATA_COMPLETE = BASE + 40;
 };
 } // namespace Telephony
 } // namespace OHOS
