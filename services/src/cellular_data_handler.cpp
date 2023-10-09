@@ -54,6 +54,8 @@ void CellularDataHandler::Init()
             .release();
     roamingObserver_ = std::make_unique<CellularDataRoamingObserver>(
         std::weak_ptr<AppExecFwk::EventHandler>(shared_from_this()), slotId_).release();
+    incallObserver_ =
+        new (std::nothrow) CellularDataIncallObserver(std::weak_ptr<AppExecFwk::EventHandler>(shared_from_this()));
     if ((apnManager_ == nullptr) || (dataSwitchSettings_ == nullptr) || (connectionManager_ == nullptr)) {
         TELEPHONY_LOGE("Slot%{public}d: apnManager_ or dataSwitchSettings_ or connectionManager_ is null", slotId_);
         return;
@@ -634,6 +636,10 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
             physicalConnectionActiveState_ = true;
             CoreManagerInner::GetInstance().DcPhysicalLinkActiveUpdate(slotId_, physicalConnectionActiveState_);
         }
+        if (incallDataStateMachine_ != nullptr) {
+            InnerEvent::Pointer incallEvent = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_CONNECTED);
+            incallDataStateMachine_->SendEvent(incallEvent);
+        }
     }
 }
 
@@ -644,12 +650,8 @@ int32_t CellularDataHandler::GetSlotId() const
 
 void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &event)
 {
-    if ((event == nullptr) || (apnManager_ == nullptr)) {
-        TELEPHONY_LOGE("Slot%{public}d: event or apnManager is null", slotId_);
-        return;
-    }
-    if (connectionManager_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: in DisconnectDataComplete connectionManager_ is null", slotId_);
+    if (event == nullptr || apnManager_ == nullptr || connectionManager_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: event or apnManager or connectionManager_ is null", slotId_);
         return;
     }
     std::unique_ptr<DataDisconnectParams> object = event->GetUniqueObject<DataDisconnectParams>();
@@ -680,14 +682,18 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
         }
         if (reason == DisConnectionReason::REASON_RETRY_CONNECTION) {
             int64_t delayTime = apnHolder->GetRetryDelay();
-            TELEPHONY_LOGI("Slot%{public}d: Establish a data connection. The apn type is %{public}s", slotId_,
-                apnHolder->GetApnType().c_str());
+            TELEPHONY_LOGI("Slot%{public}d: Retry apn type: %{public}s", slotId_, apnHolder->GetApnType().c_str());
             SendEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, apnId, delayTime);
         }
     }
-    if (connectionManager_ != nullptr && !apnManager_->HasAnyConnectedState()) {
+    if (!apnManager_->HasAnyConnectedState()) {
         connectionManager_->StopStallDetectionTimer();
         connectionManager_->EndNetStatistics();
+        if (incallDataStateMachine_ != nullptr) {
+            InnerEvent::Pointer incallEvent =
+                InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_DISCONNECTED);
+            incallDataStateMachine_->SendEvent(incallEvent);
+        }
     }
     if (reason == DisConnectionReason::REASON_CHANGE_CONNECTION) {
         HandleSortConnection();
@@ -797,7 +803,7 @@ void CellularDataHandler::OnReceiveEvent(const EventFwk::CommonEventData &data)
             TELEPHONY_LOGE("Slot%{public}d: unknown call state=%{public}d", slotId, state);
             return;
         }
-        HandleVoiceCallChanged(state);
+        HandleCallChanged(state);
     } else if (action == CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_DATA_SUBSCRIPTION_CHANGED) {
         HandleDefaultDataSubscriptionChanged();
     } else if (action == CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED) {
@@ -820,40 +826,126 @@ void CellularDataHandler::HandleSettingSwitchChanged(const InnerEvent::Pointer &
     TELEPHONY_LOGI("Slot%{public}d: setting switch = %{public}d", slotId_, setting_switch);
 }
 
+void CellularDataHandler::HandleDBSettingIncallChanged(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: event is null", slotId_);
+        return;
+    }
+    if (incallDataStateMachine_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: incallDataStateMachine_ is null", slotId_);
+        return;
+    }
+    int64_t value = event->GetParam();
+    if (value == static_cast<int64_t>(DataSwitchCode::CELLULAR_DATA_ENABLED)) {
+        InnerEvent::Pointer incallEvent = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_SETTINGS_ON);
+        incallDataStateMachine_->SendEvent(incallEvent);
+    } else {
+        InnerEvent::Pointer incallEvent = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_SETTINGS_OFF);
+        incallDataStateMachine_->SendEvent(incallEvent);
+    }
+}
+
+std::shared_ptr<IncallDataStateMachine> CellularDataHandler::CreateIncallDataStateMachine(int32_t callState)
+{
+    if (stateMachineEventLoop_ == nullptr) {
+        stateMachineEventLoop_ = RunnerPool::GetInstance().GetCommonRunner();
+        if (stateMachineEventLoop_ == nullptr) {
+            TELEPHONY_LOGE("Slot%{public}d: failed to create EventRunner", slotId_);
+            return nullptr;
+        }
+    }
+    std::shared_ptr<IncallDataStateMachine> incallDataStateMachine = std::make_shared<IncallDataStateMachine>(
+        slotId_, std::weak_ptr<AppExecFwk::EventHandler>(shared_from_this()), stateMachineEventLoop_, apnManager_);
+    if (incallDataStateMachine == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: incallDataStateMachine is null", slotId_);
+        return nullptr;
+    }
+    incallDataStateMachine->Init(callState);
+    return incallDataStateMachine;
+}
+
+void CellularDataHandler::IncallDataComplete(const InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("Slot%{public}d: MSG_INCALL_DATA_COMPLETE", slotId_);
+    if (incallDataStateMachine_ != nullptr) {
+        incallDataStateMachine_ = nullptr;
+    }
+}
+
+void CellularDataHandler::HandleCallChanged(int32_t state)
+{
+    TELEPHONY_LOGI("Slot%{public}d: lastState:%{public}d, state:%{public}d", slotId_, lastCallState_, state);
+    if (lastCallState_ == state) {
+        TELEPHONY_LOGE("Slot%{public}d: call state=%{public}d, not changed", slotId_, state);
+        return;
+    }
+    if (connectionManager_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: connectionManager is null!", slotId_);
+        return;
+    }
+    lastCallState_ = state;
+    connectionManager_->UpdateCallState(state);
+    ImsRegInfo voiceInfo;
+    CoreManagerInner::GetInstance().GetImsRegStatus(slotId_, ImsServiceType::TYPE_VOICE, voiceInfo);
+    ImsRegInfo videoInfo;
+    CoreManagerInner::GetInstance().GetImsRegStatus(slotId_, ImsServiceType::TYPE_VIDEO, videoInfo);
+    if (voiceInfo.imsRegState == ImsRegState::IMS_REGISTERED || videoInfo.imsRegState == ImsRegState::IMS_REGISTERED) {
+        HandleImsCallChanged(state);
+    } else {
+        HandleVoiceCallChanged(state);
+    }
+}
+
+void CellularDataHandler::HandleImsCallChanged(int32_t state)
+{
+    if (state == TelCallStatus::CALL_STATUS_DIALING || state == TelCallStatus::CALL_STATUS_INCOMING) {
+        if (incallDataStateMachine_ == nullptr) {
+            incallDataStateMachine_ = CreateIncallDataStateMachine(state);
+        }
+    }
+    if (incallDataStateMachine_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: incallDataStateMachine_ is null!", slotId_);
+        return;
+    }
+    incallDataStateMachine_->UpdateCallState(state);
+    if (state == TelCallStatus::CALL_STATUS_DIALING || state == TelCallStatus::CALL_STATUS_INCOMING) {
+        InnerEvent::Pointer incallEvent = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_CALL_STARTED);
+        incallDataStateMachine_->SendEvent(incallEvent);
+    }
+    if (state == TelCallStatus::CALL_STATUS_DISCONNECTED || state == TelCallStatus::CALL_STATUS_IDLE) {
+        InnerEvent::Pointer incallEvent = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_CALL_ENDED);
+        incallDataStateMachine_->SendEvent(incallEvent);
+    }
+}
+
 void CellularDataHandler::HandleVoiceCallChanged(int32_t state)
 {
     if (apnManager_ == nullptr || connectionManager_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: apnManager or connectionManager is null!", slotId_);
         return;
     }
-    TELEPHONY_LOGI("Slot%{public}d: handle voice call changed lastState:%{public}d, state:%{public}d", slotId_,
-        lastCallState_, state);
     // next to check if radio technology support voice and data at same time.
     int32_t psRadioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, psRadioTech);
     bool support = (psRadioTech == static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_GSM));
-    if (lastCallState_ != state) {
-        // call is busy
-        lastCallState_ = state;
-        connectionManager_->UpdateCallState(state);
-        if (state != TelCallStatus::CALL_STATUS_IDLE && state != TelCallStatus::CALL_STATUS_DISCONNECTED) {
-            if (apnManager_->HasAnyConnectedState() && support) {
-                connectionManager_->EndNetStatistics();
-                connectionManager_->SetDataFlowType(CellDataFlowType::DATA_FLOW_TYPE_DORMANT);
-                connectionManager_->StopStallDetectionTimer();
-                disconnectionReason_ = DisConnectionReason::REASON_GSM_AND_CALLING_ONLY;
-            }
-        } else {
-            if (apnManager_->HasAnyConnectedState() && support) {
-                connectionManager_->StartStallDetectionTimer();
-                connectionManager_->BeginNetStatistics();
-            }
-            disconnectionReason_ = DisConnectionReason::REASON_NORMAL;
-            TELEPHONY_LOGI("Slot%{public}d: HandleVoiceCallChanged EstablishAllApnsIfConnectable", slotId_);
-            EstablishAllApnsIfConnectable();
+    if (state != TelCallStatus::CALL_STATUS_IDLE && state != TelCallStatus::CALL_STATUS_DISCONNECTED) {
+        if (apnManager_->HasAnyConnectedState() && support) {
+            connectionManager_->EndNetStatistics();
+            connectionManager_->SetDataFlowType(CellDataFlowType::DATA_FLOW_TYPE_DORMANT);
+            connectionManager_->StopStallDetectionTimer();
+            disconnectionReason_ = DisConnectionReason::REASON_GSM_AND_CALLING_ONLY;
         }
-        TELEPHONY_LOGI("Slot%{public}d: disconnectionReason_=%{public}d", slotId_, disconnectionReason_);
+    } else {
+        if (apnManager_->HasAnyConnectedState() && support) {
+            connectionManager_->StartStallDetectionTimer();
+            connectionManager_->BeginNetStatistics();
+        }
+        disconnectionReason_ = DisConnectionReason::REASON_NORMAL;
+        TELEPHONY_LOGI("Slot%{public}d: HandleVoiceCallChanged EstablishAllApnsIfConnectable", slotId_);
+        EstablishAllApnsIfConnectable();
     }
+    TELEPHONY_LOGI("Slot%{public}d: disconnectionReason_=%{public}d", slotId_, disconnectionReason_);
 }
 
 void CellularDataHandler::HandleDefaultDataSubscriptionChanged()
@@ -1069,6 +1161,10 @@ void CellularDataHandler::HandleDsdsModeChanged(const AppExecFwk::InnerEvent::Po
         } else {
             SetDataPermitted(i, true);
         }
+    }
+    if (incallDataStateMachine_ != nullptr) {
+        InnerEvent::Pointer incallEvent = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DSDS_CHANGED);
+        incallDataStateMachine_->SendEvent(incallEvent);
     }
 }
 
@@ -1423,9 +1519,9 @@ void CellularDataHandler::HandleDBSettingRoamingChanged(const AppExecFwk::InnerE
 
 void CellularDataHandler::UnRegisterDataSettingObserver()
 {
-    if (settingObserver_ == nullptr || roamingObserver_ == nullptr) {
-        TELEPHONY_LOGE(
-            "UnRegisterDataSettingObserver:Slot%{public}d: settingObserver_ or roamingObserver_ is null", slotId_);
+    if (settingObserver_ == nullptr || roamingObserver_ == nullptr || incallObserver_ == nullptr) {
+        TELEPHONY_LOGE("UnRegisterDataSettingObserver:Slot%{public}d: settingObserver_ or roamingObserver_ or "
+                       "incallObserver_ is null", slotId_);
         return;
     }
     std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
@@ -1444,13 +1540,15 @@ void CellularDataHandler::UnRegisterDataSettingObserver()
     }
     Uri dataRoamingUri(std::string(CELLULAR_DATA_SETTING_DATA_ROAMING_URI) + std::to_string(simId));
     settingHelper->UnRegisterSettingsObserver(dataRoamingUri, roamingObserver_);
+    Uri dataIncallUri(CELLULAR_DATA_SETTING_DATA_INCALL_URI);
+    settingHelper->UnRegisterSettingsObserver(dataIncallUri, incallObserver_);
 }
 
 void CellularDataHandler::RegisterDataSettingObserver()
 {
-    if (settingObserver_ == nullptr || roamingObserver_ == nullptr) {
-        TELEPHONY_LOGE(
-            "RegisterDataSettingObserver:Slot%{public}d: settingObserver_ or roamingObserver_ is null", slotId_);
+    if (settingObserver_ == nullptr || roamingObserver_ == nullptr || incallObserver_ == nullptr) {
+        TELEPHONY_LOGE("RegisterDataSettingObserver:Slot%{public}d: settingObserver_ or roamingObserver_ or "
+                       "incallObserver_ is null", slotId_);
         return;
     }
     std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
@@ -1469,6 +1567,8 @@ void CellularDataHandler::RegisterDataSettingObserver()
     }
     Uri dataRoamingUri(std::string(CELLULAR_DATA_SETTING_DATA_ROAMING_URI) + std::to_string(simId));
     settingHelper->RegisterSettingsObserver(dataRoamingUri, roamingObserver_);
+    Uri dataIncallUri(CELLULAR_DATA_SETTING_DATA_INCALL_URI);
+    settingHelper->RegisterSettingsObserver(dataIncallUri, incallObserver_);
 }
 } // namespace Telephony
 } // namespace OHOS
