@@ -708,6 +708,9 @@ HWTEST_F(BranchTest, ApnManager_Test_01, Function | MediumTest | Level3)
     ASSERT_TRUE(helper->IsMvnoDataMatched("test", apnBean));
     apnBean.mvnoType = "error";
     ASSERT_FALSE(helper->IsMvnoDataMatched("test", apnBean));
+}
+
+/**
  * @tc.number   IdleState_Test_01
  * @tc.name     test error branch
  * @tc.desc     Function test
