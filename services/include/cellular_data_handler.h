@@ -116,6 +116,8 @@ private:
     void HandleCallChanged(int32_t state);
     void HandleImsCallChanged(int32_t state);
     void IncallDataComplete(const AppExecFwk::InnerEvent::Pointer &event);
+    void ResetDataFlowType();
+    void ClearConnectionIfRequired();
 
 private:
     sptr<ApnManager> apnManager_;

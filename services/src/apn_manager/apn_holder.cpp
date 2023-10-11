@@ -169,5 +169,59 @@ void ApnHolder::InitialApnRetryCount()
 {
     retryPolicy_.InitialRetryCountValue();
 }
+
+bool ApnHolder::IsSameMatchedApns(std::vector<sptr<ApnItem>> newMatchedApns, bool roamingState)
+{
+    std::vector<sptr<ApnItem>> currentMatchedApns = retryPolicy_.GetMatchedApns();
+    if (currentMatchedApns.empty() || newMatchedApns.empty()) {
+        TELEPHONY_LOGE("newMatchedApns or oldMatchedApns is empty");
+        return false;
+    }
+    if (currentMatchedApns.size() != newMatchedApns.size()) {
+        TELEPHONY_LOGI("newMatchedApns and oldMatchedApns are not equal in size");
+        return false;
+    }
+    for (const sptr<ApnItem> &newApnItem : newMatchedApns) {
+        bool canHandle = false;
+        for (const sptr<ApnItem> &oldApnItem : currentMatchedApns) {
+            if (IsSameApnItem(newApnItem, oldApnItem, roamingState)) {
+                canHandle = true;
+                break;
+            }
+        }
+        if (!canHandle) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool ApnHolder::IsSameApnItem(const sptr<ApnItem> &newApnItem,
+                              const sptr<ApnItem> &oldApnItem,
+                              bool roamingState)
+{
+    if (newApnItem == nullptr || oldApnItem == nullptr) {
+        TELEPHONY_LOGE("newApnItem or oldApnItem is null");
+        return false;
+    }
+    bool isSameProtocol = false;
+    if (roamingState) {
+        isSameProtocol = std::strcmp(newApnItem->attr_.roamingProtocol_, oldApnItem->attr_.roamingProtocol_) == 0;
+    } else {
+        isSameProtocol = std::strcmp(newApnItem->attr_.protocol_, oldApnItem->attr_.protocol_) == 0;
+    }
+    return isSameProtocol && newApnItem->attr_.profileId_ == oldApnItem->attr_.profileId_ &&
+        newApnItem->attr_.authType_ == oldApnItem->attr_.authType_ &&
+        newApnItem->attr_.isRoamingApn_ == oldApnItem->attr_.isRoamingApn_ &&
+        std::strcmp(newApnItem->attr_.types_, oldApnItem->attr_.types_) == 0 &&
+        std::strcmp(newApnItem->attr_.numeric_, oldApnItem->attr_.numeric_) == 0 &&
+        std::strcmp(newApnItem->attr_.apn_, oldApnItem->attr_.apn_) == 0 &&
+        std::strcmp(newApnItem->attr_.apnName_, oldApnItem->attr_.apnName_) == 0 &&
+        std::strcmp(newApnItem->attr_.user_, oldApnItem->attr_.user_) == 0 &&
+        std::strcmp(newApnItem->attr_.password_, oldApnItem->attr_.password_) == 0 &&
+        std::strcmp(newApnItem->attr_.homeUrl_, oldApnItem->attr_.homeUrl_) == 0 &&
+        std::strcmp(newApnItem->attr_.proxyIpAddress_, oldApnItem->attr_.proxyIpAddress_) == 0 &&
+        std::strcmp(newApnItem->attr_.mmsIpAddress_, oldApnItem->attr_.mmsIpAddress_) == 0;
+}
 } // namespace Telephony
 } // namespace OHOS

@@ -34,6 +34,7 @@ public:
     void MarkBadApn(ApnItem &apn);
     int64_t GetNextRetryDelay() const;
     void InitialRetryCountValue();
+    std::vector<sptr<ApnItem>> GetMatchedApns() const;
 
 private:
     std::vector<sptr<ApnItem>> matchedApns_;

@@ -502,6 +502,44 @@ HWTEST_F(BranchTest, Telephony_ApnHolder_001, Function | MediumTest | Level3)
 }
 
 /**
+ * @tc.number   Telephony_ApnHolder_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_ApnHolder_002, Function | MediumTest | Level3)
+{
+    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
+    std::vector<sptr<ApnItem>> newMatchedApns;
+    std::vector<sptr<ApnItem>> oldMatchedApns;
+    apnHolder->SetAllMatchedApns(oldMatchedApns);
+    ASSERT_FALSE(apnHolder->IsSameMatchedApns(newMatchedApns, true));
+    sptr<ApnItem> apnItemFirst = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
+    newMatchedApns.push_back(apnItemFirst);
+    oldMatchedApns.push_back(apnItemFirst);
+    apnHolder->SetAllMatchedApns(oldMatchedApns);
+    ASSERT_FALSE(apnHolder->IsSameMatchedApns(newMatchedApns, true));
+    sptr<ApnItem> apnItemSecond = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
+    newMatchedApns.push_back(apnItemSecond);
+    ASSERT_TRUE(apnHolder->IsSameMatchedApns(newMatchedApns, true));
+}
+
+/**
+ * @tc.number   Telephony_ApnHolder_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_ApnHolder_003, Function | MediumTest | Level3)
+{
+    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
+    sptr<ApnItem> newApnItem;
+    sptr<ApnItem> oldApnItem;
+    ASSERT_TRUE(apnHolder->IsSameApnItem(newApnItem, oldApnItem, true));
+    newApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
+    oldApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
+    ASSERT_FALSE(apnHolder->IsSameApnItem(newApnItem, oldApnItem, true));
+}
+
+/**
  * @tc.number   NetworkSearchCallback_Test_01
  * @tc.name    TestDump
  * @tc.desc     Function test
