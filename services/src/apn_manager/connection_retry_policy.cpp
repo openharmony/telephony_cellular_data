@@ -71,5 +71,10 @@ void ConnectionRetryPolicy::InitialRetryCountValue()
     tryCount_ = 0;
     TELEPHONY_LOGI("tryCount_ is %{public}d", tryCount_);
 }
+
+std::vector<sptr<ApnItem>> ConnectionRetryPolicy::GetMatchedApns() const
+{
+    return matchedApns_;
+}
 } // namespace Telephony
 } // namespace OHOS

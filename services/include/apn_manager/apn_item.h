@@ -38,6 +38,9 @@ public:
     static sptr<ApnItem> MakeDefaultApn(const std::string &apnType);
     static sptr<ApnItem> MakeApn(const PdpProfile &apnData);
 
+private:
+    static sptr<ApnItem> BuildOtherApnAttributes(sptr<ApnItem> &apnItem, const PdpProfile &apnData);
+
 public:
     constexpr static int ALL_APN_ITEM_CHAR_LENGTH = 256;
     struct attribute {
@@ -51,6 +54,10 @@ public:
         char apnName_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
         char user_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
         char password_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
+        bool isRoamingApn_ = false;
+        char homeUrl_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
+        char proxyIpAddress_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
+        char mmsIpAddress_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
     } attr_;
 
 private:

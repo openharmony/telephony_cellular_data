@@ -29,8 +29,8 @@ void DataSwitchSettings::LoadSwitchValue()
 {
     bool dataEnabled = false;
     bool dataRoamingEnabled = false;
-    IsUserDataOn(dataEnabled);
-    IsUserDataRoamingOn(dataRoamingEnabled);
+    QueryUserDataStatus(dataEnabled);
+    QueryUserDataRoamingStatus(dataRoamingEnabled);
     TELEPHONY_LOGI("LoadSwitchValue userDataOn_:%{public}d userDataRoaming_:%{public}d policyDataOn_:%{public}d",
         userDataOn_, userDataRoaming_, policyDataOn_);
 }
@@ -63,11 +63,11 @@ int32_t DataSwitchSettings::SetUserDataOn(bool userDataOn)
     return result;
 }
 
-int32_t DataSwitchSettings::IsUserDataOn(bool &dataEnabled)
+int32_t DataSwitchSettings::QueryUserDataStatus(bool &dataEnabled)
 {
     std::shared_ptr<CellularDataSettingsRdbHelper> settingsRdbHelper = CellularDataSettingsRdbHelper::GetInstance();
     if (settingsRdbHelper == nullptr) {
-        TELEPHONY_LOGE("IsUserDataOn settingsRdbHelper == nullptr!");
+        TELEPHONY_LOGE("settingsRdbHelper is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     Uri userDataEnableUri(CELLULAR_DATA_SETTING_DATA_ENABLE_URI);
@@ -106,17 +106,17 @@ int32_t DataSwitchSettings::SetUserDataRoamingOn(bool dataRoamingEnabled)
     return result;
 }
 
-int32_t DataSwitchSettings::IsUserDataRoamingOn(bool &dataRoamingEnabled)
+int32_t DataSwitchSettings::QueryUserDataRoamingStatus(bool &dataRoamingEnabled)
 {
     std::shared_ptr<CellularDataSettingsRdbHelper> settingsRdbHelper = CellularDataSettingsRdbHelper::GetInstance();
     if (settingsRdbHelper == nullptr) {
-        TELEPHONY_LOGE("IsUserDataRoamingOn settingsRdbHelper == nullptr!");
+        TELEPHONY_LOGE("settingsRdbHelper is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId_);
     if (simId <= INVALID_SIM_ID) {
-        TELEPHONY_LOGE("Slot%{public}d: IsUserDataRoamingOn invalid sim id %{public}d", slotId_, simId);
+        TELEPHONY_LOGE("Slot%{public}d: invalid sim id %{public}d", slotId_, simId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     Uri userDataRoamingUri(std::string(CELLULAR_DATA_SETTING_DATA_ROAMING_URI) + std::to_string(simId));
@@ -160,6 +160,16 @@ bool DataSwitchSettings::IsAllowActiveData() const
         TELEPHONY_LOGE("Activation not allowed[user:%{public}d policy:%{public}d]", userDataOn_, policyDataOn_);
         return false;
     }
+}
+
+bool DataSwitchSettings::IsUserDataOn()
+{
+    return userDataOn_;
+}
+
+bool DataSwitchSettings::IsUserDataRoamingOn()
+{
+    return userDataRoaming_;
 }
 } // namespace Telephony
 } // namespace OHOS
