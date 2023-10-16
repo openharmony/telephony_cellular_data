@@ -1273,6 +1273,7 @@ void CellularDataHandler::SetRilAttachApn()
     dataProfile.userName = attachApn->attr_.user_;
     dataProfile.password = attachApn->attr_.password_;
     dataProfile.roamingProtocol = attachApn->attr_.roamingProtocol_;
+    TELEPHONY_LOGI("DataProfile profileId = %{public}d", dataProfile.profileId);
     CoreManagerInner::GetInstance().SetInitApnInfo(
         slotId_, CellularDataEventCode::MSG_SET_RIL_ATTACH_APN, dataProfile, shared_from_this());
 }
