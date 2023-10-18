@@ -284,7 +284,11 @@ void CellularDataStateMachine::ResolveRoute(std::vector<AddressInfo> &routeInfoA
         route.gateway_.hostName_ = DEFAULT_HOSTNAME;
         route.gateway_.netMask_ = DEFAULT_MASK;
         route.gateway_.prefixlen_ = routeInfo.prefixLen;
-        route.destination_.address_ = "0.0.0.0";
+        if (routeInfo.type == INetAddr::IpType::IPV4) {
+            route.destination_.address_ = ROUTED_IPV4;
+        } else {
+            route.destination_.address_ = ROUTED_IPV6;
+        }
         route.destination_.family_ = routeInfo.type;
         route.destination_.type_ = routeInfo.type;
         route.destination_.hostName_ = DEFAULT_HOSTNAME;
