@@ -188,7 +188,7 @@ int32_t ApnManager::CreateAllApnItemByDatabase(int32_t slotId)
     }
     std::string mcc = numeric.substr(0, DEFAULT_MCC_SIZE);
     std::string mnc = numeric.substr(mcc.size(), numeric.size() - mcc.size());
-    TELEPHONY_LOGI("mcc = %{public}s, mnc = %{public}s", mcc.c_str(), mnc.c_str());
+    TELEPHONY_LOGI("current slotId = %{public}d, mcc = %{public}s, mnc = %{public}s", slotId, mcc.c_str(), mnc.c_str());
     int32_t mvnoCount = CreateMvnoApnItems(slotId, mcc, mnc);
     if (mvnoCount > 0) {
         return mvnoCount;
