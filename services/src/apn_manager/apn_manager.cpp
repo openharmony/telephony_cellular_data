@@ -203,7 +203,7 @@ int32_t ApnManager::CreateAllApnItemByDatabase(int32_t slotId)
         TELEPHONY_LOGE("query apns from data ability fail");
         return count;
     }
-    return MakeAllApnItem(apnVec);
+    return MakeSpecificApnItem(apnVec);
 }
 
 int32_t ApnManager::CreateMvnoApnItems(int32_t slotId, const std::string &mcc, const std::string &mnc)
@@ -239,10 +239,10 @@ int32_t ApnManager::CreateMvnoApnItems(int32_t slotId, const std::string &mcc, c
         TELEPHONY_LOGE("query mvno apns by iccId fail");
         return count;
     }
-    return MakeAllApnItem(mvnoApnVec);
+    return MakeSpecificApnItem(mvnoApnVec);
 }
 
-int32_t ApnManager::MakeAllApnItem(const std::vector<PdpProfile> &apnVec)
+int32_t ApnManager::MakeSpecificApnItem(const std::vector<PdpProfile> &apnVec)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     allApnItem_.clear();

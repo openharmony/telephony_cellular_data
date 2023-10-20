@@ -49,7 +49,7 @@ public:
 private:
     void AddApnHolder(const std::string &apnType, const int32_t priority);
     int32_t CreateMvnoApnItems(int32_t slotId, const std::string &mcc, const std::string &mnc);
-    int32_t MakeAllApnItem(const std::vector<PdpProfile> &apnVec);
+    int32_t MakeSpecificApnItem(const std::vector<PdpProfile> &apnVec);
 
 private:
     static const std::map<std::string, int32_t> apnIdApnNameMap_;
