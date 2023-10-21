@@ -15,10 +15,11 @@
 
 #include "apn_manager.h"
 
-#include "net_specifier.h"
-#include "telephony_log_wrapper.h"
-
 #include "cellular_data_utils.h"
+#include "core_manager_inner.h"
+#include "net_specifier.h"
+#include "string_ex.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -175,16 +176,23 @@ void ApnManager::CreateAllApnItem()
     }
 }
 
-int32_t ApnManager::CreateAllApnItemByDatabase(const std::string &numeric)
+int32_t ApnManager::CreateAllApnItemByDatabase(int32_t slotId)
 {
     int32_t count = 0;
+    std::u16string operatorNumeric;
+    CoreManagerInner::GetInstance().GetSimOperatorNumeric(slotId, operatorNumeric);
+    std::string numeric = Str16ToStr8(operatorNumeric);
     if (numeric.empty()) {
         TELEPHONY_LOGE("numeric is empty!!!");
         return count;
     }
     std::string mcc = numeric.substr(0, DEFAULT_MCC_SIZE);
     std::string mnc = numeric.substr(mcc.size(), numeric.size() - mcc.size());
-    TELEPHONY_LOGI("mcc = %{public}s, mnc = %{public}s", mcc.c_str(), mnc.c_str());
+    TELEPHONY_LOGI("current slotId = %{public}d, mcc = %{public}s, mnc = %{public}s", slotId, mcc.c_str(), mnc.c_str());
+    int32_t mvnoCount = CreateMvnoApnItems(slotId, mcc, mnc);
+    if (mvnoCount > 0) {
+        return mvnoCount;
+    }
     std::vector<PdpProfile> apnVec;
     auto helper = CellularDataRdbHelper::GetInstance();
     if (helper == nullptr) {
@@ -195,11 +203,53 @@ int32_t ApnManager::CreateAllApnItemByDatabase(const std::string &numeric)
         TELEPHONY_LOGE("query apns from data ability fail");
         return count;
     }
+    return MakeSpecificApnItem(apnVec);
+}
+
+int32_t ApnManager::CreateMvnoApnItems(int32_t slotId, const std::string &mcc, const std::string &mnc)
+{
+    int32_t count = 0;
+    auto helper = CellularDataRdbHelper::GetInstance();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("get cellularDataRdbHelper failed");
+        return count;
+    }
+    std::vector<PdpProfile> mvnoApnVec;
+    std::u16string spn;
+    CoreManagerInner::GetInstance().GetSimSpn(slotId, spn);
+    if (!helper->QueryMvnoApnsByType(mcc, mnc, MvnoType::SPN, Str16ToStr8(spn), mvnoApnVec)) {
+        TELEPHONY_LOGE("query mvno apns by spn fail");
+        return count;
+    }
+    std::u16string imsi;
+    CoreManagerInner::GetInstance().GetIMSI(slotId, imsi);
+    if (!helper->QueryMvnoApnsByType(mcc, mnc, MvnoType::IMSI, Str16ToStr8(imsi), mvnoApnVec)) {
+        TELEPHONY_LOGE("query mvno apns by imsi fail");
+        return count;
+    }
+    std::u16string gid1;
+    CoreManagerInner::GetInstance().GetSimGid1(slotId, gid1);
+    if (!helper->QueryMvnoApnsByType(mcc, mnc, MvnoType::GID1, Str16ToStr8(gid1), mvnoApnVec)) {
+        TELEPHONY_LOGE("query mvno apns by gid1 fail");
+        return count;
+    }
+    std::u16string iccId;
+    CoreManagerInner::GetInstance().GetSimIccId(slotId, iccId);
+    if (!helper->QueryMvnoApnsByType(mcc, mnc, MvnoType::ICCID, Str16ToStr8(iccId), mvnoApnVec)) {
+        TELEPHONY_LOGE("query mvno apns by iccId fail");
+        return count;
+    }
+    return MakeSpecificApnItem(mvnoApnVec);
+}
+
+int32_t ApnManager::MakeSpecificApnItem(const std::vector<PdpProfile> &apnVec)
+{
     std::lock_guard<std::mutex> lock(mutex_);
     allApnItem_.clear();
+    int32_t count = 0;
     for (const PdpProfile &apnData : apnVec) {
-        TELEPHONY_LOGI("profileId = %{public}d, profileName = %{public}s",
-            apnData.profileId, apnData.profileName.c_str());
+        TELEPHONY_LOGI("profileId = %{public}d, profileName = %{public}s, mvnoType = %{public}s", apnData.profileId,
+            apnData.profileName.c_str(), apnData.mvnoType.c_str());
         sptr<ApnItem> apnItem = ApnItem::MakeApn(apnData);
         if (apnItem != nullptr) {
             allApnItem_.push_back(apnItem);
