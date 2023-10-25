@@ -90,6 +90,27 @@ constexpr int32_t CellularDataStateAdapter(ApnProfileState state)
     }
 }
 
+constexpr int32_t WrapCellularDataState(const int32_t cellularDataState)
+{
+    switch (cellularDataState) {
+        case static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED): {
+            return static_cast<int32_t>(DataConnectState::DATA_STATE_DISCONNECTED);
+        }
+        case static_cast<int32_t>(DataConnectionStatus::DATA_STATE_CONNECTING): {
+            return static_cast<int32_t>(DataConnectState::DATA_STATE_CONNECTING);
+        }
+        case static_cast<int32_t>(DataConnectionStatus::DATA_STATE_CONNECTED): {
+            return static_cast<int32_t>(DataConnectState::DATA_STATE_CONNECTED);
+        }
+        case static_cast<int32_t>(DataConnectionStatus::DATA_STATE_SUSPENDED): {
+            return static_cast<int32_t>(DataConnectState::DATA_STATE_SUSPENDED);
+        }
+        default: {
+            return static_cast<int32_t>(DataConnectState::DATA_STATE_UNKNOWN);
+        }
+    }
+}
+
 enum DataContextRolesId {
     DATA_CONTEXT_ROLE_INVALID_ID = -1,
     DATA_CONTEXT_ROLE_ALL_ID = 0,
