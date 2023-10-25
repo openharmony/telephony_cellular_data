@@ -523,7 +523,7 @@ HWTEST_F(BranchTest, Telephony_ApnHolder_002, Function | MediumTest | Level3)
     ASSERT_TRUE(apnHolder->IsSameMatchedApns(newMatchedApns, true));
     sptr<ApnItem> apnItemSecond = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
     newMatchedApns.push_back(apnItemSecond);
-    ASSERT_TRUE(apnHolder->IsSameMatchedApns(newMatchedApns, true));
+    ASSERT_FALSE(apnHolder->IsSameMatchedApns(newMatchedApns, true));
 }
 
 /**
@@ -539,7 +539,7 @@ HWTEST_F(BranchTest, Telephony_ApnHolder_003, Function | MediumTest | Level3)
     ASSERT_FALSE(apnHolder->IsSameApnItem(newApnItem, oldApnItem, true));
     newApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
     oldApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
-    ASSERT_FALSE(apnHolder->IsSameApnItem(newApnItem, oldApnItem, true));
+    ASSERT_TRUE(apnHolder->IsSameApnItem(newApnItem, oldApnItem, true));
 }
 
 /**
