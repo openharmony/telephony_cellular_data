@@ -54,6 +54,33 @@ enum class RequestNetCode : int32_t {
     REQUEST_FAILED = 0,
     REQUEST_SUCCESS = 1
 };
+
+enum class DataConnectState : int32_t {
+    /**
+     * Indicates that a cellular data link is unknown.
+     */
+    DATA_STATE_UNKNOWN = -1,
+
+    /**
+     * Indicates that a cellular data link is disconnected.
+     */
+    DATA_STATE_DISCONNECTED = 0,
+
+    /**
+     * Indicates that a cellular data link is being connected.
+     */
+    DATA_STATE_CONNECTING = 1,
+
+    /**
+     * Indicates that a cellular data link is connected.
+     */
+    DATA_STATE_CONNECTED = 2,
+
+    /**
+     * Indicates that a cellular data link is suspended.
+     */
+    DATA_STATE_SUSPENDED = 3
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // CELLULAR_DATA_TYPES_H

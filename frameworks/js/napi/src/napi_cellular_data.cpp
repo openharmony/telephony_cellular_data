@@ -24,7 +24,6 @@
 #include "js_native_api.h"
 #include "js_native_api_types.h"
 #include "napi/native_common.h"
-#include "napi_cellular_data_types.h"
 #include "napi_util.h"
 #include "node_api.h"
 #include "string"
@@ -78,19 +77,19 @@ static int32_t WrapCellularDataType(const int32_t cellularDataType)
 {
     switch (cellularDataType) {
         case static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED): {
-            return static_cast<int32_t>(DataConnectionState::DATA_STATE_DISCONNECTED);
+            return static_cast<int32_t>(DataConnectState::DATA_STATE_DISCONNECTED);
         }
         case static_cast<int32_t>(DataConnectionStatus::DATA_STATE_CONNECTING): {
-            return static_cast<int32_t>(DataConnectionState::DATA_STATE_CONNECTING);
+            return static_cast<int32_t>(DataConnectState::DATA_STATE_CONNECTING);
         }
         case static_cast<int32_t>(DataConnectionStatus::DATA_STATE_CONNECTED): {
-            return static_cast<int32_t>(DataConnectionState::DATA_STATE_CONNECTED);
+            return static_cast<int32_t>(DataConnectState::DATA_STATE_CONNECTED);
         }
         case static_cast<int32_t>(DataConnectionStatus::DATA_STATE_SUSPENDED): {
-            return static_cast<int32_t>(DataConnectionState::DATA_STATE_SUSPENDED);
+            return static_cast<int32_t>(DataConnectState::DATA_STATE_SUSPENDED);
         }
         default: {
-            return static_cast<int32_t>(DataConnectionState::DATA_STATE_UNKNOWN);
+            return static_cast<int32_t>(DataConnectState::DATA_STATE_UNKNOWN);
         }
     }
 }
@@ -99,22 +98,22 @@ static int32_t WrapGetCellularDataFlowTypeType(const int32_t cellularDataType)
 {
     switch (cellularDataType) {
         case static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_NONE): {
-            return static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_NONE);
+            return static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_NONE);
         }
         case static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_DOWN): {
-            return static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_DOWN);
+            return static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_DOWN);
         }
         case static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_UP): {
-            return static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_UP);
+            return static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_UP);
         }
         case static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_UP_DOWN): {
-            return static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_UP_DOWN);
+            return static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_UP_DOWN);
         }
         case static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_DORMANT): {
             return static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_DORMANT);
         }
         default: {
-            return static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_NONE);
+            return static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_NONE);
         }
     }
 }
@@ -833,16 +832,16 @@ static napi_value CreateEnumConstructor(napi_env env, napi_callback_info info)
 static napi_value InitEnumDataConnectState(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "DATA_STATE_UNKNOWN", NapiUtil::ToInt32Value(env, static_cast<int32_t>(DATA_STATE_UNKNOWN))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "DATA_STATE_DISCONNECTED", NapiUtil::ToInt32Value(env, static_cast<int32_t>(DATA_STATE_DISCONNECTED))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "DATA_STATE_CONNECTING", NapiUtil::ToInt32Value(env, static_cast<int32_t>(DATA_STATE_CONNECTING))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "DATA_STATE_CONNECTED", NapiUtil::ToInt32Value(env, static_cast<int32_t>(DATA_STATE_CONNECTED))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "DATA_STATE_SUSPENDED", NapiUtil::ToInt32Value(env, static_cast<int32_t>(DATA_STATE_SUSPENDED))),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_STATE_UNKNOWN",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataConnectState::DATA_STATE_UNKNOWN))),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_STATE_DISCONNECTED",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataConnectState::DATA_STATE_DISCONNECTED))),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_STATE_CONNECTING",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataConnectState::DATA_STATE_CONNECTING))),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_STATE_CONNECTED",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataConnectState::DATA_STATE_CONNECTED))),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_STATE_SUSPENDED",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataConnectState::DATA_STATE_SUSPENDED))),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -851,16 +850,16 @@ static napi_value InitEnumDataConnectState(napi_env env, napi_value exports)
 static napi_value CreateDataConnectState(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "DATA_STATE_UNKNOWN", NapiUtil::ToInt32Value(env, static_cast<int32_t>(DATA_STATE_UNKNOWN))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "DATA_STATE_DISCONNECTED", NapiUtil::ToInt32Value(env, static_cast<int32_t>(DATA_STATE_DISCONNECTED))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "DATA_STATE_CONNECTING", NapiUtil::ToInt32Value(env, static_cast<int32_t>(DATA_STATE_CONNECTING))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "DATA_STATE_CONNECTED", NapiUtil::ToInt32Value(env, static_cast<int32_t>(DATA_STATE_CONNECTED))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "DATA_STATE_SUSPENDED", NapiUtil::ToInt32Value(env, static_cast<int32_t>(DATA_STATE_SUSPENDED))),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_STATE_UNKNOWN",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataConnectState::DATA_STATE_UNKNOWN))),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_STATE_DISCONNECTED",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataConnectState::DATA_STATE_DISCONNECTED))),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_STATE_CONNECTING",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataConnectState::DATA_STATE_CONNECTING))),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_STATE_CONNECTED",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataConnectState::DATA_STATE_CONNECTED))),
+        DECLARE_NAPI_STATIC_PROPERTY("DATA_STATE_SUSPENDED",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataConnectState::DATA_STATE_SUSPENDED))),
 
     };
     napi_value result = nullptr;
@@ -874,15 +873,15 @@ static napi_value InitEnumDataFlowType(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_NONE",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_NONE))),
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_NONE))),
         DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_DOWN",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_DOWN))),
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_DOWN))),
         DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_UP",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_UP))),
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_UP))),
         DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_UP_DOWN",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_UP_DOWN))),
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_UP_DOWN))),
         DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_DORMANT",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_DORMANT))),
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_DORMANT))),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -892,15 +891,15 @@ static napi_value CreateDataFlowType(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_NONE",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_NONE))),
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_NONE))),
         DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_DOWN",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_DOWN))),
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_DOWN))),
         DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_UP",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_UP))),
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_UP))),
         DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_UP_DOWN",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_UP_DOWN))),
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_UP_DOWN))),
         DECLARE_NAPI_STATIC_PROPERTY("DATA_FLOW_TYPE_DORMANT",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(DataFlowType::DATA_FLOW_TYPE_DORMANT))),
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_DORMANT))),
     };
     napi_value result = nullptr;
     napi_define_class(env, "DataFlowType", NAPI_AUTO_LENGTH, CreateEnumConstructor, nullptr,

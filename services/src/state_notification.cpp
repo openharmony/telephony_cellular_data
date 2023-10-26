@@ -29,8 +29,10 @@ StateNotification &StateNotification::GetInstance()
 void StateNotification::UpdateCellularDataConnectState(int32_t slotId, ApnProfileState dataState, int32_t networkType)
 {
     int32_t state = CellularDataStateAdapter(dataState);
-    TELEPHONY_LOGI("UpdateCellularDataConnectState= %{public}d, %{public}d, %{public}d", slotId, state, networkType);
-    TelephonyStateRegistryClient::GetInstance().UpdateCellularDataConnectState(slotId, state, networkType);
+    int32_t wrapState = WrapCellularDataState(state);
+    TELEPHONY_LOGI(
+        "UpdateCellularDataConnectState= %{public}d, %{public}d, %{public}d", slotId, wrapState, networkType);
+    TelephonyStateRegistryClient::GetInstance().UpdateCellularDataConnectState(slotId, wrapState, networkType);
 }
 
 void StateNotification::OnUpDataFlowtype(int32_t slotId, CellDataFlowType flowType)
