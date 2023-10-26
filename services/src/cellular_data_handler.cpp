@@ -996,10 +996,7 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
             if (simState == SimState::SIM_STATE_READY && iccId != u"") {
                 if (iccId != lastIccId_) {
                     dataSwitchSettings_->SetPolicyDataOn(true);
-                    GetConfigurationFor5G();
                     lastIccId_ = iccId;
-                    InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_APN_CHANGED);
-                    SendEvent(event);
                 } else if (lastIccId_ == iccId) {
                     TELEPHONY_LOGI("Slot%{public}d: sim state changed, but iccId not changed.", slotId_);
                     // the sim card status has changed to ready, so try to connect
@@ -1029,6 +1026,8 @@ void CellularDataHandler::HandleSimAccountLoaded(const InnerEvent::Pointer &even
     }
     RegisterDataSettingObserver();
     dataSwitchSettings_->LoadSwitchValue();
+    GetConfigurationFor5G();
+    HandleApnChanged();
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     if (defSlotId == slotId_) {
