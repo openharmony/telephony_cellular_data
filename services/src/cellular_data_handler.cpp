@@ -1302,7 +1302,7 @@ bool CellularDataHandler::GetEsmFlagFromOpCfg()
     if (configsForEsmFlag.intValue.find(KEY_PLMN_ESM_FLAG_INT) != configsForEsmFlag.intValue.end()) {
         esmFlagFromOpCfg = configsForEsmFlag.intValue[KEY_PLMN_ESM_FLAG_INT];
     }
-    if (esmFlagFromOpCfg < 0 || esmFlagFromOpCfg >1) {
+    if (esmFlagFromOpCfg < 0 || esmFlagFromOpCfg > 1) {
         TELEPHONY_LOGE("esmFlag value is invalid");
     }
     return (esmFlagFromOpCfg != 0);
@@ -1450,8 +1450,8 @@ bool CellularDataHandler::IsSingleConnectionEnabled(int32_t radioTech)
     std::vector<int32_t> singlePdpRadio;
     OperatorConfig configsForSinglePdpRadioType;
     CoreManagerInner::GetInstance().GetOperatorConfigs(slotId_, configsForSinglePdpRadioType);
-    if (configsForSinglePdpRadioType.intArrayValue.count(KEY_SINGLE_PDP_RADIO_TYPE_ARRAY) >0) {
-        singlePdpRadio = configsForSinglePdpRadioType.intArrayValue[KEY_SINGLE_PDP_RADIO_TYPE_ARRAY];
+    if (configsForSinglePdpRadioType.intArrayValue.count(KEY_SINGLE_PDP_RADIO_TYPE_INT_ARRAY) >0) {
+        singlePdpRadio = configsForSinglePdpRadioType.intArrayValue[KEY_SINGLE_PDP_RADIO_TYPE_INT_ARRAY];
     }
     if (singlePdpRadio.empty()) {
         TELEPHONY_LOGI("single pdp radio type array is empty");
