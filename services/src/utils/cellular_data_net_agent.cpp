@@ -51,7 +51,8 @@ bool CellularDataNetAgent::RegisterNetSupplier(const int32_t slotId)
         }
         int32_t simId = CoreManagerInner::GetInstance().GetSimId(netSupplier.slotId);
         if (simId <= INVALID_SIM_ID) {
-            return false;
+            TELEPHONY_LOGE("Slot%{public}d Invalid simId: %{public}d", slotId, simId);
+            continue;
         }
         std::set<NetCap> netCap { static_cast<NetCap>(netSupplier.capability) };
         uint32_t supplierId = 0;
@@ -73,6 +74,11 @@ void CellularDataNetAgent::UnregisterNetSupplier(const int32_t slotId)
 {
     for (const NetSupplier &netSupplier : netSuppliers_) {
         if (netSupplier.slotId != slotId) {
+            continue;
+        }
+        int32_t simId = CoreManagerInner::GetInstance().GetSimId(netSupplier.slotId);
+        if (simId <= INVALID_SIM_ID) {
+            TELEPHONY_LOGE("Slot%{public}d Invalid simId: %{public}d", slotId, simId);
             continue;
         }
         auto& netManager = NetConnClient::GetInstance();
