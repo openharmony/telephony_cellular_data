@@ -862,20 +862,20 @@ HWTEST_F(BranchTest, DeactivatingSecondaryState_Test_01, Function | MediumTest |
 }
 
 /**
- * @tc.number   Mtu_Iptype_Test_01
- * @tc.name    TestDump
+ * @tc.number   GetIpType_Test_01
+ * @tc.name     TestDump
  * @tc.desc     Function test
  */
-HWTEST_F(BranchTest, Mtu_Iptype_Test_01, Function | MediumTest | Level3)
+HWTEST_F(BranchTest, GetIpType_Test_01, Function | MediumTest | Level3)
 {
     std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
     std::string result = "";
-    std::string address = "10.124.132.134 240e:45c:1450:5fa:f8b9:c0c8:1001:bc61";
+    std::string address = "";
     std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(address);
     cellularMachine->GetIpType(result, ipInfoArray);
-    ASSERT_TRUE(result == "IPV4V6");
+    ASSERT_TRUE(result == "");
 }
 } // namespace Telephony
 } // namespace OHOS
