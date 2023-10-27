@@ -732,8 +732,8 @@ void CellularDataHandler::MsgEstablishDataConnection(const InnerEvent::Pointer &
         AttemptEstablishDataConnection(apnHolder);
     } else {
         DisConnectionReason reason = DisConnectionReason::REASON_CHANGE_CONNECTION;
-        int32_t radioTech = static_cast<int32>(RadioTech::Radio_TECHNOLOGY_INVALID);
-        CoreManagerInner::GetInstance();GetPsRadioTech(slotId_, radioTech);
+        int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+        CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, radioTech);
         if (!IsOnlySinglePdpAllowed(radioTech)) {
             reason = DisConnectionReason::REASON_CLEAR_CONNECTION;
         }
