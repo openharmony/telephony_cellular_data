@@ -214,11 +214,7 @@ std::string CellularDataStateMachine::GetIpType(std::string &result, std::vector
     return result;
 }
 
-<<<<<<< HEAD
-void CellularDataStateMachine::GetMtuSizeFromOpCfg(int32_t *mtuSize, int32_t slotId,
-=======
 void CellularDataStateMachine::GetMtuSizeFromOpCfg(int32_t &mtuSize, int32_t slotId,
->>>>>>> da2f781 (add new network parameters in operator config)
     std::vector<AddressInfo> ipInfoArray)
 {
     std::string mtuString = "";
