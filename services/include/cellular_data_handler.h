@@ -122,7 +122,7 @@ private:
     bool GetEsmFlagFromOpCfg();
     void SetInitApnWithNullDp();
     void GetSinglePdpEnabledFromOpCfg();
-    bool IsOnlySinglePdpAllowed(int32_t radioTech);
+    bool IsSingleConnectionEnabled(int32_t radioTech);
 
 private:
     sptr<ApnManager> apnManager_;

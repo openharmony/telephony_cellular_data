@@ -559,7 +559,7 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
         TELEPHONY_LOGE("Slot%{public}d: apnItem is null", slotId_);
         return false;
     }
-    if (IsOnlySinglePdpAllowed(radioTech)) {
+    if (IsSingleConnectionEnabled(radioTech)) {
         if (HasAnyHigherPriorityConnection(apnHolder)) {
             TELEPHONY_LOGE("Slot%{public}d: has higher priority connection", slotId_);
             return false;
@@ -734,7 +734,7 @@ void CellularDataHandler::MsgEstablishDataConnection(const InnerEvent::Pointer &
         DisConnectionReason reason = DisConnectionReason::REASON_CHANGE_CONNECTION;
         int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
         CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, radioTech);
-        if (!IsOnlySinglePdpAllowed(radioTech)) {
+        if (!IsSingleConnectionEnabled(radioTech)) {
             reason = DisConnectionReason::REASON_CLEAR_CONNECTION;
         }
         ClearConnection(apnHolder, reason);
@@ -1445,7 +1445,7 @@ void CellularDataHandler::GetSinglePdpEnabledFromOpCfg()
     return;
 }
 
-bool CellularDataHandler::IsOnlySinglePdpAllowed(int32_t radioTech)
+bool CellularDataHandler::IsSingleConnectionEnabled(int32_t radioTech)
 {
     std::vector<int32_t> singlePdpRadio;
     OperatorConfig configsForSinglePdpRadioType;
