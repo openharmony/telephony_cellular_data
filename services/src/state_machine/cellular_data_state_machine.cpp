@@ -196,25 +196,29 @@ bool CellularDataStateMachine::HasMatchedIpTypeAddrs(uint8_t ipType, uint8_t ipI
     return false;
 }
 
-std::string CellularDataStateMachine::GetIpType(std::string *result, std::vector<AddressInfo> ipInfoArray)
+std::string CellularDataStateMachine::GetIpType(std::string &result, std::vector<AddressInfo> ipInfoArray)
 {
     uint8_t ipInfoArraySize = ipInfoArray.size();
     uint8_t ipv4Type = INetAddr::IpType::IPV4;
     uint8_t ipv6Type = INetAddr::IpType::IPV6;
     if (HasMatchedIpTypeAddrs(ipv4Type, ipInfoArraySize, ipInfoArray) &&
         HasMatchedIpTypeAddrs(ipv6Type, ipInfoArraySize, ipInfoArray)) {
-        *result = "IPV4IPV6";
+        result = "IPV4V6";
     } else if (HasMatchedIpTypeAddrs(ipv4Type, ipInfoArraySize, ipInfoArray)) {
-        *result = "IPV4";
+        result = "IPV4";
     } else if (HasMatchedIpTypeAddrs(ipv6Type, ipInfoArraySize, ipInfoArray)) {
-        *result = "IPV6";
+        result = "IPV6";
     } else {
         TELEPHONY_LOGE("Ip type not match");
     }
-    return *result;
+    return result;
 }
 
+<<<<<<< HEAD
 void CellularDataStateMachine::GetMtuSizeFromOpCfg(int32_t *mtuSize, int32_t slotId,
+=======
+void CellularDataStateMachine::GetMtuSizeFromOpCfg(int32_t &mtuSize, int32_t slotId,
+>>>>>>> da2f781 (add new network parameters in operator config)
     std::vector<AddressInfo> ipInfoArray)
 {
     std::string mtuString = "";
@@ -227,7 +231,7 @@ void CellularDataStateMachine::GetMtuSizeFromOpCfg(int32_t *mtuSize, int32_t slo
     }
     std::vector<std::string> mtuArray = CellularDataUtils::Split(mtuString, ";");
     for (std::string &ipTypeArray : mtuArray) {
-        std::vector<std::string> mtuIpTypeArray = CellularDataUtils::Split(ipTypeArray, ",");
+        std::vector<std::string> mtuIpTypeArray = CellularDataUtils::Split(ipTypeArray, ":");
         if (mtuIpTypeArray.size() != VALID_VECTOR_SIZE || mtuIpTypeArray[0].empty() || mtuIpTypeArray[1].empty()) {
             TELEPHONY_LOGE("mtu size string is invalid");
             break;
@@ -238,8 +242,8 @@ void CellularDataStateMachine::GetMtuSizeFromOpCfg(int32_t *mtuSize, int32_t slo
             TELEPHONY_LOGE("mtu values is invalid");
             break;
         }
-        if (!ipTypeString.empty() && ipTypeString == GetIpType(&result, ipInfoArray)) {
-            *mtuSize = mtuValue;
+        if (!ipTypeString.empty() && ipTypeString == GetIpType(result, ipInfoArray)) {
+            mtuSize = mtuValue;
         }
     }
     return;
@@ -269,7 +273,7 @@ void CellularDataStateMachine::UpdateNetworkInfo(const SetupDataCallResultInfo &
         roamingState = true;
     }
     int32_t mtuSize = (dataCallInfo.maxTransferUnit == 0) ? DEFAULT_MTU : dataCallInfo.maxTransferUnit;
-    GetMtuSizeFromOpCfg(&mtuSize, slotId, ipInfoArray);
+    GetMtuSizeFromOpCfg(mtuSize, slotId, ipInfoArray);
     netLinkInfo_->ifaceName_ = dataCallInfo.netPortName;
     netLinkInfo_->mtu_ = mtuSize;
     netLinkInfo_->tcpBufferSizes_ = tcpBuffer_;
