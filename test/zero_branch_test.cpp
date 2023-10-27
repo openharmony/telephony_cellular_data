@@ -875,7 +875,7 @@ HWTEST_F(BranchTest, Mtu_Iptype_Test_01, Function | MediumTest | Level3)
     std::string address = "10.124.132.134 240e:45c:1450:5fa:f8b9:c0c8:1001:bc61";
     std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(address);
     cellularMachine->GetIpType(&result, ipInfoArray);
-    ASSERT_TRUE(result == "IPV4IPV6");
+    ASSERT_TRUE(result == "IPV4V6");
 }
 } // namespace Telephony
 } // namespace OHOS
