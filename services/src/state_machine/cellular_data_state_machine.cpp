@@ -189,7 +189,7 @@ bool CellularDataStateMachine::HasMatchedIpTypeAddrs(uint8_t ipType, uint8_t ipI
     std::vector<AddressInfo> ipInfoArray)
 {
     for (int i = 0; i < ipInfoArraySize; i++) {
-        if (ipInfoArray[i].type = ipType) {
+        if (ipInfoArray[i].type == ipType) {
             return true;
         }
     }
@@ -221,7 +221,7 @@ void CellularDataStateMachine::GetMtuSizeFromOpCfg(int32_t *mtusize, int32_t slo
     std::string result = "";
     int32_t mtuValue = INVALID_MTU_VALUE;
     OperatorConfig configsForMtuSize;
-    CoreManagerInner::GetInstance().GetOperatorConfigs(slotId_, configsForMtuSize);
+    CoreManagerInner::GetInstance().GetOperatorConfigs(slotId, configsForMtuSize);
     if (configsForMtuSize.stringValue.find(KEY_MTU_SIZE_STRING) != configsForMtuSize.stringValue.end()) {
         mtuString = configsForMtuSize.stringValue[KEY_MTU_SIZE_STRING];
     }
