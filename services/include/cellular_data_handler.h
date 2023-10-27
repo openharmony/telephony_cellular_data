@@ -34,6 +34,7 @@
 #include "radio_event.h"
 #include "state_notification.h"
 #include "tel_profile_util.h"
+#include "telephony_types.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -118,6 +119,9 @@ private:
     void IncallDataComplete(const AppExecFwk::InnerEvent::Pointer &event);
     void ResetDataFlowType();
     void ClearConnectionIfRequired();
+    int32_t GetEsmFlagFromOpCfg();
+    void SetInitApnWithNullDp(DataProfile dataProfile);
+    void GetSinglePdpEnabledFromOpCfg();
 
 private:
     sptr<ApnManager> apnManager_;

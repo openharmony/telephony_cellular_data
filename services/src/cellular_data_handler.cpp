@@ -39,6 +39,7 @@ namespace Telephony {
 using namespace AppExecFwk;
 using namespace OHOS::EventFwk;
 using namespace NetManagerStandard;
+static const int32_t ESM_FLAG_INVALID = -1;
 CellularDataHandler::CellularDataHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
     const EventFwk::CommonEventSubscribeInfo &sp, int32_t slotId)
     : EventHandler(runner), CommonEventSubscriber(sp), slotId_(slotId)
@@ -1291,6 +1292,35 @@ void CellularDataHandler::SetDataPermittedResponse(const AppExecFwk::InnerEvent:
     }
 }
 
+int32_t CellularDataHandler::GetEsmFlagFromOpCfg()
+{
+    int32_t esmFlagFromOpCfg = ESM_FLAG_INVALID;
+    OperatorConfig configsForEsmFlag;
+    CoreManagerInner::GetInstance().GetOperatorConfigs(slotId_, configsForEsmFlag);
+    if (configsForEsmFlag.intValue.find(KEY_PLMN_ESM_FLAG_INT) != configsForEsmFlag.intValue.end()) {
+        esmFlagFromOpCfg = configsForEsmFlag.intValue[KEY_PLMN_ESM_FLAG_INT];
+    }
+    if (esmFlagFromOpCfg < 0 || esmFlagFromOpCfg >1) {
+        TELEPHONY_LOGE("EsmFlag value is invalid");
+        return ESM_FLAG_INVALID;
+    }
+    return esmFlagFromOpCfg;
+}
+
+void CellularDataHandler::SetInitApnWithNullDp(DataProfile dataProfile)
+{
+    dataProfile.profileId = 0;
+    dataProfile.apn = "";
+    dataProfile.protocol = "";
+    dataProfile.verType = 0;
+    dataProfile.userName = "";
+    dataProfile.password = "";
+    dataProfile.roamingProtocol = "";
+    CoreManagerInner::GetInstance().SetInitApnInfo(
+        slotId_, CellularDataEventCode::MSG_SET_RIL_ATTACH_APN, dataProfile, shared_from_this());
+    return;
+}
+
 void CellularDataHandler::SetRilAttachApn()
 {
     sptr<ApnItem> attachApn = apnManager_->GetRilAttachApn();
@@ -1299,6 +1329,10 @@ void CellularDataHandler::SetRilAttachApn()
         return;
     }
     DataProfile dataProfile;
+    if (!GetEsmFlagFromOpCfg) {
+        SetInitApnWithNullDp(dataProfile);
+        return;
+    }
     dataProfile.profileId = attachApn->attr_.profileId_;
     dataProfile.apn = attachApn->attr_.apn_;
     dataProfile.protocol = attachApn->attr_.protocol_;
@@ -1399,6 +1433,15 @@ bool CellularDataHandler::ParseOperatorConfig(const std::u16string &configName)
     return false;
 }
 
+void CellularDataHandler::GetSinglePdpEnabledFromOpCfg()
+{
+    OperatorConfig configsForSinglePdp;
+    CoreManagerInner::GetInstance().GetOperatorConfigs(slotId_, configsForSinglePdp);
+    if (configsForSinglePdp.boolValue.find(KEY_SINGLE_PDP_ENABLED_BOOL) != configsForSinglePdp.boolValue.end()) {
+        multipleConnectionsEnabled_ = !configsForSinglePdp.boolValue[KEY_SINGLE_PDP_ENABLED_BOOL];
+    }
+    return;
+}
 void CellularDataHandler::GetDefaultConfiguration()
 {
     if (connectionManager_ == nullptr) {
@@ -1414,6 +1457,7 @@ void CellularDataHandler::GetDefaultConfiguration()
     defaultPreferApn_ = CellularDataUtils::GetDefaultPreferApnConfig();
     TELEPHONY_LOGI("Slot%{public}d: defaultPreferApn_ is %{public}d", slotId_, defaultPreferApn_);
     multipleConnectionsEnabled_ = CellularDataUtils::GetDefaultMultipleConnectionsConfig();
+    GetSinglePdpEnabledFromOpCfg();
     TELEPHONY_LOGI("Slot%{public}d: multipleConnectionsEnabled_ = %{public}d", slotId_, multipleConnectionsEnabled_);
 }
 

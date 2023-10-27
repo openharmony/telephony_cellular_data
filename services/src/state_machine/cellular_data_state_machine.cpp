@@ -18,6 +18,7 @@
 #include "core_manager_inner.h"
 #include "radio_event.h"
 #include "telephony_log_wrapper.h"
+#include <string_ex.h>
 
 #include "activating.h"
 #include "active.h"
@@ -31,6 +32,7 @@
 namespace OHOS {
 using namespace NetManagerStandard;
 namespace Telephony {
+static const int32_t INVALID_MTU_VALUE = -1;
 bool CellularDataStateMachine::IsInactiveState() const
 {
     return currentState_ == inActiveState_;
@@ -183,6 +185,65 @@ sptr<State> CellularDataStateMachine::GetCurrentState() const
     return currentState_;
 }
 
+bool CellularDataStateMachine::HasMatchedIpTypeAddrs(uint8_t ipType, uint8_t ipInfoArraySize, std::vector<AddressInfo> ipInfoArray)
+{
+    for (int i = 0; i < ipInfoArraySize; i++) {
+        if (ipInfoArray[i].type = ipType) {
+            return true;
+        }
+    }
+    return false;
+}
+
+std::string CellularDataStateMachine::GetIpType(std::string *result, std::vector<AddressInfo> ipInfoArray)
+{
+    uint8_t ipInfoArraySize = ipInfoArray.size();
+    uint8_t ipv4Type = INetAddr::IpType::IPV4;
+    uint8_t ipv6Type = INetAddr::IpType::IPV6;
+    if (HasMatchedIpTypeAddrs(ipv4Type, ipInfoArraySize, ipInfoArray) &&
+        HasMatchedIpTypeAddrs(ipv6Type, ipInfoArraySize, ipInfoArray)) {
+        *result = "IPV4IPV6";
+    } else if (HasMatchedIpTypeAddrs(ipv4Type, ipInfoArraySize, ipInfoArray)) {
+        *result = "IPV4";
+    } else if (HasMatchedIpTypeAddrs(ipv6Type, ipInfoArraySize, ipInfoArray)) {
+        *result = "IPV6";
+    } else {
+        TELEPHONY_LOGE("Ip type not match");
+    }
+    return *result;
+}
+
+void CellularDataStateMachine::GetMtuSizeFromOpCfg(int32_t *mtusize, int32_t slotId,
+    std::vector<AddressInfo> ipInfoArray)
+{
+    std::string mtuString = "";
+    std::string result = "";
+    int32_t mtuValue = INVALID_MTU_VALUE;
+    OperatorConfig configsForMtuSize;
+    CoreManagerInner::GetInstance().GetOperatorConfigs(slotId_, configsForMtuSize);
+    if (configsForMtuSize.stringValue.find(KEY_MTU_SIZE_STRING) != configsForMtuSize.stringValue.end()) {
+        esmFlagFromOpCfg = configsForMtuSize.stringValue[KEY_MTU_SIZE_STRING];
+    }
+    std::vector<std::string> mtuArray = CellularDataUtils::Split(mtuString, ";");
+    for (std::string &ipTypeArray : mtuArray) {
+        std::vector<std::string> mtuIpTypeArray = CellularDataUtils::Split(ipTypeArray, ",");
+        if (mtuIpTypeArray.size() != VALID_VECTOR_SIZE || mtuIpTypeArray[0].empty() || mtuIpTypeArray[1].empty()) {
+            TELEPHONY_LOGE("mtu size string is invalid");
+            break;
+        }
+        std::string ipTypeString = mtuIpTypeArray[0];
+        StrToInt(mtuIpTypeArray[1], mtuValue);
+        if (mtuValue == INVALID_MTU_VALUE) {
+            TELEPHONY_LOGE("mtu values is invalid");
+            break;
+        }
+        if (!ipTypeString.empty() && ipTypeString == GetIpType(&result, ipInfoArray)) {
+            *mtusize = mtuValue;
+        }
+    }
+    return;
+}
+
 void CellularDataStateMachine::UpdateNetworkInfo(const SetupDataCallResultInfo &dataCallInfo)
 {
     std::lock_guard<std::mutex> guard(mtx_);
@@ -206,8 +267,10 @@ void CellularDataStateMachine::UpdateNetworkInfo(const SetupDataCallResultInfo &
     if (CoreManagerInner::GetInstance().GetPsRoamingState(slotId) > 0) {
         roamingState = true;
     }
+    int32_t mtusize = (dataCallInfo.maxTransferUnit == 0) ? DEFAULT_MTU : dataCallInfo.maxTransferUnit;
+    GetMtuSizeFromOpCfg(&mtusize, slotId, ipInfoArray);
     netLinkInfo_->ifaceName_ = dataCallInfo.netPortName;
-    netLinkInfo_->mtu_ = (dataCallInfo.maxTransferUnit == 0) ? DEFAULT_MTU : dataCallInfo.maxTransferUnit;
+    netLinkInfo_->mtu_ = mtusize;
     netLinkInfo_->tcpBufferSizes_ = tcpBuffer_;
     ResolveIp(ipInfoArray);
     ResolveDns(dnsInfoArray);

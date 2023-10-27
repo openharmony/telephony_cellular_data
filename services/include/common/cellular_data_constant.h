@@ -211,7 +211,7 @@ constexpr const char *DEFAULT_BANDWIDTH_CONFIG =
     "NR_SA:145000,60000";
 static constexpr const char *DEFAULT_PREFER_APN = "1";
 static constexpr const char *DEFAULT_MOBILE_MTU = "1500";
-static constexpr const char *DEFAULT_MULTIPLE_CONNECTIONS = "0";
+static constexpr const char *DEFAULT_MULTIPLE_CONNECTIONS = "1";
 static const int MAX_BUFFER_SIZE = 1024;
 static const int MIN_BUFFER_SIZE = 5;
 static const int UP_DOWN_LINK_SIZE = 100;

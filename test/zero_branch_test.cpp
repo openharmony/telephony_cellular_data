@@ -860,5 +860,22 @@ HWTEST_F(BranchTest, DeactivatingSecondaryState_Test_01, Function | MediumTest |
     ASSERT_FALSE(deactivatingSecondaryState->StateProcess(event));
     deactivatingSecondaryState->StateEnd();
 }
+
+/**
+ * @tc.number   Mtu_Iptype_Test_01
+ * @tc.name    TestDump
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Mtu_Iptype_Test_01, Function | MediumTest | Level3)
+{
+    std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
+    cellularMachine->Init();
+    std::string result = "";
+    std::string address = "10.124.132.134 240e:45c:1450:5fa:f8b9:c0c8:1001:bc61";
+    std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(address);
+    cellularMachine->GetIpType(&result, ipInfoArray);
+    ASSERT_TRUE(result == "IPV4IPV6");
+}
 } // namespace Telephony
 } // namespace OHOS
