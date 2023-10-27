@@ -1302,7 +1302,6 @@ bool CellularDataHandler::GetEsmFlagFromOpCfg()
     }
     if (esmFlagFromOpCfg < 0 || esmFlagFromOpCfg >1) {
         TELEPHONY_LOGE("EsmFlag value is invalid");
-        return ESM_FLAG_INVALID;
     }
     return (esmFlagFromOpCfg == 0) ? false : true;
 }
