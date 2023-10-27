@@ -239,7 +239,7 @@ void CellularDataStateMachine::GetMtuSizeFromOpCfg(int32_t *mtusize, int32_t slo
             break;
         }
         if (!ipTypeString.empty() && ipTypeString == GetIpType(&result, ipInfoArray)) {
-            *mtusize = mtuValue;
+            *mtuSize = mtuValue;
         }
     }
     return;
@@ -268,10 +268,10 @@ void CellularDataStateMachine::UpdateNetworkInfo(const SetupDataCallResultInfo &
     if (CoreManagerInner::GetInstance().GetPsRoamingState(slotId) > 0) {
         roamingState = true;
     }
-    int32_t mtusize = (dataCallInfo.maxTransferUnit == 0) ? DEFAULT_MTU : dataCallInfo.maxTransferUnit;
-    GetMtuSizeFromOpCfg(&mtusize, slotId, ipInfoArray);
+    int32_t mtuSize = (dataCallInfo.maxTransferUnit == 0) ? DEFAULT_MTU : dataCallInfo.maxTransferUnit;
+    GetMtuSizeFromOpCfg(&mtuSize, slotId, ipInfoArray);
     netLinkInfo_->ifaceName_ = dataCallInfo.netPortName;
-    netLinkInfo_->mtu_ = mtusize;
+    netLinkInfo_->mtu_ = mtuSize;
     netLinkInfo_->tcpBufferSizes_ = tcpBuffer_;
     ResolveIp(ipInfoArray);
     ResolveDns(dnsInfoArray);

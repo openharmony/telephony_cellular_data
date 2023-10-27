@@ -1292,7 +1292,7 @@ void CellularDataHandler::SetDataPermittedResponse(const AppExecFwk::InnerEvent:
     }
 }
 
-int32_t CellularDataHandler::GetEsmFlagFromOpCfg()
+bool CellularDataHandler::GetEsmFlagFromOpCfg()
 {
     int32_t esmFlagFromOpCfg = ESM_FLAG_INVALID;
     OperatorConfig configsForEsmFlag;
@@ -1304,11 +1304,12 @@ int32_t CellularDataHandler::GetEsmFlagFromOpCfg()
         TELEPHONY_LOGE("EsmFlag value is invalid");
         return ESM_FLAG_INVALID;
     }
-    return esmFlagFromOpCfg;
+    return (esmFlagFromOpCfg == 0) ? false : true;
 }
 
-void CellularDataHandler::SetInitApnWithNullDp(DataProfile dataProfile)
+void CellularDataHandler::SetInitApnWithNullDp()
 {
+    DataProfile dataProfile;
     dataProfile.profileId = 0;
     dataProfile.apn = "";
     dataProfile.protocol = "";
@@ -1328,11 +1329,11 @@ void CellularDataHandler::SetRilAttachApn()
         TELEPHONY_LOGE("Slot%{public}d: attachApn is null", slotId_);
         return;
     }
-    DataProfile dataProfile;
     if (!GetEsmFlagFromOpCfg()) {
-        SetInitApnWithNullDp(dataProfile);
+        SetInitApnWithNullDp();
         return;
     }
+    DataProfile dataProfile;
     dataProfile.profileId = attachApn->attr_.profileId_;
     dataProfile.apn = attachApn->attr_.apn_;
     dataProfile.protocol = attachApn->attr_.protocol_;
