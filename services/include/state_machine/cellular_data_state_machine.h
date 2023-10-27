@@ -79,7 +79,7 @@ private:
     void ResolveIp(std::vector<AddressInfo> &ipInfoArray);
     void ResolveDns(std::vector<AddressInfo> &dnsInfoArray);
     void ResolveRoute(std::vector<AddressInfo> &routeInfoArray, const std::string &name);
-    void GetMtuSizeFromOpCfg(int32_t *mtusize, int32_t slotId, std::vector<AddressInfo> ipInfoArray);
+    void GetMtuSizeFromOpCfg(int32_t *mtuSize, int32_t slotId, std::vector<AddressInfo> ipInfoArray);
     std::string GetIpType(std::string *result, std::vector<AddressInfo> ipInfoArray);
     bool HasMatchedIpTypeAddrs(uint8_t ipType, uint8_t ipInfoArraySize, std::vector<AddressInfo> ipInfoArray);
 
