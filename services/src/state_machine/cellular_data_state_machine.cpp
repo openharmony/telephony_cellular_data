@@ -222,7 +222,7 @@ void CellularDataStateMachine::GetMtuSizeFromOpCfg(int32_t *mtusize, int32_t slo
     OperatorConfig configsForMtuSize;
     CoreManagerInner::GetInstance().GetOperatorConfigs(slotId_, configsForMtuSize);
     if (configsForMtuSize.stringValue.find(KEY_MTU_SIZE_STRING) != configsForMtuSize.stringValue.end()) {
-        esmFlagFromOpCfg = configsForMtuSize.stringValue[KEY_MTU_SIZE_STRING];
+        mtuString = configsForMtuSize.stringValue[KEY_MTU_SIZE_STRING];
     }
     std::vector<std::string> mtuArray = CellularDataUtils::Split(mtuString, ";");
     for (std::string &ipTypeArray : mtuArray) {

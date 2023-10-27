@@ -1329,7 +1329,7 @@ void CellularDataHandler::SetRilAttachApn()
         return;
     }
     DataProfile dataProfile;
-    if (!GetEsmFlagFromOpCfg) {
+    if (!GetEsmFlagFromOpCfg()) {
         SetInitApnWithNullDp(dataProfile);
         return;
     }
