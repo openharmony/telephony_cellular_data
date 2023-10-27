@@ -185,7 +185,8 @@ sptr<State> CellularDataStateMachine::GetCurrentState() const
     return currentState_;
 }
 
-bool CellularDataStateMachine::HasMatchedIpTypeAddrs(uint8_t ipType, uint8_t ipInfoArraySize, std::vector<AddressInfo> ipInfoArray)
+bool CellularDataStateMachine::HasMatchedIpTypeAddrs(uint8_t ipType, uint8_t ipInfoArraySize,
+    std::vector<AddressInfo> ipInfoArray)
 {
     for (int i = 0; i < ipInfoArraySize; i++) {
         if (ipInfoArray[i].type = ipType) {
