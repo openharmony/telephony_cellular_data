@@ -34,7 +34,6 @@
 #include "radio_event.h"
 #include "state_notification.h"
 #include "tel_profile_util.h"
-#include "telephony_types.h"
 
 namespace OHOS {
 namespace Telephony {
