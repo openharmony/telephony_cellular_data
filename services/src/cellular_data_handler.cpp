@@ -559,7 +559,7 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
         TELEPHONY_LOGE("Slot%{public}d: apnItem is null", slotId_);
         return false;
     }
-    if (!multipleConnectionsEnabled_) {
+    if (IsOnlySinglePdpAllowed(radioTech)) {
         if (HasAnyHigherPriorityConnection(apnHolder)) {
             TELEPHONY_LOGE("Slot%{public}d: has higher priority connection", slotId_);
             return false;
@@ -732,7 +732,9 @@ void CellularDataHandler::MsgEstablishDataConnection(const InnerEvent::Pointer &
         AttemptEstablishDataConnection(apnHolder);
     } else {
         DisConnectionReason reason = DisConnectionReason::REASON_CHANGE_CONNECTION;
-        if (multipleConnectionsEnabled_) {
+        int32_t radioTech = static_cast<int32>(RadioTech::Radio_TECHNOLOGY_INVALID);
+        CoreManagerInner::GetInstance();GetPsRadioTech(slotId_, radioTech);
+        if (!IsOnlySinglePdpAllowed(radioTech)) {
             reason = DisConnectionReason::REASON_CLEAR_CONNECTION;
         }
         ClearConnection(apnHolder, reason);
@@ -1301,7 +1303,7 @@ bool CellularDataHandler::GetEsmFlagFromOpCfg()
         esmFlagFromOpCfg = configsForEsmFlag.intValue[KEY_PLMN_ESM_FLAG_INT];
     }
     if (esmFlagFromOpCfg < 0 || esmFlagFromOpCfg >1) {
-        TELEPHONY_LOGE("EsmFlag value is invalid");
+        TELEPHONY_LOGE("esmFlag value is invalid");
     }
     return (esmFlagFromOpCfg != 0);
 }
@@ -1442,6 +1444,27 @@ void CellularDataHandler::GetSinglePdpEnabledFromOpCfg()
     }
     return;
 }
+
+bool CellularDataHandler::IsOnlySinglePdpAllowed(int32_t radioTech)
+{
+    std::vector<int32_t> singlePdpRadio;
+    OperatorConfig configsForSinglePdpRadioType;
+    CoreManagerInner::GetInstance().GetOperatorConfigs(slotId_, configsForSinglePdpRadioType);
+    if (configsForSinglePdpRadioType.intArrayValue.count(KEY_SINGLE_PDP_RADIO_TYPE_ARRAY) >0) {
+        singlePdpRadio = configsForSinglePdpRadioType.intArrayValue[KEY_SINGLE_PDP_RADIO_TYPE_ARRAY];
+    }
+    if (singlePdpRadio.empty()) {
+        TELEPHONY_LOGI("single pdp radio type array is empty");
+    }
+    if (std::find(singlePdpRadio.begin(), singlePdpRadio.end(), radioTech) != singlePdpRadio.end()) {
+        TELEPHONY_LOGI("radio type array is matched single pdp type");
+        multipleConnectionsEnabled_ = false;
+        return !multipleConnectionsEnabled_;
+    }
+    GetSinglePdpEnabledFromOpCfg();
+    return !multipleConnectionsEnabled_;
+}
+
 void CellularDataHandler::GetDefaultConfiguration()
 {
     if (connectionManager_ == nullptr) {
