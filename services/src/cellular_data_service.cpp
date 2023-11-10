@@ -25,6 +25,7 @@
 #include "runner_pool.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
+#include "telephony_ext_wrapper.h"
 #include "telephony_common_utils.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
@@ -100,6 +101,9 @@ int32_t CellularDataService::Dump(std::int32_t fd, const std::vector<std::u16str
 
 bool CellularDataService::Init()
 {
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+#endif
     eventLoop_ = RunnerPool::GetInstance().GetCommonRunner();
     if (eventLoop_ == nullptr) {
         TELEPHONY_LOGE("failed to create EventRunner");
