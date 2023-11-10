@@ -96,6 +96,7 @@ private:
     uint32_t downBandwidth_ = 0;
     std::string tcpBuffer_;
     int32_t connectId_ = 0;
+    int32_t cause_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
