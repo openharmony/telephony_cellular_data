@@ -118,6 +118,10 @@ private:
     void IncallDataComplete(const AppExecFwk::InnerEvent::Pointer &event);
     void ResetDataFlowType();
     void ClearConnectionIfRequired();
+    bool GetEsmFlagFromOpCfg();
+    void SetInitApnWithNullDp();
+    void GetSinglePdpEnabledFromOpCfg();
+    bool IsSingleConnectionEnabled(int32_t radioTech);
 
 private:
     sptr<ApnManager> apnManager_;

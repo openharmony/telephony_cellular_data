@@ -39,6 +39,7 @@ namespace Telephony {
 using namespace AppExecFwk;
 using namespace OHOS::EventFwk;
 using namespace NetManagerStandard;
+static const int32_t ESM_FLAG_INVALID = -1;
 CellularDataHandler::CellularDataHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
     const EventFwk::CommonEventSubscribeInfo &sp, int32_t slotId)
     : EventHandler(runner), CommonEventSubscriber(sp), slotId_(slotId)
@@ -558,7 +559,7 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
         TELEPHONY_LOGE("Slot%{public}d: apnItem is null", slotId_);
         return false;
     }
-    if (!multipleConnectionsEnabled_) {
+    if (IsSingleConnectionEnabled(radioTech)) {
         if (HasAnyHigherPriorityConnection(apnHolder)) {
             TELEPHONY_LOGE("Slot%{public}d: has higher priority connection", slotId_);
             return false;
@@ -731,7 +732,9 @@ void CellularDataHandler::MsgEstablishDataConnection(const InnerEvent::Pointer &
         AttemptEstablishDataConnection(apnHolder);
     } else {
         DisConnectionReason reason = DisConnectionReason::REASON_CHANGE_CONNECTION;
-        if (multipleConnectionsEnabled_) {
+        int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+        CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, radioTech);
+        if (!IsSingleConnectionEnabled(radioTech)) {
             reason = DisConnectionReason::REASON_CLEAR_CONNECTION;
         }
         ClearConnection(apnHolder, reason);
@@ -1296,11 +1299,44 @@ void CellularDataHandler::SetDataPermittedResponse(const AppExecFwk::InnerEvent:
     }
 }
 
+bool CellularDataHandler::GetEsmFlagFromOpCfg()
+{
+    int32_t esmFlagFromOpCfg = ESM_FLAG_INVALID;
+    OperatorConfig configsForEsmFlag;
+    CoreManagerInner::GetInstance().GetOperatorConfigs(slotId_, configsForEsmFlag);
+    if (configsForEsmFlag.intValue.find(KEY_PLMN_ESM_FLAG_INT) != configsForEsmFlag.intValue.end()) {
+        esmFlagFromOpCfg = configsForEsmFlag.intValue[KEY_PLMN_ESM_FLAG_INT];
+    }
+    if (esmFlagFromOpCfg < 0 || esmFlagFromOpCfg > 1) {
+        TELEPHONY_LOGE("esmFlag value is invalid");
+    }
+    return (esmFlagFromOpCfg != 0);
+}
+
+void CellularDataHandler::SetInitApnWithNullDp()
+{
+    DataProfile dataProfile;
+    dataProfile.profileId = 0;
+    dataProfile.apn = "";
+    dataProfile.protocol = "";
+    dataProfile.verType = 0;
+    dataProfile.userName = "";
+    dataProfile.password = "";
+    dataProfile.roamingProtocol = "";
+    CoreManagerInner::GetInstance().SetInitApnInfo(
+        slotId_, CellularDataEventCode::MSG_SET_RIL_ATTACH_APN, dataProfile, shared_from_this());
+    return;
+}
+
 void CellularDataHandler::SetRilAttachApn()
 {
     sptr<ApnItem> attachApn = apnManager_->GetRilAttachApn();
     if (attachApn == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: attachApn is null", slotId_);
+        return;
+    }
+    if (!GetEsmFlagFromOpCfg()) {
+        SetInitApnWithNullDp();
         return;
     }
     DataProfile dataProfile;
@@ -1404,6 +1440,36 @@ bool CellularDataHandler::ParseOperatorConfig(const std::u16string &configName)
     return false;
 }
 
+void CellularDataHandler::GetSinglePdpEnabledFromOpCfg()
+{
+    OperatorConfig configsForSinglePdp;
+    CoreManagerInner::GetInstance().GetOperatorConfigs(slotId_, configsForSinglePdp);
+    if (configsForSinglePdp.boolValue.find(KEY_SINGLE_PDP_ENABLED_BOOL) != configsForSinglePdp.boolValue.end()) {
+        multipleConnectionsEnabled_ = !configsForSinglePdp.boolValue[KEY_SINGLE_PDP_ENABLED_BOOL];
+    }
+    return;
+}
+
+bool CellularDataHandler::IsSingleConnectionEnabled(int32_t radioTech)
+{
+    std::vector<int32_t> singlePdpRadio;
+    OperatorConfig configsForSinglePdpRadioType;
+    CoreManagerInner::GetInstance().GetOperatorConfigs(slotId_, configsForSinglePdpRadioType);
+    if (configsForSinglePdpRadioType.intArrayValue.count(KEY_SINGLE_PDP_RADIO_TYPE_INT_ARRAY) >0) {
+        singlePdpRadio = configsForSinglePdpRadioType.intArrayValue[KEY_SINGLE_PDP_RADIO_TYPE_INT_ARRAY];
+    }
+    if (singlePdpRadio.empty()) {
+        TELEPHONY_LOGI("single pdp radio type array is empty");
+    }
+    if (std::find(singlePdpRadio.begin(), singlePdpRadio.end(), radioTech) != singlePdpRadio.end()) {
+        TELEPHONY_LOGI("radio type array is matched single pdp type");
+        multipleConnectionsEnabled_ = false;
+        return !multipleConnectionsEnabled_;
+    }
+    GetSinglePdpEnabledFromOpCfg();
+    return !multipleConnectionsEnabled_;
+}
+
 void CellularDataHandler::GetDefaultConfiguration()
 {
     if (connectionManager_ == nullptr) {
@@ -1419,6 +1485,7 @@ void CellularDataHandler::GetDefaultConfiguration()
     defaultPreferApn_ = CellularDataUtils::GetDefaultPreferApnConfig();
     TELEPHONY_LOGI("Slot%{public}d: defaultPreferApn_ is %{public}d", slotId_, defaultPreferApn_);
     multipleConnectionsEnabled_ = CellularDataUtils::GetDefaultMultipleConnectionsConfig();
+    GetSinglePdpEnabledFromOpCfg();
     TELEPHONY_LOGI("Slot%{public}d: multipleConnectionsEnabled_ = %{public}d", slotId_, multipleConnectionsEnabled_);
 }
 
