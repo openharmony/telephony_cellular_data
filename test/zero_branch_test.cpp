@@ -236,6 +236,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | 
     cellularDataHandler.HandleDBSettingEnableChanged(event);
     cellularDataHandler.HandleDBSettingRoamingChanged(event);
     cellularDataHandler.SetDataPermittedResponse(event);
+    cellularDataHandler.OnRilAdapterHostDied(event);
     cellularDataHandler.RegisterDataSettingObserver();
     cellularDataHandler.UnRegisterDataSettingObserver();
     ASSERT_FALSE(cellularDataHandler.HasAnyHigherPriorityConnection(apnHolder));
@@ -595,6 +596,7 @@ HWTEST_F(BranchTest, Active_Test_01, Function | MediumTest | Level3)
     ASSERT_FALSE(active->ProcessDisconnectDone(event));
     ASSERT_FALSE(active->ProcessDisconnectAllDone(event));
     ASSERT_FALSE(active->ProcessLostConnection(event));
+    ASSERT_FALSE(active->ProcessRilAdapterHostDied(event));
     ASSERT_FALSE(active->ProcessLinkCapabilityChanged(event));
     ASSERT_FALSE(active->ProcessNrStateChanged(event));
     ASSERT_FALSE(active->ProcessNrFrequencyChanged(event));

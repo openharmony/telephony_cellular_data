@@ -125,6 +125,12 @@ bool Active::ProcessLostConnection(const AppExecFwk::InnerEvent::Pointer &event)
     return PROCESSED;
 }
 
+bool Active::ProcessRilAdapterHostDied(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("Active::EVENT_RIL_ADAPTER_HOST_DIED");
+    return ProcessLostConnection(event);
+}
+
 bool Active::ProcessLinkCapabilityChanged(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("Active::MSG_SM_LINK_CAPABILITY_CHANGED");

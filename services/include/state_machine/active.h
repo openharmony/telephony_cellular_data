@@ -43,6 +43,7 @@ private:
     bool ProcessDisconnectDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessDisconnectAllDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessLostConnection(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessRilAdapterHostDied(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessLinkCapabilityChanged(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessDataConnectionRoamOn(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessDataConnectionRoamOff(const AppExecFwk::InnerEvent::Pointer &event);
@@ -65,6 +66,7 @@ private:
         { CellularDataEventCode::MSG_SM_DATA_ROAM_OFF, &Active::ProcessDataConnectionRoamOff },
         { CellularDataEventCode::MSG_SM_VOICE_CALL_STARTED, &Active::ProcessDataConnectionVoiceCallStartedOrEnded },
         { CellularDataEventCode::MSG_SM_VOICE_CALL_ENDED, &Active::ProcessDataConnectionVoiceCallStartedOrEnded },
+        { CellularDataEventCode::MSG_SM_RIL_ADAPTER_HOST_DIED, &Active::ProcessRilAdapterHostDied },
         { RadioEvent::RADIO_NR_STATE_CHANGED, &Active::ProcessNrStateChanged },
         { RadioEvent::RADIO_NR_FREQUENCY_CHANGED, &Active::ProcessNrFrequencyChanged },
         { RadioEvent::RADIO_RIL_SETUP_DATA_CALL, &Active::ProcessDataConnectionComplete },

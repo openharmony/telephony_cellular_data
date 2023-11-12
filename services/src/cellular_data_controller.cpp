@@ -202,6 +202,7 @@ void CellularDataController::RegisterEvents()
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_EMERGENCY_STATE_CLOSE, nullptr);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_NR_STATE_CHANGED, nullptr);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_NR_FREQUENCY_CHANGED, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_RIL_ADAPTER_HOST_DIED, nullptr);
     if (slotId_ == 0) {
         sptr<NetworkSearchCallback> networkSearchCallback = std::make_unique<NetworkSearchCallback>().release();
         if (networkSearchCallback != nullptr) {
@@ -235,6 +236,7 @@ void CellularDataController::UnRegisterEvents()
     coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_EMERGENCY_STATE_CLOSE);
     coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_NR_STATE_CHANGED);
     coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_NR_FREQUENCY_CHANGED);
+    coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_RIL_ADAPTER_HOST_DIED);
     TELEPHONY_LOGI("Slot%{public}d: UnRegisterEvents end", slotId_);
 }
 
