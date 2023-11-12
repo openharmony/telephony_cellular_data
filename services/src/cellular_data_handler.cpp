@@ -1676,5 +1676,20 @@ void CellularDataHandler::RegisterDataSettingObserver()
     Uri dataIncallUri(CELLULAR_DATA_SETTING_DATA_INCALL_URI);
     settingHelper->RegisterSettingsObserver(dataIncallUri, incallObserver_);
 }
+
+void CellularDataHandler::OnRilAdapterHostDied(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (connectionManager_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: connectionManager is null", slotId_);
+        return;
+    }
+    TELEPHONY_LOGI("Slot%{public}d: receive OnRilAdapterHostDied event", slotId_);
+    std::vector<std::shared_ptr<CellularDataStateMachine>> stateMachines =
+        connectionManager_->GetAllConnectionMachine();
+    for (const std::shared_ptr<CellularDataStateMachine> &cellularDataStateMachine : stateMachines) {
+        InnerEvent::Pointer eventCode = InnerEvent::Get(CellularDataEventCode::MSG_SM_RIL_ADAPTER_HOST_DIED);
+        cellularDataStateMachine->SendEvent(eventCode);
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

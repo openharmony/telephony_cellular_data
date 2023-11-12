@@ -65,6 +65,12 @@ bool CellularDataNetAgent::RegisterNetSupplier(const int32_t slotId)
             netSupplier.supplierId = supplierId;
             int32_t regCallback = netManager.RegisterNetSupplierCallback(netSupplier.supplierId, callBack_);
             TELEPHONY_LOGI("Register supplier callback(%{public}d)", regCallback);
+            sptr<NetSupplierInfo> netSupplierInfo = new (std::nothrow) NetSupplierInfo();
+            if (netSupplierInfo != nullptr) {
+                netSupplierInfo->isAvailable_ = false;
+                int32_t updateResult = netManager.UpdateNetSupplierInfo(netSupplier.supplierId, netSupplierInfo);
+                TELEPHONY_LOGI("Update network result:%{public}d", updateResult);
+            }
         }
     }
     return flag;

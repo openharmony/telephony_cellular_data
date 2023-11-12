@@ -122,6 +122,7 @@ private:
     void SetInitApnWithNullDp();
     void GetSinglePdpEnabledFromOpCfg();
     bool IsSingleConnectionEnabled(int32_t radioTech);
+    void OnRilAdapterHostDied(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     sptr<ApnManager> apnManager_;
@@ -178,6 +179,7 @@ private:
         { CellularDataEventCode::MSG_DB_SETTING_ROAMING_CHANGED, &CellularDataHandler::HandleDBSettingRoamingChanged },
         { CellularDataEventCode::MSG_DB_SETTING_INCALL_CHANGED, &CellularDataHandler::HandleDBSettingIncallChanged },
         { CellularDataEventCode::MSG_INCALL_DATA_COMPLETE, &CellularDataHandler::IncallDataComplete },
+        { RadioEvent::RADIO_RIL_ADAPTER_HOST_DIED, &CellularDataHandler::OnRilAdapterHostDied },
     };
 };
 } // namespace Telephony
