@@ -15,6 +15,8 @@
 
 #include "default.h"
 
+#include "cellular_data_utils.h"
+#include "core_manager_inner.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -104,6 +106,11 @@ bool Default::ProcessDataConnectionDrsOrRatChanged(const AppExecFwk::InnerEvent:
     int32_t supplierId = netAgent.GetSupplierId(stateMachine->GetSlotId(), stateMachine->GetCapability());
     netAgent.UpdateNetSupplierInfo(supplierId, stateMachine->netSupplierInfo_);
     netAgent.UpdateNetLinkInfo(supplierId, stateMachine->netLinkInfo_);
+    int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+    CoreManagerInner::GetInstance().GetPsRadioTech(stateMachine->GetSlotId(), radioTech);
+    netAgent.RegisterSlotType(supplierId, radioTech);
+    TELEPHONY_LOGI("RegisterSlotType: supplierId[%{public}d] slotId[%{public}d] radioTech[%{public}d]",
+        supplierId, stateMachine->GetSlotId(), radioTech);
     return false;
 }
 

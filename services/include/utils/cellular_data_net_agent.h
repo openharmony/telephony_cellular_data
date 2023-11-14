@@ -16,9 +16,9 @@
 #ifndef CELLULAR_DATA_NET_AGENT_H
 #define CELLULAR_DATA_NET_AGENT_H
 
+#include <singleton.h>
 #include <memory>
 #include <string>
-#include <singleton.h>
 #include <utility>
 
 #include "i_net_conn_service.h"
@@ -94,6 +94,8 @@ public:
      * @return unique identify
      */
     int32_t GetSupplierId(const int32_t slotId, uint64_t capability) const;
+
+    void RegisterSlotType(int32_t supplierId, int32_t radioTech);
 
 private:
     std::vector<NetSupplier> netSuppliers_;
