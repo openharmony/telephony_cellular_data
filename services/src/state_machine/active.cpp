@@ -125,12 +125,10 @@ bool Active::ProcessLostConnection(const AppExecFwk::InnerEvent::Pointer &event)
 
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     if (TELEPHONY_EXT_WRAPPER.dataEndSelfCure_) {
-    int32_t cause = static_cast<int32_t>(stateMachine->cause_);
-    int32_t slotId = stateMachine->GetSlotId();
-    TELEPHONY_LOGI("cause%{private}d:, slotId%{public}d", cause, slotId);
+        int32_t cause = static_cast<int32_t>(stateMachine->cause_);
+        int32_t slotId = stateMachine->GetSlotId();
+        TELEPHONY_LOGI("cause%{private}d:, slotId%{public}d", cause, slotId);
         TELEPHONY_EXT_WRAPPER.dataEndSelfCure_(cause, slotId);
-    } else {
-        TELEPHONY_LOGI("dataEndSelfCure_ is null");
     }
 #endif
     stateMachine->TransitionTo(stateMachine->inActiveState_);
