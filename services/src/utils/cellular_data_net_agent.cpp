@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 
+#include "cellular_data_utils.h"
 #include "core_manager_inner.h"
 #include "net_conn_client.h"
 #include "net_policy_client.h"
@@ -71,6 +72,11 @@ bool CellularDataNetAgent::RegisterNetSupplier(const int32_t slotId)
                 int32_t updateResult = netManager.UpdateNetSupplierInfo(netSupplier.supplierId, netSupplierInfo);
                 TELEPHONY_LOGI("Update network result:%{public}d", updateResult);
             }
+            int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+            CoreManagerInner::GetInstance().GetPsRadioTech(slotId, radioTech);
+            RegisterSlotType(supplierId, radioTech);
+            TELEPHONY_LOGI("RegisterSlotType: supplierId[%{public}d] slotId[%{public}d] radioTech[%{public}d]",
+                supplierId, slotId, radioTech);
         }
     }
     return flag;
@@ -161,6 +167,12 @@ int32_t CellularDataNetAgent::GetSupplierId(const int32_t slotId, uint64_t capab
         }
     }
     return 0;
+}
+
+void CellularDataNetAgent::RegisterSlotType(int32_t supplierId, int32_t radioTech)
+{
+    int32_t result = NetConnClient::GetInstance().RegisterSlotType(supplierId, radioTech);
+    TELEPHONY_LOGI("result:%{public}d", result);
 }
 } // namespace Telephony
 } // namespace OHOS
