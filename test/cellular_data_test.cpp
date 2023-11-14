@@ -39,6 +39,7 @@
 #include "permission_state_full.h"
 #include "refbase.h"
 #include "stdio.h"
+#include "telephony_ext_wrapper.h"
 #include "telephony_types.h"
 #include "token_setproc.h"
 #include "unistd.h"
@@ -828,6 +829,23 @@ HWTEST_F(CellularDataTest, CellularDataDump_Test_01, Function | MediumTest | Lev
     EXPECT_GE(DelayedSingleton<CellularDataService>::GetInstance()->Dump(-1, args), 0);
     EXPECT_GE(DelayedSingleton<CellularDataService>::GetInstance()->Dump(0, emptyArgs), 0);
     EXPECT_GE(DelayedSingleton<CellularDataService>::GetInstance()->Dump(0, args), 0);
+}
+
+/**
+ * @tc.number   Telephony_Cellulardata_InitTelephonyExtService_0100
+ * @tc.name     Init Telephony Ext Service.
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, Telephony_Cellulardata_InitTelephonyExtService_0100, Function | MediumTest | Level1)
+{
+    AccessToken token;
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+    if (TELEPHONY_EXT_WRAPPER.telephonyExtWrapperHandle_ == nullptr) {
+        TELEPHONY_LOGI("telephonyExtWrapperHandle_ null");
+    } else {
+        TELEPHONY_LOGI("telephonyExtWrapperHandle_ not null");
+        EXPECT_EQ(TELEPHONY_EXT_WRAPPER.dataEndSelfCure_ != nullptr, true);
+    }
 }
 
 #else  // TEL_TEST_UNSUPPORT

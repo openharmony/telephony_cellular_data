@@ -280,6 +280,7 @@ void CellularDataStateMachine::UpdateNetworkInfo(const SetupDataCallResultInfo &
     netSupplierInfo_->isRoaming_ = roamingState;
     netSupplierInfo_->linkUpBandwidthKbps_ = upBandwidth_;
     netSupplierInfo_->linkDownBandwidthKbps_ = downBandwidth_;
+    cause_ = dataCallInfo.reason;
     CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
     int32_t supplierId = netAgent.GetSupplierId(slotId, capability_);
     netAgent.UpdateNetSupplierInfo(supplierId, netSupplierInfo_);

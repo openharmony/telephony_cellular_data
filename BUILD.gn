@@ -11,9 +11,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build/ohos.gni")
+import("../core_service/telephony_core_service.gni")
 
+TELEPHONY_EXT_WRAPPER_ROOT = "services/telephony_ext_wrapper"
 ohos_shared_library("tel_cellular_data") {
   sources = [
+    "$TELEPHONY_EXT_WRAPPER_ROOT/src/telephony_ext_wrapper.cpp",
     "services/src/apn_manager/apn_holder.cpp",
     "services/src/apn_manager/apn_item.cpp",
     "services/src/apn_manager/apn_manager.cpp",
@@ -52,6 +55,7 @@ ohos_shared_library("tel_cellular_data") {
   ]
 
   include_dirs = [
+    "$TELEPHONY_EXT_WRAPPER_ROOT/include",
     "services/include",
     "services/include/common",
     "services/include/state_machine",
@@ -91,6 +95,8 @@ ohos_shared_library("tel_cellular_data") {
     "TELEPHONY_LOG_TAG = \"CellularData\"",
     "LOG_DOMAIN = 0xD001F03",
   ]
+
+  defines += telephony_extra_defines
 
   part_name = "cellular_data"
   subsystem_name = "telephony"

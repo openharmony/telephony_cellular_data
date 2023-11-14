@@ -20,6 +20,7 @@
 #include "core_manager_inner.h"
 #include "inactive.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -121,6 +122,15 @@ bool Active::ProcessLostConnection(const AppExecFwk::InnerEvent::Pointer &event)
     Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
     inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
     inActive->SetReason(DisConnectionReason::REASON_RETRY_CONNECTION);
+
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (TELEPHONY_EXT_WRAPPER.dataEndSelfCure_) {
+        int32_t cause = static_cast<int32_t>(stateMachine->cause_);
+        int32_t slotId = stateMachine->GetSlotId();
+        TELEPHONY_LOGI("cause%{private}d:, slotId%{public}d", cause, slotId);
+        TELEPHONY_EXT_WRAPPER.dataEndSelfCure_(cause, slotId);
+    }
+#endif
     stateMachine->TransitionTo(stateMachine->inActiveState_);
     return PROCESSED;
 }
