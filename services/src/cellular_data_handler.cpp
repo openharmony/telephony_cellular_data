@@ -136,7 +136,7 @@ int32_t CellularDataHandler::SetCellularDataEnable(bool userDataOn)
     bool dataEnabled = false;
     int32_t result = dataSwitchSettings_->QueryUserDataStatus(dataEnabled);
     if (result != TELEPHONY_ERR_SUCCESS) {
-        return result;
+        TELEPHONY_LOGE("Slot%{public}d: Query result: %{public}d", slotId_, result);
     }
     if (dataEnabled == userDataOn) {
         TELEPHONY_LOGI("Slot%{public}d: The status of the cellular data switch has not changed", slotId_);
@@ -1566,25 +1566,6 @@ void CellularDataHandler::HandleDBSettingEnableChanged(const AppExecFwk::InnerEv
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     if (dataEnabled && defSlotId == slotId_) {
         EstablishAllApnsIfConnectable();
-        if (apnManager_ == nullptr) {
-            TELEPHONY_LOGE("Slot%{public}d: apnManager is null.", slotId_);
-            return;
-        }
-        const int32_t id = DATA_CONTEXT_ROLE_DEFAULT_ID;
-        sptr<ApnHolder> apnHolder = apnManager_->FindApnHolderById(id);
-        if (apnHolder == nullptr) {
-            TELEPHONY_LOGE("Slot%{public}d: apnHolder is null.", slotId_);
-            return;
-        }
-        if (!apnHolder->IsDataCallEnabled()) {
-            NetRequest netRequest;
-            netRequest.ident =
-                std::string(IDENT_PREFIX) + std::to_string(CoreManagerInner::GetInstance().GetSimId(slotId_));
-            netRequest.capability = NetCap::NET_CAPABILITY_INTERNET;
-            apnHolder->RequestCellularData(netRequest);
-            AttemptEstablishDataConnection(apnHolder);
-            return;
-        }
     } else {
         ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
     }
