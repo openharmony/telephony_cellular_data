@@ -52,6 +52,7 @@ public:
     uint64_t GetCapability() const;
     int32_t GetCid() const;
     int32_t GetSlotId() const;
+    std::string GetIpType();
     sptr<ApnItem> GetApnItem() const;
     void Init();
     void UpdateNetworkInfo(const SetupDataCallResultInfo &dataCallInfo);
@@ -79,8 +80,8 @@ private:
     void ResolveIp(std::vector<AddressInfo> &ipInfoArray);
     void ResolveDns(std::vector<AddressInfo> &dnsInfoArray);
     void ResolveRoute(std::vector<AddressInfo> &routeInfoArray, const std::string &name);
-    void GetMtuSizeFromOpCfg(int32_t &mtuSize, int32_t slotId, std::vector<AddressInfo> ipInfoArray);
-    std::string GetIpType(std::string &result, std::vector<AddressInfo> ipInfoArray);
+    void GetMtuSizeFromOpCfg(int32_t &mtuSize, int32_t slotId);
+    std::string GetIpType(std::vector<AddressInfo> ipInfoArray);
     bool HasMatchedIpTypeAddrs(uint8_t ipType, uint8_t ipInfoArraySize, std::vector<AddressInfo> ipInfoArray);
 
 private:
@@ -100,6 +101,7 @@ private:
     std::string tcpBuffer_;
     int32_t connectId_ = 0;
     int32_t cause_ = 0;
+    std::string ipType_ = "";
 };
 } // namespace Telephony
 } // namespace OHOS

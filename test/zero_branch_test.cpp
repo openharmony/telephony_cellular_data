@@ -876,7 +876,7 @@ HWTEST_F(BranchTest, GetIpType_Test_01, Function | MediumTest | Level3)
     std::string result = "";
     std::string address = "";
     std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(address);
-    cellularMachine->GetIpType(result, ipInfoArray);
+    result = cellularMachine->GetIpType(ipInfoArray);
     ASSERT_TRUE(result == "");
 }
 } // namespace Telephony
