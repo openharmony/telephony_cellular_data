@@ -15,9 +15,7 @@
 
 #include "cellular_data_state_machine.h"
 
-#include "core_manager_inner.h"
-#include "radio_event.h"
-#include "telephony_log_wrapper.h"
+#include <cinttypes>
 #include <string_ex.h>
 
 #include "activating.h"
@@ -25,9 +23,12 @@
 #include "apn_manager.h"
 #include "cellular_data_hisysevent.h"
 #include "cellular_data_utils.h"
+#include "core_manager_inner.h"
 #include "default.h"
 #include "disconnecting.h"
 #include "inactive.h"
+#include "radio_event.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 using namespace NetManagerStandard;
