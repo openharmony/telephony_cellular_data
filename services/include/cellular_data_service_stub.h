@@ -48,6 +48,8 @@ private:
     int32_t OnGetCellularDataFlowType(MessageParcel &data, MessageParcel &reply);
     int32_t OnHasInternetCapability(MessageParcel &data, MessageParcel &reply);
     int32_t OnClearCellularDataConnections(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetDataConnApnAttr(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetDataConnIpType(MessageParcel &data, MessageParcel &reply);
 
 private:
     using Fun = int32_t (CellularDataServiceStub::*)(MessageParcel &data, MessageParcel &reply);
@@ -78,6 +80,10 @@ private:
             &CellularDataServiceStub::OnRegisterSimAccountCallback },
         { (uint32_t)CellularDataInterfaceCode::UN_REG_SIM_ACCOUNT_CALLBACK,
             &CellularDataServiceStub::OnUnregisterSimAccountCallback },
+        { (uint32_t)CellularDataInterfaceCode::GET_DATA_CONN_APN_ATTR,
+            &CellularDataServiceStub::OnGetDataConnApnAttr },
+        { (uint32_t)CellularDataInterfaceCode::GET_DATA_CONN_IP_TYPE,
+            &CellularDataServiceStub::OnGetDataConnIpType },
     };
 };
 } // namespace Telephony

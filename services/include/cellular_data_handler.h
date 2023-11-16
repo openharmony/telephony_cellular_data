@@ -64,6 +64,8 @@ public:
     bool IsRestrictedMode() const;
     DisConnectionReason GetDisConnectionReason();
     bool HasInternetCapability(const int32_t cid) const;
+    void GetDataConnApnAttr(ApnItem::Attribute &apnAttr) const;
+    std::string GetDataConnIpType() const;
 
 private:
     std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect();

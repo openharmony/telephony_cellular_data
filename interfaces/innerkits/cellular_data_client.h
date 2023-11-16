@@ -23,6 +23,7 @@
 #include "data_sim_account_call_back.h"
 #include "i_cellular_data_manager.h"
 #include "sim_account_callback.h"
+#include "apn_item.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -138,6 +139,24 @@ public:
      * @return Returns the default settings data card, -1 error code
      */
     int32_t UpdateDefaultCellularDataSlotId();
+
+    /**
+     * @brief Get data connections apn attribute.
+     *
+     * @param slotId Card slot identification.
+     * @param apnType Indicates the APN attribute used by the data connection.
+     * @return 1 set success, 0 set fail
+     */
+    int32_t GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr);
+
+    /**
+     * @brief Get data connections ip type.
+     *
+     * @param slotId Card slot identification.
+     * @param ipType Indicates IP array after data connection.
+     * @return 1 set success, 0 set fail
+     */
+    int32_t GetDataConnIpType(int32_t slotId, std::string &ipType);
 
 private:
     class CellularDataDeathRecipient : public IRemoteObject::DeathRecipient {

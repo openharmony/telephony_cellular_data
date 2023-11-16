@@ -63,7 +63,7 @@ sptr<ApnItem> ApnItem::MakeDefaultApn(const std::string &apnType)
         TELEPHONY_LOGE("apn is null");
         return nullptr;
     }
-    attribute attr = {"", "46002", DATA_PROFILE_DEFAULT, "IPV4V6", "IPV4V6",
+    Attribute attr = {"", "46002", DATA_PROFILE_DEFAULT, "IPV4V6", "IPV4V6",
         DEFAULT_AUTH_TYPE, "cmnet", "CMNET", "", "", false, "", "", ""};
     apnItem->apnTypes_ = CellularDataUtils::Split(apnType, ",");
     apnItem->attr_ = attr;
@@ -90,6 +90,7 @@ sptr<ApnItem> ApnItem::MakeApn(const PdpProfile &apnData)
         return nullptr;
     }
     apnItem->apnTypes_ = CellularDataUtils::Split(apnData.apnTypes, ",");
+    TELEPHONY_LOGI("MakeApn apnTypes_ = %{public}s", apnData.apnTypes.c_str());
     apnItem->attr_.profileId_ = apnData.profileId;
     apnItem->attr_.authType_ = apnData.authType;
     apnItem->attr_.isRoamingApn_ = apnData.isRoamingApn;

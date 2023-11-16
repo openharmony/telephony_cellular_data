@@ -476,5 +476,25 @@ int32_t CellularDataService::UnregisterSimAccountCallback()
 {
     return CoreManagerInner::GetInstance().UnregisterSimAccountCallback(GetBundleName());
 }
+
+int32_t CellularDataService::GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr)
+{
+    if (!CheckParamValid(slotId)) {
+        TELEPHONY_LOGE("cellularDataControllers_[%{public}d] is null", slotId);
+        return CELLULAR_DATA_INVALID_PARAM;;
+    }
+    cellularDataControllers_[slotId]->GetDataConnApnAttr(apnAttr);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t CellularDataService::GetDataConnIpType(int32_t slotId, std::string &ipType)
+{
+    if (!CheckParamValid(slotId)) {
+        TELEPHONY_LOGE("cellularDataControllers_[%{public}d] is null", slotId);
+        return CELLULAR_DATA_INVALID_PARAM;;
+    }
+    ipType = cellularDataControllers_[slotId]->GetDataConnIpType();
+    return TELEPHONY_ERR_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS

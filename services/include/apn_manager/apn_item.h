@@ -43,7 +43,7 @@ private:
 
 public:
     constexpr static int ALL_APN_ITEM_CHAR_LENGTH = 256;
-    struct attribute {
+    struct Attribute {
         char types_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
         char numeric_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
         int32_t profileId_ = 0;

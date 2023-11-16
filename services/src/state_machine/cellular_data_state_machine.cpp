@@ -197,11 +197,12 @@ bool CellularDataStateMachine::HasMatchedIpTypeAddrs(uint8_t ipType, uint8_t ipI
     return false;
 }
 
-std::string CellularDataStateMachine::GetIpType(std::string &result, std::vector<AddressInfo> ipInfoArray)
+std::string CellularDataStateMachine::GetIpType(std::vector<AddressInfo> ipInfoArray)
 {
     uint8_t ipInfoArraySize = ipInfoArray.size();
     uint8_t ipv4Type = INetAddr::IpType::IPV4;
     uint8_t ipv6Type = INetAddr::IpType::IPV6;
+    std::string result;
     if (HasMatchedIpTypeAddrs(ipv4Type, ipInfoArraySize, ipInfoArray) &&
         HasMatchedIpTypeAddrs(ipv6Type, ipInfoArraySize, ipInfoArray)) {
         result = "IPV4V6";
@@ -215,11 +216,14 @@ std::string CellularDataStateMachine::GetIpType(std::string &result, std::vector
     return result;
 }
 
-void CellularDataStateMachine::GetMtuSizeFromOpCfg(int32_t &mtuSize, int32_t slotId,
-    std::vector<AddressInfo> ipInfoArray)
+std::string CellularDataStateMachine::GetIpType()
+{
+    return ipType_;
+}
+
+void CellularDataStateMachine::GetMtuSizeFromOpCfg(int32_t &mtuSize, int32_t slotId)
 {
     std::string mtuString = "";
-    std::string result = "";
     int32_t mtuValue = INVALID_MTU_VALUE;
     OperatorConfig configsForMtuSize;
     CoreManagerInner::GetInstance().GetOperatorConfigs(slotId, configsForMtuSize);
@@ -239,7 +243,7 @@ void CellularDataStateMachine::GetMtuSizeFromOpCfg(int32_t &mtuSize, int32_t slo
             TELEPHONY_LOGE("mtu values is invalid");
             break;
         }
-        if (!ipTypeString.empty() && ipTypeString == GetIpType(result, ipInfoArray)) {
+        if (!ipTypeString.empty() && ipTypeString == ipType_) {
             mtuSize = mtuValue;
         }
     }
@@ -270,7 +274,8 @@ void CellularDataStateMachine::UpdateNetworkInfo(const SetupDataCallResultInfo &
         roamingState = true;
     }
     int32_t mtuSize = (dataCallInfo.maxTransferUnit == 0) ? DEFAULT_MTU : dataCallInfo.maxTransferUnit;
-    GetMtuSizeFromOpCfg(mtuSize, slotId, ipInfoArray);
+    ipType_ = GetIpType(ipInfoArray);
+    GetMtuSizeFromOpCfg(mtuSize, slotId);
     netLinkInfo_->ifaceName_ = dataCallInfo.netPortName;
     netLinkInfo_->mtu_ = mtuSize;
     netLinkInfo_->tcpBufferSizes_ = tcpBuffer_;

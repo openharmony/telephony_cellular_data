@@ -25,6 +25,7 @@
 #include "cellular_data_constant.h"
 #include "cellular_data_controller.h"
 #include "traffic_management.h"
+#include "apn_item.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -73,7 +74,8 @@ public:
     int64_t GetSpendTime();
     int32_t RegisterSimAccountCallback(const sptr<SimAccountCallback> &callback) override;
     int32_t UnregisterSimAccountCallback() override;
-
+    int32_t GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr) override;
+    int32_t GetDataConnIpType(int32_t slotId, std::string &ipType) override;
 private:
     bool Init();
     void InitModule();

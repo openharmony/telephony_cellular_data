@@ -382,5 +382,23 @@ void CellularDataController::SystemAbilityStatusChangeListener::OnRemoveSystemAb
             break;
     }
 }
+
+void CellularDataController::GetDataConnApnAttr(ApnItem::Attribute &apnAttr) const
+{
+    if (cellularDataHandler_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: GetDataConnApnAttr cellularDataHandler_ is null", slotId_);
+        return;
+    }
+    cellularDataHandler_->GetDataConnApnAttr(apnAttr);
+}
+
+std::string CellularDataController::GetDataConnIpType() const
+{
+    if (cellularDataHandler_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: GetDataConnIpType cellularDataHandler_ is null", slotId_);
+        return "";
+    }
+    return cellularDataHandler_->GetDataConnIpType();
+}
 } // namespace Telephony
 } // namespace OHOS

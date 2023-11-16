@@ -129,6 +129,10 @@ public:
 
     int32_t UnregisterSimAccountCallback();
 
+    int32_t GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr);
+
+    int32_t GetDataConnIpType(int32_t slotId, std::string &ipType);
+
 private:
     static inline BrokerDelegator<CellularDataServiceProxy> delegator_;
 };
