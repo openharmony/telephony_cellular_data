@@ -337,26 +337,25 @@ int32_t CellularDataServiceProxy::UnregisterSimAccountCallback()
 
 int32_t CellularDataServiceProxy::GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr)
 {
-    MessageParcel data;
-    MessageParcel reply;
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
     MessageOption option;
-    data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor());
-
-    data.WriteInt32(slotId);
+    dataParcel.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor());
+    dataParcel.WriteInt32(slotId);
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::GET_DATA_CONN_APN_ATTR,
-        data, reply, option);
+        dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Strategy switch fail! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t result = reply.ReadInt32();
+    int32_t result = replyParcel.ReadInt32();
     TELEPHONY_LOGI("end: result=%{public}d", result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        auto apnAttrPtr = data.ReadRawData(sizeof(ApnItem::Attribute));
+        auto apnAttrPtr = dataParcel.ReadRawData(sizeof(ApnItem::Attribute));
         if (apnAttrPtr == nullptr) {
             return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
         }
@@ -370,25 +369,25 @@ int32_t CellularDataServiceProxy::GetDataConnApnAttr(int32_t slotId, ApnItem::At
 
 int32_t CellularDataServiceProxy::GetDataConnIpType(int32_t slotId, std::string &ipType)
 {
-    MessageParcel data;
-    MessageParcel reply;
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
     MessageOption option;
-    data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor());
-    data.WriteInt32(slotId);
+    dataParcel.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor());
+    dataParcel.WriteInt32(slotId);
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::GET_DATA_CONN_IP_TYPE, data,
-        reply, option);
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::GET_DATA_CONN_IP_TYPE, dataParcel,
+        replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Strategy switch fail! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t result = reply.ReadInt32();
+    int32_t result = replyParcel.ReadInt32();
     TELEPHONY_LOGI("end: result=%{public}d", result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        ipType = reply.ReadString();
+        ipType = replyParcel.ReadString();
     }
 
     return TELEPHONY_ERR_SUCCESS;
