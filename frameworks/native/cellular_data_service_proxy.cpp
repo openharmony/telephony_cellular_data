@@ -20,6 +20,7 @@
 #include "message_parcel.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "securec.h"
 
 namespace OHOS {
 namespace Telephony {
