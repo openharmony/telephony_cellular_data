@@ -341,6 +341,7 @@ int32_t CellularDataServiceProxy::GetDataConnApnAttr(int32_t slotId, ApnItem::At
     MessageParcel reply;
     MessageOption option;
     data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor());
+
     data.WriteInt32(slotId);
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("remote is null");
