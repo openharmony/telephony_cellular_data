@@ -43,6 +43,7 @@
 #include "telephony_types.h"
 #include "token_setproc.h"
 #include "unistd.h"
+#include "apn_item.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -153,6 +154,8 @@ public:
     static int32_t PingTest();
     static int32_t HasInternetCapability(int32_t slotId, int32_t cid);
     static int32_t ClearCellularDataConnections(int32_t slotId);
+    static int32_t GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr);
+    static int32_t GetDataConnIpType(int32_t slotId, std::string &ipType);
 };
 
 bool CellularDataTest::HasSimCard(const int32_t slotId)
@@ -297,6 +300,16 @@ int32_t CellularDataTest::HasInternetCapability(int32_t slotId, int32_t cid)
 int32_t CellularDataTest::ClearCellularDataConnections(int32_t slotId)
 {
     return CellularDataClient::GetInstance().ClearCellularDataConnections(slotId);
+}
+
+int32_t CellularDataTest::GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr)
+{
+    return CellularDataClient::GetInstance().GetDataConnApnAttr(slotId, apnAttr);
+}
+
+int32_t CellularDataTest::GetDataConnIpType(int32_t slotId, std::string &ipType)
+{
+    return CellularDataClient::GetInstance().GetDataConnIpType(slotId, ipType);
 }
 #ifndef TEL_TEST_UNSUPPORT
 /**
@@ -846,6 +859,70 @@ HWTEST_F(CellularDataTest, Telephony_Cellulardata_InitTelephonyExtService_0100, 
         TELEPHONY_LOGI("telephonyExtWrapperHandle_ not null");
         EXPECT_EQ(TELEPHONY_EXT_WRAPPER.dataEndSelfCure_ != nullptr, true);
     }
+}
+
+/**
+ * @tc.number   GetDataConnApnAttr_Test_01
+ * @tc.name     Test the GetDataConnApnAttr function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, GetDataConnApnAttr_Test_01, TestSize.Level3)
+{
+    if (!HasSimCard(SIM_SLOT_ID_1)) {
+        return;
+    }
+    AccessToken token;
+    ApnItem::Attribute apnAttr;
+    int32_t result = CellularDataTest::GetDataConnApnAttr(SIM_SLOT_ID_1, apnAttr);
+    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
+}
+
+/**
+ * @tc.number   GetDataConnApnAttr_Test_02
+ * @tc.name     Test the GetDataConnApnAttr function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, GetDataConnApnAttr_Test_02, TestSize.Level3)
+{
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+    AccessToken token;
+    ApnItem::Attribute apnAttr;
+    int32_t result = CellularDataTest::GetDataConnApnAttr(DEFAULT_SIM_SLOT_ID, apnAttr);
+    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
+}
+
+/**
+ * @tc.number   GetDataConnIpType_Test_01
+ * @tc.name     Test the GetDataConnIpType function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, GetDataConnIpType_Test_01, TestSize.Level3)
+{
+    if (!HasSimCard(SIM_SLOT_ID_1)) {
+        return;
+    }
+    AccessToken token;
+    std::string ipType;
+    int32_t result = CellularDataTest::GetDataConnIpType(SIM_SLOT_ID_1, ipType);
+    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
+}
+
+/**
+ * @tc.number   GetDataConnIpType_Test_02
+ * @tc.name     Test the GetDataConnIpType function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, GetDataConnIpType_Test_02, TestSize.Level3)
+{
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+    AccessToken token;
+    std::string ipType;
+    int32_t result = CellularDataTest::GetDataConnIpType(DEFAULT_SIM_SLOT_ID, ipType);
+    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
 }
 
 #else  // TEL_TEST_UNSUPPORT
