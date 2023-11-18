@@ -221,6 +221,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | 
     cellularDataHandler.MsgRequestNetwork(event);
     cellularDataHandler.HandleSettingSwitchChanged(event);
     cellularDataHandler.HandleDBSettingIncallChanged(event);
+    cellularDataHandler.HandleDefaultDataSubscriptionChanged();
     cellularDataHandler.IncallDataComplete(event);
     cellularDataHandler.HandleCallChanged(0);
     cellularDataHandler.HandleImsCallChanged(0);

@@ -956,6 +956,9 @@ void CellularDataHandler::HandleDefaultDataSubscriptionChanged()
     } else {
         SetDataPermitted(slotId_, false);
     }
+    if (dataSwitchSettings_ != nullptr) {
+        dataSwitchSettings_->LoadSwitchValue();
+    }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     if (defSlotId == slotId_) {
@@ -970,6 +973,9 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
     if (event == nullptr) {
         return;
     }
+    if (dataSwitchSettings_ != nullptr) {
+        dataSwitchSettings_->LoadSwitchValue();
+    }
     std::u16string iccId;
     uint32_t eventId = event->GetInnerEventId();
     switch (eventId) {
@@ -983,7 +989,6 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
                     UnRegisterDataSettingObserver();
                 }
             } else {
-                dataSwitchSettings_->LoadSwitchValue();
                 CoreManagerInner::GetInstance().GetSimIccId(slotId_, iccId);
                 if (lastIccId_ != u"" && lastIccId_ == iccId) {
                     EstablishAllApnsIfConnectable();
