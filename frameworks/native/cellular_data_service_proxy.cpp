@@ -340,13 +340,20 @@ int32_t CellularDataServiceProxy::GetDataConnApnAttr(int32_t slotId, ApnItem::At
     MessageParcel dataParcel;
     MessageParcel replyParcel;
     MessageOption option;
-    dataParcel.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor());
-    dataParcel.WriteInt32(slotId);
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("remote is null");
+    if (!data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write interface token failed!");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("write userId failed!");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    sptr<OHOS::IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("remote is nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::GET_DATA_CONN_APN_ATTR,
+    int32_t error = remote->SendRequest((uint32_t)CellularDataInterfaceCode::GET_DATA_CONN_APN_ATTR,
         dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Strategy switch fail! errCode:%{public}d", error);
@@ -357,10 +364,10 @@ int32_t CellularDataServiceProxy::GetDataConnApnAttr(int32_t slotId, ApnItem::At
     if (result == TELEPHONY_ERR_SUCCESS) {
         auto apnAttrPtr = dataParcel.ReadRawData(sizeof(ApnItem::Attribute));
         if (apnAttrPtr == nullptr) {
-            return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+            return TELEPHONY_ERR_READ_DATA_FAIL;
         }
         if (memcpy_s(&apnAttr, sizeof(ApnItem::Attribute), apnAttrPtr, sizeof(ApnItem::Attribute)) != EOK) {
-            return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+            return TELEPHONY_ERR_MEMCPY_FAIL;
         }
     }
 
@@ -372,13 +379,20 @@ int32_t CellularDataServiceProxy::GetDataConnIpType(int32_t slotId, std::string 
     MessageParcel dataParcel;
     MessageParcel replyParcel;
     MessageOption option;
-    dataParcel.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor());
-    dataParcel.WriteInt32(slotId);
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("remote is null");
+    if (!data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write interface token failed!");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("write userId failed!");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    sptr<OHOS::IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("remote is nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::GET_DATA_CONN_IP_TYPE, dataParcel,
+    int32_t error = remote->SendRequest((uint32_t)CellularDataInterfaceCode::GET_DATA_CONN_IP_TYPE, dataParcel,
         replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Strategy switch fail! errCode:%{public}d", error);
