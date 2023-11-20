@@ -340,11 +340,11 @@ int32_t CellularDataServiceProxy::GetDataConnApnAttr(int32_t slotId, ApnItem::At
     MessageParcel dataParcel;
     MessageParcel replyParcel;
     MessageOption option;
-    if (!data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor())) {
+    if (!dataParcel.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write interface token failed!");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    if (!data.WriteInt32(slotId)) {
+    if (!dataParcel.WriteInt32(slotId)) {
         TELEPHONY_LOGE("write userId failed!");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
@@ -379,11 +379,11 @@ int32_t CellularDataServiceProxy::GetDataConnIpType(int32_t slotId, std::string 
     MessageParcel dataParcel;
     MessageParcel replyParcel;
     MessageOption option;
-    if (!data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor())) {
+    if (!dataParcel.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write interface token failed!");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    if (!data.WriteInt32(slotId)) {
+    if (!dataParcel.WriteInt32(slotId)) {
         TELEPHONY_LOGE("write userId failed!");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
