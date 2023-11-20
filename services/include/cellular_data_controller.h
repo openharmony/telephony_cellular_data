@@ -47,6 +47,8 @@ public:
     DisConnectionReason GetDisConnectionReason();
     bool HasInternetCapability(const int32_t cid) const;
     bool ClearAllConnections(DisConnectionReason reason) const;
+    void GetDataConnApnAttr(ApnItem::Attribute &apnAttr) const;
+    std::string GetDataConnIpType() const;
 
 private:
     void RegisterEvents();

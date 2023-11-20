@@ -284,5 +284,25 @@ int32_t CellularDataClient::ClearCellularDataConnections(int32_t slotId)
     }
     return proxy->ClearCellularDataConnections(slotId);
 }
+
+int32_t CellularDataClient::GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetDataConnApnAttr(slotId, apnAttr);
+}
+
+int32_t CellularDataClient::GetDataConnIpType(int32_t slotId, std::string &ipType)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetDataConnIpType(slotId, ipType);
+}
 } // namespace Telephony
 } // namespace OHOS

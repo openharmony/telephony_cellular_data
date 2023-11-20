@@ -13,9 +13,15 @@
 import("//build/ohos.gni")
 
 SUBSYSTEM_DIR = "../.."
+TELEPHONY_DATA_DIR = "../../../telephony_data"
 config("cellular_data_util_config") {
   # header file path
-  include_dirs = [ "$SUBSYSTEM_DIR/interfaces/innerkits" ]
+  include_dirs = [
+    "$SUBSYSTEM_DIR/interfaces/innerkits",
+    "$SUBSYSTEM_DIR/services/include/apn_manager",
+    "$SUBSYSTEM_DIR/services/include/common",
+    "$TELEPHONY_DATA_DIR/interfaces/innerkits/include",
+  ]
 
   cflags = []
   if (is_double_framework) {
@@ -52,6 +58,7 @@ ohos_shared_library("tel_cellular_data_api") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
+    "telephony_data:tel_telephony_data",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CellularDataApi\"",

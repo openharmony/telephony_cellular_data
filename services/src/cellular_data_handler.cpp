@@ -618,7 +618,6 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
         apnHolder->InitialApnRetryCount();
         int32_t networkType = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
         CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, networkType);
-        StateNotification::GetInstance().UpdateCellularDataConnectState(slotId_, PROFILE_STATE_CONNECTED, networkType);
         std::shared_ptr<CellularDataStateMachine> stateMachine = apnHolder->GetCellularDataStateMachine();
         if (stateMachine != nullptr) {
             stateMachine->UpdateNetworkInfo(*resultInfo);
@@ -638,6 +637,7 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
             InnerEvent::Pointer incallEvent = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_CONNECTED);
             incallDataStateMachine_->SendEvent(incallEvent);
         }
+        StateNotification::GetInstance().UpdateCellularDataConnectState(slotId_, PROFILE_STATE_CONNECTED, networkType);
     }
 }
 
@@ -1671,6 +1671,48 @@ void CellularDataHandler::OnRilAdapterHostDied(const AppExecFwk::InnerEvent::Poi
         InnerEvent::Pointer eventCode = InnerEvent::Get(CellularDataEventCode::MSG_SM_RIL_ADAPTER_HOST_DIED);
         cellularDataStateMachine->SendEvent(eventCode);
     }
+}
+
+void CellularDataHandler::GetDataConnApnAttr(ApnItem::Attribute &apnAttr) const
+{
+    if (apnManager_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: GetDataConnApnAttr:apnManager is null", slotId_);
+        return;
+    }
+    for (const sptr<ApnHolder> &apnHolder : apnManager_->GetAllApnHolder()) {
+        if (apnHolder == nullptr) {
+            TELEPHONY_LOGE("Slot%{public}d: apnHolder is null", slotId_);
+            continue;
+        }
+        if (apnHolder->IsDataCallEnabled()) {
+            sptr<ApnItem> ipnItem = apnHolder->GetCurrentApn();
+            apnAttr = ipnItem->attr_;
+            return;
+        }
+    }
+}
+
+std::string CellularDataHandler::GetDataConnIpType() const
+{
+    if (apnManager_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: GetDataConnApnAttr:apnManager is null", slotId_);
+        return "";
+    }
+    for (const sptr<ApnHolder> &apnHolder : apnManager_->GetAllApnHolder()) {
+        if (apnHolder == nullptr) {
+            TELEPHONY_LOGE("Slot%{public}d: apnHolder is null", slotId_);
+            continue;
+        }
+        if (apnHolder->IsDataCallEnabled()) {
+            auto stateMachine = apnHolder->GetCellularDataStateMachine();
+            if (stateMachine == nullptr) {
+                TELEPHONY_LOGE("Slot%{public}d: stateMachine is null", slotId_);
+                continue;
+            }
+            return stateMachine->GetIpType();
+        }
+    }
+    return "";
 }
 } // namespace Telephony
 } // namespace OHOS

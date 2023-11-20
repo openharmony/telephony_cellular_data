@@ -225,5 +225,37 @@ int32_t CellularDataServiceStub::OnUnregisterSimAccountCallback(MessageParcel &d
     reply.WriteInt32(result);
     return result;
 }
+
+int32_t CellularDataServiceStub::OnGetDataConnApnAttr(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    ApnItem::Attribute apnAttr;
+    int32_t result = GetDataConnApnAttr(slotId, apnAttr);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("write int32 reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteRawData(&apnAttr, sizeof(ApnItem::Attribute))) {
+        TELEPHONY_LOGE("write apnAttr reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CellularDataServiceStub::OnGetDataConnIpType(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::string ipType;
+    int32_t result = GetDataConnIpType(slotId, ipType);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("write int32 reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteString(ipType)) {
+        TELEPHONY_LOGE("write int32 reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS
