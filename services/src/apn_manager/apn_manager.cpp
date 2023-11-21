@@ -33,6 +33,14 @@ const std::map<std::string, int32_t> ApnManager::apnIdApnNameMap_ {
     {DATA_CONTEXT_ROLE_IA,        DATA_CONTEXT_ROLE_IA_ID},
     {DATA_CONTEXT_ROLE_EMERGENCY, DATA_CONTEXT_ROLE_EMERGENCY_ID}
 };
+constexpr const char *CT_MCC_MNC = "46003";
+constexpr const char *GC_ICCID = "8985231";
+constexpr const char *GC_MCC_MNC = "45431";
+constexpr const char *GC_SPN = "CTExcel";
+constexpr const char *MO_ICCID_1 = "8985302";
+constexpr const char *MO_ICCID_2 = "8985307";
+constexpr const char *MO_UNICOM_MCCMNC = "46001";
+constexpr int32_t ICCID_LEN_MINIMUM = 7;
 
 ApnManager::ApnManager() = default;
 
@@ -182,6 +190,7 @@ int32_t ApnManager::CreateAllApnItemByDatabase(int32_t slotId)
     std::u16string operatorNumeric;
     CoreManagerInner::GetInstance().GetSimOperatorNumeric(slotId, operatorNumeric);
     std::string numeric = Str16ToStr8(operatorNumeric);
+    GetCTOperator(slotId, numeric);
     if (numeric.empty()) {
         TELEPHONY_LOGE("numeric is empty!!!");
         return count;
@@ -204,6 +213,34 @@ int32_t ApnManager::CreateAllApnItemByDatabase(int32_t slotId)
         return count;
     }
     return MakeSpecificApnItem(apnVec);
+}
+
+void ApnManager::GetCTOperator(int32_t slotId, std::string &numeric)
+{
+    bool isCTSimCard = false;
+    CoreManagerInner::GetInstance().IsCTSimCard(slotId, isCTSimCard);
+    if (isCTSimCard) {
+        numeric = CT_MCC_MNC;
+    }
+    if (!numeric.compare(CT_MCC_MNC)) {
+        std::u16string tempIccId;
+        CoreManagerInner::GetInstance().GetSimIccId(slotId, tempIccId);
+        std::string iccId = Str16ToStr8(tempIccId);
+        std::u16string tempSpn;
+        CoreManagerInner::GetInstance().GetSimSpn(slotId, tempSpn);
+        std::string spn = Str16ToStr8(tempSpn);
+        if (!iccId.compare(0, ICCID_LEN_MINIMUM, GC_ICCID) || !spn.compare(GC_SPN)) {
+            numeric = GC_MCC_MNC;
+        } else if (!iccId.compare(0, ICCID_LEN_MINIMUM, MO_ICCID_1) ||
+            !iccId.compare(0, ICCID_LEN_MINIMUM, MO_ICCID_2)) {
+            std::u16string tempPlmn;
+            CoreManagerInner::GetInstance().GetSimOperatorNumeric(slotId, tempPlmn);
+            std::string plmn = Str16ToStr8(tempPlmn);
+            if (!plmn.empty() && !plmn.compare(MO_UNICOM_MCCMNC)) {
+                numeric = MO_UNICOM_MCCMNC;
+            }
+        }
+    }
 }
 
 int32_t ApnManager::CreateMvnoApnItems(int32_t slotId, const std::string &mcc, const std::string &mnc)
