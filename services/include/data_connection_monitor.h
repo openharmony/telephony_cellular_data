@@ -105,6 +105,8 @@ public:
      */
     void SetPreferredNetworkPara(const AppExecFwk::InnerEvent::Pointer &event);
 
+    RecoveryState GetDataRecoveryState();
+
 private:
     std::unique_ptr<TrafficManagement> trafficManager_;
     std::unique_ptr<TrafficManagement> stallDetectionTrafficManager_;

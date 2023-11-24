@@ -19,6 +19,7 @@
 #include "iremote_broker.h"
 #include "sim_account_callback.h"
 #include "apn_item.h"
+#include "cellular_data_constant.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -116,6 +117,8 @@ public:
 
     virtual int32_t ClearCellularDataConnections(int32_t slotId) = 0;
 
+    virtual int32_t ClearAllConnections(int32_t slotId, DisConnectionReason reason) = 0;
+
     virtual int32_t RegisterSimAccountCallback(const sptr<SimAccountCallback> &callback) = 0;
 
     virtual int32_t UnregisterSimAccountCallback() = 0;
@@ -123,6 +126,10 @@ public:
     virtual int32_t GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr) = 0;
 
     virtual int32_t GetDataConnIpType(int32_t slotId, std::string &ipType) = 0;
+
+    virtual int32_t GetApnState(int32_t slotId, const std::string &apnType) = 0;
+
+    virtual int32_t GetDataRecoveryState() = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.telephony.ICellularDataManager");
