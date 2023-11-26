@@ -296,6 +296,14 @@ void DataConnectionManager::UpdateCallState(int32_t state)
     }
 }
 
+int32_t DataConnectionManager::GetDataRecoveryState()
+{
+    if (connectionMonitor_ != nullptr) {
+        return static_cast<int32_t>(connectionMonitor_->GetDataRecoveryState());
+    }
+    return -1;
+}
+
 int32_t DataConnectionManager::GetSlotId() const
 {
     return slotId_;

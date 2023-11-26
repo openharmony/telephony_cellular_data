@@ -1719,5 +1719,14 @@ std::string CellularDataHandler::GetDataConnIpType() const
     }
     return "";
 }
+
+int32_t CellularDataHandler::GetDataRecoveryState()
+{
+    if (connectionManager_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: connectionManager is null", slotId_);
+        return -1;
+    }
+    return connectionManager_->GetDataRecoveryState();
+}
 } // namespace Telephony
 } // namespace OHOS

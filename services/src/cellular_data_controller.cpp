@@ -400,5 +400,14 @@ std::string CellularDataController::GetDataConnIpType() const
     }
     return cellularDataHandler_->GetDataConnIpType();
 }
+
+int32_t CellularDataController::GetDataRecoveryState()
+{
+    if (cellularDataHandler_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler is null", slotId_);
+        return false;
+    }
+    return cellularDataHandler_->GetDataRecoveryState();
+}
 } // namespace Telephony
 } // namespace OHOS

@@ -44,6 +44,7 @@
 #include "token_setproc.h"
 #include "unistd.h"
 #include "apn_item.h"
+#include "cellular_data_constant.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -154,6 +155,9 @@ public:
     static int32_t PingTest();
     static int32_t HasInternetCapability(int32_t slotId, int32_t cid);
     static int32_t ClearCellularDataConnections(int32_t slotId);
+    static int32_t ClearAllConnections(int32_t slotId, DisConnectionReason reason);
+    static int32_t GetApnState(int32_t slotId, const std::string &apnTyp);
+    static int32_t GetDataRecoveryState();
     static int32_t GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr);
     static int32_t GetDataConnIpType(int32_t slotId, std::string &ipType);
 };
@@ -300,6 +304,21 @@ int32_t CellularDataTest::HasInternetCapability(int32_t slotId, int32_t cid)
 int32_t CellularDataTest::ClearCellularDataConnections(int32_t slotId)
 {
     return CellularDataClient::GetInstance().ClearCellularDataConnections(slotId);
+}
+
+int32_t CellularDataTest::ClearAllConnections(int32_t slotId, DisConnectionReason reason)
+{
+    return CellularDataClient::GetInstance().ClearAllConnections(slotId, reason);
+}
+
+int32_t CellularDataTest::GetApnState(int32_t slotId, const std::string &apnTyp)
+{
+    return CellularDataClient::GetInstance().GetApnState(slotId, apnTyp);
+}
+
+int32_t CellularDataTest::GetDataRecoveryState()
+{
+    return CellularDataClient::GetInstance().GetDataRecoveryState();
 }
 
 int32_t CellularDataTest::GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr)
@@ -828,6 +847,52 @@ HWTEST_F(CellularDataTest, ClearCellularDataConnections_Test_02, TestSize.Level3
     AccessToken token;
     int32_t result = CellularDataTest::ClearCellularDataConnections(DEFAULT_SIM_SLOT_ID);
     ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
+}
+
+/**
+ * @tc.number   ClearAllConnections
+ * @tc.name     Test the ClearAllConnections function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, ClearAllConnections_Test_01, TestSize.Level3)
+{
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+    AccessToken token;
+    int32_t result = CellularDataTest::ClearAllConnections(
+        DEFAULT_SIM_SLOT_ID, DisConnectionReason::REASON_RETRY_CONNECTION);
+    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
+}
+
+/**
+ * @tc.number   GetApnState
+ * @tc.name     Test the GetApnState function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, GetApnState_Test_01, TestSize.Level3)
+{
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+    AccessToken token;
+    int32_t result = CellularDataTest::GetApnState(DEFAULT_SIM_SLOT_ID, "default");
+    ASSERT_TRUE(result >= 0 && result <= 5);
+}
+
+/**
+ * @tc.number   GetDataRecoveryState
+ * @tc.name     Test the GetDataRecoveryState function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, GetDataRecoveryState_Test_01, TestSize.Level3)
+{
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+    AccessToken token;
+    int32_t result = CellularDataTest::GetDataRecoveryState();
+    ASSERT_TRUE(result >= 0 && result <= 3);
 }
 
 /**

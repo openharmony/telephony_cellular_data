@@ -24,6 +24,7 @@
 #include "iremote_broker.h"
 #include "iremote_proxy.h"
 #include "refbase.h"
+#include "cellular_data_constant.h"
 
 namespace OHOS {
 class IRemoteObject;
@@ -59,6 +60,17 @@ public:
      *         14 Indicates that a cellular data link is suspended
      */
     int32_t GetCellularDataState();
+
+    /**
+     * Get the apn status based on slotId and apnType
+     *
+     * @param slotId card slot identification
+     * @param apnType apn type, eg."default"
+     * @return apnstate
+     */
+    int32_t GetApnState(int32_t slotId, const std::string &apnType);
+
+    int32_t GetDataRecoveryState();
 
     /**
      * Whether roaming is allowed
@@ -124,6 +136,8 @@ public:
     int32_t HasInternetCapability(int32_t slotId, int32_t cid);
 
     int32_t ClearCellularDataConnections(int32_t slotId);
+
+    int32_t ClearAllConnections(int32_t slotId, DisConnectionReason reason);
 
     int32_t RegisterSimAccountCallback(const sptr<SimAccountCallback> &callback);
 
