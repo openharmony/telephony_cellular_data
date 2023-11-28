@@ -211,6 +211,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | 
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
     sptr<ApnHolder> apnHolder;
+    ApnItem::Attribute apnAttr;
     cellularDataHandler.RadioPsConnectionAttached(event);
     cellularDataHandler.RadioPsConnectionDetached(event);
     cellularDataHandler.RoamingStateOn(event);
@@ -240,6 +241,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | 
     cellularDataHandler.OnRilAdapterHostDied(event);
     cellularDataHandler.RegisterDataSettingObserver();
     cellularDataHandler.UnRegisterDataSettingObserver();
+    cellularDataHandler.GetDataConnApnAttr(apnAttr);
     ASSERT_FALSE(cellularDataHandler.HasAnyHigherPriorityConnection(apnHolder));
 }
 

@@ -1690,12 +1690,17 @@ void CellularDataHandler::GetDataConnApnAttr(ApnItem::Attribute &apnAttr) const
             continue;
         }
         if (apnHolder->IsDataCallEnabled()) {
-            sptr<ApnItem> ipnItem = apnHolder->GetCurrentApn();
-            apnAttr = ipnItem->attr_;
+            sptr<ApnItem> apnItem = apnHolder->GetCurrentApn();
+            if (apnItem == nullptr) {
+                TELEPHONY_LOGE("Slot%{public}d: apnItem is null", slotId_);
+                continue;
+            }
+            apnAttr = apnItem->attr_;
             return;
         }
     }
 }
+
 
 std::string CellularDataHandler::GetDataConnIpType() const
 {
