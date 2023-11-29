@@ -31,13 +31,10 @@ DataConnectionManager::DataConnectionManager(const std::shared_ptr<AppExecFwk::E
     : StateMachine(runner), slotId_(slotId)
 {
     connectionMonitor_ = std::make_shared<DataConnectionMonitor>(runner, slotId);
-    ccmDefaultState_ = std::make_unique<CcmDefaultState>(*this, "CcmDefaultState").release();
-    if (connectionMonitor_ == nullptr || ccmDefaultState_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: connectionMonitor_ or ccmDefaultState is null", slotId_);
+    if (connectionMonitor_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: connectionMonitor_ is null", slotId_);
         return;
     }
-    StateMachine::SetOriginalState(ccmDefaultState_);
-    StateMachine::Start();
 }
 
 DataConnectionManager::~DataConnectionManager()
@@ -45,6 +42,17 @@ DataConnectionManager::~DataConnectionManager()
     if (connectionMonitor_ != nullptr) {
         connectionMonitor_->RemoveAllEvents();
     }
+}
+
+void DataConnectionManager::Init()
+{
+    ccmDefaultState_ = std::make_unique<CcmDefaultState>(*this, "CcmDefaultState").release();
+    if (ccmDefaultState_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: ccmDefaultState_ is null", slotId_);
+        return;
+    }
+    StateMachine::SetOriginalState(ccmDefaultState_);
+    StateMachine::Start();
 }
 
 void DataConnectionManager::AddConnectionStateMachine(const std::shared_ptr<CellularDataStateMachine> &stateMachine)

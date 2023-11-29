@@ -61,6 +61,7 @@ void CellularDataHandler::Init()
         TELEPHONY_LOGE("Slot%{public}d: apnManager_ or dataSwitchSettings_ or connectionManager_ is null", slotId_);
         return;
     }
+    connectionManager_->Init();
     apnManager_->InitApnHolders();
     apnManager_->CreateAllApnItem();
     dataSwitchSettings_->LoadSwitchValue();
