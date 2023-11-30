@@ -1003,7 +1003,9 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
             TELEPHONY_LOGI("Slot%{public}d: sim records loaded state is :%{public}d", slotId_, simState);
             if (simState == SimState::SIM_STATE_READY && iccId != u"") {
                 if (iccId != lastIccId_) {
-                    dataSwitchSettings_->SetPolicyDataOn(true);
+                    if (dataSwitchSettings_ != nullptr) {
+                        dataSwitchSettings_->SetPolicyDataOn(true);
+                    }
                     lastIccId_ = iccId;
                 } else if (lastIccId_ == iccId) {
                     TELEPHONY_LOGI("Slot%{public}d: sim state changed, but iccId not changed.", slotId_);
