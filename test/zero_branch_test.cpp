@@ -239,6 +239,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | 
     cellularDataHandler.HandleDBSettingRoamingChanged(event);
     cellularDataHandler.SetDataPermittedResponse(event);
     cellularDataHandler.OnRilAdapterHostDied(event);
+    cellularDataHandler.OnCleanAllDataConnectionsDone(event);
     cellularDataHandler.RegisterDataSettingObserver();
     cellularDataHandler.UnRegisterDataSettingObserver();
     cellularDataHandler.GetDataConnApnAttr(apnAttr);

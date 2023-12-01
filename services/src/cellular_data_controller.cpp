@@ -211,6 +211,7 @@ void CellularDataController::RegisterEvents()
             TELEPHONY_LOGE("Slot%{public}d: networkSearchCallback is null", slotId_);
         }
     }
+    coreInner.CleanAllConnections(slotId_, RadioEvent::RADIO_CLEAN_ALL_DATA_CONNECTIONS, cellularDataHandler_);
 }
 
 void CellularDataController::UnRegisterEvents()
