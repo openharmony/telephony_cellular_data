@@ -133,6 +133,8 @@ public:
 
     int32_t GetDataConnIpType(int32_t slotId, std::string &ipType);
 
+    int32_t IsNeedDoRecovery(int32_t slotId, bool needDoRecovery);
+
 private:
     static inline BrokerDelegator<CellularDataServiceProxy> delegator_;
 };

@@ -50,6 +50,7 @@ private:
     int32_t OnClearCellularDataConnections(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetDataConnApnAttr(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetDataConnIpType(MessageParcel &data, MessageParcel &reply);
+    int32_t OnIsNeedDoRecovery(MessageParcel &data, MessageParcel &reply);
 
 private:
     using Fun = int32_t (CellularDataServiceStub::*)(MessageParcel &data, MessageParcel &reply);
@@ -84,6 +85,8 @@ private:
             &CellularDataServiceStub::OnGetDataConnApnAttr },
         { (uint32_t)CellularDataInterfaceCode::GET_DATA_CONN_IP_TYPE,
             &CellularDataServiceStub::OnGetDataConnIpType },
+        { (uint32_t)CellularDataInterfaceCode::IS_NEED_DO_RECOVERY,
+            &CellularDataServiceStub::OnIsNeedDoRecovery },
     };
 };
 } // namespace Telephony

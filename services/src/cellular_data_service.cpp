@@ -29,6 +29,7 @@
 #include "telephony_common_utils.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
+#include "booster_net_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -103,6 +104,9 @@ bool CellularDataService::Init()
 {
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+#endif
+#ifdef OHOS_BUILD_ENABLE_BOOSTER_NET
+    BOOSTER_NET_WRAPPER.InitBoosterNetWrapper();
 #endif
     eventLoop_ = RunnerPool::GetInstance().GetCommonRunner();
     if (eventLoop_ == nullptr) {
@@ -494,6 +498,16 @@ int32_t CellularDataService::GetDataConnIpType(int32_t slotId, std::string &ipTy
         return CELLULAR_DATA_INVALID_PARAM;
     }
     ipType = cellularDataControllers_[slotId]->GetDataConnIpType();
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t CellularDataService::IsNeedDoRecovery(int32_t slotId, bool needDoRecovery)
+{
+    if (!CheckParamValid(slotId)) {
+        TELEPHONY_LOGE("cellularDataControllers_[%{public}d] is null", slotId);
+        return CELLULAR_DATA_INVALID_PARAM;
+    }
+    cellularDataControllers_[slotId]->IsNeedDoRecovery(needDoRecovery);
     return TELEPHONY_ERR_SUCCESS;
 }
 } // namespace Telephony

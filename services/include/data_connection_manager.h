@@ -53,6 +53,7 @@ public:
     LinkBandwidthInfo GetBandwidthsByRadioTech(const int32_t radioTech);
     std::string GetTcpBufferByRadioTech(const int32_t radioTech);
     void UpdateCallState(int32_t state);
+    void IsNeedDoRecovery(bool needDoRecovery) const;
 
 private:
     void UpdateBandWidthsUseLte();

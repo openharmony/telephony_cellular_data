@@ -188,7 +188,8 @@ static constexpr const char *CELLULAR_DATA_SETTING_DATA_ROAMING_URI =
 static constexpr const char *CELLULAR_DATA_SETTING_DATA_INCALL_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=cellular_data_incall_enable";
 static const int32_t DEFAULT_NET_STATISTICS_PERIOD = 3 * 1000;
-static const int32_t DEFAULT_STALL_DETECTION_PERIOD = 10 * 1000;
+static const int32_t DATA_STALL_ALARM_NON_AGGRESSIVE_DELAY_IN_MS_DEFAULT = 1000 * 60 * 10;
+static const int32_t DATA_STALL_ALARM_AGGRESSIVE_DELAY_IN_MS_DEFAULT = 1000 * 10;
 static const int32_t ESTABLISH_DATA_CONNECTION_DELAY = 1 * 1000;
 static const int32_t CONNECTION_DISCONNECTION_TIMEOUT = 120 * 1000;
 static const int32_t RECOVERY_TRIGGER_PACKET = 10;

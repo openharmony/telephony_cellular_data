@@ -66,6 +66,7 @@ public:
     bool HasInternetCapability(const int32_t cid) const;
     void GetDataConnApnAttr(ApnItem::Attribute &apnAttr) const;
     std::string GetDataConnIpType() const;
+    void IsNeedDoRecovery(bool needDoRecovery) const;
 
 private:
     std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect();
