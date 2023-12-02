@@ -1002,17 +1002,19 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
             SimState simState = SimState::SIM_STATE_UNKNOWN;
             CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
             TELEPHONY_LOGI("Slot%{public}d: sim records loaded state is :%{public}d", slotId_, simState);
-            if (simState == SimState::SIM_STATE_READY && iccId != u"") {
-                if (iccId != lastIccId_) {
-                    if (dataSwitchSettings_ != nullptr) {
-                        dataSwitchSettings_->SetPolicyDataOn(true);
-                    }
-                    lastIccId_ = iccId;
-                } else if (lastIccId_ == iccId) {
-                    TELEPHONY_LOGI("Slot%{public}d: sim state changed, but iccId not changed.", slotId_);
-                    // the sim card status has changed to ready, so try to connect
-                    EstablishAllApnsIfConnectable();
+            if (simState != SimState::SIM_STATE_READY || iccId == u"") {
+                TELEPHONY_LOGI("sim state error or iccId nullptr");
+                break;
+            }
+            if (iccId != lastIccId_) {
+                if (dataSwitchSettings_ != nullptr) {
+                    dataSwitchSettings_->SetPolicyDataOn(true);
                 }
+                lastIccId_ = iccId;
+            } else if (lastIccId_ == iccId) {
+                TELEPHONY_LOGI("Slot%{public}d: sim state changed, but iccId not changed.", slotId_);
+                // the sim card status has changed to ready, so try to connect
+                EstablishAllApnsIfConnectable();
             }
             break;
         }
