@@ -127,16 +127,12 @@ public:
 
     virtual int32_t GetDataConnIpType(int32_t slotId, std::string &ipType) = 0;
 
-<<<<<<< HEAD
-    virtual int32_t IsNeedDoRecovery(int32_t slotId, bool needDoRecovery) = 0;
-
-||||||| bfbaef1
-=======
     virtual int32_t GetApnState(int32_t slotId, const std::string &apnType) = 0;
 
     virtual int32_t GetDataRecoveryState() = 0;
 
->>>>>>> c59dd65b4d4f0ea87de3cb65c4db5d9c35be0aa5
+    virtual int32_t IsNeedDoRecovery(int32_t slotId, bool needDoRecovery) = 0;
+
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.telephony.ICellularDataManager");
 };
