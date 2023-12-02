@@ -324,20 +324,6 @@ int32_t CellularDataClient::GetDataConnIpType(int32_t slotId, std::string &ipTyp
     }
     return proxy->GetDataConnIpType(slotId, ipType);
 }
-<<<<<<< HEAD
-
-int32_t CellularDataClient::IsNeedDoRecovery(int32_t slotId, bool needDoRecovery)
-{
-    sptr<ICellularDataManager> proxy = GetProxy();
-    if (proxy == nullptr) {
-        TELEPHONY_LOGE("proxy is null");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    return proxy->IsNeedDoRecovery(slotId, needDoRecovery);
-}
-
-||||||| bfbaef1
-=======
 
 int32_t CellularDataClient::ClearAllConnections(int32_t slotId, DisConnectionReason reason)
 {
@@ -358,6 +344,15 @@ int32_t CellularDataClient::HandleApnChanged(int32_t slotId)
     }
     return proxy->HandleApnChanged(slotId);
 }
->>>>>>> c59dd65b4d4f0ea87de3cb65c4db5d9c35be0aa5
+
+int32_t CellularDataClient::IsNeedDoRecovery(int32_t slotId, bool needDoRecovery)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->IsNeedDoRecovery(slotId, needDoRecovery);
+}
 } // namespace Telephony
 } // namespace OHOS
