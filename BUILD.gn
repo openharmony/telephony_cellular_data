@@ -23,8 +23,8 @@ ohos_shared_library("tel_cellular_data") {
   }
   branch_protector_ret = "pac_ret"
   sources = [
-    "$TELEPHONY_EXT_WRAPPER_ROOT/src/telephony_ext_wrapper.cpp",
     "$BOOSTER_NET_WRAPPER_ROOT/src/booster_net_wrapper.cpp",
+    "$TELEPHONY_EXT_WRAPPER_ROOT/src/telephony_ext_wrapper.cpp",
     "services/src/apn_manager/apn_holder.cpp",
     "services/src/apn_manager/apn_item.cpp",
     "services/src/apn_manager/apn_manager.cpp",
