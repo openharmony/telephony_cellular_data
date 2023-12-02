@@ -245,6 +245,11 @@ void DataConnectionMonitor::SetPreferredNetworkPara(const AppExecFwk::InnerEvent
         RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, networkType, shared_from_this());
 }
 
+RecoveryState DataConnectionMonitor::GetDataRecoveryState()
+{
+    return dataRecoveryState_;
+}
+
 void DataConnectionMonitor::UpdateDataFlowType()
 {
     if (trafficManager_ == nullptr) {

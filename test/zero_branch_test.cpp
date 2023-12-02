@@ -222,6 +222,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | 
     cellularDataHandler.MsgRequestNetwork(event);
     cellularDataHandler.HandleSettingSwitchChanged(event);
     cellularDataHandler.HandleDBSettingIncallChanged(event);
+    cellularDataHandler.HandleDefaultDataSubscriptionChanged();
     cellularDataHandler.IncallDataComplete(event);
     cellularDataHandler.HandleCallChanged(0);
     cellularDataHandler.HandleImsCallChanged(0);
@@ -267,6 +268,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_003, Function | MediumTest | 
     cellularDataHandler.connectionManager_ = std::make_unique<DataConnectionManager>(runner, INVALID_SLOTID).release();
     cellularDataHandler.ClearAllConnections(reason);
     cellularDataHandler.EstablishAllApnsIfConnectable();
+    cellularDataHandler.ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
     ASSERT_FALSE(cellularDataHandler.CheckApnState(apnHolder));
     cellularDataHandler.AttemptEstablishDataConnection(apnHolder);
     cellularDataHandler.connectionManager_ = nullptr;
@@ -368,6 +370,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataConnectionManager_001, Function | Med
     DataConnectionManager con { runner, 0 };
     con.connectionMonitor_ = nullptr;
     con.ccmDefaultState_ = nullptr;
+    con.stateMachineEventHandler_ = nullptr;
     std::shared_ptr<CellularDataStateMachine> stateMachine = nullptr;
     con.RemoveConnectionStateMachine(stateMachine);
     ASSERT_TRUE(con.GetActiveConnectionByCid(0) == nullptr);
@@ -543,6 +546,12 @@ HWTEST_F(BranchTest, Telephony_ApnHolder_003, Function | MediumTest | Level3)
     newApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
     oldApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
     ASSERT_TRUE(apnHolder->IsSameApnItem(newApnItem, oldApnItem, true));
+    oldApnItem->CanDealWithType(DATA_CONTEXT_ROLE_DEFAULT);
+    oldApnItem->GetApnTypes();
+    PdpProfile apnBean;
+    oldApnItem->MakeApn(apnBean);
+    oldApnItem->MarkBadApn(false);
+    ASSERT_FALSE(oldApnItem->IsBadApn());
 }
 
 /**
@@ -733,6 +742,15 @@ HWTEST_F(BranchTest, ApnManager_Test_01, Function | MediumTest | Level3)
     auto apnManager = std::make_shared<ApnManager>();
     EXPECT_GE(apnManager->CreateAllApnItemByDatabase(0), 0);
     EXPECT_EQ(apnManager->CreateAllApnItemByDatabase(0), 0);
+    std::string operatorNumeric = "46003";
+    apnManager->GetCTOperator(0, operatorNumeric);
+    EXPECT_EQ(operatorNumeric, "46003");
+    apnManager->GetApnHolder(DATA_CONTEXT_ROLE_DEFAULT);
+    apnManager->FindApnNameByApnId(1);
+    std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
+    cellularMachine->Init();
+    ASSERT_TRUE(apnManager->IsDataConnectionNotUsed(cellularMachine));
     auto helper = CellularDataRdbHelper::GetInstance();
     std::shared_ptr<DataShare::DataShareResultSet> result = nullptr;
     std::vector<PdpProfile> apnVec;

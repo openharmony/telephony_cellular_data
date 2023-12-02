@@ -61,6 +61,7 @@ void CellularDataHandler::Init()
         TELEPHONY_LOGE("Slot%{public}d: apnManager_ or dataSwitchSettings_ or connectionManager_ is null", slotId_);
         return;
     }
+    connectionManager_->Init();
     apnManager_->InitApnHolders();
     apnManager_->CreateAllApnItem();
     dataSwitchSettings_->LoadSwitchValue();
@@ -956,6 +957,9 @@ void CellularDataHandler::HandleDefaultDataSubscriptionChanged()
     } else {
         SetDataPermitted(slotId_, false);
     }
+    if (dataSwitchSettings_ != nullptr) {
+        dataSwitchSettings_->LoadSwitchValue();
+    }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     if (defSlotId == slotId_) {
@@ -970,6 +974,9 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
     if (event == nullptr) {
         return;
     }
+    if (dataSwitchSettings_ != nullptr) {
+        dataSwitchSettings_->LoadSwitchValue();
+    }
     std::u16string iccId;
     uint32_t eventId = event->GetInnerEventId();
     switch (eventId) {
@@ -983,7 +990,6 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
                     UnRegisterDataSettingObserver();
                 }
             } else {
-                dataSwitchSettings_->LoadSwitchValue();
                 CoreManagerInner::GetInstance().GetSimIccId(slotId_, iccId);
                 if (lastIccId_ != u"" && lastIccId_ == iccId) {
                     EstablishAllApnsIfConnectable();
@@ -998,7 +1004,9 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
             TELEPHONY_LOGI("Slot%{public}d: sim records loaded state is :%{public}d", slotId_, simState);
             if (simState == SimState::SIM_STATE_READY && iccId != u"") {
                 if (iccId != lastIccId_) {
-                    dataSwitchSettings_->SetPolicyDataOn(true);
+                    if (dataSwitchSettings_ != nullptr) {
+                        dataSwitchSettings_->SetPolicyDataOn(true);
+                    }
                     lastIccId_ = iccId;
                 } else if (lastIccId_ == iccId) {
                     TELEPHONY_LOGI("Slot%{public}d: sim state changed, but iccId not changed.", slotId_);
@@ -1719,6 +1727,15 @@ std::string CellularDataHandler::GetDataConnIpType() const
     return "";
 }
 
+int32_t CellularDataHandler::GetDataRecoveryState()
+{
+    if (connectionManager_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: connectionManager is null", slotId_);
+        return -1;
+    }
+    return connectionManager_->GetDataRecoveryState();
+}
+
 void CellularDataHandler::IsNeedDoRecovery(bool needDoRecovery) const
 {
     if (connectionManager_ == nullptr) {
@@ -1727,5 +1744,6 @@ void CellularDataHandler::IsNeedDoRecovery(bool needDoRecovery) const
  
     connectionManager_->IsNeedDoRecovery(needDoRecovery);
 }
+
 } // namespace Telephony
 } // namespace OHOS

@@ -180,6 +180,28 @@ int32_t CellularDataService::GetCellularDataState()
     return dataState;
 }
 
+int32_t CellularDataService::GetApnState(int32_t slotId, const std::string &apnType)
+{
+    std::map<int32_t, std::shared_ptr<CellularDataController>>::const_iterator item =
+        cellularDataControllers_.find(slotId);
+    if (item == cellularDataControllers_.end() || item->second == nullptr) {
+        TELEPHONY_LOGE("cellularDataControllers_[%{public}d] is null", slotId);
+        return CELLULAR_DATA_INVALID_PARAM;
+    }
+    int32_t apnState = static_cast<int32_t>(item->second->GetCellularDataState(apnType));
+    return apnState;
+}
+
+int32_t CellularDataService::GetDataRecoveryState()
+{
+    int32_t state = 0;
+    for (auto controler : cellularDataControllers_) {
+        int32_t curState = controler.second->GetDataRecoveryState();
+        state = (curState > state) ? curState : state;
+    }
+    return state;
+}
+
 int32_t CellularDataService::IsCellularDataRoamingEnabled(const int32_t slotId, bool &dataRoamingEnabled)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {

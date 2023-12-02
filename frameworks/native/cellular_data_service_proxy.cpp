@@ -89,6 +89,48 @@ int32_t CellularDataServiceProxy::GetCellularDataState()
     return result;
 }
 
+int32_t CellularDataServiceProxy::GetApnState(int32_t slotId, const std::string &apnType)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor());
+    data.WriteInt32(slotId);
+    data.WriteString(apnType);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::GET_CELLULAR_DATA_APN_STATE, data,
+        reply, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function GetCellularDataState call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    return result;
+}
+
+int32_t CellularDataServiceProxy::GetDataRecoveryState()
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor());
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::GET_RECOVERY_STATE, data,
+        reply, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function GetDefaultCellularDataSlotId call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    return result;
+}
+
 int32_t CellularDataServiceProxy::IsCellularDataRoamingEnabled(int32_t slotId, bool &dataRoamingEnabled)
 {
     MessageParcel data;
@@ -272,6 +314,28 @@ int32_t CellularDataServiceProxy::ClearCellularDataConnections(int32_t slotId)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::CLEAR_ALL_CONNECTIONS, data,
+        reply, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Strategy switch fail! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    return result;
+}
+
+int32_t CellularDataServiceProxy::ClearAllConnections(int32_t slotId, DisConnectionReason reason)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor());
+    data.WriteInt32(slotId);
+    data.WriteInt32(static_cast<int32_t>(reason));
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::CLEAR_ALL_CONNECTIONS_USE_REASON, data,
         reply, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Strategy switch fail! errCode:%{public}d", error);

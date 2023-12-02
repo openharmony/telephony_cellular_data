@@ -105,6 +105,8 @@ public:
      */
     void SetPreferredNetworkPara(const AppExecFwk::InnerEvent::Pointer &event);
 
+    RecoveryState GetDataRecoveryState();
+
     void IsNeedDoRecovery(bool needDoRecovery);
 
 private:

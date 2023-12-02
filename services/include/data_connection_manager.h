@@ -30,6 +30,7 @@ class DataConnectionManager : public StateMachine, public RefBase {
 public:
     DataConnectionManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner, int32_t slotId);
     ~DataConnectionManager();
+    void Init();
     void AddConnectionStateMachine(const std::shared_ptr<CellularDataStateMachine> &stateMachine);
     void RemoveConnectionStateMachine(const std::shared_ptr<CellularDataStateMachine> &stateMachine);
     void AddActiveConnectionByCid(const std::shared_ptr<CellularDataStateMachine> &stateMachine);
@@ -53,6 +54,7 @@ public:
     LinkBandwidthInfo GetBandwidthsByRadioTech(const int32_t radioTech);
     std::string GetTcpBufferByRadioTech(const int32_t radioTech);
     void UpdateCallState(int32_t state);
+    int32_t GetDataRecoveryState();
     void IsNeedDoRecovery(bool needDoRecovery) const;
 
 private:

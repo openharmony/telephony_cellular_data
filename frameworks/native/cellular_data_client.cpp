@@ -235,6 +235,26 @@ int32_t CellularDataClient::GetCellularDataState()
     return proxy->GetCellularDataState();
 }
 
+int32_t CellularDataClient::GetApnState(int32_t slotId, const std::string &apnType)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetApnState(slotId, apnType);
+}
+
+int32_t CellularDataClient::GetDataRecoveryState()
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetDataRecoveryState();
+}
+
 int32_t CellularDataClient::IsCellularDataRoamingEnabled(int32_t slotId, bool &dataRoamingEnabled)
 {
     sptr<ICellularDataManager> proxy = GetProxy();
@@ -304,6 +324,7 @@ int32_t CellularDataClient::GetDataConnIpType(int32_t slotId, std::string &ipTyp
     }
     return proxy->GetDataConnIpType(slotId, ipType);
 }
+<<<<<<< HEAD
 
 int32_t CellularDataClient::IsNeedDoRecovery(int32_t slotId, bool needDoRecovery)
 {
@@ -315,5 +336,28 @@ int32_t CellularDataClient::IsNeedDoRecovery(int32_t slotId, bool needDoRecovery
     return proxy->IsNeedDoRecovery(slotId, needDoRecovery);
 }
 
+||||||| bfbaef1
+=======
+
+int32_t CellularDataClient::ClearAllConnections(int32_t slotId, DisConnectionReason reason)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->ClearAllConnections(slotId, reason);
+}
+
+int32_t CellularDataClient::HandleApnChanged(int32_t slotId)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->HandleApnChanged(slotId);
+}
+>>>>>>> c59dd65b4d4f0ea87de3cb65c4db5d9c35be0aa5
 } // namespace Telephony
 } // namespace OHOS

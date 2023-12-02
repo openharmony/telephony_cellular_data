@@ -49,6 +49,7 @@ public:
     bool ClearAllConnections(DisConnectionReason reason) const;
     void GetDataConnApnAttr(ApnItem::Attribute &apnAttr) const;
     std::string GetDataConnIpType() const;
+    int32_t GetDataRecoveryState();
     void IsNeedDoRecovery(bool needDoRecovery) const;
 
 private:

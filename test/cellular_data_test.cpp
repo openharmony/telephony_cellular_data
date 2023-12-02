@@ -34,6 +34,10 @@
 #include "i_cellular_data_manager.h"
 #include "iosfwd"
 #include "iostream"
+#include "net_conn_callback_stub.h"
+#include "net_conn_client.h"
+#include "net_handle.h"
+#include "net_specifier.h"
 #include "ostream"
 #include "permission_def.h"
 #include "permission_state_full.h"
@@ -44,20 +48,23 @@
 #include "token_setproc.h"
 #include "unistd.h"
 #include "apn_item.h"
+#include "cellular_data_constant.h"
 
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
 using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
+using namespace OHOS::NetManagerStandard;
 
 static const int32_t SLEEP_TIME = 1;
 static const int32_t SIM_SLOT_ID_1 = DEFAULT_SIM_SLOT_ID + 1;
 static const int32_t DATA_SLOT_ID_INVALID = DEFAULT_SIM_SLOT_ID + 10;
 static const int32_t PING_CHECK_SUCCESS = 0;
 static const int32_t PING_CHECK_FAIL = 1;
-static const int32_t MAX_TIMES = 35;
+static const int32_t MAX_TIMES = 60;
 static const int32_t CMD_BUF_SIZE = 10240;
+static const int32_t NET_REGISTER_TIMEOUT_MS = 20000;
 
 HapInfoParams testInfoParams = {
     .bundleName = "tel_cellular_data_test",
@@ -132,6 +139,55 @@ private:
     AccessTokenID accessID_ = 0;
 };
 
+class TestCallback : public NetManagerStandard::NetConnCallbackStub {
+    int32_t NetAvailable(sptr<NetManagerStandard::NetHandle> &netHandle) override
+    {
+        isCallback_ = true;
+        std::cout << "TestCallback::NetAvailable" << std::endl;
+        return 0;
+    }
+
+    int32_t NetCapabilitiesChange(sptr<NetManagerStandard::NetHandle> &netHandle,
+        const sptr<NetManagerStandard::NetAllCapabilities> &netAllCap) override
+    {
+        isCallback_ = true;
+        std::cout << "TestCallback::NetCapabilitiesChange" << std::endl;
+        return 0;
+    }
+
+    int32_t NetConnectionPropertiesChange(
+        sptr<NetManagerStandard::NetHandle> &netHandle, const sptr<NetManagerStandard::NetLinkInfo> &info) override
+    {
+        isCallback_ = true;
+        std::cout << "TestCallback::NetConnectionPropertiesChange" << std::endl;
+        return 0;
+    }
+
+    int32_t NetLost(sptr<NetManagerStandard::NetHandle> &netHandle) override
+    {
+        isCallback_ = true;
+        std::cout << "TestCallback::NetLost" << std::endl;
+        return 0;
+    }
+
+    int32_t NetUnavailable() override
+    {
+        isCallback_ = true;
+        std::cout << "TestCallback::NetUnavailable" << std::endl;
+        return 0;
+    }
+
+    int32_t NetBlockStatusChange(sptr<NetManagerStandard::NetHandle> &netHandle, bool blocked) override
+    {
+        isCallback_ = true;
+        std::cout << "TestCallback::NetBlockStatusChange" << std::endl;
+        return 0;
+    }
+
+public:
+    bool isCallback_ = false;
+};
+
 class CellularDataTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -154,6 +210,9 @@ public:
     static int32_t PingTest();
     static int32_t HasInternetCapability(int32_t slotId, int32_t cid);
     static int32_t ClearCellularDataConnections(int32_t slotId);
+    static int32_t ClearAllConnections(int32_t slotId, DisConnectionReason reason);
+    static int32_t GetApnState(int32_t slotId, const std::string &apnTyp);
+    static int32_t GetDataRecoveryState();
     static int32_t GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr);
     static int32_t GetDataConnIpType(int32_t slotId, std::string &ipType);
     static int32_t IsNeedDoRecovery(int32_t slotId, bool needDoRecovery);
@@ -166,7 +225,31 @@ bool CellularDataTest::HasSimCard(const int32_t slotId)
     return hasSimCard;
 }
 
-void CellularDataTest::TearDownTestCase() {}
+void CellularDataTest::TearDownTestCase()
+{
+    if (CoreServiceClient::GetInstance().GetProxy() == nullptr) {
+        std::cout << "connect coreService server failed!" << std::endl;
+        return;
+    }
+    AccessToken token;
+    int32_t slotId = DATA_SLOT_ID_INVALID;
+    if (HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        slotId = DEFAULT_SIM_SLOT_ID;
+    } else if (HasSimCard(SIM_SLOT_ID_1)) {
+        slotId = SIM_SLOT_ID_1;
+    }
+    if (slotId == DATA_SLOT_ID_INVALID) {
+        return;
+    }
+    // Set the default slot
+    int32_t result = CellularDataClient::GetInstance().SetDefaultCellularDataSlotId(slotId);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return;
+    }
+    int32_t enable = CellularDataClient::GetInstance().EnableCellularData(true);
+    ASSERT_TRUE(enable == TELEPHONY_ERR_SUCCESS);
+    WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_CONNECTED));
+}
 
 void CellularDataTest::SetUp() {}
 
@@ -178,7 +261,6 @@ void CellularDataTest::SetUpTestCase()
         std::cout << "connect coreService server failed!" << std::endl;
         return;
     }
-
     AccessToken token;
     int32_t slotId = DATA_SLOT_ID_INVALID;
     if (HasSimCard(DEFAULT_SIM_SLOT_ID)) {
@@ -301,6 +383,21 @@ int32_t CellularDataTest::HasInternetCapability(int32_t slotId, int32_t cid)
 int32_t CellularDataTest::ClearCellularDataConnections(int32_t slotId)
 {
     return CellularDataClient::GetInstance().ClearCellularDataConnections(slotId);
+}
+
+int32_t CellularDataTest::ClearAllConnections(int32_t slotId, DisConnectionReason reason)
+{
+    return CellularDataClient::GetInstance().ClearAllConnections(slotId, reason);
+}
+
+int32_t CellularDataTest::GetApnState(int32_t slotId, const std::string &apnTyp)
+{
+    return CellularDataClient::GetInstance().GetApnState(slotId, apnTyp);
+}
+
+int32_t CellularDataTest::GetDataRecoveryState()
+{
+    return CellularDataClient::GetInstance().GetDataRecoveryState();
 }
 
 int32_t CellularDataTest::GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr)
@@ -775,6 +872,102 @@ HWTEST_F(CellularDataTest, DataFlowType_Test_02, TestSize.Level3)
 }
 
 /**
+ * @tc.number   MmsApn_Test_01
+ * @tc.name     Test the Mms apn function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, MmsApn_Test_01, TestSize.Level3)
+{
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+    AccessToken token;
+    sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
+    if (callback == nullptr) {
+        std::cout << "callback is null" << std::endl;
+        return;
+    }
+    NetSpecifier netSpecifier;
+    NetAllCapabilities netAllCapabilities;
+    netAllCapabilities.netCaps_.insert(NetCap::NET_CAPABILITY_MMS);
+    netAllCapabilities.bearerTypes_.insert(NetBearType::BEARER_CELLULAR);
+    int32_t simId = CoreServiceClient::GetInstance().GetSimId(DEFAULT_SIM_SLOT_ID);
+    netSpecifier.ident_ = "simId" + std::to_string(simId);
+    netSpecifier.netCapabilities_ = netAllCapabilities;
+    sptr<NetSpecifier> specifier = new (std::nothrow) NetSpecifier(netSpecifier);
+    if (specifier == nullptr) {
+        std::cout << "specifier is null" << std::endl;
+        return;
+    }
+    int32_t result = NetConnClient::GetInstance().RegisterNetConnCallback(specifier, callback, NET_REGISTER_TIMEOUT_MS);
+    std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
+    auto mmsCallback = static_cast<TestCallback *>(callback.GetRefPtr());
+    if (mmsCallback == nullptr) {
+        std::cout << "mmsCallback is null" << std::endl;
+        return;
+    }
+    int32_t count = 0;
+    while (count < MAX_TIMES) {
+        sleep(SLEEP_TIME);
+        if (mmsCallback->isCallback_ == true) {
+            break;
+        }
+        count++;
+    }
+    ASSERT_TRUE(mmsCallback->isCallback_);
+    result = NetConnClient::GetInstance().UnregisterNetConnCallback(callback);
+    std::cout << "UnregisterNetConnCallback result [" << result << "]" << std::endl;
+}
+
+/**
+ * @tc.number   MmsApn_Test_02
+ * @tc.name     Test the Mms apn function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, MmsApn_Test_02, TestSize.Level3)
+{
+    if (!HasSimCard(SIM_SLOT_ID_1)) {
+        return;
+    }
+    AccessToken token;
+    sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
+    if (callback == nullptr) {
+        std::cout << "callback is null" << std::endl;
+        return;
+    }
+    NetSpecifier netSpecifier;
+    NetAllCapabilities netAllCapabilities;
+    netAllCapabilities.netCaps_.insert(NetCap::NET_CAPABILITY_MMS);
+    netAllCapabilities.bearerTypes_.insert(NetBearType::BEARER_CELLULAR);
+    int32_t simId = CoreServiceClient::GetInstance().GetSimId(SIM_SLOT_ID_1);
+    netSpecifier.ident_ = "simId" + std::to_string(simId);
+    netSpecifier.netCapabilities_ = netAllCapabilities;
+    sptr<NetSpecifier> specifier = new (std::nothrow) NetSpecifier(netSpecifier);
+    if (specifier == nullptr) {
+        std::cout << "specifier is null" << std::endl;
+        return;
+    }
+    int32_t result = NetConnClient::GetInstance().RegisterNetConnCallback(specifier, callback, NET_REGISTER_TIMEOUT_MS);
+    std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
+    auto mmsCallback = static_cast<TestCallback *>(callback.GetRefPtr());
+    if (mmsCallback == nullptr) {
+        std::cout << "mmsCallback is null" << std::endl;
+        return;
+    }
+    int32_t count = 0;
+    while (count < MAX_TIMES) {
+        sleep(SLEEP_TIME);
+        if (mmsCallback->isCallback_ == true) {
+            break;
+        }
+        count++;
+    }
+    ASSERT_TRUE(mmsCallback->isCallback_);
+    result = NetConnClient::GetInstance().UnregisterNetConnCallback(callback);
+    std::cout << "UnregisterNetConnCallback result [" << result << "]" << std::endl;
+}
+
+/**
  * @tc.number   HasInternetCapability_Test_01
  * @tc.name     Test the HasInternetCapability function
  * @tc.desc     Function test
@@ -834,6 +1027,52 @@ HWTEST_F(CellularDataTest, ClearCellularDataConnections_Test_02, TestSize.Level3
     AccessToken token;
     int32_t result = CellularDataTest::ClearCellularDataConnections(DEFAULT_SIM_SLOT_ID);
     ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
+}
+
+/**
+ * @tc.number   ClearAllConnections
+ * @tc.name     Test the ClearAllConnections function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, ClearAllConnections_Test_01, TestSize.Level3)
+{
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+    AccessToken token;
+    int32_t result = CellularDataTest::ClearAllConnections(
+        DEFAULT_SIM_SLOT_ID, DisConnectionReason::REASON_RETRY_CONNECTION);
+    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
+}
+
+/**
+ * @tc.number   GetApnState
+ * @tc.name     Test the GetApnState function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, GetApnState_Test_01, TestSize.Level3)
+{
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+    AccessToken token;
+    int32_t result = CellularDataTest::GetApnState(DEFAULT_SIM_SLOT_ID, "default");
+    ASSERT_TRUE(result >= 0 && result <= 5);
+}
+
+/**
+ * @tc.number   GetDataRecoveryState
+ * @tc.name     Test the GetDataRecoveryState function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, GetDataRecoveryState_Test_01, TestSize.Level3)
+{
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+    AccessToken token;
+    int32_t result = CellularDataTest::GetDataRecoveryState();
+    ASSERT_TRUE(result >= 0 && result <= 3);
 }
 
 /**

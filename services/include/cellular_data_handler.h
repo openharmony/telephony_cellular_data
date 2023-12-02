@@ -66,6 +66,8 @@ public:
     bool HasInternetCapability(const int32_t cid) const;
     void GetDataConnApnAttr(ApnItem::Attribute &apnAttr) const;
     std::string GetDataConnIpType() const;
+    int32_t GetDataRecoveryState();
+    void SetRilAttachApn();
     void IsNeedDoRecovery(bool needDoRecovery) const;
 
 private:
@@ -95,7 +97,6 @@ private:
     void HandleSimAccountLoaded(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleRadioStateChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void PsDataRatChanged(const AppExecFwk::InnerEvent::Pointer &event);
-    void SetRilAttachApn();
     void SetRilAttachApnResponse(const AppExecFwk::InnerEvent::Pointer &event);
     bool HasAnyHigherPriorityConnection(const sptr<ApnHolder> &apnHolder);
     void GetConfigurationFor5G();

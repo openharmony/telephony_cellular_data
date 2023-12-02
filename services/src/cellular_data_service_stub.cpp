@@ -205,6 +205,18 @@ int32_t CellularDataServiceStub::OnClearCellularDataConnections(MessageParcel &d
     return result;
 }
 
+int32_t CellularDataServiceStub::OnClearAllConnections(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    DisConnectionReason reason = static_cast<DisConnectionReason>(data.ReadInt32());
+    int32_t result = ClearAllConnections(slotId, reason);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
 int32_t CellularDataServiceStub::OnRegisterSimAccountCallback(MessageParcel &data, MessageParcel &reply)
 {
     sptr<SimAccountCallback> callback = iface_cast<SimAccountCallback>(data.ReadRemoteObject());
@@ -258,6 +270,28 @@ int32_t CellularDataServiceStub::OnGetDataConnIpType(MessageParcel &data, Messag
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CellularDataServiceStub::OnGetApnState(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::string apnType = data.ReadString();
+    int32_t result = GetApnState(slotId, apnType);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CellularDataServiceStub::OnGetRecoveryState(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = GetDataRecoveryState();
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
 int32_t CellularDataServiceStub::OnIsNeedDoRecovery(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
@@ -269,5 +303,6 @@ int32_t CellularDataServiceStub::OnIsNeedDoRecovery(MessageParcel &data, Message
     }
     return result;
 }
+
 } // namespace Telephony
 } // namespace OHOS

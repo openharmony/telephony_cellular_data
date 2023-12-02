@@ -24,6 +24,7 @@
 #include "i_cellular_data_manager.h"
 #include "sim_account_callback.h"
 #include "apn_item.h"
+#include "cellular_data_constant.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -60,6 +61,18 @@ public:
      * @return Returns data connection status defined in DataConnectionStatus.
      */
     int32_t GetCellularDataState();
+
+    /**
+     * @brief Get the apn status based on slotId and apnType
+     *
+     * @return Returns apn status
+     */
+    int32_t GetApnState(int32_t slotId, const std::string &apnType);
+
+    /**
+     * @brief Get recovery state
+     */
+    int32_t GetDataRecoveryState();
 
     /**
      * @brief Whether roaming is allowed
@@ -125,6 +138,10 @@ public:
      * @return 1 set success, 0 set fail, 84082688 invalid parameter
      */
     int32_t ClearCellularDataConnections(int32_t slotId);
+
+    int32_t ClearAllConnections(int32_t slotId, DisConnectionReason reason);
+
+    int32_t HandleApnChanged(int32_t slotId);
 
     /**
      * @brief Get cellular data proxy.

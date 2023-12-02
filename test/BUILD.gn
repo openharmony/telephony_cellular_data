@@ -20,7 +20,6 @@ ohos_unittest("tel_cellular_data_test") {
   module_out_path = part_name + "/" + test_module
 
   sources = [
-    "$SOURCE_DIR/frameworks/native/cellular_data_service_proxy.cpp",
     "$SOURCE_DIR/test/cellular_data_test.cpp",
     "$SOURCE_DIR/test/zero_branch_test.cpp",
   ]
@@ -31,8 +30,6 @@ ohos_unittest("tel_cellular_data_test") {
     "$SOURCE_DIR/services/include/state_machine",
     "$SOURCE_DIR/services/include/utils",
     "$SOURCE_DIR/services/include/apn_manager",
-    "$SOURCE_DIR/interfaces/innerkits",
-    "$SOURCE_DIR/frameworks/native",
     "$SOURCE_DIR/services/telephony_ext_wrapper/include",
   ]
 
