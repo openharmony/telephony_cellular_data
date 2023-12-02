@@ -494,7 +494,7 @@ int32_t CellularDataServiceProxy::IsNeedDoRecovery(int32_t slotId, bool needDoRe
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = replyParcel.ReadInt32();
-    return result;  
+    return result;
 }
 
 } // namespace Telephony
