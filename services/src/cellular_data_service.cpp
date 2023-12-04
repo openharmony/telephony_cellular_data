@@ -29,7 +29,7 @@
 #include "telephony_common_utils.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
-#include "booster_net_wrapper.h"
+#include "data_service_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -105,8 +105,8 @@ bool CellularDataService::Init()
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
 #endif
-#ifdef OHOS_BUILD_ENABLE_BOOSTER_NET
-    BOOSTER_NET_WRAPPER.InitBoosterNetWrapper();
+#ifdef OHOS_BUILD_ENABLE_DATA_SERVICE_EXT
+    DATA_SERVICE_EXT_WRAPPER.InitDataServiceExtWrapper();
 #endif
     eventLoop_ = RunnerPool::GetInstance().GetCommonRunner();
     if (eventLoop_ == nullptr) {

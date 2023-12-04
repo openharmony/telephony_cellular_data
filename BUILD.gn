@@ -14,7 +14,7 @@ import("//build/ohos.gni")
 import("../core_service/telephony_core_service.gni")
 
 TELEPHONY_EXT_WRAPPER_ROOT = "services/telephony_ext_wrapper"
-BOOSTER_NET_WRAPPER_ROOT = "services/booster_net_wrapper"
+DATA_SERVICE_EXT_WRAPPER_ROOT = "services/data_service_ext_wrapper"
 ohos_shared_library("tel_cellular_data") {
   sanitize = {
     cfi = true
@@ -23,7 +23,7 @@ ohos_shared_library("tel_cellular_data") {
   }
   branch_protector_ret = "pac_ret"
   sources = [
-    "$BOOSTER_NET_WRAPPER_ROOT/src/booster_net_wrapper.cpp",
+    "$DATA_SERVICE_EXT_WRAPPER_ROOT/src/data_service_ext_wrapper.cpp",
     "$TELEPHONY_EXT_WRAPPER_ROOT/src/telephony_ext_wrapper.cpp",
     "services/src/apn_manager/apn_holder.cpp",
     "services/src/apn_manager/apn_item.cpp",
@@ -64,7 +64,7 @@ ohos_shared_library("tel_cellular_data") {
 
   include_dirs = [
     "$TELEPHONY_EXT_WRAPPER_ROOT/include",
-    "$BOOSTER_NET_WRAPPER_ROOT/include",
+    "$DATA_SERVICE_EXT_WRAPPER_ROOT/include",
     "services/include",
     "services/include/common",
     "services/include/state_machine",

@@ -24,7 +24,7 @@
 #include "cellular_data_service.h"
 #include "cellular_data_types.h"
 #include "cellular_data_constant.h"
-#include "booster_net_wrapper.h"
+#include "data_service_ext_wrapper.h"
  
 #ifdef ABILITY_POWER_SUPPORT
 #include "power_mgr_client.h"
@@ -83,11 +83,11 @@ void DataConnectionMonitor::StartStallDetectionTimer()
 void DataConnectionMonitor::OnStallDetectionTimer()
 {
     TELEPHONY_LOGI("Slot%{public}d: on stall detection", slotId_);
-#ifdef OHOS_BUILD_ENABLE_BOOSTER_NET
-    if (BOOSTER_NET_WRAPPER.sendGetTcpSumToKernel_) {
-        BOOSTER_NET_WRAPPER.sendGetTcpSumToKernel_();
+#ifdef OHOS_BUILD_ENABLE_DATA_SERVICE_EXT
+    if (DATA_SERVICE_EXT_WRAPPER.requestTcpAndDnsPackets_) {
+        DATA_SERVICE_EXT_WRAPPER.requestTcpAndDnsPackets_();
+        return;
     }
-    return;
 #endif
     UpdateFlowInfo();
     if (noRecvPackets_ > RECOVERY_TRIGGER_PACKET) {

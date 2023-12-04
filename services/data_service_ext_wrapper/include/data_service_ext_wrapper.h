@@ -13,30 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef BOOSTER_NET_WRAPPER_H
-#define BOOSTER_NET_WRAPPER_H
+#ifndef DATA_SERVICE_EXT_WRAPPER_H
+#define DATA_SERVICE_EXT_WRAPPER_H
 
 #include "nocopyable.h"
 #include "singleton.h"
 
 namespace OHOS {
 namespace Telephony {
-class BoosterNetWrapper final {
-DECLARE_DELAYED_REF_SINGLETON(BoosterNetWrapper);
+class DataServiceExtWrapper final {
+DECLARE_DELAYED_REF_SINGLETON(DataServiceExtWrapper);
 
 public:
-    DISALLOW_COPY_AND_MOVE(BoosterNetWrapper);
-    void InitBoosterNetWrapper();
+    DISALLOW_COPY_AND_MOVE(DataServiceExtWrapper);
+    void InitDataServiceExtWrapper();
 
-    typedef void (*SEND_GET_TCP_SUM_TO_KERNEL)();
+    typedef void (*REQUEST_TCP_AND_DNS_PACKETS)();
 
-    SEND_GET_TCP_SUM_TO_KERNEL sendGetTcpSumToKernel_ = nullptr;
+    REQUEST_TCP_AND_DNS_PACKETS requestTcpAndDnsPackets_ = nullptr;
 
 private:
-    void* boosterNetWrapperHandle_ = nullptr;
+    void* DataServiceExtWrapperHandle_ = nullptr;
 };
 
-#define BOOSTER_NET_WRAPPER ::OHOS::DelayedRefSingleton<BoosterNetWrapper>::GetInstance()
+#define DATA_SERVICE_EXT_WRAPPER ::OHOS::DelayedRefSingleton<DataServiceExtWrapper>::GetInstance()
 } // namespace Telephony
 } // namespace OHOS
-#endif // BOOSTER_NET_WRAPPER_H
+#endif // DATA_SERVICE_EXT_WRAPPER_H
