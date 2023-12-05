@@ -1706,7 +1706,6 @@ void CellularDataHandler::GetDataConnApnAttr(ApnItem::Attribute &apnAttr) const
     }
 }
 
-
 std::string CellularDataHandler::GetDataConnIpType() const
 {
     if (apnManager_ == nullptr) {
@@ -1738,5 +1737,15 @@ int32_t CellularDataHandler::GetDataRecoveryState()
     }
     return connectionManager_->GetDataRecoveryState();
 }
+
+void CellularDataHandler::IsNeedDoRecovery(bool needDoRecovery) const
+{
+    if (connectionManager_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: in IsNeedDoRecovery connectionManager_ is null", slotId_);
+    }
+ 
+    connectionManager_->IsNeedDoRecovery(needDoRecovery);
+}
+
 } // namespace Telephony
 } // namespace OHOS

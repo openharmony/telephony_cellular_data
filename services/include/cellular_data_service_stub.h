@@ -53,6 +53,7 @@ private:
     int32_t OnClearAllConnections(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetApnState(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetRecoveryState(MessageParcel &data, MessageParcel &reply);
+    int32_t OnIsNeedDoRecovery(MessageParcel &data, MessageParcel &reply);
 
 private:
     using Fun = int32_t (CellularDataServiceStub::*)(MessageParcel &data, MessageParcel &reply);
@@ -92,7 +93,9 @@ private:
         { (uint32_t)CellularDataInterfaceCode::GET_CELLULAR_DATA_APN_STATE,
             &CellularDataServiceStub::OnGetApnState },
         { (uint32_t)CellularDataInterfaceCode::GET_RECOVERY_STATE,
-            &CellularDataServiceStub::OnGetRecoveryState }
+            &CellularDataServiceStub::OnGetRecoveryState },
+        { (uint32_t)CellularDataInterfaceCode::IS_NEED_DO_RECOVERY,
+            &CellularDataServiceStub::OnIsNeedDoRecovery }
     };
 };
 } // namespace Telephony

@@ -131,6 +131,8 @@ public:
 
     virtual int32_t GetDataRecoveryState() = 0;
 
+    virtual int32_t IsNeedDoRecovery(int32_t slotId, bool needDoRecovery) = 0;
+
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.telephony.ICellularDataManager");
 };

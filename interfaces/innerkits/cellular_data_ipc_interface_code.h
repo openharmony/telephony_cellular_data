@@ -38,7 +38,8 @@ enum class CellularDataInterfaceCode {
     REG_SIM_ACCOUNT_CALLBACK,
     UN_REG_SIM_ACCOUNT_CALLBACK,
     GET_DATA_CONN_APN_ATTR,
-    GET_DATA_CONN_IP_TYPE
+    GET_DATA_CONN_IP_TYPE,
+    IS_NEED_DO_RECOVERY
 };
 } // namespace Telephony
 } // namespace OHOS

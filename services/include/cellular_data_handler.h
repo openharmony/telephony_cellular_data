@@ -68,6 +68,7 @@ public:
     std::string GetDataConnIpType() const;
     int32_t GetDataRecoveryState();
     void SetRilAttachApn();
+    void IsNeedDoRecovery(bool needDoRecovery) const;
 
 private:
     std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect();
