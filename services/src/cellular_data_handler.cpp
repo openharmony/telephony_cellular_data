@@ -1738,5 +1738,17 @@ int32_t CellularDataHandler::GetDataRecoveryState()
     }
     return connectionManager_->GetDataRecoveryState();
 }
+
+void CellularDataHandler::HandleFactoryReset(const InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("Slot%{public}d: factory reset", slotId_);
+    SetCellularDataEnable(true);
+    SetCellularDataRoamingEnabled(false);
+    if (apnManager_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: apnManager_ is null", slotId_);
+        return;
+    }
+    apnManager_->ResetApns();
+}
 } // namespace Telephony
 } // namespace OHOS
