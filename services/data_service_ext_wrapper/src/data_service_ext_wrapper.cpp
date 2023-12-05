@@ -16,12 +16,11 @@
 #include <dlfcn.h>
 #include "data_service_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
+#include "cellular_data_constant.h"
+#include "parameter.h"
 
 namespace OHOS {
 namespace Telephony {
-namespace {
-const std::string DATA_SERVICE_EXT_WRAPPER_PATH = "libradio_boosternet.z.so";
-} // namespace
 
 DataServiceExtWrapper::DataServiceExtWrapper() {}
 DataServiceExtWrapper::~DataServiceExtWrapper()
@@ -34,7 +33,13 @@ DataServiceExtWrapper::~DataServiceExtWrapper()
 void DataServiceExtWrapper::InitDataServiceExtWrapper()
 {
     TELEPHONY_LOGD("DataServiceExtWrapper::InitDataServiceExtWrapper() start");
-    DataServiceExtWrapperHandle_ = dlopen(DATA_SERVICE_EXT_WRAPPER_PATH.c_str(), RTLD_NOW);
+    char path[PATH_PARAMETER_SIZE] = {0};
+    int retLen = GetParameter(CONFIG_DATA_SERVICE_EXT_PATH, "", path, PATH_PARAMETER_SIZE);
+    if (retLen == 0) {
+        TELEPHONY_LOGE("Failed to get vendor library path through system properties.");
+        return;
+    }
+    DataServiceExtWrapperHandle_ = dlopen(path, RTLD_NOW);
     if (DataServiceExtWrapperHandle_ == nullptr) {
         TELEPHONY_LOGE("DATA_SERVICE_EXT_WRAPPER_PATH was not loaded, error: %{public}s", dlerror());
         return;

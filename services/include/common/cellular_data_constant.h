@@ -200,6 +200,7 @@ static const int32_t TYPE_RELEASE_NET = 0;
 static const int32_t DEFAULT_READ_APN_TIME = 2;
 static const int32_t DEFAULT_MCC_SIZE = 3;
 static const int32_t NULL_POINTER_EXCEPTION = -1;
+static const int32_t PATH_PARAMETER_SIZE = 128;
 static constexpr const char *ROUTED_IPV4 = "0.0.0.0";
 static constexpr const char *ROUTED_IPV6 = "::";
 static constexpr const char *CONFIG_DOWNLINK_THRESHOLDS = "persist.sys.data.downlink";
@@ -207,6 +208,7 @@ static constexpr const char *CONFIG_UPLINK_THRESHOLDS = "persist.sys.data.uplink
 static constexpr const char *CONFIG_TCP_BUFFER = "persist.sys.data.tcpbuffer";
 static constexpr const char *CONFIG_PREFERAPN = "persist.sys.data.preferapn";
 static constexpr const char *CONFIG_MOBILE_MTU = "persist.sys.data.mobilemtu";
+static constexpr const char *CONFIG_DATA_SERVICE_EXT_PATH = "persist.sys.data.dataextpath";
 static constexpr const char *CONFIG_MULTIPLE_CONNECTIONS = "persist.sys.data.multiple.connections";
 static constexpr const char *CAPACITY_THRESHOLDS_FOR_DOWNLINK = "100,500,1000,5000,10000,20000,50000,75000,"
                                                                 "100000,200000,500000,1000000,1500000,2000000";
