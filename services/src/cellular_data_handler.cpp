@@ -134,7 +134,7 @@ int32_t CellularDataHandler::SetCellularDataEnable(bool userDataOn)
         TELEPHONY_LOGE("Slot%{public}d: SetCellularDataEnable dataSwitchSettings_ is null.", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    bool dataEnabled = false;
+    bool dataEnabled = true;
     int32_t result = dataSwitchSettings_->QueryUserDataStatus(dataEnabled);
     if (result != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("Slot%{public}d: Query result: %{public}d", slotId_, result);
@@ -1570,7 +1570,7 @@ void CellularDataHandler::HandleDBSettingEnableChanged(const AppExecFwk::InnerEv
         TELEPHONY_LOGE("Slot%{public}d: HandleDBSettingEnableChanged dataSwitchSettings_ is null.", slotId_);
         return;
     }
-    bool dataEnabled = false;
+    bool dataEnabled = true;
     dataSwitchSettings_->QueryUserDataStatus(dataEnabled);
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
