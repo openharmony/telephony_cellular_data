@@ -1747,5 +1747,9 @@ void CellularDataHandler::IsNeedDoRecovery(bool needDoRecovery) const
     connectionManager_->IsNeedDoRecovery(needDoRecovery);
 }
 
+void CellularDataHandler::OnCleanAllDataConnectionsDone(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("Slot%{public}d: receive OnCleanAllDataConnectionsDone event", slotId_);
+}
 } // namespace Telephony
 } // namespace OHOS
