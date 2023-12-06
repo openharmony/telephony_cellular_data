@@ -35,6 +35,7 @@ std::shared_ptr<CellularDataStateMachine> StateMachineFuzzer::CreateCellularData
     if (connectionManager == nullptr) {
         return nullptr;
     }
+    connectionManager->Init();
     cellularDataStateMachine_ =
         std::make_shared<CellularDataStateMachine>(connectionManager, shared_from_this(), stateMachineEventLoop_);
     return cellularDataStateMachine_;
