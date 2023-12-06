@@ -192,6 +192,7 @@ private:
     void OnRemoteDied(const wptr<IRemoteObject> &remote);
     void RegisterSimAccountCallback();
     void UnregisterSimAccountCallback();
+    bool IsValidSlotId(int32_t slotId);
 
 private:
     std::mutex mutexProxy_;

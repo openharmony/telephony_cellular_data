@@ -441,7 +441,7 @@ HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test, TestSize.Level2)
     ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     // Multiple cards will need to be optimized again
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID - 1);
-    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
+    ASSERT_TRUE(result != TELEPHONY_ERR_SUCCESS);
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(DATA_SLOT_ID_INVALID);
     ASSERT_TRUE(result != TELEPHONY_ERR_SUCCESS);
 }
