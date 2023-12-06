@@ -414,6 +414,7 @@ void CellularDataController::IsNeedDoRecovery(bool needDoRecovery) const
 {
     if (cellularDataHandler_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: IsNeedDoRecovery cellularDataHandler_ is null", slotId_);
+        return;
     }
     cellularDataHandler_->IsNeedDoRecovery(needDoRecovery);
 }
