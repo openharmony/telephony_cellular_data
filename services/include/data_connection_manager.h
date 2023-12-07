@@ -55,6 +55,7 @@ public:
     std::string GetTcpBufferByRadioTech(const int32_t radioTech);
     void UpdateCallState(int32_t state);
     int32_t GetDataRecoveryState();
+    void IsNeedDoRecovery(bool needDoRecovery) const;
 
 private:
     void UpdateBandWidthsUseLte();

@@ -215,6 +215,7 @@ public:
     static int32_t GetDataRecoveryState();
     static int32_t GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr);
     static int32_t GetDataConnIpType(int32_t slotId, std::string &ipType);
+    static int32_t IsNeedDoRecovery(int32_t slotId, bool needDoRecovery);
 };
 
 bool CellularDataTest::HasSimCard(const int32_t slotId)
@@ -407,6 +408,11 @@ int32_t CellularDataTest::GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute 
 int32_t CellularDataTest::GetDataConnIpType(int32_t slotId, std::string &ipType)
 {
     return CellularDataClient::GetInstance().GetDataConnIpType(slotId, ipType);
+}
+
+int32_t CellularDataTest::IsNeedDoRecovery(int32_t slotId, bool needDoRecovery)
+{
+    return CellularDataClient::GetInstance().IsNeedDoRecovery(slotId, needDoRecovery);
 }
 #ifndef TEL_TEST_UNSUPPORT
 /**
@@ -1161,6 +1167,38 @@ HWTEST_F(CellularDataTest, GetDataConnIpType_Test_02, TestSize.Level3)
     AccessToken token;
     std::string ipType;
     int32_t result = CellularDataTest::GetDataConnIpType(DEFAULT_SIM_SLOT_ID, ipType);
+    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
+}
+
+/**
+ * @tc.number   IsNeedDoRecovery_Test_01
+ * @tc.name     Test the IsNeedDoRecovery function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, IsNeedDoRecovery_Test_01, TestSize.Level3)
+{
+    if (!HasSimCard(SIM_SLOT_ID_1)) {
+        return;
+    }
+    AccessToken token;
+    bool needDoRecovery = true;
+    int32_t result = CellularDataTest::IsNeedDoRecovery(SIM_SLOT_ID_1, needDoRecovery);
+    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
+}
+
+/**
+ * @tc.number   IsNeedDoRecovery_Test_02
+ * @tc.name     Test the IsNeedDoRecovery function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, IsNeedDoRecovery_Test_02, TestSize.Level3)
+{
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+    AccessToken token;
+    bool needDoRecovery = true;
+    int32_t result = CellularDataTest::IsNeedDoRecovery(DEFAULT_SIM_SLOT_ID, needDoRecovery);
     ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
 }
 

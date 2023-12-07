@@ -78,6 +78,7 @@ public:
     int32_t UnregisterSimAccountCallback() override;
     int32_t GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr) override;
     int32_t GetDataConnIpType(int32_t slotId, std::string &ipType) override;
+    int32_t IsNeedDoRecovery(int32_t slotId, bool needDoRecovery) override;
 private:
     bool Init();
     void InitModule();

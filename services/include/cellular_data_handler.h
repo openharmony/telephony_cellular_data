@@ -68,6 +68,7 @@ public:
     std::string GetDataConnIpType() const;
     int32_t GetDataRecoveryState();
     void SetRilAttachApn();
+    void IsNeedDoRecovery(bool needDoRecovery) const;
 
 private:
     std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect();
@@ -127,6 +128,7 @@ private:
     bool IsSingleConnectionEnabled(int32_t radioTech);
     void OnRilAdapterHostDied(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleFactoryReset(const AppExecFwk::InnerEvent::Pointer &event);
+    void OnCleanAllDataConnectionsDone(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     sptr<ApnManager> apnManager_;
@@ -185,6 +187,7 @@ private:
         { CellularDataEventCode::MSG_INCALL_DATA_COMPLETE, &CellularDataHandler::IncallDataComplete },
         { RadioEvent::RADIO_RIL_ADAPTER_HOST_DIED, &CellularDataHandler::OnRilAdapterHostDied },
         { RadioEvent::RADIO_FACTORY_RESET, &CellularDataHandler::HandleFactoryReset },
+        { RadioEvent::RADIO_CLEAN_ALL_DATA_CONNECTIONS, &CellularDataHandler::OnCleanAllDataConnectionsDone },
     };
 };
 } // namespace Telephony

@@ -47,7 +47,8 @@
                 "relational_store",
                 "safwk",
                 "samgr",
-                "telephony_data"
+                "telephony_data",
+                "power_manager"
             ]
         },
         "build": {

@@ -212,6 +212,7 @@ void CellularDataController::RegisterEvents()
             TELEPHONY_LOGE("Slot%{public}d: networkSearchCallback is null", slotId_);
         }
     }
+    coreInner.CleanAllConnections(slotId_, RadioEvent::RADIO_CLEAN_ALL_DATA_CONNECTIONS, cellularDataHandler_);
 }
 
 void CellularDataController::UnRegisterEvents()
@@ -409,6 +410,15 @@ int32_t CellularDataController::GetDataRecoveryState()
         return false;
     }
     return cellularDataHandler_->GetDataRecoveryState();
+}
+
+void CellularDataController::IsNeedDoRecovery(bool needDoRecovery) const
+{
+    if (cellularDataHandler_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: IsNeedDoRecovery cellularDataHandler_ is null", slotId_);
+        return;
+    }
+    cellularDataHandler_->IsNeedDoRecovery(needDoRecovery);
 }
 } // namespace Telephony
 } // namespace OHOS

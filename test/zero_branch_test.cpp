@@ -110,6 +110,7 @@ std::shared_ptr<CellularDataStateMachine> StateMachineTest::CreateCellularDataCo
     if (connectionManager == nullptr) {
         return nullptr;
     }
+    connectionManager->Init();
     cellularDataStateMachine_ =
         std::make_shared<CellularDataStateMachine>(connectionManager, shared_from_this(), stateMachineEventLoop_);
     return cellularDataStateMachine_;
@@ -239,6 +240,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | 
     cellularDataHandler.HandleDBSettingRoamingChanged(event);
     cellularDataHandler.SetDataPermittedResponse(event);
     cellularDataHandler.OnRilAdapterHostDied(event);
+    cellularDataHandler.OnCleanAllDataConnectionsDone(event);
     cellularDataHandler.RegisterDataSettingObserver();
     cellularDataHandler.UnRegisterDataSettingObserver();
     cellularDataHandler.GetDataConnApnAttr(apnAttr);
@@ -369,6 +371,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataConnectionManager_001, Function | Med
 {
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
     DataConnectionManager con { runner, 0 };
+    con.Init();
     con.connectionMonitor_ = nullptr;
     con.ccmDefaultState_ = nullptr;
     con.stateMachineEventHandler_ = nullptr;

@@ -107,7 +107,13 @@ public:
 
     RecoveryState GetDataRecoveryState();
 
+    void IsNeedDoRecovery(bool needDoRecovery);
+
 private:
+    bool IsAggressiveRecovery();
+    int32_t GetStallDetectionPeriod();
+    bool IsScreenOn();
+
     std::unique_ptr<TrafficManagement> trafficManager_;
     std::unique_ptr<TrafficManagement> stallDetectionTrafficManager_;
     bool updateNetStat_ = false;

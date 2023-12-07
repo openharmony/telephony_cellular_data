@@ -452,5 +452,12 @@ std::string DataConnectionManager::GetTcpBufferByRadioTech(const int32_t radioTe
     }
     return tcpBuffer;
 }
+
+void DataConnectionManager::IsNeedDoRecovery(bool needDoRecovery) const
+{
+    if (connectionMonitor_ != nullptr) {
+        connectionMonitor_->IsNeedDoRecovery(needDoRecovery);
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

@@ -175,6 +175,15 @@ public:
      */
     int32_t GetDataConnIpType(int32_t slotId, std::string &ipType);
 
+    /**
+     * @brief Whether do recovery is needed.
+     *
+     * @param slotId Card slot identification.
+     * @param needDoRecovery Whether do recovery is needed.
+     * @return 1 set success, 0 set fail
+     */
+    int32_t IsNeedDoRecovery(int32_t slotId, bool needDoRecovery);
+
 private:
     class CellularDataDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
