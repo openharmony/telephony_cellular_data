@@ -127,6 +127,7 @@ private:
     void GetSinglePdpEnabledFromOpCfg();
     bool IsSingleConnectionEnabled(int32_t radioTech);
     void OnRilAdapterHostDied(const AppExecFwk::InnerEvent::Pointer &event);
+    void HandleFactoryReset(const AppExecFwk::InnerEvent::Pointer &event);
     void OnCleanAllDataConnectionsDone(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
@@ -185,6 +186,7 @@ private:
         { CellularDataEventCode::MSG_DB_SETTING_INCALL_CHANGED, &CellularDataHandler::HandleDBSettingIncallChanged },
         { CellularDataEventCode::MSG_INCALL_DATA_COMPLETE, &CellularDataHandler::IncallDataComplete },
         { RadioEvent::RADIO_RIL_ADAPTER_HOST_DIED, &CellularDataHandler::OnRilAdapterHostDied },
+        { RadioEvent::RADIO_FACTORY_RESET, &CellularDataHandler::HandleFactoryReset },
         { RadioEvent::RADIO_CLEAN_ALL_DATA_CONNECTIONS, &CellularDataHandler::OnCleanAllDataConnectionsDone },
     };
 };

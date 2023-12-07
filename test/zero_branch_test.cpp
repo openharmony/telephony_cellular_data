@@ -244,6 +244,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | 
     cellularDataHandler.RegisterDataSettingObserver();
     cellularDataHandler.UnRegisterDataSettingObserver();
     cellularDataHandler.GetDataConnApnAttr(apnAttr);
+    cellularDataHandler.HandleFactoryReset(event);
     ASSERT_FALSE(cellularDataHandler.HasAnyHigherPriorityConnection(apnHolder));
 }
 
@@ -745,6 +746,7 @@ HWTEST_F(BranchTest, ApnManager_Test_01, Function | MediumTest | Level3)
     auto apnManager = std::make_shared<ApnManager>();
     EXPECT_GE(apnManager->CreateAllApnItemByDatabase(0), 0);
     EXPECT_EQ(apnManager->CreateAllApnItemByDatabase(0), 0);
+    apnManager->ResetApns();
     std::string operatorNumeric = "46003";
     apnManager->GetCTOperator(0, operatorNumeric);
     EXPECT_EQ(operatorNumeric, "46003");
