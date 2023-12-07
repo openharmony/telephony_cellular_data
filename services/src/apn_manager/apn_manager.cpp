@@ -398,16 +398,14 @@ sptr<ApnItem> ApnManager::GetRilAttachApn()
     return attachApn;
 }
 
-int32_t ApnManager::ResetApns()
+bool ApnManager::ResetApns()
 {
-    int32_t count = 0;
     auto helper = CellularDataRdbHelper::GetInstance();
     if (helper == nullptr) {
         TELEPHONY_LOGE("get cellularDataRdbHelper failed");
-        return count;
+        return false;
     }
-    count = helper->ResetApns();
-    return count;
+    return helper->ResetApns();
 }
 } // namespace Telephony
 } // namespace OHOS

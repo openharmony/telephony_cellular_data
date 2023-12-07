@@ -70,12 +70,12 @@ int CellularDataRdbHelper::Insert(const DataShare::DataShareValuesBucket &values
     return result;
 }
 
-int CellularDataRdbHelper::ResetApns()
+bool CellularDataRdbHelper::ResetApns()
 {
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAbilityHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("dataShareHelper is null");
-        return NULL_POINTER_EXCEPTION;
+        return false;
     }
     TELEPHONY_LOGI("Reset apns");
     Uri resetApnUri(CELLULAR_DATA_RDB_RESET);
@@ -84,7 +84,7 @@ int CellularDataRdbHelper::ResetApns()
     int32_t result = dataShareHelper->Update(resetApnUri, predicates, values);
     dataShareHelper->NotifyChange(cellularDataUri_);
     dataShareHelper->Release();
-    return result;
+    return result >= 0;
 }
 
 bool CellularDataRdbHelper::QueryApns(const std::string &mcc, const std::string &mnc, std::vector<PdpProfile> &apnVec)
