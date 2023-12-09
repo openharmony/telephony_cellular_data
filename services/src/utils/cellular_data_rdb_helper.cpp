@@ -192,6 +192,8 @@ void CellularDataRdbHelper::MakePdpProfile(
     result->GetString(index, apnBean.mvnoType);
     result->GetColumnIndex(PdpProfileData::MVNO_MATCH_DATA, index);
     result->GetString(index, apnBean.mvnoMatchData);
+    result->GetColumnIndex(PdpProfileData::EDITED_STATUS, index);
+    result->GetInt(index, apnBean.edited);
     if (apnBean.pdpProtocol.empty()) {
         apnBean.pdpProtocol = "IPV4V6";
     }

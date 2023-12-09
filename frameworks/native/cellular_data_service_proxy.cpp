@@ -426,7 +426,7 @@ int32_t CellularDataServiceProxy::GetDataConnApnAttr(int32_t slotId, ApnItem::At
     int32_t result = replyParcel.ReadInt32();
     TELEPHONY_LOGI("end: result=%{public}d", result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        auto apnAttrPtr = dataParcel.ReadRawData(sizeof(ApnItem::Attribute));
+        auto apnAttrPtr = replyParcel.ReadRawData(sizeof(ApnItem::Attribute));
         if (apnAttrPtr == nullptr) {
             return TELEPHONY_ERR_READ_DATA_FAIL;
         }

@@ -58,6 +58,7 @@ public:
         char homeUrl_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
         char proxyIpAddress_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
         char mmsIpAddress_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
+        bool isEdited_ = false;
     } attr_;
 
 private:

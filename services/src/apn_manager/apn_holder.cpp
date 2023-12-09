@@ -213,6 +213,7 @@ bool ApnHolder::IsSameApnItem(const sptr<ApnItem> &newApnItem,
     return isSameProtocol && newApnItem->attr_.profileId_ == oldApnItem->attr_.profileId_ &&
         newApnItem->attr_.authType_ == oldApnItem->attr_.authType_ &&
         newApnItem->attr_.isRoamingApn_ == oldApnItem->attr_.isRoamingApn_ &&
+        newApnItem->attr_.isEdited_ == oldApnItem->attr_.isEdited_ &&
         std::strcmp(newApnItem->attr_.types_, oldApnItem->attr_.types_) == 0 &&
         std::strcmp(newApnItem->attr_.numeric_, oldApnItem->attr_.numeric_) == 0 &&
         std::strcmp(newApnItem->attr_.apn_, oldApnItem->attr_.apn_) == 0 &&
