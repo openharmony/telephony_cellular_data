@@ -357,6 +357,16 @@ int32_t CellularDataService::SetDefaultCellularDataSlotId(const int32_t slotId)
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
+    bool hasSim = false;
+    CoreManagerInner::GetInstance().HasSimCard(slotId, hasSim);
+    if (!hasSim) {
+        TELEPHONY_LOGE("has no sim!");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    if (!CoreManagerInner::GetInstance().IsSimActive(slotId)) {
+        TELEPHONY_LOGE("sim is not active!");
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
     int32_t formerSlotId = GetDefaultCellularDataSlotId();
     if (formerSlotId < 0) {
         TELEPHONY_LOGI("No old card slot id.");
