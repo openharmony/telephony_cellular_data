@@ -57,6 +57,8 @@ void CellularDataHandler::Init()
         std::weak_ptr<AppExecFwk::EventHandler>(shared_from_this()), slotId_).release();
     incallObserver_ =
         new (std::nothrow) CellularDataIncallObserver(std::weak_ptr<AppExecFwk::EventHandler>(shared_from_this()));
+    cellularDataRdbObserver_ =
+        new (std::nothrow) CellularDataRdbObserver(std::weak_ptr<AppExecFwk::EventHandler>(shared_from_this()));
     if ((apnManager_ == nullptr) || (dataSwitchSettings_ == nullptr) || (connectionManager_ == nullptr)) {
         TELEPHONY_LOGE("Slot%{public}d: apnManager_ or dataSwitchSettings_ or connectionManager_ is null", slotId_);
         return;
@@ -1616,14 +1618,15 @@ void CellularDataHandler::HandleDBSettingRoamingChanged(const AppExecFwk::InnerE
 
 void CellularDataHandler::UnRegisterDataSettingObserver()
 {
-    if (settingObserver_ == nullptr || roamingObserver_ == nullptr || incallObserver_ == nullptr) {
-        TELEPHONY_LOGE("UnRegisterDataSettingObserver:Slot%{public}d: settingObserver_ or roamingObserver_ or "
-                       "incallObserver_ is null", slotId_);
+    if (settingObserver_ == nullptr || roamingObserver_ == nullptr || incallObserver_ == nullptr ||
+        cellularDataRdbObserver_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: settingObserver_ or roamingObserver_ or incallObserver_ or "
+                       "cellularDataRdbObserver_ is null", slotId_);
         return;
     }
     std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
     if (settingHelper == nullptr) {
-        TELEPHONY_LOGE("UnRegisterDataSettingObserver:Slot%{public}d: settingHelper is null", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: settingHelper is null", slotId_);
         return;
     }
     Uri dataEnableUri(CELLULAR_DATA_SETTING_DATA_ENABLE_URI);
@@ -1631,26 +1634,33 @@ void CellularDataHandler::UnRegisterDataSettingObserver()
 
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId_);
     if (simId <= INVALID_SIM_ID) {
-        TELEPHONY_LOGE(
-            "UnRegisterDataSettingObserver:Slot%{public}d: failed due to invalid sim id %{public}d", slotId_, simId);
+        TELEPHONY_LOGE("Slot%{public}d: failed due to invalid sim id %{public}d", slotId_, simId);
         return;
     }
     Uri dataRoamingUri(std::string(CELLULAR_DATA_SETTING_DATA_ROAMING_URI) + std::to_string(simId));
     settingHelper->UnRegisterSettingsObserver(dataRoamingUri, roamingObserver_);
     Uri dataIncallUri(CELLULAR_DATA_SETTING_DATA_INCALL_URI);
     settingHelper->UnRegisterSettingsObserver(dataIncallUri, incallObserver_);
+
+    std::shared_ptr<CellularDataRdbHelper> cellularDataRdbHelper = CellularDataRdbHelper::GetInstance();
+    if (cellularDataRdbHelper == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: cellularDataRdbHelper is null", slotId_);
+        return;
+    }
+    cellularDataRdbHelper->UnRegisterObserver(cellularDataRdbObserver_);
 }
 
 void CellularDataHandler::RegisterDataSettingObserver()
 {
-    if (settingObserver_ == nullptr || roamingObserver_ == nullptr || incallObserver_ == nullptr) {
-        TELEPHONY_LOGE("RegisterDataSettingObserver:Slot%{public}d: settingObserver_ or roamingObserver_ or "
-                       "incallObserver_ is null", slotId_);
+    if (settingObserver_ == nullptr || roamingObserver_ == nullptr || incallObserver_ == nullptr ||
+        cellularDataRdbObserver_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: settingObserver_ or roamingObserver_ or incallObserver_ or "
+                       "cellularDataRdbObserver_ is null", slotId_);
         return;
     }
     std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
     if (settingHelper == nullptr) {
-        TELEPHONY_LOGE("RegisterDataSettingObserver:Slot%{public}d: settingHelper is null", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: settingHelper is null", slotId_);
         return;
     }
     Uri dataEnableUri(CELLULAR_DATA_SETTING_DATA_ENABLE_URI);
@@ -1658,14 +1668,20 @@ void CellularDataHandler::RegisterDataSettingObserver()
 
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId_);
     if (simId <= INVALID_SIM_ID) {
-        TELEPHONY_LOGE(
-            "RegisterDataSettingObserver:Slot%{public}d: failed due to invalid sim id %{public}d", slotId_, simId);
+        TELEPHONY_LOGE("Slot%{public}d: failed due to invalid sim id %{public}d", slotId_, simId);
         return;
     }
     Uri dataRoamingUri(std::string(CELLULAR_DATA_SETTING_DATA_ROAMING_URI) + std::to_string(simId));
     settingHelper->RegisterSettingsObserver(dataRoamingUri, roamingObserver_);
     Uri dataIncallUri(CELLULAR_DATA_SETTING_DATA_INCALL_URI);
     settingHelper->RegisterSettingsObserver(dataIncallUri, incallObserver_);
+
+    std::shared_ptr<CellularDataRdbHelper> cellularDataRdbHelper = CellularDataRdbHelper::GetInstance();
+    if (cellularDataRdbHelper == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: cellularDataRdbHelper is null", slotId_);
+        return;
+    }
+    cellularDataRdbHelper->RegisterObserver(cellularDataRdbObserver_);
 }
 
 void CellularDataHandler::OnRilAdapterHostDied(const AppExecFwk::InnerEvent::Pointer &event)

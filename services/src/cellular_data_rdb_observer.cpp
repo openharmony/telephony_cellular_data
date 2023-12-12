@@ -15,6 +15,7 @@
 
 #include "cellular_data_rdb_observer.h"
 
+#include "cellular_data_event_code.h"
 #include "inner_event.h"
 #include "telephony_log_wrapper.h"
 
@@ -22,20 +23,22 @@ namespace OHOS {
 namespace Telephony {
 using namespace AppExecFwk;
 
-CellularDataRdbObserver::CellularDataRdbObserver(std::shared_ptr<CellularDataHandler> &cellularDataHandler)
-    : cellularDataHandler_(cellularDataHandler)
+CellularDataRdbObserver::CellularDataRdbObserver(std::weak_ptr<AppExecFwk::EventHandler> &&cellularDataHandler)
+    : cellularDataHandler_(std::move(cellularDataHandler))
 {}
 
 CellularDataRdbObserver::~CellularDataRdbObserver() = default;
 
 void CellularDataRdbObserver::OnChange()
 {
-    if (cellularDataHandler_ == nullptr) {
-        TELEPHONY_LOGE("cellularDataHandler_ is null");
+    TELEPHONY_LOGI("OnChange");
+    auto cellularDataHandler = cellularDataHandler_.lock();
+    if (cellularDataHandler == nullptr) {
+        TELEPHONY_LOGE("cellularDataHandler is null");
         return;
     }
     InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_APN_CHANGED);
-    cellularDataHandler_->SendEvent(event);
+    cellularDataHandler->SendEvent(event);
 }
 } // namespace Telephony
 } // namespace OHOS

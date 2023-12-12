@@ -22,6 +22,7 @@
 #include "apn_manager.h"
 #include "cellular_data_event_code.h"
 #include "cellular_data_incall_observer.h"
+#include "cellular_data_rdb_observer.h"
 #include "cellular_data_roaming_observer.h"
 #include "cellular_data_setting_observer.h"
 #include "cellular_data_state_machine.h"
@@ -155,6 +156,7 @@ private:
     sptr<CellularDataSettingObserver> settingObserver_;
     sptr<CellularDataRoamingObserver> roamingObserver_;
     sptr<CellularDataIncallObserver> incallObserver_;
+    sptr<CellularDataRdbObserver> cellularDataRdbObserver_;
     std::shared_ptr<IncallDataStateMachine> incallDataStateMachine_;
 
     using Fun = void (CellularDataHandler::*)(const AppExecFwk::InnerEvent::Pointer &event);
