@@ -20,7 +20,6 @@
 
 #include "cellular_data_constant.h"
 #include "cellular_data_handler.h"
-#include "cellular_data_rdb_observer.h"
 #include "system_ability_status_change_stub.h"
 
 namespace OHOS {
@@ -55,12 +54,9 @@ public:
 private:
     void RegisterEvents();
     void UnRegisterEvents();
-    void RegisterDatabaseObserver();
-    void UnRegisterDatabaseObserver();
 
 private:
     std::shared_ptr<CellularDataHandler> cellularDataHandler_;
-    sptr<CellularDataRdbObserver> cellularDataRdbObserver_;
     sptr<ISystemAbilityStatusChange> systemAbilityListener_ = nullptr;
     const int32_t slotId_;
 

@@ -17,19 +17,18 @@
 #define CELLULAR_DATA_RDB_OBSERVER_H
 
 #include "data_ability_observer_stub.h"
-
-#include "cellular_data_handler.h"
+#include "event_handler.h"
 
 namespace OHOS {
 namespace Telephony {
 class CellularDataRdbObserver : public AAFwk::DataAbilityObserverStub {
 public:
-    explicit CellularDataRdbObserver(std::shared_ptr<CellularDataHandler> &cellularDataHandler);
+    explicit CellularDataRdbObserver(std::weak_ptr<AppExecFwk::EventHandler> &&cellularDataHandler);
     ~CellularDataRdbObserver();
     void OnChange() override;
 
 private:
-    std::shared_ptr<CellularDataHandler> cellularDataHandler_;
+    std::weak_ptr<AppExecFwk::EventHandler> cellularDataHandler_;
 };
 } // namespace Telephony
 } // namespace OHOS

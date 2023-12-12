@@ -332,7 +332,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataController_001, Function | MediumTest
     controller.RegisterEvents();
     controller.Init();
     controller.cellularDataHandler_ = nullptr;
-    controller.cellularDataRdbObserver_ = nullptr;
     NetRequest request;
     ASSERT_FALSE(controller.ReleaseNet(request));
     ASSERT_FALSE(controller.RequestNet(request));
