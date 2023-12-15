@@ -903,5 +903,30 @@ HWTEST_F(BranchTest, GetIpType_Test_01, Function | MediumTest | Level3)
     result = cellularMachine->GetIpType(ipInfoArray);
     ASSERT_TRUE(result == "");
 }
+
+/**
+ * @tc.number   DataSwitchSettings_Test_01
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, DataSwitchSettings_Test_01, Function | MediumTest | Level3)
+{
+    std::unique_ptr<DataSwitchSettings> dataSwitchSettings = std::make_unique<DataSwitchSettings>(0);
+    dataSwitchSettings->LoadSwitchValue();
+    bool status = true;
+    dataSwitchSettings->QueryUserDataStatus(status);
+    dataSwitchSettings->QueryUserDataRoamingStatus(status);
+    dataSwitchSettings->SetPolicyDataOn(true);
+    ASSERT_TRUE(dataSwitchSettings->IsPolicyDataOn());
+    dataSwitchSettings->IsAllowActiveData();
+    dataSwitchSettings->SetUserDataOn(true);
+    dataSwitchSettings->IsUserDataOn();
+    dataSwitchSettings->SetCarrierDataOn(true);
+    ASSERT_TRUE(dataSwitchSettings->IsCarrierDataOn());
+    dataSwitchSettings->SetUserDataRoamingOn(true);
+    dataSwitchSettings->IsUserDataRoamingOn();
+    dataSwitchSettings->SetInternalDataOn(true);
+    ASSERT_TRUE(dataSwitchSettings->IsInternalDataOn());
+}
 } // namespace Telephony
 } // namespace OHOS
