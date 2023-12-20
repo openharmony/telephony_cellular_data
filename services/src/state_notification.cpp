@@ -15,6 +15,7 @@
 
 #include "state_notification.h"
 
+#include "core_manager_inner.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_state_registry_client.h"
 
@@ -38,6 +39,11 @@ void StateNotification::UpdateCellularDataConnectState(int32_t slotId, ApnProfil
 void StateNotification::OnUpDataFlowtype(int32_t slotId, CellDataFlowType flowType)
 {
     TELEPHONY_LOGI("UpdateCellularDataFlow= %{public}d, %{public}d", slotId, flowType);
+    int32_t defaultSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
+    if (slotId != defaultSlotId) {
+        TELEPHONY_LOGI("defaultSlotId= %{public}d", defaultSlotId);
+        return;
+    }
     TelephonyStateRegistryClient::GetInstance().UpdateCellularDataFlow(slotId, static_cast<int32_t>(flowType));
 }
 } // namespace Telephony
