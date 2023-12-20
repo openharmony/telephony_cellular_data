@@ -697,7 +697,7 @@ static void NativeSetDefaultCellularDataSlotId(napi_env env, void *data)
         NapiUtil::ThrowParameterError(env);
         return;
     }
-    if (!IsValidSlotId(asyncContext->slotId) && (asyncContext->slotId != DEFAULT_SIM_SLOT_ID_REMOVE)) {
+    if (!IsValidSlotId(asyncContext->slotId)) {
         TELEPHONY_LOGE("NativeSetDefaultCellularDataSlotId slotId is invalid");
         asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
         return;
