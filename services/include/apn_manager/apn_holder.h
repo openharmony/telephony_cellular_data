@@ -44,7 +44,7 @@ public:
     int32_t GetProfileId(const std::string &apnType) const;
     void SetCellularDataStateMachine(const std::shared_ptr<CellularDataStateMachine> &stateMachine);
     std::shared_ptr<CellularDataStateMachine> GetCellularDataStateMachine() const;
-    uint32_t GetCapability() const;
+    uint64_t GetCapability() const;
     int32_t GetPriority() const;
     void RequestCellularData(const NetRequest &netRequest);
     void ReleaseCellularData(const NetRequest &netRequest);

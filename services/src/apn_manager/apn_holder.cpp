@@ -125,7 +125,7 @@ std::shared_ptr<CellularDataStateMachine> ApnHolder::GetCellularDataStateMachine
     return cellularDataStateMachine_;
 }
 
-uint32_t ApnHolder::GetCapability() const
+uint64_t ApnHolder::GetCapability() const
 {
     return capability_;
 }

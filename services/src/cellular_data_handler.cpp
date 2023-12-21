@@ -594,7 +594,9 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
     apnHolder->SetCellularDataStateMachine(cellularDataStateMachine);
     bool roamingState = CoreManagerInner::GetInstance().GetPsRoamingState(slotId_) > 0;
     bool userDataRoaming = dataSwitchSettings_->IsUserDataRoamingOn();
-    StateNotification::GetInstance().UpdateCellularDataConnectState(slotId_, PROFILE_STATE_CONNECTING, radioTech);
+    if (apnHolder->GetCapability() == NetCap::NET_CAPABILITY_INTERNET) {
+        StateNotification::GetInstance().UpdateCellularDataConnectState(slotId_, PROFILE_STATE_CONNECTING, radioTech);
+    }
     std::unique_ptr<DataConnectionParams> object = std::make_unique<DataConnectionParams>(
         apnHolder, apnItem->attr_.profileId_, radioTech, roamingState, userDataRoaming, true);
     TELEPHONY_LOGI("Slot%{public}d: MSG_SM_CONNECT profileId:%{public}d type:%{public}s networkType:%{public}d",
@@ -621,6 +623,10 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
         apnHolder->InitialApnRetryCount();
         int32_t networkType = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
         CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, networkType);
+        if (apnHolder->GetCapability() == NetCap::NET_CAPABILITY_INTERNET) {
+            StateNotification::GetInstance().UpdateCellularDataConnectState(
+                slotId_, PROFILE_STATE_CONNECTED, networkType);
+        }
         std::shared_ptr<CellularDataStateMachine> stateMachine = apnHolder->GetCellularDataStateMachine();
         if (stateMachine != nullptr) {
             stateMachine->UpdateNetworkInfo(*resultInfo);
@@ -666,17 +672,12 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
     apnHolder->SetApnState(PROFILE_STATE_IDLE);
     int32_t networkType = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, networkType);
-    StateNotification::GetInstance().UpdateCellularDataConnectState(slotId_, PROFILE_STATE_IDLE, networkType);
+    if (apnHolder->GetCapability() == NetCap::NET_CAPABILITY_INTERNET) {
+        StateNotification::GetInstance().UpdateCellularDataConnectState(slotId_, PROFILE_STATE_IDLE, networkType);
+    }
     TELEPHONY_LOGI("Slot%{public}d: apn type: %{public}s call:%{public}d", slotId_, apnHolder->GetApnType().c_str(),
         apnHolder->IsDataCallEnabled());
-    bool noActiveConnection = connectionManager_->isNoActiveConnection();
-    if (noActiveConnection && physicalConnectionActiveState_) {
-        physicalConnectionActiveState_ = false;
-        CoreManagerInner::GetInstance().DcPhysicalLinkActiveUpdate(slotId_, physicalConnectionActiveState_);
-    } else if (!noActiveConnection && !physicalConnectionActiveState_) {
-        physicalConnectionActiveState_ = true;
-        CoreManagerInner::GetInstance().DcPhysicalLinkActiveUpdate(slotId_, physicalConnectionActiveState_);
-    }
+    UpdatePhysicalConnectionState(connectionManager_->isNoActiveConnection());
     if (apnHolder->IsDataCallEnabled()) {
         if (apnHolder->GetApnState() == PROFILE_STATE_IDLE || apnHolder->GetApnState() == PROFILE_STATE_FAILED) {
             apnHolder->SetCellularDataStateMachine(nullptr);
@@ -698,6 +699,17 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
     }
     if (reason == DisConnectionReason::REASON_CHANGE_CONNECTION) {
         HandleSortConnection();
+    }
+}
+
+void CellularDataHandler::UpdatePhysicalConnectionState(bool noActiveConnection)
+{
+    if (noActiveConnection && physicalConnectionActiveState_) {
+        physicalConnectionActiveState_ = false;
+        CoreManagerInner::GetInstance().DcPhysicalLinkActiveUpdate(slotId_, physicalConnectionActiveState_);
+    } else if (!noActiveConnection && !physicalConnectionActiveState_) {
+        physicalConnectionActiveState_ = true;
+        CoreManagerInner::GetInstance().DcPhysicalLinkActiveUpdate(slotId_, physicalConnectionActiveState_);
     }
 }
 

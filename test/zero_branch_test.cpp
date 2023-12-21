@@ -271,6 +271,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_003, Function | MediumTest | 
     cellularDataHandler.connectionManager_ = std::make_unique<DataConnectionManager>(runner, INVALID_SLOTID).release();
     cellularDataHandler.ClearAllConnections(reason);
     cellularDataHandler.EstablishAllApnsIfConnectable();
+    cellularDataHandler.UpdatePhysicalConnectionState(true);
     cellularDataHandler.ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
     ASSERT_FALSE(cellularDataHandler.CheckApnState(apnHolder));
     cellularDataHandler.AttemptEstablishDataConnection(apnHolder);
