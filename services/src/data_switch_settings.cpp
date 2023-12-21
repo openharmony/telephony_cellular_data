@@ -71,11 +71,10 @@ int32_t DataSwitchSettings::QueryUserDataStatus(bool &dataEnabled)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     Uri userDataEnableUri(CELLULAR_DATA_SETTING_DATA_ENABLE_URI);
-    int32_t userDataEnable = static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_DISABLED);
+    int32_t userDataEnable = static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED);
     int32_t ret = settingsRdbHelper->GetValue(userDataEnableUri, CELLULAR_DATA_COLUMN_ENABLE, userDataEnable);
     if (ret != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("GetValue failed!");
-        return ret;
     }
     userDataOn_ = (userDataEnable == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED));
     dataEnabled = userDataOn_;

@@ -110,6 +110,7 @@ std::shared_ptr<CellularDataStateMachine> StateMachineTest::CreateCellularDataCo
     if (connectionManager == nullptr) {
         return nullptr;
     }
+    connectionManager->Init();
     cellularDataStateMachine_ =
         std::make_shared<CellularDataStateMachine>(connectionManager, shared_from_this(), stateMachineEventLoop_);
     return cellularDataStateMachine_;
@@ -239,9 +240,11 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | 
     cellularDataHandler.HandleDBSettingRoamingChanged(event);
     cellularDataHandler.SetDataPermittedResponse(event);
     cellularDataHandler.OnRilAdapterHostDied(event);
+    cellularDataHandler.OnCleanAllDataConnectionsDone(event);
     cellularDataHandler.RegisterDataSettingObserver();
     cellularDataHandler.UnRegisterDataSettingObserver();
     cellularDataHandler.GetDataConnApnAttr(apnAttr);
+    cellularDataHandler.HandleFactoryReset(event);
     ASSERT_FALSE(cellularDataHandler.HasAnyHigherPriorityConnection(apnHolder));
 }
 
@@ -329,7 +332,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataController_001, Function | MediumTest
     controller.RegisterEvents();
     controller.Init();
     controller.cellularDataHandler_ = nullptr;
-    controller.cellularDataRdbObserver_ = nullptr;
     NetRequest request;
     ASSERT_FALSE(controller.ReleaseNet(request));
     ASSERT_FALSE(controller.RequestNet(request));
@@ -368,6 +370,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataConnectionManager_001, Function | Med
 {
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
     DataConnectionManager con { runner, 0 };
+    con.Init();
     con.connectionMonitor_ = nullptr;
     con.ccmDefaultState_ = nullptr;
     con.stateMachineEventHandler_ = nullptr;
@@ -742,6 +745,7 @@ HWTEST_F(BranchTest, ApnManager_Test_01, Function | MediumTest | Level3)
     auto apnManager = std::make_shared<ApnManager>();
     EXPECT_GE(apnManager->CreateAllApnItemByDatabase(0), 0);
     EXPECT_EQ(apnManager->CreateAllApnItemByDatabase(0), 0);
+    apnManager->ResetApns();
     std::string operatorNumeric = "46003";
     apnManager->GetCTOperator(0, operatorNumeric);
     EXPECT_EQ(operatorNumeric, "46003");
@@ -898,6 +902,31 @@ HWTEST_F(BranchTest, GetIpType_Test_01, Function | MediumTest | Level3)
     std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(address);
     result = cellularMachine->GetIpType(ipInfoArray);
     ASSERT_TRUE(result == "");
+}
+
+/**
+ * @tc.number   DataSwitchSettings_Test_01
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, DataSwitchSettings_Test_01, Function | MediumTest | Level3)
+{
+    std::unique_ptr<DataSwitchSettings> dataSwitchSettings = std::make_unique<DataSwitchSettings>(0);
+    dataSwitchSettings->LoadSwitchValue();
+    bool status = true;
+    dataSwitchSettings->QueryUserDataStatus(status);
+    dataSwitchSettings->QueryUserDataRoamingStatus(status);
+    dataSwitchSettings->SetPolicyDataOn(true);
+    ASSERT_TRUE(dataSwitchSettings->IsPolicyDataOn());
+    dataSwitchSettings->IsAllowActiveData();
+    dataSwitchSettings->SetUserDataOn(true);
+    dataSwitchSettings->IsUserDataOn();
+    dataSwitchSettings->SetCarrierDataOn(true);
+    ASSERT_TRUE(dataSwitchSettings->IsCarrierDataOn());
+    dataSwitchSettings->SetUserDataRoamingOn(true);
+    dataSwitchSettings->IsUserDataRoamingOn();
+    dataSwitchSettings->SetInternalDataOn(true);
+    ASSERT_TRUE(dataSwitchSettings->IsInternalDataOn());
 }
 } // namespace Telephony
 } // namespace OHOS

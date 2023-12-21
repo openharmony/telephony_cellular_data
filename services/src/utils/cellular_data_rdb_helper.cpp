@@ -70,6 +70,23 @@ int CellularDataRdbHelper::Insert(const DataShare::DataShareValuesBucket &values
     return result;
 }
 
+bool CellularDataRdbHelper::ResetApns()
+{
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAbilityHelper();
+    if (dataShareHelper == nullptr) {
+        TELEPHONY_LOGE("dataShareHelper is null");
+        return false;
+    }
+    TELEPHONY_LOGI("Reset apns");
+    Uri resetApnUri(CELLULAR_DATA_RDB_RESET);
+    DataShare::DataSharePredicates predicates;
+    DataShare::DataShareValuesBucket values;
+    int32_t result = dataShareHelper->Update(resetApnUri, predicates, values);
+    dataShareHelper->NotifyChange(cellularDataUri_);
+    dataShareHelper->Release();
+    return result >= 0;
+}
+
 bool CellularDataRdbHelper::QueryApns(const std::string &mcc, const std::string &mnc, std::vector<PdpProfile> &apnVec)
 {
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAbilityHelper();
@@ -192,6 +209,8 @@ void CellularDataRdbHelper::MakePdpProfile(
     result->GetString(index, apnBean.mvnoType);
     result->GetColumnIndex(PdpProfileData::MVNO_MATCH_DATA, index);
     result->GetString(index, apnBean.mvnoMatchData);
+    result->GetColumnIndex(PdpProfileData::EDITED_STATUS, index);
+    result->GetInt(index, apnBean.edited);
     if (apnBean.pdpProtocol.empty()) {
         apnBean.pdpProtocol = "IPV4V6";
     }

@@ -22,6 +22,7 @@
 #include "apn_manager.h"
 #include "cellular_data_event_code.h"
 #include "cellular_data_incall_observer.h"
+#include "cellular_data_rdb_observer.h"
 #include "cellular_data_roaming_observer.h"
 #include "cellular_data_setting_observer.h"
 #include "cellular_data_state_machine.h"
@@ -127,6 +128,8 @@ private:
     void GetSinglePdpEnabledFromOpCfg();
     bool IsSingleConnectionEnabled(int32_t radioTech);
     void OnRilAdapterHostDied(const AppExecFwk::InnerEvent::Pointer &event);
+    void HandleFactoryReset(const AppExecFwk::InnerEvent::Pointer &event);
+    void OnCleanAllDataConnectionsDone(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     sptr<ApnManager> apnManager_;
@@ -153,6 +156,7 @@ private:
     sptr<CellularDataSettingObserver> settingObserver_;
     sptr<CellularDataRoamingObserver> roamingObserver_;
     sptr<CellularDataIncallObserver> incallObserver_;
+    sptr<CellularDataRdbObserver> cellularDataRdbObserver_;
     std::shared_ptr<IncallDataStateMachine> incallDataStateMachine_;
 
     using Fun = void (CellularDataHandler::*)(const AppExecFwk::InnerEvent::Pointer &event);
@@ -184,6 +188,8 @@ private:
         { CellularDataEventCode::MSG_DB_SETTING_INCALL_CHANGED, &CellularDataHandler::HandleDBSettingIncallChanged },
         { CellularDataEventCode::MSG_INCALL_DATA_COMPLETE, &CellularDataHandler::IncallDataComplete },
         { RadioEvent::RADIO_RIL_ADAPTER_HOST_DIED, &CellularDataHandler::OnRilAdapterHostDied },
+        { RadioEvent::RADIO_FACTORY_RESET, &CellularDataHandler::HandleFactoryReset },
+        { RadioEvent::RADIO_CLEAN_ALL_DATA_CONNECTIONS, &CellularDataHandler::OnCleanAllDataConnectionsDone },
     };
 };
 } // namespace Telephony

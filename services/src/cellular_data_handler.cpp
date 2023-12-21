@@ -57,6 +57,8 @@ void CellularDataHandler::Init()
         std::weak_ptr<AppExecFwk::EventHandler>(shared_from_this()), slotId_).release();
     incallObserver_ =
         new (std::nothrow) CellularDataIncallObserver(std::weak_ptr<AppExecFwk::EventHandler>(shared_from_this()));
+    cellularDataRdbObserver_ =
+        new (std::nothrow) CellularDataRdbObserver(std::weak_ptr<AppExecFwk::EventHandler>(shared_from_this()));
     if ((apnManager_ == nullptr) || (dataSwitchSettings_ == nullptr) || (connectionManager_ == nullptr)) {
         TELEPHONY_LOGE("Slot%{public}d: apnManager_ or dataSwitchSettings_ or connectionManager_ is null", slotId_);
         return;
@@ -134,7 +136,7 @@ int32_t CellularDataHandler::SetCellularDataEnable(bool userDataOn)
         TELEPHONY_LOGE("Slot%{public}d: SetCellularDataEnable dataSwitchSettings_ is null.", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    bool dataEnabled = false;
+    bool dataEnabled = true;
     int32_t result = dataSwitchSettings_->QueryUserDataStatus(dataEnabled);
     if (result != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("Slot%{public}d: Query result: %{public}d", slotId_, result);
@@ -1002,17 +1004,19 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
             SimState simState = SimState::SIM_STATE_UNKNOWN;
             CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
             TELEPHONY_LOGI("Slot%{public}d: sim records loaded state is :%{public}d", slotId_, simState);
-            if (simState == SimState::SIM_STATE_READY && iccId != u"") {
-                if (iccId == lastIccId_) {
-                    TELEPHONY_LOGI("Slot%{public}d: sim state changed, but iccId not changed.", slotId_);
-                    // the sim card status has changed to ready, so try to connect
-                    EstablishAllApnsIfConnectable();
-                    break;
-                }
+            if (simState != SimState::SIM_STATE_READY || iccId == u"") {
+                TELEPHONY_LOGI("sim state error or iccId nullptr");
+                break;
+            }
+            if (iccId != lastIccId_) {
                 if (dataSwitchSettings_ != nullptr) {
                     dataSwitchSettings_->SetPolicyDataOn(true);
                 }
                 lastIccId_ = iccId;
+            } else if (lastIccId_ == iccId) {
+                TELEPHONY_LOGI("Slot%{public}d: sim state changed, but iccId not changed.", slotId_);
+                // the sim card status has changed to ready, so try to connect
+                EstablishAllApnsIfConnectable();
             }
             break;
         }
@@ -1568,7 +1572,7 @@ void CellularDataHandler::HandleDBSettingEnableChanged(const AppExecFwk::InnerEv
         TELEPHONY_LOGE("Slot%{public}d: HandleDBSettingEnableChanged dataSwitchSettings_ is null.", slotId_);
         return;
     }
-    bool dataEnabled = false;
+    bool dataEnabled = true;
     dataSwitchSettings_->QueryUserDataStatus(dataEnabled);
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
@@ -1614,14 +1618,15 @@ void CellularDataHandler::HandleDBSettingRoamingChanged(const AppExecFwk::InnerE
 
 void CellularDataHandler::UnRegisterDataSettingObserver()
 {
-    if (settingObserver_ == nullptr || roamingObserver_ == nullptr || incallObserver_ == nullptr) {
-        TELEPHONY_LOGE("UnRegisterDataSettingObserver:Slot%{public}d: settingObserver_ or roamingObserver_ or "
-                       "incallObserver_ is null", slotId_);
+    if (settingObserver_ == nullptr || roamingObserver_ == nullptr || incallObserver_ == nullptr ||
+        cellularDataRdbObserver_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: settingObserver_ or roamingObserver_ or incallObserver_ or "
+                       "cellularDataRdbObserver_ is null", slotId_);
         return;
     }
     std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
     if (settingHelper == nullptr) {
-        TELEPHONY_LOGE("UnRegisterDataSettingObserver:Slot%{public}d: settingHelper is null", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: settingHelper is null", slotId_);
         return;
     }
     Uri dataEnableUri(CELLULAR_DATA_SETTING_DATA_ENABLE_URI);
@@ -1629,26 +1634,33 @@ void CellularDataHandler::UnRegisterDataSettingObserver()
 
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId_);
     if (simId <= INVALID_SIM_ID) {
-        TELEPHONY_LOGE(
-            "UnRegisterDataSettingObserver:Slot%{public}d: failed due to invalid sim id %{public}d", slotId_, simId);
+        TELEPHONY_LOGE("Slot%{public}d: failed due to invalid sim id %{public}d", slotId_, simId);
         return;
     }
     Uri dataRoamingUri(std::string(CELLULAR_DATA_SETTING_DATA_ROAMING_URI) + std::to_string(simId));
     settingHelper->UnRegisterSettingsObserver(dataRoamingUri, roamingObserver_);
     Uri dataIncallUri(CELLULAR_DATA_SETTING_DATA_INCALL_URI);
     settingHelper->UnRegisterSettingsObserver(dataIncallUri, incallObserver_);
+
+    std::shared_ptr<CellularDataRdbHelper> cellularDataRdbHelper = CellularDataRdbHelper::GetInstance();
+    if (cellularDataRdbHelper == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: cellularDataRdbHelper is null", slotId_);
+        return;
+    }
+    cellularDataRdbHelper->UnRegisterObserver(cellularDataRdbObserver_);
 }
 
 void CellularDataHandler::RegisterDataSettingObserver()
 {
-    if (settingObserver_ == nullptr || roamingObserver_ == nullptr || incallObserver_ == nullptr) {
-        TELEPHONY_LOGE("RegisterDataSettingObserver:Slot%{public}d: settingObserver_ or roamingObserver_ or "
-                       "incallObserver_ is null", slotId_);
+    if (settingObserver_ == nullptr || roamingObserver_ == nullptr || incallObserver_ == nullptr ||
+        cellularDataRdbObserver_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: settingObserver_ or roamingObserver_ or incallObserver_ or "
+                       "cellularDataRdbObserver_ is null", slotId_);
         return;
     }
     std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
     if (settingHelper == nullptr) {
-        TELEPHONY_LOGE("RegisterDataSettingObserver:Slot%{public}d: settingHelper is null", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: settingHelper is null", slotId_);
         return;
     }
     Uri dataEnableUri(CELLULAR_DATA_SETTING_DATA_ENABLE_URI);
@@ -1656,14 +1668,20 @@ void CellularDataHandler::RegisterDataSettingObserver()
 
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId_);
     if (simId <= INVALID_SIM_ID) {
-        TELEPHONY_LOGE(
-            "RegisterDataSettingObserver:Slot%{public}d: failed due to invalid sim id %{public}d", slotId_, simId);
+        TELEPHONY_LOGE("Slot%{public}d: failed due to invalid sim id %{public}d", slotId_, simId);
         return;
     }
     Uri dataRoamingUri(std::string(CELLULAR_DATA_SETTING_DATA_ROAMING_URI) + std::to_string(simId));
     settingHelper->RegisterSettingsObserver(dataRoamingUri, roamingObserver_);
     Uri dataIncallUri(CELLULAR_DATA_SETTING_DATA_INCALL_URI);
     settingHelper->RegisterSettingsObserver(dataIncallUri, incallObserver_);
+
+    std::shared_ptr<CellularDataRdbHelper> cellularDataRdbHelper = CellularDataRdbHelper::GetInstance();
+    if (cellularDataRdbHelper == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: cellularDataRdbHelper is null", slotId_);
+        return;
+    }
+    cellularDataRdbHelper->RegisterObserver(cellularDataRdbObserver_);
 }
 
 void CellularDataHandler::OnRilAdapterHostDied(const AppExecFwk::InnerEvent::Pointer &event)
@@ -1736,6 +1754,18 @@ int32_t CellularDataHandler::GetDataRecoveryState()
     return connectionManager_->GetDataRecoveryState();
 }
 
+void CellularDataHandler::HandleFactoryReset(const InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("Slot%{public}d: factory reset", slotId_);
+    SetCellularDataEnable(true);
+    SetCellularDataRoamingEnabled(false);
+    if (apnManager_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: apnManager_ is null", slotId_);
+        return;
+    }
+    apnManager_->ResetApns();
+}
+
 void CellularDataHandler::IsNeedDoRecovery(bool needDoRecovery) const
 {
     if (connectionManager_ == nullptr) {
@@ -1745,5 +1775,9 @@ void CellularDataHandler::IsNeedDoRecovery(bool needDoRecovery) const
     connectionManager_->IsNeedDoRecovery(needDoRecovery);
 }
 
+void CellularDataHandler::OnCleanAllDataConnectionsDone(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("Slot%{public}d: receive OnCleanAllDataConnectionsDone event", slotId_);
+}
 } // namespace Telephony
 } // namespace OHOS

@@ -45,6 +45,11 @@ CellularDataClient::~CellularDataClient()
     UnregisterSimAccountCallback();
 }
 
+bool CellularDataClient::IsValidSlotId(int32_t slotId)
+{
+    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT));
+}
+
 sptr<ICellularDataManager> CellularDataClient::GetProxy()
 {
     std::lock_guard<std::mutex> lock(mutexProxy_);
@@ -137,7 +142,7 @@ void CellularDataClient::UnregisterSimAccountCallback()
 int32_t CellularDataClient::GetDefaultCellularDataSlotId()
 {
     RegisterSimAccountCallback();
-    if (defaultCellularDataSlotId_ != INVALID_MAIN_CARD_SLOTID) {
+    if (IsValidSlotId(defaultCellularDataSlotId_)) {
         return defaultCellularDataSlotId_;
     }
     sptr<ICellularDataManager> proxy = GetProxy();
@@ -184,9 +189,6 @@ int32_t CellularDataClient::SetDefaultCellularDataSlotId(int32_t slotId)
         if (ret == TELEPHONY_ERR_SUCCESS) {
             defaultCellularDataSimId_ = simId;
         }
-    }
-    if (slotId == DEFAULT_SIM_SLOT_ID_REMOVE) {
-        UpdateDefaultCellularDataSlotId();
     }
     return result;
 }

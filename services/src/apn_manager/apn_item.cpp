@@ -64,7 +64,7 @@ sptr<ApnItem> ApnItem::MakeDefaultApn(const std::string &apnType)
         return nullptr;
     }
     Attribute attr = {"", "46002", DATA_PROFILE_DEFAULT, "IPV4V6", "IPV4V6",
-        DEFAULT_AUTH_TYPE, "cmnet", "CMNET", "", "", false, "", "", ""};
+        DEFAULT_AUTH_TYPE, "cmnet", "CMNET", "", "", false, "", "", "", false};
     apnItem->apnTypes_ = CellularDataUtils::Split(apnType, ",");
     apnItem->attr_ = attr;
     if (strcpy_s(apnItem->attr_.types_, ALL_APN_ITEM_CHAR_LENGTH, apnType.c_str()) != EOK) {
@@ -94,6 +94,7 @@ sptr<ApnItem> ApnItem::MakeApn(const PdpProfile &apnData)
     apnItem->attr_.profileId_ = apnData.profileId;
     apnItem->attr_.authType_ = apnData.authType;
     apnItem->attr_.isRoamingApn_ = apnData.isRoamingApn;
+    apnItem->attr_.isEdited_ = apnData.edited;
     if (strcpy_s(apnItem->attr_.types_, ALL_APN_ITEM_CHAR_LENGTH, apnData.apnTypes.c_str()) != EOK) {
         TELEPHONY_LOGE("types_ copy fail");
         return nullptr;

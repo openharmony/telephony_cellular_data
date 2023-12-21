@@ -16,7 +16,6 @@
 #include "cellular_data_controller.h"
 
 #include "cellular_data_constant.h"
-#include "cellular_data_settings_rdb_helper.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "core_manager_inner.h"
@@ -37,7 +36,6 @@ CellularDataController::CellularDataController(std::shared_ptr<AppExecFwk::Event
 CellularDataController::~CellularDataController()
 {
     UnRegisterEvents();
-    UnRegisterDatabaseObserver();
     if (systemAbilityListener_ != nullptr) {
         auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (samgrProxy != nullptr) {
@@ -63,7 +61,6 @@ void CellularDataController::Init()
         return;
     }
     cellularDataHandler_->Init();
-    RegisterDatabaseObserver();
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgrProxy == nullptr) {
         TELEPHONY_LOGE("samgrProxy is nullptr");
@@ -203,6 +200,7 @@ void CellularDataController::RegisterEvents()
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_NR_STATE_CHANGED, nullptr);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_NR_FREQUENCY_CHANGED, nullptr);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_RIL_ADAPTER_HOST_DIED, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_FACTORY_RESET, nullptr);
     if (slotId_ == 0) {
         sptr<NetworkSearchCallback> networkSearchCallback = std::make_unique<NetworkSearchCallback>().release();
         if (networkSearchCallback != nullptr) {
@@ -211,6 +209,7 @@ void CellularDataController::RegisterEvents()
             TELEPHONY_LOGE("Slot%{public}d: networkSearchCallback is null", slotId_);
         }
     }
+    coreInner.CleanAllConnections(slotId_, RadioEvent::RADIO_CLEAN_ALL_DATA_CONNECTIONS, cellularDataHandler_);
 }
 
 void CellularDataController::UnRegisterEvents()
@@ -237,28 +236,8 @@ void CellularDataController::UnRegisterEvents()
     coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_NR_STATE_CHANGED);
     coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_NR_FREQUENCY_CHANGED);
     coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_RIL_ADAPTER_HOST_DIED);
+    coreInner.UnRegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_FACTORY_RESET);
     TELEPHONY_LOGI("Slot%{public}d: UnRegisterEvents end", slotId_);
-}
-
-void CellularDataController::UnRegisterDatabaseObserver()
-{
-    if (cellularDataRdbObserver_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: cellularDataRdbObserver_ is null", slotId_);
-        return;
-    }
-    std::shared_ptr<CellularDataRdbHelper> cellularDataDbHelper = CellularDataRdbHelper::GetInstance();
-    cellularDataDbHelper->UnRegisterObserver(cellularDataRdbObserver_);
-}
-
-void CellularDataController::RegisterDatabaseObserver()
-{
-    cellularDataRdbObserver_ = std::make_unique<CellularDataRdbObserver>(cellularDataHandler_).release();
-    if (cellularDataRdbObserver_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: cellularDataRdbObserver_ is null", slotId_);
-        return;
-    }
-    std::shared_ptr<CellularDataRdbHelper> cellularDataDbHelper = CellularDataRdbHelper::GetInstance();
-    cellularDataDbHelper->RegisterObserver(cellularDataRdbObserver_);
 }
 
 bool CellularDataController::HandleApnChanged()
@@ -413,6 +392,7 @@ void CellularDataController::IsNeedDoRecovery(bool needDoRecovery) const
 {
     if (cellularDataHandler_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: IsNeedDoRecovery cellularDataHandler_ is null", slotId_);
+        return;
     }
     cellularDataHandler_->IsNeedDoRecovery(needDoRecovery);
 }

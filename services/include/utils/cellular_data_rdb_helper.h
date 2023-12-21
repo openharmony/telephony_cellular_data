@@ -42,6 +42,7 @@ public:
         const std::string &mvnoDataFromSim, std::vector<PdpProfile> &mvnoApnVec);
     void RegisterObserver(const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
     void UnRegisterObserver(const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
+    bool ResetApns();
 
 private:
     std::shared_ptr<DataShare::DataShareHelper> CreateDataAbilityHelper();
