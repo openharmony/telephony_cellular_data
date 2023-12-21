@@ -1119,7 +1119,7 @@ HWTEST_F(CellularDataTest, GetDataConnApnAttr_Test_01, TestSize.Level3)
     AccessToken token;
     ApnItem::Attribute apnAttr;
     int32_t result = CellularDataTest::GetDataConnApnAttr(SIM_SLOT_ID_1, apnAttr);
-    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1135,7 +1135,7 @@ HWTEST_F(CellularDataTest, GetDataConnApnAttr_Test_02, TestSize.Level3)
     AccessToken token;
     ApnItem::Attribute apnAttr;
     int32_t result = CellularDataTest::GetDataConnApnAttr(DEFAULT_SIM_SLOT_ID, apnAttr);
-    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1151,7 +1151,7 @@ HWTEST_F(CellularDataTest, GetDataConnIpType_Test_01, TestSize.Level3)
     AccessToken token;
     std::string ipType;
     int32_t result = CellularDataTest::GetDataConnIpType(SIM_SLOT_ID_1, ipType);
-    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1167,7 +1167,7 @@ HWTEST_F(CellularDataTest, GetDataConnIpType_Test_02, TestSize.Level3)
     AccessToken token;
     std::string ipType;
     int32_t result = CellularDataTest::GetDataConnIpType(DEFAULT_SIM_SLOT_ID, ipType);
-    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1183,7 +1183,7 @@ HWTEST_F(CellularDataTest, IsNeedDoRecovery_Test_01, TestSize.Level3)
     AccessToken token;
     bool needDoRecovery = true;
     int32_t result = CellularDataTest::IsNeedDoRecovery(SIM_SLOT_ID_1, needDoRecovery);
-    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1199,7 +1199,7 @@ HWTEST_F(CellularDataTest, IsNeedDoRecovery_Test_02, TestSize.Level3)
     AccessToken token;
     bool needDoRecovery = true;
     int32_t result = CellularDataTest::IsNeedDoRecovery(DEFAULT_SIM_SLOT_ID, needDoRecovery);
-    ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
 }
 
 #else  // TEL_TEST_UNSUPPORT

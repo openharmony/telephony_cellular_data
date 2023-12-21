@@ -1770,8 +1770,8 @@ void CellularDataHandler::IsNeedDoRecovery(bool needDoRecovery) const
 {
     if (connectionManager_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: in IsNeedDoRecovery connectionManager_ is null", slotId_);
+        return;
     }
- 
     connectionManager_->IsNeedDoRecovery(needDoRecovery);
 }
 
