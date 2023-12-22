@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace Telephony {
 CellularDataRoamingObserver::CellularDataRoamingObserver(
-    std::weak_ptr<AppExecFwk::EventHandler> &&cellularDataHandler, int32_t slotId)
+    std::weak_ptr<TelEventHandler> &&cellularDataHandler, int32_t slotId)
     : cellularDataHandler_(std::move(cellularDataHandler)), slotId_(slotId)
 {}
 

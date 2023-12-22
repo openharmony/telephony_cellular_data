@@ -64,10 +64,6 @@ void UpdateActiveMachineFuzz(const uint8_t *data, size_t size)
     active->ProcessDataConnectionComplete(event);
     active->RefreshTcpBufferSizes();
     active->RefreshConnectionBandwidths();
-
-    if (machine->stateMachineEventLoop_ != nullptr) {
-        machine->stateMachineEventLoop_->Stop();
-    }
 }
 
 void UpdateActiveMachineWithMyAPI(const uint8_t *data, size_t size)

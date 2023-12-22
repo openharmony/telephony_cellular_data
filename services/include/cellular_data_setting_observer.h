@@ -17,18 +17,18 @@
 #define CELLULAR_DATA_SETTING_OBSERVER_H
 
 #include "data_ability_observer_stub.h"
-#include "event_handler.h"
+#include "tel_event_handler.h"
 
 namespace OHOS {
 namespace Telephony {
 class CellularDataSettingObserver : public AAFwk::DataAbilityObserverStub {
 public:
-    explicit CellularDataSettingObserver(std::weak_ptr<AppExecFwk::EventHandler> &&cellularDataHandler);
+    explicit CellularDataSettingObserver(std::weak_ptr<TelEventHandler> &&cellularDataHandler);
     ~CellularDataSettingObserver();
     void OnChange() override;
 
 private:
-    std::weak_ptr<AppExecFwk::EventHandler> cellularDataHandler_;
+    std::weak_ptr<TelEventHandler> cellularDataHandler_;
 };
 } // namespace Telephony
 } // namespace OHOS

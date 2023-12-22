@@ -31,7 +31,6 @@ public:
     std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect(int32_t slotId);
 
 public:
-    std::shared_ptr<AppExecFwk::EventRunner> stateMachineEventLoop_ = nullptr;
     std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine_ = nullptr;
 };
 } // namespace Telephony

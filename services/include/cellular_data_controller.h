@@ -21,12 +21,13 @@
 #include "cellular_data_constant.h"
 #include "cellular_data_handler.h"
 #include "system_ability_status_change_stub.h"
+#include "tel_event_handler.h"
 
 namespace OHOS {
 namespace Telephony {
-class CellularDataController : public AppExecFwk::EventHandler {
+class CellularDataController : public TelEventHandler {
 public:
-    explicit CellularDataController(std::shared_ptr<AppExecFwk::EventRunner> &runner, int32_t slotId);
+    explicit CellularDataController(int32_t slotId);
     ~CellularDataController();
     void Init();
     bool ReleaseNet(const NetRequest &request);

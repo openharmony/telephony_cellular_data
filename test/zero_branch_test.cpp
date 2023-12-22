@@ -83,14 +83,13 @@ void BranchTest::SetUp() {}
 
 void BranchTest::TearDown() {}
 
-class StateMachineTest : public AppExecFwk::EventHandler {
+class StateMachineTest : public TelEventHandler {
 public:
-    StateMachineTest() = default;
+    StateMachineTest() : TelEventHandler("StateMachineTest") {}
     ~StateMachineTest() = default;
     std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect(int32_t slotId);
 
 public:
-    std::shared_ptr<AppExecFwk::EventRunner> stateMachineEventLoop_ = nullptr;
     std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine_ = nullptr;
 };
 
@@ -99,31 +98,23 @@ std::shared_ptr<CellularDataStateMachine> StateMachineTest::CreateCellularDataCo
     if (cellularDataStateMachine_ != nullptr) {
         return cellularDataStateMachine_;
     }
-    stateMachineEventLoop_ = AppExecFwk::EventRunner::Create("CellularDataStateMachine");
-    if (stateMachineEventLoop_ == nullptr) {
-        return nullptr;
-    }
-    stateMachineEventLoop_->Run();
-
-    sptr<DataConnectionManager> connectionManager =
-        std::make_unique<DataConnectionManager>(GetEventRunner(), slotId).release();
+    sptr<DataConnectionManager> connectionManager = std::make_unique<DataConnectionManager>(slotId).release();
     if (connectionManager == nullptr) {
         return nullptr;
     }
     connectionManager->Init();
-    cellularDataStateMachine_ =
-        std::make_shared<CellularDataStateMachine>(connectionManager, shared_from_this(), stateMachineEventLoop_);
+    cellularDataStateMachine_ = std::make_shared<CellularDataStateMachine>(
+        connectionManager, std::static_pointer_cast<TelEventHandler>(shared_from_this()));
     return cellularDataStateMachine_;
 }
 
-class IncallStateMachineTest : public AppExecFwk::EventHandler {
+class IncallStateMachineTest : public TelEventHandler {
 public:
-    IncallStateMachineTest() = default;
+    IncallStateMachineTest() : TelEventHandler("IncallStateMachineTest") {}
     ~IncallStateMachineTest() = default;
     std::shared_ptr<IncallDataStateMachine> CreateIncallDataStateMachine(int32_t slotId);
 
 public:
-    std::shared_ptr<AppExecFwk::EventRunner> stateMachineEventLoop_ = nullptr;
     std::shared_ptr<IncallDataStateMachine> incallStateMachine_ = nullptr;
 };
 
@@ -132,17 +123,12 @@ std::shared_ptr<IncallDataStateMachine> IncallStateMachineTest::CreateIncallData
     if (incallStateMachine_ != nullptr) {
         return incallStateMachine_;
     }
-    stateMachineEventLoop_ = AppExecFwk::EventRunner::Create("IncallDataStateMachine");
-    if (stateMachineEventLoop_ == nullptr) {
-        return nullptr;
-    }
-    stateMachineEventLoop_->Run();
     sptr<ApnManager> apnManager = std::make_unique<ApnManager>().release();
     if (apnManager == nullptr) {
         return nullptr;
     }
-    incallStateMachine_ =
-        std::make_shared<IncallDataStateMachine>(slotId, shared_from_this(), stateMachineEventLoop_, apnManager);
+    incallStateMachine_ = std::make_shared<IncallDataStateMachine>(slotId,
+        std::weak_ptr<TelEventHandler>(std::static_pointer_cast<TelEventHandler>(shared_from_this())), apnManager);
     return incallStateMachine_;
 }
 
@@ -153,11 +139,10 @@ std::shared_ptr<IncallDataStateMachine> IncallStateMachineTest::CreateIncallData
  */
 HWTEST_F(BranchTest, Telephony_CellularDataHandler_001, Function | MediumTest | Level1)
 {
-    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    CellularDataHandler cellularDataHandler { runner, subscriberInfo, 0 };
+    CellularDataHandler cellularDataHandler { subscriberInfo, 0 };
     NetRequest request;
     ASSERT_FALSE(cellularDataHandler.ReleaseNet(request));
     ASSERT_FALSE(cellularDataHandler.RequestNet(request));
@@ -203,11 +188,10 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_001, Function | MediumTest | 
  */
 HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | Level1)
 {
-    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    CellularDataHandler cellularDataHandler { runner, subscriberInfo, 0 };
+    CellularDataHandler cellularDataHandler { subscriberInfo, 0 };
     NetRequest request;
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
@@ -255,11 +239,10 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | 
  */
 HWTEST_F(BranchTest, Telephony_CellularDataHandler_003, Function | MediumTest | Level3)
 {
-    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    CellularDataHandler cellularDataHandler { runner, subscriberInfo, INVALID_SLOTID };
+    CellularDataHandler cellularDataHandler { subscriberInfo, INVALID_SLOTID };
     cellularDataHandler.apnManager_ = std::make_unique<ApnManager>().release();
     NetRequest request;
     ASSERT_FALSE(cellularDataHandler.ReleaseNet(request));
@@ -268,7 +251,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_003, Function | MediumTest | 
     cellularDataHandler.ClearConnection(apnHolder, reason);
     cellularDataHandler.EstablishAllApnsIfConnectable();
     cellularDataHandler.ClearAllConnections(reason);
-    cellularDataHandler.connectionManager_ = std::make_unique<DataConnectionManager>(runner, INVALID_SLOTID).release();
+    cellularDataHandler.connectionManager_ = std::make_unique<DataConnectionManager>(INVALID_SLOTID).release();
     cellularDataHandler.ClearAllConnections(reason);
     cellularDataHandler.EstablishAllApnsIfConnectable();
     cellularDataHandler.ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
@@ -279,7 +262,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_003, Function | MediumTest | 
     event = nullptr;
     cellularDataHandler.MsgEstablishDataConnection(event);
     ASSERT_FALSE(cellularDataHandler.HasAnyHigherPriorityConnection(apnHolder));
-    cellularDataHandler.connectionManager_ = std::make_unique<DataConnectionManager>(runner, INVALID_SLOTID).release();
+    cellularDataHandler.connectionManager_ = std::make_unique<DataConnectionManager>(INVALID_SLOTID).release();
     ASSERT_FALSE(cellularDataHandler.HasInternetCapability(INVALID_CID));
 }
 
@@ -327,8 +310,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_001, Function | MediumTest | 
  */
 HWTEST_F(BranchTest, Telephony_CellularDataController_001, Function | MediumTest | Level3)
 {
-    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
-    CellularDataController controller { runner, 0 };
+    CellularDataController controller { 0 };
     controller.RegisterEvents();
     controller.Init();
     controller.cellularDataHandler_ = nullptr;
@@ -368,8 +350,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataController_001, Function | MediumTest
  */
 HWTEST_F(BranchTest, Telephony_CellularDataConnectionManager_001, Function | MediumTest | Level3)
 {
-    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
-    DataConnectionManager con { runner, 0 };
+    DataConnectionManager con { 0 };
     con.Init();
     con.connectionMonitor_ = nullptr;
     con.ccmDefaultState_ = nullptr;
@@ -409,8 +390,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataConnectionManager_001, Function | Med
  */
 HWTEST_F(BranchTest, Telephony_DataConnectionMonitor_001, Function | MediumTest | Level3)
 {
-    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
-    DataConnectionMonitor mon { runner, 0 };
+    DataConnectionMonitor mon { 0 };
     mon.trafficManager_ = nullptr;
     mon.stallDetectionTrafficManager_ = nullptr;
     mon.UpdateFlowInfo();

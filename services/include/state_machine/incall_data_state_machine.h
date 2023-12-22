@@ -21,19 +21,19 @@
 
 #include "apn_manager.h"
 #include "cellular_data_constant.h"
-#include "event_handler.h"
 #include "inner_event.h"
 #include "refbase.h"
 #include "state_machine.h"
+#include "tel_event_handler.h"
 
 namespace OHOS {
 namespace Telephony {
 class IncallDataStateMachine : public StateMachine, public std::enable_shared_from_this<IncallDataStateMachine> {
 public:
-    IncallDataStateMachine(int32_t slotId, std::weak_ptr<AppExecFwk::EventHandler> &&cellularDataHandler,
-        const std::shared_ptr<AppExecFwk::EventRunner> &runner, sptr<ApnManager> &apnManager)
-        : StateMachine(runner), cellularDataHandler_(std::move(cellularDataHandler)), apnManager_(apnManager),
-          slotId_(slotId)
+    IncallDataStateMachine(
+        int32_t slotId, std::weak_ptr<TelEventHandler> &&cellularDataHandler, sptr<ApnManager> &apnManager)
+        : StateMachine("IncallDataStateMachine"), cellularDataHandler_(std::move(cellularDataHandler)),
+          apnManager_(apnManager), slotId_(slotId)
     {}
     ~IncallDataStateMachine() = default;
     sptr<State> GetCurrentState() const;
@@ -50,7 +50,7 @@ protected:
     sptr<State> activatedSecondaryState_;
     sptr<State> deactivatingSecondaryState_;
     sptr<State> currentState_;
-    std::weak_ptr<AppExecFwk::EventHandler> cellularDataHandler_;
+    std::weak_ptr<TelEventHandler> cellularDataHandler_;
     sptr<ApnManager> apnManager_;
 
 private:

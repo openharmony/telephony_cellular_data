@@ -16,17 +16,16 @@
 #ifndef DATA_CONNECTION_MONITOR_H
 #define DATA_CONNECTION_MONITOR_H
 
-#include "event_handler.h"
-#include "inner_event.h"
-
 #include "apn_holder.h"
+#include "inner_event.h"
+#include "tel_event_handler.h"
 #include "traffic_management.h"
 
 namespace OHOS {
 namespace Telephony {
-class DataConnectionMonitor : public AppExecFwk::EventHandler {
+class DataConnectionMonitor : public TelEventHandler {
 public:
-    explicit DataConnectionMonitor(const std::shared_ptr<AppExecFwk::EventRunner> &runner, int32_t slotId);
+    explicit DataConnectionMonitor(int32_t slotId);
     ~DataConnectionMonitor() = default;
 
     /**

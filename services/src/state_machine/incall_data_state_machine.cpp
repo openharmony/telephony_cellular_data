@@ -166,7 +166,7 @@ void IdleState::StateBegin()
     stateMachine->SetCurrentState(sptr<State>(this));
     if (stateMachine->GetCallState() == static_cast<int32_t>(TelCallStatus::CALL_STATUS_IDLE) ||
         stateMachine->GetCallState() == static_cast<int32_t>(TelCallStatus::CALL_STATUS_DISCONNECTED)) {
-        std::shared_ptr<AppExecFwk::EventHandler> eventHandler = stateMachine->cellularDataHandler_.lock();
+        std::shared_ptr<TelEventHandler> eventHandler = stateMachine->cellularDataHandler_.lock();
         if (eventHandler != nullptr) {
             eventHandler->SendEvent(CellularDataEventCode::MSG_INCALL_DATA_COMPLETE);
         }
@@ -232,7 +232,7 @@ bool IdleState::ProcessCallEnded(const AppExecFwk::InnerEvent::Pointer &event)
         CellularDataEventCode::MSG_SM_INCALL_DATA_DSDS_CHANGED)) {
         stateMachine->stateMachineEventHandler_->RemoveEvent(CellularDataEventCode::MSG_SM_INCALL_DATA_DSDS_CHANGED);
     }
-    std::shared_ptr<AppExecFwk::EventHandler> eventHandler = stateMachine->cellularDataHandler_.lock();
+    std::shared_ptr<TelEventHandler> eventHandler = stateMachine->cellularDataHandler_.lock();
     if (eventHandler != nullptr) {
         eventHandler->SendEvent(CellularDataEventCode::MSG_INCALL_DATA_COMPLETE);
     }

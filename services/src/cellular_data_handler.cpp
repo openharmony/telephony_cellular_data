@@ -28,7 +28,6 @@
 #include "hril_call_parcel.h"
 #include "net_specifier.h"
 #include "radio_event.h"
-#include "runner_pool.h"
 #include "str_convert.h"
 #include "string_ex.h"
 #include "telephony_log_wrapper.h"
@@ -40,25 +39,23 @@ using namespace AppExecFwk;
 using namespace OHOS::EventFwk;
 using namespace NetManagerStandard;
 static const int32_t ESM_FLAG_INVALID = -1;
-CellularDataHandler::CellularDataHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-    const EventFwk::CommonEventSubscribeInfo &sp, int32_t slotId)
-    : EventHandler(runner), CommonEventSubscriber(sp), slotId_(slotId)
+CellularDataHandler::CellularDataHandler(const EventFwk::CommonEventSubscribeInfo &sp, int32_t slotId)
+    : TelEventHandler("CellularDataHandler"), CommonEventSubscriber(sp), slotId_(slotId)
 {}
 
 void CellularDataHandler::Init()
 {
     apnManager_ = std::make_unique<ApnManager>().release();
     dataSwitchSettings_ = std::make_unique<DataSwitchSettings>(slotId_);
-    connectionManager_ = std::make_unique<DataConnectionManager>(GetEventRunner(), slotId_).release();
-    settingObserver_ =
-        std::make_unique<CellularDataSettingObserver>(std::weak_ptr<AppExecFwk::EventHandler>(shared_from_this()))
-            .release();
-    roamingObserver_ = std::make_unique<CellularDataRoamingObserver>(
-        std::weak_ptr<AppExecFwk::EventHandler>(shared_from_this()), slotId_).release();
-    incallObserver_ =
-        new (std::nothrow) CellularDataIncallObserver(std::weak_ptr<AppExecFwk::EventHandler>(shared_from_this()));
-    cellularDataRdbObserver_ =
-        new (std::nothrow) CellularDataRdbObserver(std::weak_ptr<AppExecFwk::EventHandler>(shared_from_this()));
+    connectionManager_ = std::make_unique<DataConnectionManager>(slotId_).release();
+    settingObserver_ = new (std::nothrow) CellularDataSettingObserver(
+        std::weak_ptr<TelEventHandler>(std::static_pointer_cast<TelEventHandler>(shared_from_this())));
+    roamingObserver_ = new (std::nothrow) CellularDataRoamingObserver(
+        std::weak_ptr<TelEventHandler>(std::static_pointer_cast<TelEventHandler>(shared_from_this())), slotId_);
+    incallObserver_ = new (std::nothrow) CellularDataIncallObserver(
+        std::weak_ptr<TelEventHandler>(std::static_pointer_cast<TelEventHandler>(shared_from_this())));
+    cellularDataRdbObserver_ = new (std::nothrow) CellularDataRdbObserver(
+        std::weak_ptr<TelEventHandler>(std::static_pointer_cast<TelEventHandler>(shared_from_this())));
     if ((apnManager_ == nullptr) || (dataSwitchSettings_ == nullptr) || (connectionManager_ == nullptr)) {
         TELEPHONY_LOGE("Slot%{public}d: apnManager_ or dataSwitchSettings_ or connectionManager_ is null", slotId_);
         return;
@@ -539,15 +536,8 @@ std::shared_ptr<CellularDataStateMachine> CellularDataHandler::FindIdleCellularD
 
 std::shared_ptr<CellularDataStateMachine> CellularDataHandler::CreateCellularDataConnect()
 {
-    if (stateMachineEventLoop_ == nullptr) {
-        stateMachineEventLoop_ = RunnerPool::GetInstance().GetCommonRunner();
-        if (stateMachineEventLoop_ == nullptr) {
-            TELEPHONY_LOGE("Slot%{public}d: failed to create EventRunner", slotId_);
-            return nullptr;
-        }
-    }
-    std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine =
-        std::make_shared<CellularDataStateMachine>(connectionManager_, shared_from_this(), stateMachineEventLoop_);
+    std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine = std::make_shared<CellularDataStateMachine>(
+        connectionManager_, std::static_pointer_cast<TelEventHandler>(shared_from_this()));
     if (cellularDataStateMachine == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: cellularDataStateMachine is null", slotId_);
         return nullptr;
@@ -851,15 +841,8 @@ void CellularDataHandler::HandleDBSettingIncallChanged(const AppExecFwk::InnerEv
 
 std::shared_ptr<IncallDataStateMachine> CellularDataHandler::CreateIncallDataStateMachine(int32_t callState)
 {
-    if (stateMachineEventLoop_ == nullptr) {
-        stateMachineEventLoop_ = RunnerPool::GetInstance().GetCommonRunner();
-        if (stateMachineEventLoop_ == nullptr) {
-            TELEPHONY_LOGE("Slot%{public}d: failed to create EventRunner", slotId_);
-            return nullptr;
-        }
-    }
-    std::shared_ptr<IncallDataStateMachine> incallDataStateMachine = std::make_shared<IncallDataStateMachine>(
-        slotId_, std::weak_ptr<AppExecFwk::EventHandler>(shared_from_this()), stateMachineEventLoop_, apnManager_);
+    std::shared_ptr<IncallDataStateMachine> incallDataStateMachine = std::make_shared<IncallDataStateMachine>(slotId_,
+        std::weak_ptr<TelEventHandler>(std::static_pointer_cast<TelEventHandler>(shared_from_this())), apnManager_);
     if (incallDataStateMachine == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: incallDataStateMachine is null", slotId_);
         return nullptr;

@@ -32,8 +32,7 @@
 
 namespace OHOS {
 namespace Telephony {
-DataConnectionMonitor::DataConnectionMonitor(const std::shared_ptr<AppExecFwk::EventRunner> &runner, int32_t slotId)
-    : AppExecFwk::EventHandler(runner), slotId_(slotId)
+DataConnectionMonitor::DataConnectionMonitor(int32_t slotId) : TelEventHandler("DataConnectionMonitor"), slotId_(slotId)
 {
     trafficManager_ = std::make_unique<TrafficManagement>(slotId);
     stallDetectionTrafficManager_ = std::make_unique<TrafficManagement>(slotId);

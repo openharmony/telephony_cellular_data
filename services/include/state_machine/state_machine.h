@@ -21,12 +21,10 @@
 #include <utility>
 #include <vector>
 
-#include "event_handler.h"
-#include "inner_event.h"
-
-#include "telephony_log_wrapper.h"
-
 #include "cellular_data_event_code.h"
+#include "inner_event.h"
+#include "tel_event_handler.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -57,11 +55,9 @@ protected:
     bool isActive_ = false;
 };
 
-class StateMachineEventHandler : public AppExecFwk::EventHandler {
+class StateMachineEventHandler : public TelEventHandler {
 public:
-    explicit StateMachineEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner)
-        : EventHandler(runner)
-    {}
+    explicit StateMachineEventHandler(const std::string &name) : TelEventHandler(name) {}
     ~StateMachineEventHandler() = default;
 
     virtual void SetOriginalState(sptr<State> &originalState)
@@ -184,9 +180,9 @@ private:
 
 class StateMachine {
 public:
-    explicit StateMachine(const std::shared_ptr<AppExecFwk::EventRunner> &runner)
+    explicit StateMachine(const std::string &name)
     {
-        stateMachineEventHandler_ = std::make_shared<StateMachineEventHandler>(runner);
+        stateMachineEventHandler_ = std::make_shared<StateMachineEventHandler>(name);
         if (stateMachineEventHandler_ == nullptr) {
             TELEPHONY_LOGE("stateMachineEventHandler_ is null");
             return;
