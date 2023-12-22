@@ -69,10 +69,6 @@ void UpdateDisconnectMachineFuzz(const uint8_t *data, size_t size)
     defaultStatus->ProcessDataConnectionDrsOrRatChanged(event);
     defaultStatus->ProcessDataConnectionRoamOn(event);
     defaultStatus->ProcessDataConnectionRoamOff(event);
-
-    if (machine->stateMachineEventLoop_ != nullptr) {
-        machine->stateMachineEventLoop_->Stop();
-    }
 }
 
 void UpdateActiveMachineWithMyAPI(const uint8_t *data, size_t size)

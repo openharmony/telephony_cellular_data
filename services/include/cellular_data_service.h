@@ -87,7 +87,6 @@ private:
 
 private:
     std::map<int32_t, std::shared_ptr<CellularDataController>> cellularDataControllers_;
-    std::shared_ptr<AppExecFwk::EventRunner> eventLoop_;
     bool registerToService_;
     int64_t beginTime_ = 0L;
     int64_t endTime_ = 0L;

@@ -29,8 +29,8 @@ namespace Telephony {
 using namespace NetManagerStandard;
 using namespace OHOS::EventFwk;
 
-CellularDataController::CellularDataController(std::shared_ptr<AppExecFwk::EventRunner> &runner, int32_t slotId)
-    : AppExecFwk::EventHandler(runner), slotId_(slotId)
+CellularDataController::CellularDataController(int32_t slotId)
+    : TelEventHandler("CellularDataController"), slotId_(slotId)
 {}
 
 CellularDataController::~CellularDataController()
@@ -55,7 +55,7 @@ void CellularDataController::Init()
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
-    cellularDataHandler_ = std::make_shared<CellularDataHandler>(GetEventRunner(), subscriberInfo, slotId_);
+    cellularDataHandler_ = std::make_shared<CellularDataHandler>(subscriberInfo, slotId_);
     if (cellularDataHandler_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler_ is null", slotId_);
         return;

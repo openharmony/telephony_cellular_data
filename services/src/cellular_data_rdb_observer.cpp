@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Telephony {
 using namespace AppExecFwk;
 
-CellularDataRdbObserver::CellularDataRdbObserver(std::weak_ptr<AppExecFwk::EventHandler> &&cellularDataHandler)
+CellularDataRdbObserver::CellularDataRdbObserver(std::weak_ptr<TelEventHandler> &&cellularDataHandler)
     : cellularDataHandler_(std::move(cellularDataHandler))
 {}
 

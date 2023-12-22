@@ -24,20 +24,13 @@ std::shared_ptr<CellularDataStateMachine> StateMachineFuzzer::CreateCellularData
     if (cellularDataStateMachine_ != nullptr) {
         return cellularDataStateMachine_;
     }
-    stateMachineEventLoop_ = AppExecFwk::EventRunner::Create("CellularDataStateMachine");
-    if (stateMachineEventLoop_ == nullptr) {
-        return nullptr;
-    }
-    stateMachineEventLoop_->Run();
-
-    sptr<DataConnectionManager> connectionManager =
-        std::make_unique<DataConnectionManager>(GetEventRunner(), slotId).release();
+    sptr<DataConnectionManager> connectionManager = std::make_unique<DataConnectionManager>(slotId).release();
     if (connectionManager == nullptr) {
         return nullptr;
     }
     connectionManager->Init();
-    cellularDataStateMachine_ =
-        std::make_shared<CellularDataStateMachine>(connectionManager, shared_from_this(), stateMachineEventLoop_);
+    cellularDataStateMachine_ = std::make_shared<CellularDataStateMachine>(
+        connectionManager, std::static_pointer_cast<TelEventHandler>(shared_from_this()));
     return cellularDataStateMachine_;
 }
 } // namespace Telephony
