@@ -15,9 +15,9 @@
 
 #include "cellular_data_rdb_helper.h"
 
-#include "telephony_log_wrapper.h"
-
 #include "cellular_data_constant.h"
+#include "core_manager_inner.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
