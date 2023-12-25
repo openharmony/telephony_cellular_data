@@ -140,6 +140,32 @@ bool CellularDataRdbHelper::QueryMvnoApnsByType(const std::string &mcc, const st
     return true;
 }
 
+bool CellularDataRdbHelper::QueryPreferApn(int32_t slotId, std::vector<PdpProfile> &apnVec)
+{
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAbilityHelper();
+    if (dataShareHelper == nullptr) {
+        TELEPHONY_LOGE("dataShareHelper is null");
+        return false;
+    }
+    std::vector<std::string> columns;
+    DataShare::DataSharePredicates predicates;
+    int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
+    Uri preferApnUri(std::string(CELLULAR_DATA_RDB_PREFER) + "?Proxy=true&simId=" + std::to_string(simId));
+    std::shared_ptr<DataShare::DataShareResultSet> result = dataShareHelper->Query(preferApnUri, predicates, columns);
+    if (result == nullptr) {
+        TELEPHONY_LOGE("query prefer apns error");
+        dataShareHelper->Release();
+        return false;
+    }
+    ReadApnResult(result, apnVec);
+    result->Close();
+    dataShareHelper->Release();
+    if (apnVec.size() > 0) {
+        return true;
+    }
+    return false;
+}
+
 void CellularDataRdbHelper::ReadApnResult(
     const std::shared_ptr<DataShare::DataShareResultSet> &result, std::vector<PdpProfile> &apnVec)
 {
@@ -246,6 +272,8 @@ void CellularDataRdbHelper::RegisterObserver(const sptr<AAFwk::IDataAbilityObser
         TELEPHONY_LOGE("dataShareHelper is null");
         return;
     }
+    Uri preferApnUri(CELLULAR_DATA_RDB_PREFER);
+    dataShareHelper->RegisterObserver(preferApnUri, dataObserver);
     dataShareHelper->RegisterObserver(cellularDataUri_, dataObserver);
     dataShareHelper->Release();
     TELEPHONY_LOGI("CellularDataRdbHelper::RegisterObserver Success");
@@ -258,6 +286,8 @@ void CellularDataRdbHelper::UnRegisterObserver(const sptr<AAFwk::IDataAbilityObs
         TELEPHONY_LOGE("dataShareHelper is null");
         return;
     }
+    Uri preferApnUri(CELLULAR_DATA_RDB_PREFER);
+    dataShareHelper->UnregisterObserver(preferApnUri, dataObserver);
     dataShareHelper->UnregisterObserver(cellularDataUri_, dataObserver);
     dataShareHelper->Release();
     TELEPHONY_LOGI("CellularDataRdbHelper::UnRegisterObserver Success");
