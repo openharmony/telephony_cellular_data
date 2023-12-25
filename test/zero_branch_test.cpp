@@ -28,6 +28,7 @@
 #include "cellular_data_rdb_observer.h"
 #include "cellular_data_roaming_observer.h"
 #include "cellular_data_service.h"
+#include "cellular_data_service_stub.h"
 #include "cellular_data_setting_observer.h"
 #include "cellular_data_state_machine.h"
 #include "cellular_data_utils.h"
@@ -59,6 +60,8 @@ const int32_t INVALID_SLOTID = -1;
 const int32_t INVALID_SLOTID_TWO = 5;
 const int32_t INVALID_CID = -1;
 const int32_t INVALID_FD = -1;
+const std::string ADDRESS = "127.0.0.1";
+const std::string FLAG = ".";
 } // namespace
 
 class DemoHandler : public AppExecFwk::EventHandler {
@@ -907,6 +910,75 @@ HWTEST_F(BranchTest, DataSwitchSettings_Test_01, Function | MediumTest | Level3)
     dataSwitchSettings->IsUserDataRoamingOn();
     dataSwitchSettings->SetInternalDataOn(true);
     ASSERT_TRUE(dataSwitchSettings->IsInternalDataOn());
+}
+
+/**
+ * @tc.number   CellularDataServices_Test_01
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, CellularDataServices_Test_01, Function | MediumTest | Level3)
+{
+    std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
+    cellularMachine->IsInactiveState();
+    uint64_t capability = 1;
+    cellularMachine->SetCapability(capability);
+    cellularMachine->GetCapability();
+    const int32_t cid = 1;
+    cellularMachine->SetCid(cid);
+    cellularMachine->GetSlotId();
+    cellularMachine->GetApnItem();
+    cellularMachine->GetCurrentState();
+    const uint32_t upBandwidth = 0;
+    const uint32_t downBandwidth = 0;
+    cellularMachine->SetConnectionBandwidth(upBandwidth, downBandwidth);
+    const std::string tcpBuffer = "";
+    cellularMachine->SetConnectionTcpBuffer(tcpBuffer);
+    EXPECT_TRUE(cellularMachine != nullptr);
+    CellularDataDumpHelper dumpHelper;
+    std::string result = "";
+    dumpHelper.ShowHelp(result);
+    EXPECT_GE(result.size(), 0);
+}
+
+/**
+ * @tc.number   CellularDataServices_Test_02
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, CellularDataServices_Test_02, Function | MediumTest | Level3)
+{
+    CellularDataUtils::ParseNormalIpAddr(ADDRESS);
+    CellularDataUtils::ParseRoute(ADDRESS);
+    CellularDataUtils::GetPrefixLen(ADDRESS, FLAG);
+    auto cellularDataHiSysEvent = DelayedSingleton<CellularDataHiSysEvent>::GetInstance();
+    cellularDataHiSysEvent->WriteRoamingConnectStateBehaviorEvent(1);
+    cellularDataHiSysEvent->SetCellularDataActivateStartTime();
+    cellularDataHiSysEvent->JudgingDataActivateTimeOut(0, 1);
+    std::shared_ptr<DataConnectionMonitor> dataConnectionMonitor = std::make_shared<DataConnectionMonitor>(0);
+    dataConnectionMonitor->HandleRecovery();
+    dataConnectionMonitor->GetPdpContextList();
+    dataConnectionMonitor->SetRadioState(0, RadioEvent::RADIO_ON);
+    dataConnectionMonitor->GetPreferredNetworkPara();
+    dataConnectionMonitor->GetDataFlowType();
+    auto cellularDataService = DelayedSingleton<CellularDataService>::GetInstance();
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_GE(cellularDataService->OnIsCellularDataEnabled(data, reply), 0);
+    EXPECT_GE(cellularDataService->OnEnableCellularData(data, reply), 0);
+    EXPECT_GE(cellularDataService->OnGetCellularDataState(data, reply), 0);
+    EXPECT_GE(cellularDataService->OnIsCellularDataRoamingEnabled(data, reply), 0);
+    EXPECT_GE(cellularDataService->OnEnableCellularDataRoaming(data, reply), 0);
+    EXPECT_GE(cellularDataService->OnHandleApnChanged(data, reply), 0);
+    cellularDataService->OnGetDefaultCellularDataSlotId(data, reply);
+    EXPECT_GE(cellularDataService->OnGetDefaultCellularDataSimId(data, reply), 0);
+    EXPECT_GE(cellularDataService->OnSetDefaultCellularDataSlotId(data, reply), 0);
+    EXPECT_GE(cellularDataService->OnGetCellularDataFlowType(data, reply), 0);
+    EXPECT_GE(cellularDataService->OnHasInternetCapability(data, reply), 0);
+    EXPECT_GE(cellularDataService->OnClearCellularDataConnections(data, reply), 0);
+    EXPECT_GE(cellularDataService->OnRegisterSimAccountCallback(data, reply), 0);
+    EXPECT_GE(cellularDataService->OnUnregisterSimAccountCallback(data, reply), 0);
 }
 } // namespace Telephony
 } // namespace OHOS
