@@ -106,13 +106,13 @@ bool CellularDataHandler::RequestNet(const NetRequest &request)
     int32_t id = ApnManager::FindApnIdByCapability(request.capability);
     sptr<ApnHolder> apnHolder = apnManager_->FindApnHolderById(id);
     if (apnHolder == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: RequestNet apnHolder is null.", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: apnHolder is null.", slotId_);
         return false;
     }
     ApnProfileState apnState = apnHolder->GetApnState();
     if (apnState == ApnProfileState::PROFILE_STATE_CONNECTED || apnState == ApnProfileState::PROFILE_STATE_CONNECTING ||
         apnState == ApnProfileState::PROFILE_STATE_DISCONNECTING) {
-        TELEPHONY_LOGE("Slot%{public}d: RequestNet apn state is connected(%{public}d).", slotId_, apnState);
+        TELEPHONY_LOGD("Slot%{public}d: apn state is connected(%{public}d).", slotId_, apnState);
         return true;
     }
     std::unique_ptr<NetRequest> netRequest = std::make_unique<NetRequest>();
