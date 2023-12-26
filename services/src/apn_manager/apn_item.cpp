@@ -68,17 +68,17 @@ sptr<ApnItem> ApnItem::MakeDefaultApn(const std::string &apnType)
     apnItem->apnTypes_ = CellularDataUtils::Split(apnType, ",");
     apnItem->attr_ = attr;
     if (strcpy_s(apnItem->attr_.types_, ALL_APN_ITEM_CHAR_LENGTH, apnType.c_str()) != EOK) {
-        TELEPHONY_LOGE("MakeDefaultApn: types_ copy fail");
+        TELEPHONY_LOGE("types_ copy fail");
         return nullptr;
     }
     if (apnType == "mms") {
         std::string apn = "cmwap";
         if (strcpy_s(apnItem->attr_.apn_, ALL_APN_ITEM_CHAR_LENGTH, apn.c_str()) != EOK) {
-            TELEPHONY_LOGE("MakeDefaultApn: types_ copy fail");
+            TELEPHONY_LOGE("types_ copy fail");
             return nullptr;
         }
     }
-    TELEPHONY_LOGI("MakeDefaultApn: type = %{public}s", apnItem->attr_.types_);
+    TELEPHONY_LOGI("type = %{public}s", apnItem->attr_.types_);
     return apnItem;
 }
 

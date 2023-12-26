@@ -86,12 +86,12 @@ sptr<ICellularDataManager> CellularDataClient::GetProxy()
 void CellularDataClient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     if (remote == nullptr) {
-        TELEPHONY_LOGE("OnRemoteDied failed, remote is nullptr");
+        TELEPHONY_LOGE("remote is nullptr");
         return;
     }
     std::lock_guard<std::mutex> lock(mutexProxy_);
     if (proxy_ == nullptr) {
-        TELEPHONY_LOGE("OnRemoteDied proxy_ is nullptr");
+        TELEPHONY_LOGE("proxy_ is nullptr");
         return;
     }
     sptr<IRemoteObject> serviceRemote = proxy_->AsObject();
@@ -122,7 +122,7 @@ void CellularDataClient::RegisterSimAccountCallback()
         return;
     }
     int32_t ret = proxy->RegisterSimAccountCallback(callback_);
-    TELEPHONY_LOGI("CellularDataClient::RegisterSimAccountCallback ret:%{public}d", ret);
+    TELEPHONY_LOGI("ret:%{public}d", ret);
     if (ret == TELEPHONY_ERR_SUCCESS) {
         registerStatus_ = true;
     }
@@ -136,7 +136,7 @@ void CellularDataClient::UnregisterSimAccountCallback()
         return;
     }
     int32_t ret = proxy->UnregisterSimAccountCallback();
-    TELEPHONY_LOGI("CellularDataClient::UnregisterSimAccountCallback ret:%{public}d", ret);
+    TELEPHONY_LOGI("ret:%{public}d", ret);
 }
 
 int32_t CellularDataClient::GetDefaultCellularDataSlotId()

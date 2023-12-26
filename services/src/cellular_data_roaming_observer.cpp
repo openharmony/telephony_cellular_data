@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace Telephony {
 CellularDataRoamingObserver::CellularDataRoamingObserver(
-    std::weak_ptr<AppExecFwk::EventHandler> &&cellularDataHandler, int32_t slotId)
+    std::weak_ptr<TelEventHandler> &&cellularDataHandler, int32_t slotId)
     : cellularDataHandler_(std::move(cellularDataHandler)), slotId_(slotId)
 {}
 
@@ -45,7 +45,7 @@ void CellularDataRoamingObserver::OnChange()
     int value = static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_DISABLED);
     if (settingHelper->GetValue(uri, std::string(CELLULAR_DATA_COLUMN_ROAMING) + std::to_string(simId), value) !=
         TELEPHONY_ERR_SUCCESS) {
-        TELEPHONY_LOGE("OnChange GetValue failed!");
+        TELEPHONY_LOGE("GetValue failed!");
         return;
     }
     TELEPHONY_LOGI("cellular data roaming switch is %{public}d", value);

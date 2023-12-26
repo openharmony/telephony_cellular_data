@@ -16,20 +16,17 @@
 #ifndef CELLULAR_DATA_STATE_MACHINE_H
 #define CELLULAR_DATA_STATE_MACHINE_H
 
-#include <memory>
 #include <map>
-
-#include "event_handler.h"
-#include "inner_event.h"
-
-#include "network_state.h"
+#include <memory>
 
 #include "apn_item.h"
 #include "cellular_data_net_agent.h"
 #include "data_connection_manager.h"
 #include "data_connection_params.h"
 #include "data_disconnect_params.h"
+#include "network_state.h"
 #include "state_machine.h"
+#include "tel_event_handler.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -37,12 +34,11 @@ class DataConnectionManager;
 class CellularDataStateMachine : public StateMachine,
     public std::enable_shared_from_this<CellularDataStateMachine> {
 public:
-    CellularDataStateMachine(sptr<DataConnectionManager> &cdConnectionManager,
-        std::shared_ptr<AppExecFwk::EventHandler> &&cellularDataHandler,
-        const std::shared_ptr<AppExecFwk::EventRunner> &runner)
-        : StateMachine(runner), cdConnectionManager_(cdConnectionManager),
-        cellularDataHandler_(std::move(cellularDataHandler)), cid_(0), capability_(0),
-        rilRat_(RadioTech::RADIO_TECHNOLOGY_UNKNOWN), apnId_(0)
+    CellularDataStateMachine(
+        sptr<DataConnectionManager> &cdConnectionManager, std::shared_ptr<TelEventHandler> &&cellularDataHandler)
+        : StateMachine("CellularDataStateMachine"), cdConnectionManager_(cdConnectionManager),
+          cellularDataHandler_(std::move(cellularDataHandler)), cid_(0), capability_(0),
+          rilRat_(RadioTech::RADIO_TECHNOLOGY_UNKNOWN), apnId_(0)
     {}
     ~CellularDataStateMachine() = default;
     bool operator==(const CellularDataStateMachine &stateMachine) const;
@@ -68,7 +64,7 @@ protected:
     sptr<State> defaultState_;
     sptr<State> currentState_;
     sptr<DataConnectionManager> cdConnectionManager_;
-    std::shared_ptr<AppExecFwk::EventHandler> cellularDataHandler_;
+    std::shared_ptr<TelEventHandler> cellularDataHandler_;
     sptr<NetManagerStandard::NetLinkInfo> netLinkInfo_;
     sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo_;
 

@@ -68,10 +68,6 @@ void UpdateInActiveMachineFuzz(const uint8_t *data, size_t size)
     activating->RilErrorResponse(event);
     activating->ProcessConnectTimeout(event);
     activating->StateProcess(event);
-
-    if (machine->stateMachineEventLoop_ != nullptr) {
-        machine->stateMachineEventLoop_->Stop();
-    }
 }
 
 void UpdateActiveMachineWithMyAPI(const uint8_t *data, size_t size)

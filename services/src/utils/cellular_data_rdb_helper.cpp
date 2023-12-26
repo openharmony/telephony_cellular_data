@@ -30,12 +30,12 @@ std::shared_ptr<DataShare::DataShareHelper> CellularDataRdbHelper::CreateDataAbi
     TELEPHONY_LOGI("Create data ability helper");
     sptr<ISystemAbilityManager> saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (saManager == nullptr) {
-        TELEPHONY_LOGE("CellularDataRdbHelper GetSystemAbilityManager failed.");
+        TELEPHONY_LOGE("GetSystemAbilityManager failed.");
         return nullptr;
     }
     sptr<IRemoteObject> remoteObj = saManager->GetSystemAbility(TELEPHONY_CELLULAR_DATA_SYS_ABILITY_ID);
     if (remoteObj == nullptr) {
-        TELEPHONY_LOGE("CellularDataRdbHelper GetSystemAbility Service Failed.");
+        TELEPHONY_LOGE("GetSystemAbility Service Failed.");
         return nullptr;
     }
     return DataShare::DataShareHelper::Creator(remoteObj, CELLULAR_DATA_RDB_URI);
@@ -100,7 +100,7 @@ bool CellularDataRdbHelper::QueryApns(const std::string &mcc, const std::string 
     std::shared_ptr<DataShare::DataShareResultSet> result =
         dataShareHelper->Query(cellularDataUri_, predicates, columns);
     if (result == nullptr) {
-        TELEPHONY_LOGE("CellularDataRdbHelper: query apns error");
+        TELEPHONY_LOGE("query apns error");
         dataShareHelper->Release();
         return false;
     }
@@ -144,12 +144,12 @@ void CellularDataRdbHelper::ReadApnResult(
     const std::shared_ptr<DataShare::DataShareResultSet> &result, std::vector<PdpProfile> &apnVec)
 {
     if (result == nullptr) {
-        TELEPHONY_LOGI("ReadApnResult result is nullptr");
+        TELEPHONY_LOGI("result is nullptr");
         return;
     }
     int rowCnt = 0;
     result->GetRowCount(rowCnt);
-    TELEPHONY_LOGI("CellularDataRdbHelper::query apns rowCnt = %{public}d", rowCnt);
+    TELEPHONY_LOGI("query apns rowCnt = %{public}d", rowCnt);
     for (int i = 0; i < rowCnt; ++i) {
         PdpProfile apnBean;
         MakePdpProfile(result, i, apnBean);
@@ -163,12 +163,12 @@ void CellularDataRdbHelper::ReadMvnoApnResult(const std::shared_ptr<DataShare::D
     const std::string &mvnoDataFromSim, std::vector<PdpProfile> &apnVec)
 {
     if (result == nullptr) {
-        TELEPHONY_LOGI("ReadMvnoApnResult result is nullptr");
+        TELEPHONY_LOGI("result is nullptr");
         return;
     }
     int rowCnt = 0;
     result->GetRowCount(rowCnt);
-    TELEPHONY_LOGI("CellularDataRdbHelper::query mvno apns rowCnt = %{public}d", rowCnt);
+    TELEPHONY_LOGI("query mvno apns rowCnt = %{public}d", rowCnt);
     for (int i = 0; i < rowCnt; ++i) {
         PdpProfile apnBean;
         MakePdpProfile(result, i, apnBean);
@@ -248,7 +248,7 @@ void CellularDataRdbHelper::RegisterObserver(const sptr<AAFwk::IDataAbilityObser
     }
     dataShareHelper->RegisterObserver(cellularDataUri_, dataObserver);
     dataShareHelper->Release();
-    TELEPHONY_LOGI("CellularDataRdbHelper::RegisterObserver Success");
+    TELEPHONY_LOGI("RegisterObserver Success");
 }
 
 void CellularDataRdbHelper::UnRegisterObserver(const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
@@ -260,7 +260,7 @@ void CellularDataRdbHelper::UnRegisterObserver(const sptr<AAFwk::IDataAbilityObs
     }
     dataShareHelper->UnregisterObserver(cellularDataUri_, dataObserver);
     dataShareHelper->Release();
-    TELEPHONY_LOGI("CellularDataRdbHelper::UnRegisterObserver Success");
+    TELEPHONY_LOGI("UnRegisterObserver Success");
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -40,7 +40,6 @@ ohos_shared_library("tel_cellular_data") {
     "services/src/data_connection_manager.cpp",
     "services/src/data_connection_monitor.cpp",
     "services/src/data_switch_settings.cpp",
-    "services/src/runner_pool.cpp",
     "services/src/sim_account_callback_proxy.cpp",
     "services/src/state_machine/activating.cpp",
     "services/src/state_machine/active.cpp",

@@ -28,20 +28,19 @@
 #include "cellular_data_state_machine.h"
 #include "common_event_manager.h"
 #include "data_switch_settings.h"
-#include "event_handler.h"
 #include "hril_data_parcel.h"
 #include "incall_data_state_machine.h"
 #include "inner_event.h"
 #include "radio_event.h"
 #include "state_notification.h"
+#include "tel_event_handler.h"
 #include "tel_profile_util.h"
 
 namespace OHOS {
 namespace Telephony {
-class CellularDataHandler : public AppExecFwk::EventHandler, public EventFwk::CommonEventSubscriber {
+class CellularDataHandler : public TelEventHandler, public EventFwk::CommonEventSubscriber {
 public:
-    explicit CellularDataHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-        const EventFwk::CommonEventSubscribeInfo &sp, int32_t slotId);
+    explicit CellularDataHandler(const EventFwk::CommonEventSubscribeInfo &sp, int32_t slotId);
     ~CellularDataHandler();
     void Init();
     bool ReleaseNet(const NetRequest &request);
@@ -141,7 +140,6 @@ private:
     int32_t lastCallState_ = (int32_t)TelCallStatus::CALL_STATUS_IDLE;
     const int32_t slotId_;
     DisConnectionReason disconnectionReason_ = DisConnectionReason::REASON_NORMAL;
-    std::shared_ptr<AppExecFwk::EventRunner> stateMachineEventLoop_;
     bool unMeteredAllNsaConfig_ = false;
     bool unMeteredNrNsaMmwaveConfig_ = false;
     bool unMeteredNrNsaSub6Config_ = false;

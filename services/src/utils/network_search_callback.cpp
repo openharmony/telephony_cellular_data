@@ -15,9 +15,8 @@
 
 #include "network_search_callback.h"
 
-#include "telephony_log_wrapper.h"
-
 #include "cellular_data_service.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -27,7 +26,7 @@ bool NetworkSearchCallback::HasInternetCapability(int32_t slotId, int32_t cId)
     if (result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)) {
         return true;
     }
-    TELEPHONY_LOGE("HasInternetCapability slot:%{public}d cid:%{public}d failed %{public}d", slotId, cId, result);
+    TELEPHONY_LOGE("slot:%{public}d cid:%{public}d failed %{public}d", slotId, cId, result);
     return false;
 }
 
@@ -35,7 +34,7 @@ void NetworkSearchCallback::ClearCellularDataConnections(int32_t slotId)
 {
     int32_t result = DelayedRefSingleton<CellularDataService>::GetInstance().ClearCellularDataConnections(slotId);
     if (result != static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)) {
-        TELEPHONY_LOGE("ClearCellularDataConnections slot:%{public}d failed %{public}d", slotId, result);
+        TELEPHONY_LOGE("slot:%{public}d failed %{public}d", slotId, result);
     }
 }
 } // namespace Telephony

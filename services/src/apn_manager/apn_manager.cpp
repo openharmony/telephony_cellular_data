@@ -136,7 +136,7 @@ sptr<ApnHolder> ApnManager::GetApnHolder(const std::string &apnType) const
     if (it != apnIdApnHolderMap_.end()) {
         return it->second;
     }
-    TELEPHONY_LOGE("ApnManager::GetApnHolder:apnType %{public}s is not exist!", apnType.c_str());
+    TELEPHONY_LOGE("apnType %{public}s is not exist!", apnType.c_str());
     return nullptr;
 }
 
@@ -305,7 +305,7 @@ std::vector<sptr<ApnItem>> ApnManager::FilterMatchedApns(const std::string &requ
             matchApnItemList.push_back(apnItem);
         }
     }
-    TELEPHONY_LOGI("FilterMatchedApns,apn size is :%{public}zu", matchApnItemList.size());
+    TELEPHONY_LOGI("apn size is :%{public}zu", matchApnItemList.size());
     return matchApnItemList;
 }
 

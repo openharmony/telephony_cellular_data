@@ -22,7 +22,6 @@
 #include "core_manager_inner.h"
 #include "data_connection_monitor.h"
 #include "net_specifier.h"
-#include "runner_pool.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
 #include "telephony_ext_wrapper.h"
@@ -52,7 +51,6 @@ void CellularDataService::OnStart()
         TELEPHONY_LOGE("CellularDataService has already started.");
         return;
     }
-    RunnerPool::GetInstance().Init();
     if (!Init()) {
         TELEPHONY_LOGE("failed to init CellularDataService");
         return;
@@ -61,15 +59,12 @@ void CellularDataService::OnStart()
     endTime_ =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
             .count();
-    TELEPHONY_LOGI("CellularDataService::OnStart start service success.");
+    TELEPHONY_LOGI("start service success.");
 }
 
 void CellularDataService::OnStop()
 {
-    TELEPHONY_LOGI("CellularDataService::OnStop ready to stop service.");
-    if (eventLoop_ != nullptr) {
-        eventLoop_.reset();
-    }
+    TELEPHONY_LOGI("ready to stop service.");
     state_ = ServiceRunningState::STATE_NOT_START;
     registerToService_ = false;
     UnRegisterAllNetSpecifier();
@@ -108,16 +103,11 @@ bool CellularDataService::Init()
 #ifdef OHOS_BUILD_ENABLE_DATA_SERVICE_EXT
     DATA_SERVICE_EXT_WRAPPER.InitDataServiceExtWrapper();
 #endif
-    eventLoop_ = RunnerPool::GetInstance().GetCommonRunner();
-    if (eventLoop_ == nullptr) {
-        TELEPHONY_LOGE("failed to create EventRunner");
-        return false;
-    }
     InitModule();
     if (!registerToService_) {
         bool ret = Publish(DelayedRefSingleton<CellularDataService>::GetInstance().AsObject());
         if (!ret) {
-            TELEPHONY_LOGE("CellularDataService::Init Publish failed!");
+            TELEPHONY_LOGE("Publish failed!");
             return false;
         }
         registerToService_ = true;
@@ -244,8 +234,7 @@ void CellularDataService::InitModule()
     netCapabilities.push_back(NetCap::NET_CAPABILITY_MMS);
     int32_t simNum = CoreManagerInner::GetInstance().GetMaxSimCount();
     for (int32_t i = 0; i < simNum; ++i) {
-        std::shared_ptr<CellularDataController> cellularDataController =
-            std::make_shared<CellularDataController>(eventLoop_, i);
+        std::shared_ptr<CellularDataController> cellularDataController = std::make_shared<CellularDataController>(i);
         if (cellularDataController == nullptr) {
             TELEPHONY_LOGE("CellularDataService init module failed cellularDataController is null.");
             continue;

@@ -19,10 +19,8 @@
 #include <memory>
 #include <string>
 
-#include "event_handler.h"
-#include "inner_event.h"
-
 #include "cellular_data_state_machine.h"
+#include "inner_event.h"
 
 namespace OHOS {
 namespace Telephony {

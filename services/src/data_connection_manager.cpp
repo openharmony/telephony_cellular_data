@@ -27,10 +27,9 @@
 
 namespace OHOS {
 namespace Telephony {
-DataConnectionManager::DataConnectionManager(const std::shared_ptr<AppExecFwk::EventRunner> &runner, int32_t slotId)
-    : StateMachine(runner), slotId_(slotId)
+DataConnectionManager::DataConnectionManager(int32_t slotId) : StateMachine("DataConnectionManager"), slotId_(slotId)
 {
-    connectionMonitor_ = std::make_shared<DataConnectionMonitor>(runner, slotId);
+    connectionMonitor_ = std::make_shared<DataConnectionMonitor>(slotId);
     if (connectionMonitor_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: connectionMonitor_ is null", slotId_);
         return;
@@ -198,7 +197,7 @@ bool CcmDefaultState::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
             RadioLinkCapabilityChanged(event);
             break;
         default:
-            TELEPHONY_LOGE("StateProcess handle nothing!");
+            TELEPHONY_LOGE("handle nothing!");
             return false;
     }
     return true;

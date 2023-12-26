@@ -19,12 +19,10 @@
 #include <memory>
 #include <string>
 
-#include "event_handler.h"
-#include "inner_event.h"
-#include "radio_event.h"
-
 #include "cellular_data_event_code.h"
 #include "cellular_data_state_machine.h"
+#include "inner_event.h"
+#include "radio_event.h"
 
 namespace OHOS {
 namespace Telephony {
