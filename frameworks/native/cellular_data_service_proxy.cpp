@@ -37,7 +37,7 @@ int32_t CellularDataServiceProxy::IsCellularDataEnabled(bool &dataEnabled)
     int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::IS_CELLULAR_DATA_ENABLED, data,
         reply, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("function IsCellularDataEnabled call failed! errCode:%{public}d", error);
+        TELEPHONY_LOGE("call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
@@ -62,7 +62,7 @@ int32_t CellularDataServiceProxy::EnableCellularData(bool enable)
     int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::ENABLE_CELLULAR_DATA, data,
         reply, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("function EnableCellularData call failed! errCode:%{public}d", error);
+        TELEPHONY_LOGE("call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
@@ -82,7 +82,7 @@ int32_t CellularDataServiceProxy::GetCellularDataState()
     int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::GET_CELLULAR_DATA_STATE, data,
         reply, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("function GetCellularDataState call failed! errCode:%{public}d", error);
+        TELEPHONY_LOGE("call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
@@ -145,7 +145,7 @@ int32_t CellularDataServiceProxy::IsCellularDataRoamingEnabled(int32_t slotId, b
     int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::IS_DATA_ROAMING_ENABLED, data,
         reply, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("function IsCellularDataRoamingEnabled call failed! errCode:%{public}d", error);
+        TELEPHONY_LOGE("call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
@@ -171,7 +171,7 @@ int32_t CellularDataServiceProxy::EnableCellularDataRoaming(int32_t slotId, bool
     int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::ENABLE_DATA_ROAMING, data,
         reply, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("function EnableCellularDataRoaming call failed! errCode:%{public}d", error);
+        TELEPHONY_LOGE("call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
@@ -191,7 +191,7 @@ int32_t CellularDataServiceProxy::HandleApnChanged(int32_t slotId)
     }
     int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::APN_DATA_CHANGED, data, reply, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("HandleApnChanged call failed! errCode:%{public}d", error);
+        TELEPHONY_LOGE("call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
@@ -211,7 +211,7 @@ int32_t CellularDataServiceProxy::GetDefaultCellularDataSlotId()
     int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::GET_DEFAULT_SLOT_ID, data,
         reply, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("function GetDefaultCellularDataSlotId call failed! errCode:%{public}d", error);
+        TELEPHONY_LOGE("call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
@@ -255,7 +255,7 @@ int32_t CellularDataServiceProxy::SetDefaultCellularDataSlotId(int32_t slotId)
     int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::SET_DEFAULT_SLOT_ID, data,
         reply, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("function SetDefaultCellularDataSlotId call failed! errCode:%{public}d", error);
+        TELEPHONY_LOGE("call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
@@ -274,7 +274,7 @@ int32_t CellularDataServiceProxy::GetCellularDataFlowType()
     }
     int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::GET_FLOW_TYPE_ID, data, reply, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("function GetCellularDataFlowType call failed! errCode:%{public}d", error);
+        TELEPHONY_LOGE("call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();

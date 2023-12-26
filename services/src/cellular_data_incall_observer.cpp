@@ -38,7 +38,7 @@ void CellularDataIncallObserver::OnChange()
     Uri uri(CELLULAR_DATA_SETTING_DATA_INCALL_URI);
     int value = static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_DISABLED);
     if (settingHelper->GetValue(uri, CELLULAR_DATA_COLUMN_INCALL, value) != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("OnChange GetValue failed!");
+        TELEPHONY_LOGE("GetValue failed!");
         return;
     }
     TELEPHONY_LOGI("cellular data incall is %{public}d", value);

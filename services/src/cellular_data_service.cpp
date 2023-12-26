@@ -59,12 +59,12 @@ void CellularDataService::OnStart()
     endTime_ =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
             .count();
-    TELEPHONY_LOGI("CellularDataService::OnStart start service success.");
+    TELEPHONY_LOGI("start service success.");
 }
 
 void CellularDataService::OnStop()
 {
-    TELEPHONY_LOGI("CellularDataService::OnStop ready to stop service.");
+    TELEPHONY_LOGI("ready to stop service.");
     state_ = ServiceRunningState::STATE_NOT_START;
     registerToService_ = false;
     UnRegisterAllNetSpecifier();
@@ -107,7 +107,7 @@ bool CellularDataService::Init()
     if (!registerToService_) {
         bool ret = Publish(DelayedRefSingleton<CellularDataService>::GetInstance().AsObject());
         if (!ret) {
-            TELEPHONY_LOGE("CellularDataService::Init Publish failed!");
+            TELEPHONY_LOGE("Publish failed!");
             return false;
         }
         registerToService_ = true;

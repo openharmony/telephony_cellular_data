@@ -197,7 +197,7 @@ bool CcmDefaultState::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
             RadioLinkCapabilityChanged(event);
             break;
         default:
-            TELEPHONY_LOGE("StateProcess handle nothing!");
+            TELEPHONY_LOGE("handle nothing!");
             return false;
     }
     return true;
