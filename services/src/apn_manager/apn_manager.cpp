@@ -291,21 +291,22 @@ int32_t ApnManager::MakeSpecificApnItem(const std::vector<PdpProfile> &apnVec)
     std::lock_guard<std::mutex> lock(mutex_);
     allApnItem_.clear();
     int32_t count = 0;
-    int32_t preferIndex = 0;
     for (const PdpProfile &apnData : apnVec) {
         TELEPHONY_LOGI("profileId = %{public}d, profileName = %{public}s, mvnoType = %{public}s", apnData.profileId,
             apnData.profileName.c_str(), apnData.mvnoType.c_str());
         sptr<ApnItem> apnItem = ApnItem::MakeApn(apnData);
         if (apnItem != nullptr) {
             allApnItem_.push_back(apnItem);
-            if (apnData.profileId == preferId) {
-                preferIndex = count;
-            }
             count++;
         }
     }
-    if (preferIndex > 0 && allApnItem_[preferIndex] != nullptr) {
-        std::swap(allApnItem_[0], allApnItem_[preferIndex]);
+    int32_t preferId_ = preferId;
+    auto it = std::find_if(allApnItem_.begin(), allApnItem_.end(),
+        [preferId_](auto &apn) { return apn != nullptr && apn->attr_.profileId_ == preferId_; });
+    if (it != allApnItem_.end()) {
+        sptr<ApnItem> apnItem = *it;
+        allApnItem_.erase(it);
+        allApnItem_.insert(allApnItem_.begin(), apnItem);
     }
     return count;
 }
