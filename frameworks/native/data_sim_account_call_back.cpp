@@ -23,7 +23,7 @@ namespace Telephony {
 void DataSimAccountCallback::OnSimAccountChanged()
 {
     int32_t ret = CellularDataClient::GetInstance().UpdateDefaultCellularDataSlotId();
-    TELEPHONY_LOGI("DataSimAccountCallback OnSimAccountChanged ret:%{public}d", ret);
+    TELEPHONY_LOGI("ret:%{public}d", ret);
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -31,13 +31,13 @@ void StateNotification::UpdateCellularDataConnectState(int32_t slotId, ApnProfil
     int32_t state = CellularDataStateAdapter(dataState);
     int32_t wrapState = WrapCellularDataState(state);
     TELEPHONY_LOGI(
-        "UpdateCellularDataConnectState= %{public}d, %{public}d, %{public}d", slotId, wrapState, networkType);
+        "slotId = %{public}d, wrapState = %{public}d, networkType = %{public}d", slotId, wrapState, networkType);
     TelephonyStateRegistryClient::GetInstance().UpdateCellularDataConnectState(slotId, wrapState, networkType);
 }
 
 void StateNotification::OnUpDataFlowtype(int32_t slotId, CellDataFlowType flowType)
 {
-    TELEPHONY_LOGI("UpdateCellularDataFlow= %{public}d, %{public}d", slotId, flowType);
+    TELEPHONY_LOGI("slotId = %{public}d, flowType = %{public}d", slotId, flowType);
     TelephonyStateRegistryClient::GetInstance().UpdateCellularDataFlow(slotId, static_cast<int32_t>(flowType));
 }
 } // namespace Telephony

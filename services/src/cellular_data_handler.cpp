@@ -82,7 +82,7 @@ bool CellularDataHandler::ReleaseNet(const NetRequest &request)
     int32_t id = ApnManager::FindApnIdByCapability(request.capability);
     sptr<ApnHolder> apnHolder = apnManager_->FindApnHolderById(id);
     if (apnHolder == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: ReleaseNet apnHolder is null.", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: apnHolder is null.", slotId_);
         return false;
     }
     std::unique_ptr<NetRequest> netRequest = std::make_unique<NetRequest>();
@@ -130,7 +130,7 @@ bool CellularDataHandler::RequestNet(const NetRequest &request)
 int32_t CellularDataHandler::SetCellularDataEnable(bool userDataOn)
 {
     if (dataSwitchSettings_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: SetCellularDataEnable dataSwitchSettings_ is null.", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ is null.", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     bool dataEnabled = true;
@@ -148,7 +148,7 @@ int32_t CellularDataHandler::SetCellularDataEnable(bool userDataOn)
 int32_t CellularDataHandler::IsCellularDataEnabled(bool &dataEnabled) const
 {
     if (dataSwitchSettings_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: IsCellularDataEnabled dataSwitchSettings_ is null", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ is null", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return dataSwitchSettings_->QueryUserDataStatus(dataEnabled);
@@ -157,7 +157,7 @@ int32_t CellularDataHandler::IsCellularDataEnabled(bool &dataEnabled) const
 int32_t CellularDataHandler::IsCellularDataRoamingEnabled(bool &dataRoamingEnabled) const
 {
     if (dataSwitchSettings_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: IsCellularDataRoamingEnabled dataSwitchSettings_ is null", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ is null", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return dataSwitchSettings_->QueryUserDataRoamingStatus(dataRoamingEnabled);
@@ -195,7 +195,7 @@ int32_t CellularDataHandler::SetCellularDataRoamingEnabled(bool dataRoamingEnabl
 void CellularDataHandler::ClearAllConnections(DisConnectionReason reason)
 {
     if (apnManager_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: ClearAllConnections:apnManager is null", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: apnManager is null", slotId_);
         return;
     }
     ApnProfileState currentState = apnManager_->GetOverallApnState();
@@ -211,7 +211,7 @@ void CellularDataHandler::ClearAllConnections(DisConnectionReason reason)
     }
 
     if (connectionManager_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: in ClearAllConnections connectionManager_ is null", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: connectionManager_ is null", slotId_);
         return;
     }
     connectionManager_->StopStallDetectionTimer();
@@ -235,7 +235,7 @@ void CellularDataHandler::ResetDataFlowType()
 void CellularDataHandler::ClearConnection(const sptr<ApnHolder> &apn, DisConnectionReason reason)
 {
     if (apn == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: ClearConnection:apnHolder is null", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: apnHolder is null", slotId_);
         return;
     }
     std::shared_ptr<CellularDataStateMachine> stateMachine = apn->GetCellularDataStateMachine();
@@ -357,7 +357,7 @@ void CellularDataHandler::PsRadioEmergencyStateClose(const InnerEvent::Pointer &
 void CellularDataHandler::EstablishAllApnsIfConnectable()
 {
     if (apnManager_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: EstablishAllApnsIfConnectable:apnManager is null", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: apnManager is null", slotId_);
         return;
     }
     for (sptr<ApnHolder> apnHolder : apnManager_->GetSortApnHolder()) {
@@ -518,7 +518,7 @@ void CellularDataHandler::AttemptEstablishDataConnection(sptr<ApnHolder> &apnHol
 std::shared_ptr<CellularDataStateMachine> CellularDataHandler::FindIdleCellularDataConnection() const
 {
     if (connectionManager_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: in FindIdleCellularDataConnection connectionManager_ is null", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: connectionManager_ is null", slotId_);
         return nullptr;
     }
     std::vector<std::shared_ptr<CellularDataStateMachine>> allMachines = connectionManager_->GetAllConnectionMachine();
@@ -573,7 +573,7 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
         }
         cellularDataStateMachine->Init();
         if (connectionManager_ == nullptr) {
-            TELEPHONY_LOGE("Slot%{public}d: in EstablishDataConnection connectionManager_ is null", slotId_);
+            TELEPHONY_LOGE("Slot%{public}d: connectionManager_ is null", slotId_);
             return false;
         }
         connectionManager_->AddConnectionStateMachine(cellularDataStateMachine);
@@ -719,7 +719,7 @@ void CellularDataHandler::MsgEstablishDataConnection(const InnerEvent::Pointer &
         TELEPHONY_LOGE("Slot%{public}d: apnHolder is null", slotId_);
         return;
     }
-    TELEPHONY_LOGI("Slot%{public}d: Establish a data connection. APN holder type:%{public}s call:%{public}d", slotId_,
+    TELEPHONY_LOGI("Slot%{public}d: APN holder type:%{public}s call:%{public}d", slotId_,
         apnHolder->GetApnType().c_str(), apnHolder->IsDataCallEnabled());
     if (apnHolder->IsDataCallEnabled()) {
         AttemptEstablishDataConnection(apnHolder);
@@ -771,7 +771,7 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
 void CellularDataHandler::ProcessEvent(const InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: start ProcessEvent but event is null!", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: event is null!", slotId_);
         return;
     }
     uint32_t eventCode = event->GetInnerEventId();
@@ -936,7 +936,7 @@ void CellularDataHandler::HandleVoiceCallChanged(int32_t state)
 
 void CellularDataHandler::HandleDefaultDataSubscriptionChanged()
 {
-    TELEPHONY_LOGI("Slot%{public}d: HandleDefaultDataSubscriptionChanged", slotId_);
+    TELEPHONY_LOGI("Slot%{public}d", slotId_);
     if (CheckDataPermittedByDsds()) {
         SetDataPermitted(slotId_, true);
     } else {
@@ -1014,7 +1014,7 @@ void CellularDataHandler::HandleSimAccountLoaded(const InnerEvent::Pointer &even
         TELEPHONY_LOGE("Slot%{public}d: event or dataSwitchSettings_ is null", slotId_);
         return;
     }
-    TELEPHONY_LOGI("Slot%{public}d: HandleSimAccountLoaded", slotId_);
+    TELEPHONY_LOGI("Slot%{public}d", slotId_);
     ClearAllConnections(DisConnectionReason::REASON_CHANGE_CONNECTION);
     CellularDataNetAgent::GetInstance().UnregisterNetSupplier(slotId_);
     CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
@@ -1100,7 +1100,7 @@ void CellularDataHandler::HandleRadioStateChanged(const AppExecFwk::InnerEvent::
     }
     std::shared_ptr<HRilInt32Parcel> object = event->GetSharedObject<HRilInt32Parcel>();
     if (object == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: HandleRadioStateChanged object is nullptr!", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: object is nullptr!", slotId_);
         return;
     }
     TELEPHONY_LOGI("Slot%{public}d: Radio changed with state: %{public}d", slotId_, object->data);
@@ -1281,12 +1281,12 @@ void CellularDataHandler::SetDataPermitted(int32_t slotId, bool dataPermitted)
 void CellularDataHandler::SetDataPermittedResponse(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        TELEPHONY_LOGE("SetDataPermittedResponse:Slot%{public}d: event is null", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: event is null", slotId_);
         return;
     }
     std::shared_ptr<TelRilResponseInfo<int32_t>> rilInfo = event->GetSharedObject<TelRilResponseInfo<int32_t>>();
     if (rilInfo == nullptr) {
-        TELEPHONY_LOGE("SetDataPermittedResponse:Slot%{public}d: HRilRadioResponseInfo is null", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: HRilRadioResponseInfo is null", slotId_);
         return;
     }
     if (rilInfo->errorNo != 0) {
@@ -1350,12 +1350,12 @@ void CellularDataHandler::SetRilAttachApn()
 void CellularDataHandler::SetRilAttachApnResponse(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        TELEPHONY_LOGE("SetRilAttachApnResponse:Slot%{public}d: event is null", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: event is null", slotId_);
         return;
     }
     std::shared_ptr<TelRilResponseInfo<int32_t>> rilInfo = event->GetSharedObject<TelRilResponseInfo<int32_t>>();
     if (rilInfo == nullptr) {
-        TELEPHONY_LOGE("SetRilAttachApnResponse:Slot%{public}d: HRilRadioResponseInfo is null", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: HRilRadioResponseInfo is null", slotId_);
         return;
     }
     if (rilInfo->errorNo != 0) {
@@ -1490,7 +1490,7 @@ void CellularDataHandler::HandleRadioNrStateChanged(const AppExecFwk::InnerEvent
         TELEPHONY_LOGE("Slot%{public}d: connectionManager is null", slotId_);
         return;
     }
-    TELEPHONY_LOGI("Slot%{public}d: receive HandleRadioNrStateChanged event", slotId_);
+    TELEPHONY_LOGI("Slot%{public}d: receive event", slotId_);
     std::vector<std::shared_ptr<CellularDataStateMachine>> stateMachines =
         connectionManager_->GetAllConnectionMachine();
     for (const std::shared_ptr<CellularDataStateMachine> &cellularDataStateMachine : stateMachines) {
@@ -1505,7 +1505,7 @@ void CellularDataHandler::HandleRadioNrFrequencyChanged(const AppExecFwk::InnerE
         TELEPHONY_LOGE("Slot%{public}d: connectionManager is null", slotId_);
         return;
     }
-    TELEPHONY_LOGI("Slot%{public}d: receive HandleRadioNrFrequencyChanged event", slotId_);
+    TELEPHONY_LOGI("Slot%{public}d: receive event", slotId_);
     std::vector<std::shared_ptr<CellularDataStateMachine>> stateMachines =
         connectionManager_->GetAllConnectionMachine();
     for (const std::shared_ptr<CellularDataStateMachine> &cellularDataStateMachine : stateMachines) {
@@ -1552,7 +1552,7 @@ void CellularDataHandler::SetRilLinkBandwidths()
 void CellularDataHandler::HandleDBSettingEnableChanged(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (dataSwitchSettings_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: HandleDBSettingEnableChanged dataSwitchSettings_ is null.", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ is null.", slotId_);
         return;
     }
     bool dataEnabled = true;
@@ -1673,7 +1673,7 @@ void CellularDataHandler::OnRilAdapterHostDied(const AppExecFwk::InnerEvent::Poi
         TELEPHONY_LOGE("Slot%{public}d: connectionManager is null", slotId_);
         return;
     }
-    TELEPHONY_LOGI("Slot%{public}d: receive OnRilAdapterHostDied event", slotId_);
+    TELEPHONY_LOGI("Slot%{public}d: receive event", slotId_);
     std::vector<std::shared_ptr<CellularDataStateMachine>> stateMachines =
         connectionManager_->GetAllConnectionMachine();
     for (const std::shared_ptr<CellularDataStateMachine> &cellularDataStateMachine : stateMachines) {

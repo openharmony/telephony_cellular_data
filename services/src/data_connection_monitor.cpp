@@ -81,7 +81,7 @@ void DataConnectionMonitor::StartStallDetectionTimer()
 
 void DataConnectionMonitor::OnStallDetectionTimer()
 {
-    TELEPHONY_LOGI("Slot%{public}d: on stall detection", slotId_);
+    TELEPHONY_LOGD("Slot%{public}d: on stall detection", slotId_);
 #ifdef OHOS_BUILD_ENABLE_DATA_SERVICE_EXT
     if (DATA_SERVICE_EXT_WRAPPER.requestTcpAndDnsPackets_) {
         DATA_SERVICE_EXT_WRAPPER.requestTcpAndDnsPackets_();
@@ -130,7 +130,7 @@ void DataConnectionMonitor::UpdateFlowInfo()
         noRecvPackets_ = 0;
         dataRecoveryState_ = RecoveryState::STATE_REQUEST_CONTEXT_LIST;
     } else {
-        TELEPHONY_LOGE("Slot%{public}d: Update Flow Info nothing to do", slotId_);
+        TELEPHONY_LOGD("Slot%{public}d: Update Flow Info nothing to do", slotId_);
     }
 }
 
