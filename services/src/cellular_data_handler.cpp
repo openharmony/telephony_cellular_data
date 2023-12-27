@@ -449,8 +449,10 @@ bool CellularDataHandler::CheckRoamingState(sptr<ApnHolder> &apnHolder)
     bool dataRoamingEnabled = dataSwitchSettings_->IsUserDataRoamingOn();
     if (roamingState && !dataRoamingEnabled) {
         isAllowActiveData = false;
+    } else if (isMmsApn) {
+        isAllowActiveData = true;
     }
-    if (isEmergencyApn || isMmsApn) {
+    if (isEmergencyApn) {
         isAllowActiveData = true;
     }
     if (!isAllowActiveData) {
