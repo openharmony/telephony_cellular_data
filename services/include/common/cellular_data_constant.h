@@ -154,7 +154,6 @@ static constexpr const char *DATA_CONTEXT_ROLE_DUN = "dun";
 static constexpr const char *DATA_CONTEXT_ROLE_IMS = "ims";
 static constexpr const char *DATA_CONTEXT_ROLE_IA = "ia";
 static constexpr const char *DATA_CONTEXT_ROLE_EMERGENCY = "emergency";
-static const int32_t INVALID_PROFILE_ID = -1;
 static const int32_t DATA_PROFILE_DEFAULT = 0;
 static const int32_t DATA_PROFILE_MMS = 1;
 static const int32_t CMCC_MCC_MNC = 46002;
@@ -180,6 +179,8 @@ static constexpr const char *DEFAULT_MASK = "";
 static constexpr const char *CELLULAR_DATA_RDB_URI = "datashare:///com.ohos.pdpprofileability";
 static constexpr const char *CELLULAR_DATA_RDB_SELECTION = "datashare:///com.ohos.pdpprofileability/net/pdp_profile";
 static constexpr const char *CELLULAR_DATA_RDB_RESET = "datashare:///com.ohos.pdpprofileability/net/pdp_profile/reset";
+static constexpr const char *CELLULAR_DATA_RDB_PREFER =
+    "datashare:///com.ohos.pdpprofileability/net/pdp_profile/preferapn";
 static constexpr const char *CELLULAR_DATA_SETTING_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
 static constexpr const char *CELLULAR_DATA_SETTING_DATA_ENABLE_URI =

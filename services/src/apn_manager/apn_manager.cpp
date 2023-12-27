@@ -19,6 +19,7 @@
 #include "core_manager_inner.h"
 #include "net_specifier.h"
 #include "string_ex.h"
+#include "tel_profile_util.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -195,19 +196,25 @@ int32_t ApnManager::CreateAllApnItemByDatabase(int32_t slotId)
         TELEPHONY_LOGE("numeric is empty!!!");
         return count;
     }
-    std::string mcc = numeric.substr(0, DEFAULT_MCC_SIZE);
-    std::string mnc = numeric.substr(mcc.size(), numeric.size() - mcc.size());
-    TELEPHONY_LOGI("current slotId = %{public}d, mcc = %{public}s, mnc = %{public}s", slotId, mcc.c_str(), mnc.c_str());
-    int32_t mvnoCount = CreateMvnoApnItems(slotId, mcc, mnc);
-    if (mvnoCount > 0) {
-        return mvnoCount;
-    }
-    std::vector<PdpProfile> apnVec;
+    TELEPHONY_LOGI("current slotId = %{public}d, numeric = %{public}s", slotId, numeric.c_str());
     auto helper = CellularDataRdbHelper::GetInstance();
     if (helper == nullptr) {
         TELEPHONY_LOGE("get cellularDataRdbHelper failed");
         return count;
     }
+    preferId_ = INVALID_PROFILE_ID;
+    std::vector<PdpProfile> preferApnVec;
+    if (helper->QueryPreferApn(slotId, preferApnVec)) {
+        preferId_ = preferApnVec[0].profileId;
+        TELEPHONY_LOGI("query preferId_ = %{public}d", preferId_);
+    }
+    std::string mcc = numeric.substr(0, DEFAULT_MCC_SIZE);
+    std::string mnc = numeric.substr(mcc.size(), numeric.size() - mcc.size());
+    int32_t mvnoCount = CreateMvnoApnItems(slotId, mcc, mnc);
+    if (mvnoCount > 0) {
+        return mvnoCount;
+    }
+    std::vector<PdpProfile> apnVec;
     if (!helper->QueryApns(mcc, mnc, apnVec)) {
         TELEPHONY_LOGE("query apns from data ability fail");
         return count;
@@ -292,6 +299,14 @@ int32_t ApnManager::MakeSpecificApnItem(const std::vector<PdpProfile> &apnVec)
             allApnItem_.push_back(apnItem);
             count++;
         }
+    }
+    int32_t preferId = preferId_;
+    auto it = std::find_if(allApnItem_.begin(), allApnItem_.end(),
+        [preferId](auto &apn) { return apn != nullptr && apn->attr_.profileId_ == preferId; });
+    if (it != allApnItem_.end()) {
+        sptr<ApnItem> apnItem = *it;
+        allApnItem_.erase(it);
+        allApnItem_.insert(allApnItem_.begin(), apnItem);
     }
     return count;
 }

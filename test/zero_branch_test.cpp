@@ -755,6 +755,8 @@ HWTEST_F(BranchTest, ApnManager_Test_01, Function | MediumTest | Level3)
     ASSERT_TRUE(helper->IsMvnoDataMatched("test", apnBean));
     apnBean.mvnoType = "error";
     ASSERT_FALSE(helper->IsMvnoDataMatched("test", apnBean));
+    helper->QueryPreferApn(0, apnVec);
+    ASSERT_FALSE(helper->QueryPreferApn(-1, apnVec));
 }
 
 /**

@@ -40,6 +40,7 @@ public:
     bool QueryApns(const std::string &mcc, const std::string &mnc, std::vector<PdpProfile> &apnVec);
     bool QueryMvnoApnsByType(const std::string &mcc, const std::string &mnc, const std::string &mvnoType,
         const std::string &mvnoDataFromSim, std::vector<PdpProfile> &mvnoApnVec);
+    bool QueryPreferApn(int32_t slotId, std::vector<PdpProfile> &apnVec);
     void RegisterObserver(const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
     void UnRegisterObserver(const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
     bool ResetApns();
