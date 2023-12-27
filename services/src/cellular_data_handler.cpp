@@ -443,13 +443,14 @@ bool CellularDataHandler::CheckRoamingState(sptr<ApnHolder> &apnHolder)
     }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     bool isEmergencyApn = apnHolder->IsEmergencyType();
+    bool isMmsApn = apnHolder->IsMmsType();
     bool isAllowActiveData = dataSwitchSettings_->IsAllowActiveData();
     bool roamingState = coreInner.GetPsRoamingState(slotId_) > 0;
     bool dataRoamingEnabled = dataSwitchSettings_->IsUserDataRoamingOn();
     if (roamingState && !dataRoamingEnabled) {
         isAllowActiveData = false;
     }
-    if (isEmergencyApn) {
+    if (isEmergencyApn || isMmsApn) {
         isAllowActiveData = true;
     }
     if (!isAllowActiveData) {
