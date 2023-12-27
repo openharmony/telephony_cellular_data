@@ -202,11 +202,11 @@ int32_t ApnManager::CreateAllApnItemByDatabase(int32_t slotId)
         TELEPHONY_LOGE("get cellularDataRdbHelper failed");
         return count;
     }
-    preferId = INVALID_PROFILE_ID;
+    preferId_ = INVALID_PROFILE_ID;
     std::vector<PdpProfile> preferApnVec;
     if (helper->QueryPreferApn(slotId, preferApnVec)) {
-        preferId = preferApnVec[0].profileId;
-        TELEPHONY_LOGI("query preferId = %{public}d", preferId);
+        preferId_ = preferApnVec[0].profileId;
+        TELEPHONY_LOGI("query preferId_ = %{public}d", preferId_);
     }
     std::string mcc = numeric.substr(0, DEFAULT_MCC_SIZE);
     std::string mnc = numeric.substr(mcc.size(), numeric.size() - mcc.size());
@@ -300,9 +300,9 @@ int32_t ApnManager::MakeSpecificApnItem(const std::vector<PdpProfile> &apnVec)
             count++;
         }
     }
-    int32_t preferId_ = preferId;
+    int32_t preferId = preferId_;
     auto it = std::find_if(allApnItem_.begin(), allApnItem_.end(),
-        [preferId_](auto &apn) { return apn != nullptr && apn->attr_.profileId_ == preferId_; });
+        [preferId](auto &apn) { return apn != nullptr && apn->attr_.profileId_ == preferId; });
     if (it != allApnItem_.end()) {
         sptr<ApnItem> apnItem = *it;
         allApnItem_.erase(it);
