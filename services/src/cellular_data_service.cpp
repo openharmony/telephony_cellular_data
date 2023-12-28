@@ -245,6 +245,7 @@ void CellularDataService::InitModule()
             NetSupplier netSupplier = { 0 };
             netSupplier.supplierId = 0;
             netSupplier.slotId = i;
+            netSupplier.simId = INVALID_SIM_ID;
             netSupplier.capability = capability;
             netAgent.AddNetSupplier(netSupplier);
         }

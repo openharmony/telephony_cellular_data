@@ -282,6 +282,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_001, Function | MediumTest | 
     ASSERT_EQ(TELEPHONY_ERR_FAIL, service.Dump(INVALID_FD, strV));
     service.state_ = ServiceRunningState::STATE_RUNNING;
     service.OnStart();
+    service.InitModule();
     bool dataEnabled = false;
     bool dataRoamingEnabled = false;
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.IsCellularDataEnabled(dataEnabled));
