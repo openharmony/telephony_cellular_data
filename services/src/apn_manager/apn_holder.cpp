@@ -165,6 +165,11 @@ bool ApnHolder::IsEmergencyType() const
     return apnType_ == DATA_CONTEXT_ROLE_EMERGENCY;
 }
 
+bool ApnHolder::IsMmsType() const
+{
+    return apnType_ == DATA_CONTEXT_ROLE_MMS;
+}
+
 void ApnHolder::InitialApnRetryCount()
 {
     retryPolicy_.InitialRetryCountValue();

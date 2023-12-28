@@ -49,6 +49,7 @@ public:
     void RequestCellularData(const NetRequest &netRequest);
     void ReleaseCellularData(const NetRequest &netRequest);
     bool IsEmergencyType() const;
+    bool IsMmsType() const;
     void InitialApnRetryCount();
     bool IsSameMatchedApns(std::vector<sptr<ApnItem>> newMatchedApns, bool roamingState);
     bool IsSameApnItem(const sptr<ApnItem> &newApnItem, const sptr<ApnItem> &oldApnItem, bool roamingState);
