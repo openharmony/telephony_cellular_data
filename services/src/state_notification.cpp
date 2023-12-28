@@ -40,7 +40,7 @@ void StateNotification::OnUpDataFlowtype(int32_t slotId, CellDataFlowType flowTy
 {
     TELEPHONY_LOGI("slotId = %{public}d, flowType = %{public}d", slotId, flowType);
     int32_t defaultSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
-    if (slotId != defaultSlotId) {
+    if (flowType != CellDataFlowType::DATA_FLOW_TYPE_NONE && slotId != defaultSlotId) {
         TELEPHONY_LOGI("defaultSlotId= %{public}d", defaultSlotId);
         return;
     }
