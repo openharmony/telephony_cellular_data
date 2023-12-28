@@ -129,6 +129,8 @@ private:
     void OnRilAdapterHostDied(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleFactoryReset(const AppExecFwk::InnerEvent::Pointer &event);
     void OnCleanAllDataConnectionsDone(const AppExecFwk::InnerEvent::Pointer &event);
+    void CreateApnItem();
+    void UpdatePhysicalConnectionState(bool noActiveConnection);
 
 private:
     sptr<ApnManager> apnManager_;

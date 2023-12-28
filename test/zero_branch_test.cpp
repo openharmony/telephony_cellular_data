@@ -257,6 +257,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_003, Function | MediumTest | 
     cellularDataHandler.connectionManager_ = std::make_unique<DataConnectionManager>(INVALID_SLOTID).release();
     cellularDataHandler.ClearAllConnections(reason);
     cellularDataHandler.EstablishAllApnsIfConnectable();
+    cellularDataHandler.UpdatePhysicalConnectionState(true);
     cellularDataHandler.ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
     ASSERT_FALSE(cellularDataHandler.CheckApnState(apnHolder));
     cellularDataHandler.AttemptEstablishDataConnection(apnHolder);
@@ -564,6 +565,7 @@ HWTEST_F(BranchTest, StateNotification_Test_01, Function | MediumTest | Level3)
 {
     StateNotification::GetInstance().UpdateCellularDataConnectState(0, PROFILE_STATE_DISCONNECTING, 0);
     StateNotification::GetInstance().OnUpDataFlowtype(0, CellDataFlowType::DATA_FLOW_TYPE_NONE);
+    StateNotification::GetInstance().OnUpDataFlowtype(1, CellDataFlowType::DATA_FLOW_TYPE_UP_DOWN);
     std::shared_ptr<CellularDataHandler> cellularDataHandler = nullptr;
     auto cellularDataRdbObserver = std::make_shared<CellularDataRdbObserver>(cellularDataHandler);
     cellularDataRdbObserver->OnChange();
