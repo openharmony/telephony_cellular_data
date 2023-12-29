@@ -51,7 +51,6 @@ int CellularDataRdbHelper::Update(
     }
     TELEPHONY_LOGI("Cellular data RDB helper update");
     int32_t result = dataShareHelper->Update(cellularDataUri_, predicates, value);
-    dataShareHelper->NotifyChange(cellularDataUri_);
     dataShareHelper->Release();
     return result;
 }
@@ -65,7 +64,6 @@ int CellularDataRdbHelper::Insert(const DataShare::DataShareValuesBucket &values
     }
     TELEPHONY_LOGI("Cellular data RDB helper insert");
     int32_t result = dataShareHelper->Insert(cellularDataUri_, values);
-    dataShareHelper->NotifyChange(cellularDataUri_);
     dataShareHelper->Release();
     return result;
 }
@@ -82,7 +80,6 @@ bool CellularDataRdbHelper::ResetApns()
     DataShare::DataSharePredicates predicates;
     DataShare::DataShareValuesBucket values;
     int32_t result = dataShareHelper->Update(resetApnUri, predicates, values);
-    dataShareHelper->NotifyChange(cellularDataUri_);
     dataShareHelper->Release();
     return result >= 0;
 }
@@ -273,6 +270,8 @@ void CellularDataRdbHelper::RegisterObserver(const sptr<AAFwk::IDataAbilityObser
         return;
     }
     Uri preferApnUri(CELLULAR_DATA_RDB_PREFER);
+    Uri resetApnUri(CELLULAR_DATA_RDB_RESET);
+    dataShareHelper->RegisterObserver(resetApnUri, dataObserver);
     dataShareHelper->RegisterObserver(preferApnUri, dataObserver);
     dataShareHelper->RegisterObserver(cellularDataUri_, dataObserver);
     dataShareHelper->Release();
@@ -287,6 +286,8 @@ void CellularDataRdbHelper::UnRegisterObserver(const sptr<AAFwk::IDataAbilityObs
         return;
     }
     Uri preferApnUri(CELLULAR_DATA_RDB_PREFER);
+    Uri resetApnUri(CELLULAR_DATA_RDB_RESET);
+    dataShareHelper->UnregisterObserver(resetApnUri, dataObserver);
     dataShareHelper->UnregisterObserver(preferApnUri, dataObserver);
     dataShareHelper->UnregisterObserver(cellularDataUri_, dataObserver);
     dataShareHelper->Release();

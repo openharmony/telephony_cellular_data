@@ -742,6 +742,7 @@ HWTEST_F(BranchTest, ApnManager_Test_01, Function | MediumTest | Level3)
     cellularMachine->Init();
     ASSERT_TRUE(apnManager->IsDataConnectionNotUsed(cellularMachine));
     auto helper = CellularDataRdbHelper::GetInstance();
+    helper->ResetApns();
     std::shared_ptr<DataShare::DataShareResultSet> result = nullptr;
     std::vector<PdpProfile> apnVec;
     helper->ReadMvnoApnResult(result, "", apnVec);
