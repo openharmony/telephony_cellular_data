@@ -729,6 +729,7 @@ HWTEST_F(BranchTest, Default_Test_01, Function | MediumTest | Level3)
 HWTEST_F(BranchTest, ApnManager_Test_01, Function | MediumTest | Level3)
 {
     auto apnManager = std::make_shared<ApnManager>();
+    apnManager->CreateAllApnItem();
     EXPECT_GE(apnManager->CreateAllApnItemByDatabase(0), 0);
     EXPECT_EQ(apnManager->CreateAllApnItemByDatabase(0), 0);
     apnManager->ResetApns();

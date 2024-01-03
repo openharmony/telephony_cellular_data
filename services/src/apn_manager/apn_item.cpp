@@ -63,8 +63,8 @@ sptr<ApnItem> ApnItem::MakeDefaultApn(const std::string &apnType)
         TELEPHONY_LOGE("apn is null");
         return nullptr;
     }
-    Attribute attr = {"", "46002", DATA_PROFILE_DEFAULT, "IPV4V6", "IPV4V6",
-        DEFAULT_AUTH_TYPE, "cmnet", "CMNET", "", "", false, "", "", "", false};
+    Attribute attr = { "", "46002", DATA_PROFILE_DEFAULT, "IP", "IP", DEFAULT_AUTH_TYPE, "cmnet", "CMNET", "", "",
+        false, "", "", "", false };
     apnItem->apnTypes_ = CellularDataUtils::Split(apnType, ",");
     apnItem->attr_ = attr;
     if (strcpy_s(apnItem->attr_.types_, ALL_APN_ITEM_CHAR_LENGTH, apnType.c_str()) != EOK) {
