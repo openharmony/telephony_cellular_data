@@ -57,6 +57,7 @@ struct NetSupplier {
     uint32_t supplierId = 0;
     uint64_t capability = 0;
     int32_t slotId = 0;
+    int32_t simId = 0;
 };
 
 struct NetRequest {
