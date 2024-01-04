@@ -235,10 +235,10 @@ void CellularDataRdbHelper::MakePdpProfile(
     result->GetColumnIndex(PdpProfileData::EDITED_STATUS, index);
     result->GetInt(index, apnBean.edited);
     if (apnBean.pdpProtocol.empty()) {
-        apnBean.pdpProtocol = "IPV4V6";
+        apnBean.pdpProtocol = "IP";
     }
     if (apnBean.roamPdpProtocol.empty()) {
-        apnBean.roamPdpProtocol = "IPV4V6";
+        apnBean.roamPdpProtocol = "IP";
     }
 }
 
