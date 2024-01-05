@@ -734,9 +734,9 @@ HWTEST_F(BranchTest, ApnManager_Test_01, Function | MediumTest | Level3)
     EXPECT_GE(apnManager->CreateAllApnItemByDatabase(0), 0);
     EXPECT_EQ(apnManager->CreateAllApnItemByDatabase(0), 0);
     apnManager->ResetApns();
-    std::string operatorNumeric = "46003";
+    std::string operatorNumeric = "46011";
     apnManager->GetCTOperator(0, operatorNumeric);
-    EXPECT_EQ(operatorNumeric, "46003");
+    EXPECT_EQ(operatorNumeric, "46011");
     apnManager->GetApnHolder(DATA_CONTEXT_ROLE_DEFAULT);
     apnManager->FindApnNameByApnId(1);
     std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();

@@ -34,7 +34,8 @@ const std::map<std::string, int32_t> ApnManager::apnIdApnNameMap_ {
     {DATA_CONTEXT_ROLE_IA,        DATA_CONTEXT_ROLE_IA_ID},
     {DATA_CONTEXT_ROLE_EMERGENCY, DATA_CONTEXT_ROLE_EMERGENCY_ID}
 };
-constexpr const char *CT_MCC_MNC = "46003";
+constexpr const char *CT_MCC_MNC_1 = "46003";
+constexpr const char *CT_MCC_MNC_2 = "46011";
 constexpr const char *GC_ICCID = "8985231";
 constexpr const char *GC_MCC_MNC = "45431";
 constexpr const char *GC_SPN = "CTExcel";
@@ -226,10 +227,10 @@ void ApnManager::GetCTOperator(int32_t slotId, std::string &numeric)
 {
     bool isCTSimCard = false;
     CoreManagerInner::GetInstance().IsCTSimCard(slotId, isCTSimCard);
-    if (isCTSimCard) {
-        numeric = CT_MCC_MNC;
+    if (isCTSimCard && numeric.compare(CT_MCC_MNC_2)) {
+        numeric = CT_MCC_MNC_1;
     }
-    if (!numeric.compare(CT_MCC_MNC)) {
+    if (!numeric.compare(CT_MCC_MNC_1)) {
         std::u16string tempIccId;
         CoreManagerInner::GetInstance().GetSimIccId(slotId, tempIccId);
         std::string iccId = Str16ToStr8(tempIccId);
