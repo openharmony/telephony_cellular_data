@@ -30,6 +30,7 @@
 #include "cellular_data_service.h"
 #include "cellular_data_service_stub.h"
 #include "cellular_data_setting_observer.h"
+#include "cellular_data_settings_rdb_helper.h"
 #include "cellular_data_state_machine.h"
 #include "cellular_data_utils.h"
 #include "common_event_manager.h"
@@ -50,6 +51,7 @@
 #include "telephony_errors.h"
 #include "telephony_hisysevent.h"
 #include "telephony_log_wrapper.h"
+#include "uri.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -987,6 +989,24 @@ HWTEST_F(BranchTest, CellularDataServices_Test_02, Function | MediumTest | Level
     EXPECT_GE(cellularDataService->OnClearCellularDataConnections(data, reply), 0);
     EXPECT_GE(cellularDataService->OnRegisterSimAccountCallback(data, reply), 0);
     EXPECT_GE(cellularDataService->OnUnregisterSimAccountCallback(data, reply), 0);
+}
+
+/**
+ * @tc.number   CellularDataSettingsRdbHelper_Test_01
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, CellularDataSettingsRdbHelper_Test_01, Function | MediumTest | Level3)
+{
+    auto settingHelper = CellularDataSettingsRdbHelper::GetInstance();
+    if (settingHelper == nullptr) {
+        TELEPHONY_LOGE("settingHelper is null");
+        return;
+    }
+    Uri dataEnableUri(CELLULAR_DATA_SETTING_DATA_ROAMING_URI);
+    settingHelper->RegisterSettingsObserver(dataEnableUri, nullptr);
+    settingHelper->UnRegisterSettingsObserver(dataEnableUri, nullptr);
+    EXPECT_TRUE(settingHelper != nullptr);
 }
 } // namespace Telephony
 } // namespace OHOS

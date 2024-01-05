@@ -42,6 +42,7 @@ CellularDataController::~CellularDataController()
             samgrProxy->UnSubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID, systemAbilityListener_);
             samgrProxy->UnSubscribeSystemAbility(COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID, systemAbilityListener_);
             samgrProxy->UnSubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, systemAbilityListener_);
+            samgrProxy->UnSubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID, systemAbilityListener_);
             systemAbilityListener_ = nullptr;
         }
     }
@@ -74,6 +75,7 @@ void CellularDataController::Init()
     samgrProxy->SubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID, systemAbilityListener_);
     samgrProxy->SubscribeSystemAbility(COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID, systemAbilityListener_);
     samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, systemAbilityListener_);
+    samgrProxy->SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID, systemAbilityListener_);
 }
 
 int32_t CellularDataController::SetCellularDataEnable(bool userDataEnabled)
@@ -332,6 +334,12 @@ void CellularDataController::SystemAbilityStatusChangeListener::OnAddSystemAbili
                 TELEPHONY_LOGI("subscribeResult = %{public}d", subscribeResult);
             }
             break;
+        case DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID:
+            TELEPHONY_LOGI("DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID running");
+            if (handler_ != nullptr) {
+                handler_->RegisterDataSettingObserver();
+            }
+            break;
         default:
             TELEPHONY_LOGE("systemAbilityId is invalid");
             break;
@@ -354,6 +362,9 @@ void CellularDataController::SystemAbilityStatusChangeListener::OnRemoveSystemAb
                 bool unSubscribeResult = EventFwk::CommonEventManager::UnSubscribeCommonEvent(handler_);
                 TELEPHONY_LOGI("unSubscribeResult = %{public}d", unSubscribeResult);
             }
+            break;
+        case DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID:
+            TELEPHONY_LOGE("DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID stopped");
             break;
         default:
             TELEPHONY_LOGE("systemAbilityId is invalid");

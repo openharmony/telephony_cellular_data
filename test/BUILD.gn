@@ -40,6 +40,7 @@ ohos_unittest("tel_cellular_data_test") {
 
   external_deps = [
     "ability_base:want",
+    "ability_base:zuri",
     "ability_runtime:abilitykit_native",
     "ability_runtime:data_ability_helper",
     "ability_runtime:dataobs_manager",
