@@ -69,6 +69,8 @@ public:
     int32_t GetDataRecoveryState();
     void SetRilAttachApn();
     void IsNeedDoRecovery(bool needDoRecovery) const;
+    void RegisterDataSettingObserver();
+    void UnRegisterDataSettingObserver();
 
 private:
     std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect();
@@ -111,8 +113,6 @@ private:
     void HandleDBSettingRoamingChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleSortConnection();
     void SetDataPermittedResponse(const AppExecFwk::InnerEvent::Pointer &event);
-    void RegisterDataSettingObserver();
-    void UnRegisterDataSettingObserver();
     void SetDataPermitted(int32_t slotId, bool dataPermitted);
     bool CheckDataPermittedByDsds();
     std::shared_ptr<IncallDataStateMachine> CreateIncallDataStateMachine(int32_t callState);
