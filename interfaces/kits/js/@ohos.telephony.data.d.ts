@@ -378,9 +378,18 @@ declare namespace data {
   /**
    * Enable Intelligence Switch.
    * 
-   * @returns { number } Returns the success or failed statecode.
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @param { boolean } isSwitchOn - Set intelligenceSwitch state.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
    * @syscap SystemCapability.Telephony.CellularData
-   * @since 10
+   * @systemapi Hide this for inner system use.
+   * @since 11
    */
   function enableIntelligenceSwitch(isSwitchOn: boolean): number;
 
