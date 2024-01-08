@@ -217,6 +217,16 @@ int32_t CellularDataClient::EnableCellularData(bool enable)
     return proxy->EnableCellularData(enable);
 }
 
+int32_t CellularDataClient::EnableIntelligenceSwitch(bool enable)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->EnableIntelligenceSwitch(enable);
+}
+
 int32_t CellularDataClient::IsCellularDataEnabled(bool &dataEnabled)
 {
     sptr<ICellularDataManager> proxy = GetProxy();

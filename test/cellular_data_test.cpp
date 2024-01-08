@@ -197,6 +197,7 @@ public:
     static bool HasSimCard(const int32_t slotId);
     static int32_t IsCellularDataEnabledTest(bool &dataEnabled);
     static int32_t EnableCellularDataTest(bool enable);
+    static int32_t EnableIntelligenceSwitchTest(bool enable);
     static int32_t GetCellularDataStateTest();
     static int32_t IsCellularDataRoamingEnabledTest(int32_t slotId, bool &dataRoamingEnabled);
     static int32_t EnableCellularDataRoamingTest(int32_t slotId, bool enable);
@@ -341,6 +342,11 @@ int32_t CellularDataTest::IsCellularDataEnabledTest(bool &dataEnabled)
 int32_t CellularDataTest::EnableCellularDataTest(bool enable)
 {
     return CellularDataClient::GetInstance().EnableCellularData(enable);
+}
+
+int32_t CellularDataTest::EnableIntelligenceSwitchTest(bool enable)
+{
+    return CellularDataClient::GetInstance().EnableIntelligenceSwitch(enable);
 }
 
 int32_t CellularDataTest::GetCellularDataStateTest()
@@ -1200,6 +1206,28 @@ HWTEST_F(CellularDataTest, IsNeedDoRecovery_Test_02, TestSize.Level3)
     bool needDoRecovery = true;
     int32_t result = CellularDataTest::IsNeedDoRecovery(DEFAULT_SIM_SLOT_ID, needDoRecovery);
     ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   EnableIntelligenceSwitch_Test_01
+ * @tc.name     Test Intelligence switch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, EnableIntelligenceSwitch_Test_01, TestSize.Level2)
+{
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+    AccessToken token;
+    CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
+    int32_t result1 = CellularDataTest::EnableIntelligenceSwitchTest(true);
+    ASSERT_TRUE(result1 == TELEPHONY_ERR_SUCCESS);
+    sleep(SLEEP_TIME);
+    std::cout << "EnableIntelligenceSwitch ..." << std::endl;
+    int32_t result2 = CellularDataTest::EnableIntelligenceSwitchTest(false);
+    ASSERT_TRUE(result2 == TELEPHONY_ERR_SUCCESS);
+    sleep(SLEEP_TIME);
+    std::cout << "DisableIntelligenceSwitch ..." << std::endl;
 }
 
 #else  // TEL_TEST_UNSUPPORT

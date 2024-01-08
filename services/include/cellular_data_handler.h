@@ -48,6 +48,7 @@ public:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
     int32_t SetCellularDataEnable(bool userDataEnabled);
+    int32_t SetIntelligenceSwitchEnable(bool userDataEnabled);
     int32_t IsCellularDataEnabled(bool &dataEnabled) const;
     int32_t IsCellularDataRoamingEnabled(bool &dataRoamingEnabled) const;
     int32_t SetCellularDataRoamingEnabled(bool dataRoamingEnabled);

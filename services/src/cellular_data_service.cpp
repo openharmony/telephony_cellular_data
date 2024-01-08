@@ -153,6 +153,25 @@ int32_t CellularDataService::EnableCellularData(bool enable)
     return cellularDataControllers_[DEFAULT_SIM_SLOT_ID]->SetCellularDataEnable(enable);
 }
 
+int32_t CellularDataService::EnableIntelligenceSwitch(bool enable)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        int32_t slotId = CellularDataService::GetDefaultCellularDataSlotId();
+        CellularDataHiSysEvent::WriteDataActivateFaultEvent(
+            slotId, enable, CellularDataErrorCode::DATA_ERROR_PERMISSION_ERROR, Permission::SET_TELEPHONY_STATE);
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (cellularDataControllers_[DEFAULT_SIM_SLOT_ID] == nullptr) {
+        TELEPHONY_LOGE("cellularDataControllers_[0] is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularDataControllers_[DEFAULT_SIM_SLOT_ID]->SetIntelligenceSwitchEnable(enable);
+}
+
 int32_t CellularDataService::GetCellularDataState()
 {
     int32_t slotId = CellularDataService::GetDefaultCellularDataSlotId();

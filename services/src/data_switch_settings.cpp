@@ -63,6 +63,24 @@ int32_t DataSwitchSettings::SetUserDataOn(bool userDataOn)
     return result;
 }
 
+int32_t DataSwitchSettings::SetIntelliSwitchOn(bool userSwitchOn)
+{
+    std::shared_ptr<CellularDataSettingsRdbHelper> settingsRdbHelper = CellularDataSettingsRdbHelper::GetInstance();
+    if (settingsRdbHelper == nullptr) {
+        TELEPHONY_LOGE("settingsRdbHelper == nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int value = (userSwitchOn ? static_cast<int>(IntelligenceSwitchCode::INTELLIGENCE_SWITCH_ENABLED)
+                            : static_cast<int>(IntelligenceSwitchCode::INTELLIGENCE_SWITCH_DISABLED));
+    TELEPHONY_LOGI("value:%{public}d", value);
+    Uri intelliSwitchEnableUri(CELLULAR_DATA_SETTING_INTELLIGENCE_SWITCH_URI);
+    int32_t result = settingsRdbHelper->PutValue(intelliSwitchEnableUri, INTELLIGENCE_SWITCH_COLUMN_ENABLE, value);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        intelliSwitchOn_ = userSwitchOn;
+    }
+    return result;
+}
+
 int32_t DataSwitchSettings::QueryUserDataStatus(bool &dataEnabled)
 {
     std::shared_ptr<CellularDataSettingsRdbHelper> settingsRdbHelper = CellularDataSettingsRdbHelper::GetInstance();
@@ -78,6 +96,26 @@ int32_t DataSwitchSettings::QueryUserDataStatus(bool &dataEnabled)
     }
     userDataOn_ = (userDataEnable == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED));
     dataEnabled = userDataOn_;
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t DataSwitchSettings::QueryIntelligenceSwitchStatus(bool &switchEnabled)
+{
+    std::shared_ptr<CellularDataSettingsRdbHelper> settingsRdbHelper = CellularDataSettingsRdbHelper::GetInstance();
+    if (settingsRdbHelper == nullptr) {
+        TELEPHONY_LOGE("settingsRdbHelper is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    Uri intelliSwitchEnableUri(CELLULAR_DATA_SETTING_INTELLIGENCE_SWITCH_URI);
+    int32_t intelliSwitchEnable = static_cast<int32_t>(IntelligenceSwitchCode::INTELLIGENCE_SWITCH_DISABLED);
+    int32_t ret = settingsRdbHelper->GetValue(intelliSwitchEnableUri,
+        INTELLIGENCE_SWITCH_COLUMN_ENABLE, intelliSwitchEnable);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("GetValue failed!");
+    }
+    intelliSwitchOn_ =
+        (intelliSwitchEnable == static_cast<int32_t>(IntelligenceSwitchCode::INTELLIGENCE_SWITCH_ENABLED));
+    switchEnabled = intelliSwitchOn_;
     return TELEPHONY_ERR_SUCCESS;
 }
 

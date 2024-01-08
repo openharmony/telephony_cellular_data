@@ -145,6 +145,24 @@ int32_t CellularDataHandler::SetCellularDataEnable(bool userDataOn)
     return dataSwitchSettings_->SetUserDataOn(userDataOn);
 }
 
+int32_t CellularDataHandler::SetIntelligenceSwitchEnable(bool userSwitchOn)
+{
+    if (dataSwitchSettings_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ is null.", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    bool switchEnabled = false;
+    int32_t result = dataSwitchSettings_->QueryIntelligenceSwitchStatus(switchEnabled);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("Slot%{public}d: Query result: %{public}d", slotId_, result);
+    }
+    if (switchEnabled == userSwitchOn) {
+        TELEPHONY_LOGI("Slot%{public}d: The status of the cellular data switch has not changed", slotId_);
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    return dataSwitchSettings_->SetIntelliSwitchOn(userSwitchOn);
+}
+
 int32_t CellularDataHandler::IsCellularDataEnabled(bool &dataEnabled) const
 {
     if (dataSwitchSettings_ == nullptr) {

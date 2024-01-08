@@ -80,6 +80,17 @@ int32_t CellularDataServiceStub::OnEnableCellularData(MessageParcel &data, Messa
     return result;
 }
 
+int32_t CellularDataServiceStub::OnEnableIntelligenceSwitch(MessageParcel &data, MessageParcel &reply)
+{
+    bool enable = data.ReadBool();
+    int32_t result = EnableIntelligenceSwitch(enable);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
 int32_t CellularDataServiceStub::OnGetCellularDataState(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = GetCellularDataState();

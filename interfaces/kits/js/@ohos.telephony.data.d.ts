@@ -376,6 +376,15 @@ declare namespace data {
   function getDefaultCellularDataSimId(): number;
 
   /**
+   * Enable Intelligence Switch.
+   * 
+   * @returns { number } Returns the success or failed statecode.
+   * @syscap SystemCapability.Telephony.CellularData
+   * @since 10
+   */
+  function enableIntelligenceSwitch(isSwitchOn: boolean): number;
+
+  /**
    * Describes the cellular data flow type.
    *
    * @enum { number }

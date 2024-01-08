@@ -48,6 +48,14 @@ public:
     int32_t EnableCellularData(bool enable);
 
     /**
+     * @brief Whether to enable intelligence switch
+     *
+     * @param enable Enable or not.
+     * @return Return 84082688 invalid parameter, 1 data enable success, 0 enable fail.
+     */
+    int32_t EnableIntelligenceSwitch(bool enable);
+
+    /**
      * @brief Whether the cellular data user switch is enabled
      *
      * @param dataEnabled Indicates the result of data enabled status.

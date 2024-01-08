@@ -33,6 +33,7 @@ public:
     bool ReleaseNet(const NetRequest &request);
     bool RequestNet(const NetRequest &request);
     int32_t SetCellularDataEnable(bool userDataEnabled);
+    int32_t SetIntelligenceSwitchEnable(bool userDataEnabled);
     int32_t IsCellularDataEnabled(bool &dataEnabled) const;
     int32_t SetCellularDataRoamingEnabled(bool dataRoamingEnabled);
     ApnProfileState GetCellularDataState() const;
