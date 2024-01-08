@@ -926,22 +926,6 @@ static napi_value EnableIntelligenceSwitch(napi_env env, napi_callback_info info
     return value;
 }
 
-static napi_value DisableIntelligenceSwitch(napi_env env, napi_callback_info info)
-{
-    size_t parameterCount = 1;
-    napi_value parameters[1];
-    napi_value thisVar = nullptr;
-    void *data = nullptr;
-    napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
-    int32_t result = -1;
-    if (parameterCount == 0) {
-        result = CellularDataClient::GetInstance().EnableIntelligenceSwitch(false);
-    }
-    napi_value value = nullptr;
-    NAPI_CALL(env, napi_create_int32(env, result, &value));
-    return value;
-}
-
 EXTERN_C_START
 napi_value RegistCellularData(napi_env env, napi_value exports)
 {
