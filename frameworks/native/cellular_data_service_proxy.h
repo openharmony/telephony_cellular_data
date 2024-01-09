@@ -43,6 +43,14 @@ public:
     virtual int32_t IsCellularDataEnabled(bool &dataEnabled);
 
     /**
+     * Whether to enable intelligence switch
+     *
+     * @param enable allow or not
+     * @return return 84082688 invalid parameter, 1 data enable success, 0 enable fail
+     */
+    int32_t EnableIntelligenceSwitch(bool enable);
+
+    /**
      * Whether to enable cellular data user switch
      *
      * @param enable allow or not

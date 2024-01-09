@@ -35,7 +35,9 @@ public:
     bool IsUserDataOn();
     bool IsUserDataRoamingOn();
     int32_t SetUserDataOn(bool userDataOn);
+    int32_t SetIntelliSwitchOn(bool userSwitchOn);
     int32_t SetUserDataRoamingOn(bool dataRoamingEnabled);
+    int32_t QueryIntelligenceSwitchStatus(bool &switchEnabled);
     int32_t QueryUserDataStatus(bool &dataEnabled);
     int32_t QueryUserDataRoamingStatus(bool &dataRoamingEnabled);
 
@@ -45,6 +47,7 @@ private:
     bool userDataRoaming_ = false;
     bool policyDataOn_ = true;
     bool carrierDataOn_ = false;
+    bool intelliSwitchOn_ = false;
     const int32_t slotId_;
 };
 } // namespace Telephony

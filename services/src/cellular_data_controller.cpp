@@ -87,6 +87,15 @@ int32_t CellularDataController::SetCellularDataEnable(bool userDataEnabled)
     return cellularDataHandler_->SetCellularDataEnable(userDataEnabled);
 }
 
+int32_t CellularDataController::SetIntelligenceSwitchEnable(bool userDataEnabled)
+{
+    if (cellularDataHandler_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler_ is null", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularDataHandler_->SetIntelligenceSwitchEnable(userDataEnabled);
+}
+
 int32_t CellularDataController::IsCellularDataEnabled(bool &dataEnabled) const
 {
     if (cellularDataHandler_ == nullptr) {
