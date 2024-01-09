@@ -382,6 +382,7 @@ int32_t CellularDataTest::HasInternetCapability(int32_t slotId, int32_t cid)
 
 int32_t CellularDataTest::ClearCellularDataConnections(int32_t slotId)
 {
+    CellularDataClient::GetInstance().IsConnect();
     return CellularDataClient::GetInstance().ClearCellularDataConnections(slotId);
 }
 

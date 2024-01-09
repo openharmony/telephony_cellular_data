@@ -102,9 +102,10 @@ void CellularDataClient::OnRemoteDied(const wptr<IRemoteObject> &remote)
     }
 }
 
-bool CellularDataClient::IsConnect() const
+bool CellularDataClient::IsConnect()
 {
-    return (proxy_ != nullptr);
+    sptr<ICellularDataManager> proxy = GetProxy();
+    return (proxy != nullptr);
 }
 
 void CellularDataClient::RegisterSimAccountCallback()
