@@ -37,7 +37,7 @@ public:
      *
      * @return Return true on connected, false on not connected.
      */
-    bool IsConnect() const;
+    bool IsConnect();
 
     /**
      * @brief Whether to enable cellular data user switch
