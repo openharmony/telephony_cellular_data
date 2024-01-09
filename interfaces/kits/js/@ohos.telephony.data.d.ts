@@ -389,7 +389,7 @@ declare namespace data {
    * @throws { BusinessError } 8300999 - Unknown error code.
    * @syscap SystemCapability.Telephony.CellularData
    * @systemapi Hide this for inner system use.
-   * @since 11
+   * @since 12
    */
   function enableIntelligenceSwitch(isSwitchOn: boolean): number;
 
