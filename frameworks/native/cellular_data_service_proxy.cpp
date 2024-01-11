@@ -391,7 +391,7 @@ int32_t CellularDataServiceProxy::RegisterSimAccountCallback(const sptr<SimAccou
     int32_t error = remote->SendRequest(static_cast<uint32_t>(CellularDataInterfaceCode::REG_SIM_ACCOUNT_CALLBACK),
         data, reply, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("error! errCode:%{public}d", error);
+        TELEPHONY_LOGD("error! errCode:%{public}d", error);
         return error;
     }
     return reply.ReadInt32();

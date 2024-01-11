@@ -438,7 +438,7 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
     bool attached = coreInner.GetPsRegState(slotId_) == (int32_t)RegServiceState::REG_STATE_IN_SERVICE;
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     coreInner.GetSimState(slotId_, simState);
-    TELEPHONY_LOGI("Slot%{public}d: attached: %{public}d simState: %{public}d", slotId_, attached, simState);
+    TELEPHONY_LOGD("Slot%{public}d: attached: %{public}d simState: %{public}d", slotId_, attached, simState);
     bool isEmergencyApn = apnHolder->IsEmergencyType();
     if (!isEmergencyApn && !attached) {
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
@@ -751,7 +751,7 @@ void CellularDataHandler::MsgEstablishDataConnection(const InnerEvent::Pointer &
         TELEPHONY_LOGE("Slot%{public}d: apnHolder is null", slotId_);
         return;
     }
-    TELEPHONY_LOGI("Slot%{public}d: APN holder type:%{public}s call:%{public}d", slotId_,
+    TELEPHONY_LOGD("Slot%{public}d: APN holder type:%{public}s call:%{public}d", slotId_,
         apnHolder->GetApnType().c_str(), apnHolder->IsDataCallEnabled());
     if (apnHolder->IsDataCallEnabled()) {
         AttemptEstablishDataConnection(apnHolder);

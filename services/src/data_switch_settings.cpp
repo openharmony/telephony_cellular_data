@@ -194,7 +194,7 @@ bool DataSwitchSettings::IsAllowActiveData() const
     if (userDataOn_ && policyDataOn_) {
         return true;
     } else {
-        TELEPHONY_LOGE("Activation not allowed[user:%{public}d policy:%{public}d]", userDataOn_, policyDataOn_);
+        TELEPHONY_LOGD("Activation not allowed[user:%{public}d policy:%{public}d]", userDataOn_, policyDataOn_);
         return false;
     }
 }

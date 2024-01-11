@@ -85,7 +85,7 @@ public:
     virtual void ProcessTransitions(const AppExecFwk::InnerEvent::Pointer &event)
     {
         if (curState_ != destState_) {
-            TELEPHONY_LOGI("Begin process transitions");
+            TELEPHONY_LOGD("Begin process transitions");
             if (curState_ != nullptr) {
                 sptr<State> tmpState = curState_->parent_;
                 while (tmpState != nullptr) {
