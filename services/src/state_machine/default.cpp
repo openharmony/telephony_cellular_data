@@ -23,13 +23,13 @@ namespace OHOS {
 namespace Telephony {
 void Default::StateBegin()
 {
-    TELEPHONY_LOGI("Enter default state");
+    TELEPHONY_LOGD("Enter default state");
     isActive_ = true;
 }
 
 void Default::StateEnd()
 {
-    TELEPHONY_LOGI("Exit default state");
+    TELEPHONY_LOGD("Exit default state");
     isActive_ = false;
 }
 
