@@ -395,6 +395,23 @@ void CellularDataHandler::EstablishAllApnsIfConnectable()
     }
 }
 
+bool CellularDataHandler::SetDataPermittedForMms(bool dataPermittedForMms)
+{
+    if (incallDataStateMachine_ != nullptr) {
+        TELEPHONY_LOGI("Slot%{public}d: incall data active", slotId_);
+        return false;
+    }
+    if (CheckDataPermittedByDsds()) {
+        TELEPHONY_LOGI("Slot%{public}d: data permitted", slotId_);
+        return false;
+    }
+    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
+    const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
+    SetDataPermitted(defSlotId, !dataPermittedForMms);
+    SetDataPermitted(slotId_, dataPermittedForMms);
+    return true;
+}
+
 bool CellularDataHandler::CheckDataPermittedByDsds()
 {
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
@@ -439,6 +456,12 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     coreInner.GetSimState(slotId_, simState);
     TELEPHONY_LOGD("Slot%{public}d: attached: %{public}d simState: %{public}d", slotId_, attached, simState);
+    bool isMmsApn = apnHolder->IsMmsType();
+    if (isMmsApn && !attached && (simState == SimState::SIM_STATE_READY)) {
+        if (SetDataPermittedForMms(true)) {
+            return false;
+        }
+    }
     bool isEmergencyApn = apnHolder->IsEmergencyType();
     if (!isEmergencyApn && !attached) {
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
@@ -706,6 +729,9 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
                 InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_DISCONNECTED);
             incallDataStateMachine_->SendEvent(incallEvent);
         }
+    }
+    if (apnHolder->IsMmsType()) {
+        SetDataPermittedForMms(false);
     }
     if (reason == DisConnectionReason::REASON_CHANGE_CONNECTION) {
         HandleSortConnection();

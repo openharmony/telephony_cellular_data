@@ -251,6 +251,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_003, Function | MediumTest | 
     cellularDataHandler.apnManager_ = std::make_unique<ApnManager>().release();
     NetRequest request;
     ASSERT_FALSE(cellularDataHandler.ReleaseNet(request));
+    cellularDataHandler.SetDataPermittedForMms(false);
     sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
     DisConnectionReason reason = DisConnectionReason::REASON_NORMAL;
     cellularDataHandler.ClearConnection(apnHolder, reason);
