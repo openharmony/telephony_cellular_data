@@ -24,9 +24,9 @@ namespace OHOS {
 namespace Telephony {
 using namespace AppExecFwk;
 
-class StateMachineFuzzer : public AppExecFwk::EventHandler {
+class StateMachineFuzzer : public TelEventHandler {
 public:
-    StateMachineFuzzer() = default;
+    explicit StateMachineFuzzer() : TelEventHandler("StateMachineFuzzer") {}
     ~StateMachineFuzzer() = default;
     std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect(int32_t slotId);
 
