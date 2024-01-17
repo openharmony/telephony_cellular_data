@@ -424,11 +424,11 @@ LinkBandwidthInfo DataConnectionManager::GetBandwidthsByRadioTech(const int32_t 
     if (radioTechName == "NR") {
         radioTechName = "NR_SA";
     }
-    TELEPHONY_LOGI("Slot%{public}d: accessRadioName is %{public}s", slotId_, radioTechName.c_str());
+    TELEPHONY_LOGI("Slot%{public}d: accessRadioName is %{private}s", slotId_, radioTechName.c_str());
     std::map<std::string, LinkBandwidthInfo>::iterator iter = bandwidthConfigMap_.find(radioTechName);
     if (iter != bandwidthConfigMap_.end()) {
         linkBandwidthInfo = iter->second;
-        TELEPHONY_LOGI("Slot%{public}d: name is %{public}s upBandwidth = %{public}u downBandwidth = %{public}u",
+        TELEPHONY_LOGI("Slot%{public}d: name is %{private}s upBandwidth = %{public}u downBandwidth = %{public}u",
             slotId_, iter->first.c_str(), linkBandwidthInfo.upBandwidth, linkBandwidthInfo.downBandwidth);
     }
     return linkBandwidthInfo;
