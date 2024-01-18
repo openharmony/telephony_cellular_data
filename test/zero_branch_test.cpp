@@ -945,6 +945,12 @@ HWTEST_F(BranchTest, CellularDataServices_Test_01, Function | MediumTest | Level
     cellularMachine->SetConnectionBandwidth(upBandwidth, downBandwidth);
     const std::string tcpBuffer = "";
     cellularMachine->SetConnectionTcpBuffer(tcpBuffer);
+    std::string proxyIpAddress = "1234:567";
+    std::string host = "";
+    uint16_t port = 0;
+    cellularMachine->SplitProxyIpAddress(proxyIpAddress, host, port);
+    EXPECT_EQ(host, "1234");
+    EXPECT_EQ(port, 567);
     EXPECT_TRUE(cellularMachine != nullptr);
     CellularDataDumpHelper dumpHelper;
     std::string result = "";

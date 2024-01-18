@@ -30,6 +30,10 @@
 
 namespace OHOS {
 namespace Telephony {
+static const uint16_t DEFAULT_PORT = 0;
+static const size_t HOST_SIZE = 1;
+static const size_t HOST_PORT_SIZE = 2;
+
 class DataConnectionManager;
 class CellularDataStateMachine : public StateMachine,
     public std::enable_shared_from_this<CellularDataStateMachine> {
@@ -51,10 +55,12 @@ public:
     std::string GetIpType();
     sptr<ApnItem> GetApnItem() const;
     void Init();
+    void UpdateHttpProxy(const std::string &proxyIpAddress);
     void UpdateNetworkInfo(const SetupDataCallResultInfo &dataCallInfo);
     void UpdateNetworkInfo();
     void SetConnectionBandwidth(const uint32_t upBandwidth, const uint32_t downBandwidth);
     void SetConnectionTcpBuffer(const std::string &tcpBuffer);
+    void SplitProxyIpAddress(const std::string &proxyIpAddress, std::string &host, uint16_t &port);
 
 protected:
     sptr<State> activeState_;
