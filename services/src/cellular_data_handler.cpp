@@ -640,6 +640,12 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
         }
         std::shared_ptr<CellularDataStateMachine> stateMachine = apnHolder->GetCellularDataStateMachine();
         if (stateMachine != nullptr) {
+            std::string proxyIpAddress = "";
+            sptr<ApnItem> attachApn = apnManager_->GetRilAttachApn();
+            if (attachApn != nullptr) {
+                proxyIpAddress = attachApn->attr_.proxyIpAddress_;
+            }
+            stateMachine->UpdateHttpProxy(proxyIpAddress);
             stateMachine->UpdateNetworkInfo(*resultInfo);
         } else {
             TELEPHONY_LOGE(

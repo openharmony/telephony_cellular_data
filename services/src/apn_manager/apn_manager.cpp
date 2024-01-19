@@ -287,14 +287,17 @@ int32_t ApnManager::CreateMvnoApnItems(int32_t slotId, const std::string &mcc, c
     return MakeSpecificApnItem(mvnoApnVec);
 }
 
-int32_t ApnManager::MakeSpecificApnItem(const std::vector<PdpProfile> &apnVec)
+int32_t ApnManager::MakeSpecificApnItem(std::vector<PdpProfile> &apnVec)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     allApnItem_.clear();
     int32_t count = 0;
-    for (const PdpProfile &apnData : apnVec) {
+    for (PdpProfile &apnData : apnVec) {
         TELEPHONY_LOGI("profileId = %{public}d, profileName = %{public}s, mvnoType = %{public}s", apnData.profileId,
             apnData.profileName.c_str(), apnData.mvnoType.c_str());
+        if (apnData.profileId == preferId_ && apnData.apnTypes.empty()) {
+            apnData.apnTypes = DATA_CONTEXT_ROLE_DEFAULT;
+        }
         sptr<ApnItem> apnItem = ApnItem::MakeApn(apnData);
         if (apnItem != nullptr) {
             allApnItem_.push_back(apnItem);

@@ -234,6 +234,8 @@ void CellularDataRdbHelper::MakePdpProfile(
     result->GetString(index, apnBean.mvnoMatchData);
     result->GetColumnIndex(PdpProfileData::EDITED_STATUS, index);
     result->GetInt(index, apnBean.edited);
+    result->GetColumnIndex(PdpProfileData::PROXY_IP_ADDRESS, index);
+    result->GetString(index, apnBean.proxyIpAddress);
     if (apnBean.pdpProtocol.empty()) {
         apnBean.pdpProtocol = "IP";
     }

@@ -250,6 +250,34 @@ void CellularDataStateMachine::GetMtuSizeFromOpCfg(int32_t &mtuSize, int32_t slo
     return;
 }
 
+void CellularDataStateMachine::SplitProxyIpAddress(const std::string &proxyIpAddress, std::string &host, uint16_t &port)
+{
+    std::vector<std::string> address;
+    size_t pos = 0;
+    size_t found = 0;
+    while ((found = proxyIpAddress.find(':', pos)) != std::string::npos) {
+        address.push_back(proxyIpAddress.substr(pos, found - pos));
+        pos = found + 1;
+    }
+    address.push_back(proxyIpAddress.substr(pos));
+    if (address.size() == HOST_SIZE) {
+        host = address[0];
+    }
+    if (address.size() == HOST_PORT_SIZE) {
+        host = address[0];
+        port = static_cast<uint16_t>(std::stoi(address[1]));
+    }
+}
+
+void CellularDataStateMachine::UpdateHttpProxy(const std::string &proxyIpAddress)
+{
+    std::string host = "";
+    uint16_t port = DEFAULT_PORT;
+    SplitProxyIpAddress(proxyIpAddress, host, port);
+    HttpProxy httpProxy = { host, port, {} };
+    netLinkInfo_->httpProxy_ = httpProxy;
+}
+
 void CellularDataStateMachine::UpdateNetworkInfo(const SetupDataCallResultInfo &dataCallInfo)
 {
     std::lock_guard<std::mutex> guard(mtx_);
