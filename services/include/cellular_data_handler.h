@@ -116,6 +116,7 @@ private:
     void SetDataPermittedResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void SetDataPermitted(int32_t slotId, bool dataPermitted);
     bool CheckDataPermittedByDsds();
+    bool SetDataPermittedForMms(bool dataPermittedForMms);
     std::shared_ptr<IncallDataStateMachine> CreateIncallDataStateMachine(int32_t callState);
     void HandleDBSettingIncallChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleCallChanged(int32_t state);
