@@ -18,7 +18,6 @@
 
 #define private public
 #include <stdio.h>
-#include <gtest/gtest.h>
 
 #include "access_token.h"
 #include "accesstoken_kit.h"
