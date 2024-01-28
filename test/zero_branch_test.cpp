@@ -696,6 +696,7 @@ HWTEST_F(BranchTest, Disconnecting_Test_01, Function | MediumTest | Level3)
     disconnecting->StateBegin();
     disconnecting->StateEnd();
     disconnecting->ProcessDisconnectTimeout(event);
+    disconnecting->ProcessRilAdapterHostDied(event);
     ASSERT_FALSE(disconnecting->StateProcess(event));
 }
 
