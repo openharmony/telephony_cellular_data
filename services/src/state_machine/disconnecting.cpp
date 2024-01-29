@@ -64,6 +64,20 @@ void Disconnecting::ProcessDisconnectTimeout(const AppExecFwk::InnerEvent::Point
     TELEPHONY_LOGI("ProcessDisconnectTimeout");
 }
 
+void Disconnecting::ProcessRilAdapterHostDied(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
+    if (stateMachine == nullptr) {
+        TELEPHONY_LOGE("stateMachine is null");
+        return;
+    }
+    Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+    inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
+    inActive->SetReason(DisConnectionReason::REASON_RETRY_CONNECTION);
+    stateMachine->TransitionTo(stateMachine->inActiveState_);
+    TELEPHONY_LOGI("ProcessRilAdapterHostDied");
+}
+
 bool Disconnecting::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
@@ -107,6 +121,10 @@ bool Disconnecting::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
         }
         case CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK:
             ProcessDisconnectTimeout(event);
+            retVal = PROCESSED;
+            break;
+        case CellularDataEventCode::MSG_SM_RIL_ADAPTER_HOST_DIED:
+            ProcessRilAdapterHostDied(event);
             retVal = PROCESSED;
             break;
         default:
