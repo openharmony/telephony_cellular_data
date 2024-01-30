@@ -387,7 +387,7 @@ ApnProfileState ApnManager::GetOverallApnState() const
         }
     }
     if (failState) {
-        TELEPHONY_LOGI("apn overall state is STATE_IDLE");
+        TELEPHONY_LOGD("apn overall state is STATE_IDLE");
         return ApnProfileState::PROFILE_STATE_IDLE;
     }
     TELEPHONY_LOGI("apn overall state is STATE_FAILED");

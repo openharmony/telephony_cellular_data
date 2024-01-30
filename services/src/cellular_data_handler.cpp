@@ -258,7 +258,7 @@ void CellularDataHandler::ClearConnection(const sptr<ApnHolder> &apn, DisConnect
     }
     std::shared_ptr<CellularDataStateMachine> stateMachine = apn->GetCellularDataStateMachine();
     if (stateMachine == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: stateMachine is null", slotId_);
+        TELEPHONY_LOGD("Slot%{public}d: stateMachine is null", slotId_);
         return;
     }
     TELEPHONY_LOGI("Slot%{public}d: The APN holder is of type %{public}s", slotId_, apn->GetApnType().c_str());
@@ -436,7 +436,7 @@ bool CellularDataHandler::CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder)
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     std::string apnType = apnHolder->GetApnType();
     if (defSlotId != slotId_ && !apnType.compare(DATA_CONTEXT_ROLE_DEFAULT)) {
-        TELEPHONY_LOGI("Slot%{public}d: default:%{public}d, current:%{public}d", slotId_, defSlotId, slotId_);
+        TELEPHONY_LOGD("Slot%{public}d: default:%{public}d, current:%{public}d", slotId_, defSlotId, slotId_);
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
             CellularDataErrorCode::DATA_ERROR_CELLULAR_DATA_SLOT_ID_MISMATCH,
             "Default cellular data slot id is not current slot id");
@@ -499,7 +499,7 @@ bool CellularDataHandler::CheckRoamingState(sptr<ApnHolder> &apnHolder)
     if (!isAllowActiveData) {
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
             CellularDataErrorCode::DATA_ERROR_ROAMING_SWITCH_OFF_AND_ROAMING, "Data roaming is not on and is roaming");
-        TELEPHONY_LOGE("Slot%{public}d: AllowActiveData:%{public}d lastCallState_:%{public}d", slotId_,
+        TELEPHONY_LOGD("Slot%{public}d: AllowActiveData:%{public}d lastCallState_:%{public}d", slotId_,
             isAllowActiveData, lastCallState_);
         return false;
     }
@@ -507,7 +507,7 @@ bool CellularDataHandler::CheckRoamingState(sptr<ApnHolder> &apnHolder)
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
             CellularDataErrorCode::DATA_ERROR_CALL_AND_DATA_NOT_CONCURRENCY,
             "CS call and data are not allowed concurrency");
-        TELEPHONY_LOGE("Slot%{public}d: AllowActiveData:%{public}d lastCallState_:%{public}d", slotId_,
+        TELEPHONY_LOGD("Slot%{public}d: AllowActiveData:%{public}d lastCallState_:%{public}d", slotId_,
             isAllowActiveData, lastCallState_);
         return false;
     }
