@@ -36,6 +36,7 @@ public:
 
 private:
     void ProcessDisconnectTimeout(const AppExecFwk::InnerEvent::Pointer &event);
+    void ProcessRilAdapterHostDied(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     std::weak_ptr<CellularDataStateMachine> stateMachine_;

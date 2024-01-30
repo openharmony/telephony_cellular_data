@@ -101,7 +101,7 @@ int32_t CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &col
     result->GetString(columnIndex, resultValue);
     result->Close();
     settingHelper->Release();
-    TELEPHONY_LOGI("Query end resultValue is %{public}s", resultValue.c_str());
+    TELEPHONY_LOGD("Query end resultValue is %{public}s", resultValue.c_str());
     if (resultValue.empty()) {
         TELEPHONY_LOGE("resultValue is empty");
         return TELEPHONY_ERR_DATABASE_READ_FAIL;
