@@ -79,7 +79,7 @@ sptr<ICellularDataManager> CellularDataClient::GetProxy()
     }
     proxy_ = iface_cast<ICellularDataManager>(obj);
     deathRecipient_ = dr;
-    TELEPHONY_LOGI("Succeed to connect cellular data service %{public}d", proxy_ == nullptr);
+    TELEPHONY_LOGD("Succeed to connect cellular data service %{public}d", proxy_ == nullptr);
     return proxy_;
 }
 
@@ -123,7 +123,7 @@ void CellularDataClient::RegisterSimAccountCallback()
         return;
     }
     int32_t ret = proxy->RegisterSimAccountCallback(callback_);
-    TELEPHONY_LOGI("ret:%{public}d", ret);
+    TELEPHONY_LOGD("ret:%{public}d", ret);
     if (ret == TELEPHONY_ERR_SUCCESS) {
         registerStatus_ = true;
     }
@@ -137,7 +137,7 @@ void CellularDataClient::UnregisterSimAccountCallback()
         return;
     }
     int32_t ret = proxy->UnregisterSimAccountCallback();
-    TELEPHONY_LOGI("ret:%{public}d", ret);
+    TELEPHONY_LOGD("ret:%{public}d", ret);
 }
 
 int32_t CellularDataClient::GetDefaultCellularDataSlotId()
