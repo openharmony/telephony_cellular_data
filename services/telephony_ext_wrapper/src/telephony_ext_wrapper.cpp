@@ -31,7 +31,7 @@ TelephonyExtWrapper::~TelephonyExtWrapper()
     telephonyExtWrapperHandle_ = nullptr;
 }
 
-void InitDataEndSelfCure()
+void TelephonyExtWrapper::InitDataEndSelfCure()
 {
     dataEndSelfCure_ = (DATA_EDN_SELF_CURE)dlsym(telephonyExtWrapperHandle_, "DataEndSelfCure");
     if (dataEndSelfCure_ == nullptr) {
@@ -41,7 +41,7 @@ void InitDataEndSelfCure()
     TELEPHONY_LOGD("telephony ext wrapper init DataEndSelfCure success");
 }
 
-void InitIsApnAllowedActive()
+void TelephonyExtWrapper::InitIsApnAllowedActive()
 {
     isApnAllowedActive_ = (IS_APN_ALLOWED_ACTIVE)dlsym(telephonyExtWrapperHandle_, "IsApnAllowedActive");
     if (isApnAllowedActive_ == nullptr) {
