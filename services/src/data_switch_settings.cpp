@@ -191,10 +191,11 @@ void DataSwitchSettings::SetCarrierDataOn(bool carrierDataOn)
 
 bool DataSwitchSettings::IsAllowActiveData() const
 {
-    if (userDataOn_ && policyDataOn_) {
+    if (userDataOn_ && policyDataOn_ && internalDataOn_) {
         return true;
     } else {
-        TELEPHONY_LOGD("Activation not allowed[user:%{public}d policy:%{public}d]", userDataOn_, policyDataOn_);
+        TELEPHONY_LOGD("Activation not allowed[user:%{public}d policy:%{public}d internal:%{public}d]", userDataOn_,
+            policyDataOn_, internalDataOn_);
         return false;
     }
 }

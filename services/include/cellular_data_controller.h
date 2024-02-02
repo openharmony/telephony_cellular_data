@@ -52,6 +52,7 @@ public:
     std::string GetDataConnIpType() const;
     int32_t GetDataRecoveryState();
     void IsNeedDoRecovery(bool needDoRecovery) const;
+    bool ChangeConnectionForMms(bool dataPermittedForMms) const;
 
 private:
     void RegisterEvents();

@@ -502,6 +502,19 @@ int32_t CellularDataService::ClearAllConnections(const int32_t slotId, DisConnec
                   : static_cast<int32_t>(RequestNetCode::REQUEST_FAILED);
 }
 
+int32_t CellularDataService::ChangeConnectionForMms(const int32_t slotId, bool dataPermittedForMms)
+{
+    std::map<int32_t, std::shared_ptr<CellularDataController>>::const_iterator item =
+        cellularDataControllers_.find(slotId);
+    if (item == cellularDataControllers_.end() || item->second == nullptr) {
+        TELEPHONY_LOGE("cellularDataControllers_[%{public}d] is null", slotId);
+        return CELLULAR_DATA_INVALID_PARAM;
+    }
+    bool result = item->second->ChangeConnectionForMms(dataPermittedForMms);
+    return result ? static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)
+                  : static_cast<int32_t>(RequestNetCode::REQUEST_FAILED);
+}
+
 int32_t CellularDataService::GetServiceRunningState()
 {
     return static_cast<int32_t>(state_);
