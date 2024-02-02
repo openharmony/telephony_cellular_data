@@ -57,6 +57,7 @@ public:
     void ClearConnection(const sptr<ApnHolder> &apnHolder, DisConnectionReason reason);
     void EstablishAllApnsIfConnectable();
     void ClearAllConnections(DisConnectionReason reason);
+    bool ChangeConnectionForMms(bool dataPermittedForMms);
     int32_t GetSlotId() const;
     bool HandleApnChanged();
     void HandleApnChanged(const AppExecFwk::InnerEvent::Pointer &event);

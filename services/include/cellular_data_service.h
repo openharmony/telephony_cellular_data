@@ -67,6 +67,7 @@ public:
     int32_t HasInternetCapability(const int32_t slotId, const int32_t cid) override;
     int32_t ClearCellularDataConnections(const int32_t slotId) override;
     int32_t ClearAllConnections(const int32_t slotId, DisConnectionReason reason) override;
+    int32_t ChangeConnectionForMms(const int32_t slotId, bool dataPermittedForMms);
     int32_t StrategySwitch(int32_t slotId, bool enable);
     int32_t RequestNet(const NetRequest &request);
     int32_t ReleaseNet(const NetRequest &request);

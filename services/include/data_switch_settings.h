@@ -42,7 +42,7 @@ public:
     int32_t QueryUserDataRoamingStatus(bool &dataRoamingEnabled);
 
 private:
-    bool internalDataOn_ = false;
+    bool internalDataOn_ = true;
     bool userDataOn_ = true;
     bool userDataRoaming_ = false;
     bool policyDataOn_ = true;
