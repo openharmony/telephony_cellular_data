@@ -157,6 +157,8 @@ public:
 
     int32_t IsNeedDoRecovery(int32_t slotId, bool needDoRecovery);
 
+    int32_t InitCellularDataController(int32_t slotId);
+
 private:
     static inline BrokerDelegator<CellularDataServiceProxy> delegator_;
 };
