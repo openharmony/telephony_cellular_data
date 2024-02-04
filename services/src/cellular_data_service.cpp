@@ -257,9 +257,10 @@ void CellularDataService::InitModule()
     }
 }
 
-void AddNetSupplier(CellularDataNetAgent &netAgent, std::vector<unit64_t> netCapabilities, int32_t slotId)
+void CellularDataService::AddNetSupplier(CellularDataNetAgent &netAgent, std::vector<uint64_t> netCapabilities,
+    int32_t slotId)
 {
-    std::shared_ptr<CellularDataController> cellularDataController = std::make_shared<CellularDataController>(i);
+    std::shared_ptr<CellularDataController> cellularDataController = std::make_shared<CellularDataController>(slotId);
     if (cellularDataController == nullptr) {
         TELEPHONY_LOGE("CellularDataService init module failed cellularDataController is null.");
         return;
@@ -276,7 +277,7 @@ void AddNetSupplier(CellularDataNetAgent &netAgent, std::vector<unit64_t> netCap
     }
 }
 
-int32_t InitCellularDataController(int32_t slotId)
+int32_t CellularDataService::InitCellularDataController(int32_t slotId)
 {
     CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
     std::vector<uint64_t> netCapabilities;
