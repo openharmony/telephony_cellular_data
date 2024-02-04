@@ -1497,7 +1497,6 @@ bool CellularDataHandler::ChangeConnectionForMms(bool dataPermittedForMms)
     if (dataPermittedForMms) {
         dataSwitchSettings_->SetInternalDataOn(false);
         ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
-
     } else {
         dataSwitchSettings_->SetInternalDataOn(true);
         EstablishAllApnsIfConnectable();
