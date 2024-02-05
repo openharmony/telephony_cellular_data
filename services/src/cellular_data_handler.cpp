@@ -110,8 +110,7 @@ bool CellularDataHandler::RequestNet(const NetRequest &request)
         return false;
     }
     ApnProfileState apnState = apnHolder->GetApnState();
-    if (apnState == ApnProfileState::PROFILE_STATE_CONNECTED || apnState == ApnProfileState::PROFILE_STATE_CONNECTING ||
-        apnState == ApnProfileState::PROFILE_STATE_DISCONNECTING) {
+    if (apnState == ApnProfileState::PROFILE_STATE_CONNECTED || apnState == ApnProfileState::PROFILE_STATE_CONNECTING) {
         TELEPHONY_LOGD("Slot%{public}d: apn state is connected(%{public}d).", slotId_, apnState);
         return true;
     }
@@ -520,7 +519,13 @@ bool CellularDataHandler::CheckApnState(sptr<ApnHolder> &apnHolder)
         TELEPHONY_LOGE("Slot%{public}d: apnManager_ or apnManager_ is null", slotId_);
         return false;
     }
-
+    if (apnHolder->GetApnState() == PROFILE_STATE_DISCONNECTING &&
+        !HasInnerEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION)) {
+        TELEPHONY_LOGI("Slot%{public}d: APN holder is disconnecting", slotId_);
+        int32_t id = apnManager_->FindApnIdByApnName(apnHolder->GetApnType());
+        SendEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, id, ESTABLISH_DATA_CONNECTION_DELAY);
+        return false;
+    }
     if (apnHolder->GetApnState() == PROFILE_STATE_FAILED) {
         apnHolder->SetApnState(PROFILE_STATE_IDLE);
     }
