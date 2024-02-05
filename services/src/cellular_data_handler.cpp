@@ -18,6 +18,7 @@
 #include "cellular_data_constant.h"
 #include "cellular_data_error.h"
 #include "cellular_data_hisysevent.h"
+#include "cellular_data_service.h"
 #include "cellular_data_settings_rdb_helper.h"
 #include "cellular_data_types.h"
 #include "cellular_data_utils.h"
@@ -408,6 +409,7 @@ bool CellularDataHandler::SetDataPermittedForMms(bool dataPermittedForMms)
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     SetDataPermitted(defSlotId, !dataPermittedForMms);
     SetDataPermitted(slotId_, dataPermittedForMms);
+    DelayedRefSingleton<CellularDataService>::GetInstance().ChangeConnectionForMms(defSlotId, dataPermittedForMms);
     return true;
 }
 
@@ -1489,6 +1491,22 @@ bool CellularDataHandler::HasInternetCapability(const int32_t cid) const
         return true;
     }
     return false;
+}
+
+bool CellularDataHandler::ChangeConnectionForMms(bool dataPermittedForMms)
+{
+    if (dataSwitchSettings_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ is null.", slotId_);
+        return false;
+    }
+    if (dataPermittedForMms) {
+        dataSwitchSettings_->SetInternalDataOn(false);
+        ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
+    } else {
+        dataSwitchSettings_->SetInternalDataOn(true);
+        EstablishAllApnsIfConnectable();
+    }
+    return true;
 }
 
 void CellularDataHandler::GetConfigurationFor5G()
