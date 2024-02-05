@@ -302,6 +302,16 @@ bool CellularDataController::HasInternetCapability(const int32_t cid) const
     return cellularDataHandler_->HasInternetCapability(cid);
 }
 
+bool CellularDataController::ChangeConnectionForMms(bool dataPermittedForMms) const
+{
+    if (cellularDataHandler_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler is null", slotId_);
+        return false;
+    }
+    cellularDataHandler_->ChangeConnectionForMms(dataPermittedForMms);
+    return true;
+}
+
 bool CellularDataController::ClearAllConnections(DisConnectionReason reason) const
 {
     if (cellularDataHandler_ == nullptr) {
