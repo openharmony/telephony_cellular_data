@@ -662,12 +662,6 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
         }
         apnHolder->SetApnState(PROFILE_STATE_CONNECTED);
         apnHolder->InitialApnRetryCount();
-        int32_t networkType = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
-        CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, networkType);
-        if (apnHolder->GetCapability() == NetCap::NET_CAPABILITY_INTERNET) {
-            StateNotification::GetInstance().UpdateCellularDataConnectState(
-                slotId_, PROFILE_STATE_CONNECTED, networkType);
-        }
         std::shared_ptr<CellularDataStateMachine> stateMachine = apnHolder->GetCellularDataStateMachine();
         if (stateMachine != nullptr) {
             std::string proxyIpAddress = "";
@@ -692,6 +686,12 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
         if (incallDataStateMachine_ != nullptr) {
             InnerEvent::Pointer incallEvent = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_CONNECTED);
             incallDataStateMachine_->SendEvent(incallEvent);
+        }
+        int32_t networkType = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+        CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, networkType);
+        if (apnHolder->GetCapability() == NetCap::NET_CAPABILITY_INTERNET) {
+            StateNotification::GetInstance().UpdateCellularDataConnectState(
+                slotId_, PROFILE_STATE_CONNECTED, networkType);
         }
     }
 }
