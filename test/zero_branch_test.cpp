@@ -197,7 +197,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | 
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     CellularDataHandler cellularDataHandler { subscriberInfo, 0 };
-    NetRequest request;
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
     sptr<ApnHolder> apnHolder;
