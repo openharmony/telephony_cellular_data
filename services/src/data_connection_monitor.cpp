@@ -80,7 +80,7 @@ void DataConnectionMonitor::StartStallDetectionTimer()
     }
 }
 
-void DataConnectionMonitor::OnStallDetectionTimer()
+__attribute__((no_sanitize("cfi"))) void DataConnectionMonitor::OnStallDetectionTimer()
 {
     TELEPHONY_LOGI("Slot%{public}d: on stall detection", slotId_);
 #ifdef OHOS_BUILD_ENABLE_DATA_SERVICE_EXT
