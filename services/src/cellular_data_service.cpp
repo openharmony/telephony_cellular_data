@@ -279,6 +279,9 @@ void CellularDataService::AddNetSupplier(CellularDataNetAgent &netAgent, std::ve
 
 int32_t CellularDataService::InitCellularDataController(int32_t slotId)
 {
+    if (slotId != VSIM_SLOT_ID) {
+        return CELLULAR_DATA_INVALID_PARAM;
+    }
     CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
     std::vector<uint64_t> netCapabilities;
     netCapabilities.push_back(NetCap::NET_CAPABILITY_INTERNET);
