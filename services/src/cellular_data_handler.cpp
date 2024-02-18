@@ -33,6 +33,7 @@
 #include "string_ex.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_types.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -497,6 +498,15 @@ bool CellularDataHandler::CheckRoamingState(sptr<ApnHolder> &apnHolder)
     if (isEmergencyApn) {
         isAllowActiveData = true;
     }
+
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (TELEPHONY_EXT_WRAPPER.isApnAllowedActive_) {
+        std::string apnHolderType = apnHolder->GetApnType();
+        isAllowActiveData =
+            TELEPHONY_EXT_WRAPPER.isApnAllowedActive_(slotId_, apnHolderType.c_str(), isAllowActiveData);
+    }
+#endif
+
     if (!isAllowActiveData) {
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
             CellularDataErrorCode::DATA_ERROR_ROAMING_SWITCH_OFF_AND_ROAMING, "Data roaming is not on and is roaming");

@@ -29,10 +29,14 @@ public:
     void InitTelephonyExtWrapper();
 
     typedef void (*DATA_EDN_SELF_CURE)(int32_t&, int32_t&);
+    typedef bool (*IS_APN_ALLOWED_ACTIVE)(int32_t, const char*, bool);
 
     DATA_EDN_SELF_CURE dataEndSelfCure_ = nullptr;
+    IS_APN_ALLOWED_ACTIVE isApnAllowedActive_ = nullptr;
 
 private:
+    void InitDataEndSelfCure();
+    void InitIsApnAllowedActive();
     void* telephonyExtWrapperHandle_ = nullptr;
 };
 

@@ -31,6 +31,26 @@ TelephonyExtWrapper::~TelephonyExtWrapper()
     telephonyExtWrapperHandle_ = nullptr;
 }
 
+void TelephonyExtWrapper::InitDataEndSelfCure()
+{
+    dataEndSelfCure_ = (DATA_EDN_SELF_CURE)dlsym(telephonyExtWrapperHandle_, "DataEndSelfCure");
+    if (dataEndSelfCure_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol DataEndSelfCure failed, error: %{public}s", dlerror());
+        return;
+    }
+    TELEPHONY_LOGD("telephony ext wrapper init DataEndSelfCure success");
+}
+
+void TelephonyExtWrapper::InitIsApnAllowedActive()
+{
+    isApnAllowedActive_ = (IS_APN_ALLOWED_ACTIVE)dlsym(telephonyExtWrapperHandle_, "IsApnAllowedActive");
+    if (isApnAllowedActive_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol InitIsApnAllowedActive failed, error: %{public}s", dlerror());
+        return;
+    }
+    TELEPHONY_LOGD("telephony ext wrapper init InitIsApnAllowedActive success");
+}
+
 void TelephonyExtWrapper::InitTelephonyExtWrapper()
 {
     TELEPHONY_LOGD("TelephonyExtWrapper::InitTelephonyExtWrapper() start");
@@ -39,14 +59,8 @@ void TelephonyExtWrapper::InitTelephonyExtWrapper()
         TELEPHONY_LOGE("libtelephony_ext_service.z.so was not loaded, error: %{public}s", dlerror());
         return;
     }
-
-    dataEndSelfCure_ = (DATA_EDN_SELF_CURE)dlsym(telephonyExtWrapperHandle_, "DataEndSelfCure");
-    // Check whether all function pointers are empty.
-    if (dataEndSelfCure_ == nullptr) {
-        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
-        return;
-    }
-    TELEPHONY_LOGI("telephony ext wrapper init success");
+    InitDataEndSelfCure();
+    InitIsApnAllowedActive();
 }
 } // namespace Telephony
 } // namespace OHOS
