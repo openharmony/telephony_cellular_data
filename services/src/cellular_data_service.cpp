@@ -253,12 +253,12 @@ void CellularDataService::InitModule()
     netCapabilities.push_back(NetCap::NET_CAPABILITY_MMS);
     int32_t simNum = CoreManagerInner::GetInstance().GetMaxSimCount();
     for (int32_t i = 0; i < simNum; ++i) {
-        AddNetSupplier(netAgent, netCapabilities, i);
+        AddNetSupplier(i, netAgent, netCapabilities);
     }
 }
 
-void CellularDataService::AddNetSupplier(CellularDataNetAgent &netAgent, std::vector<uint64_t> &netCapabilities,
-    int32_t slotId)
+void CellularDataService::AddNetSupplier(int32_t slotId, CellularDataNetAgent &netAgent,
+    std::vector<uint64_t> &netCapabilities)
 {
     std::shared_ptr<CellularDataController> cellularDataController = std::make_shared<CellularDataController>(slotId);
     if (cellularDataController == nullptr) {
@@ -286,7 +286,7 @@ int32_t CellularDataService::InitCellularDataController(int32_t slotId)
     std::vector<uint64_t> netCapabilities;
     netCapabilities.push_back(NetCap::NET_CAPABILITY_INTERNET);
     netCapabilities.push_back(NetCap::NET_CAPABILITY_MMS);
-    AddNetSupplier(netAgent, netCapabilities, slotId);
+    AddNetSupplier(slotId, netAgent, netCapabilities);
     return TELEPHONY_ERR_SUCCESS;
 }
 

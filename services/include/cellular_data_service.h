@@ -87,7 +87,7 @@ private:
     void InitModule();
     bool CheckParamValid(const int32_t slotId);
     void UnRegisterAllNetSpecifier();
-    void AddNetSupplier(CellularDataNetAgent &netAgent, std::vector<uint64_t> &netCapabilities, int32_t slotId);
+    void AddNetSupplier(int32_t slotId, CellularDataNetAgent &netAgent, std::vector<uint64_t> &netCapabilities);
 
 private:
     std::map<int32_t, std::shared_ptr<CellularDataController>> cellularDataControllers_;
