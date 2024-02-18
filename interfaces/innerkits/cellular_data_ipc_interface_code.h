@@ -40,7 +40,8 @@ enum class CellularDataInterfaceCode {
     GET_DATA_CONN_APN_ATTR,
     GET_DATA_CONN_IP_TYPE,
     IS_NEED_DO_RECOVERY,
-    ENABLE_INTELLIGENCE_SWITCH
+    ENABLE_INTELLIGENCE_SWITCH,
+    INIT_CELLULAR_DATA_CONTROLLER
 };
 } // namespace Telephony
 } // namespace OHOS

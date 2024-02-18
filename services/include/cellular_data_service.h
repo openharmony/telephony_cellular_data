@@ -81,11 +81,14 @@ public:
     int32_t GetDataConnIpType(int32_t slotId, std::string &ipType) override;
     int32_t IsNeedDoRecovery(int32_t slotId, bool needDoRecovery) override;
     int32_t EnableIntelligenceSwitch(bool enable) override;
+    int32_t InitCellularDataController(int32_t slotId) override;
+
 private:
     bool Init();
     void InitModule();
     bool CheckParamValid(const int32_t slotId);
     void UnRegisterAllNetSpecifier();
+    void AddNetSupplier(int32_t slotId, CellularDataNetAgent &netAgent, std::vector<uint64_t> &netCapabilities);
 
 private:
     std::map<int32_t, std::shared_ptr<CellularDataController>> cellularDataControllers_;

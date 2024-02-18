@@ -518,5 +518,29 @@ int32_t CellularDataServiceProxy::IsNeedDoRecovery(int32_t slotId, bool needDoRe
     return result;
 }
 
+int32_t CellularDataServiceProxy::InitCellularDataController(int32_t slotId)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    if (!dataParcel.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write interface token failed!");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt32(slotId);
+    sptr<OHOS::IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("remote is nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest((uint32_t)CellularDataInterfaceCode::INIT_CELLULAR_DATA_CONTROLLER, dataParcel,
+        replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function InitCellularDataController call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = replyParcel.ReadInt32();
+    return result;
+}
 } // namespace Telephony
 } // namespace OHOS

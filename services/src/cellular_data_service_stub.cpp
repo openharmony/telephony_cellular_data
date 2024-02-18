@@ -315,5 +315,15 @@ int32_t CellularDataServiceStub::OnIsNeedDoRecovery(MessageParcel &data, Message
     return result;
 }
 
+int32_t CellularDataServiceStub::OnInitCellularDataController(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t result = InitCellularDataController(slotId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("write int32 reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
 } // namespace Telephony
 } // namespace OHOS

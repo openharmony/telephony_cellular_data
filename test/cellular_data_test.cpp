@@ -218,6 +218,7 @@ public:
     static int32_t GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr);
     static int32_t GetDataConnIpType(int32_t slotId, std::string &ipType);
     static int32_t IsNeedDoRecovery(int32_t slotId, bool needDoRecovery);
+    static int32_t InitCellularDataController(int32_t slotId);
 };
 
 bool CellularDataTest::HasSimCard(const int32_t slotId)
@@ -421,6 +422,11 @@ int32_t CellularDataTest::GetDataConnIpType(int32_t slotId, std::string &ipType)
 int32_t CellularDataTest::IsNeedDoRecovery(int32_t slotId, bool needDoRecovery)
 {
     return CellularDataClient::GetInstance().IsNeedDoRecovery(slotId, needDoRecovery);
+}
+
+int32_t CellularDataTest::InitCellularDataController(int32_t slotId)
+{
+    return CellularDataClient::GetInstance().InitCellularDataController(slotId);
 }
 #ifndef TEL_TEST_UNSUPPORT
 /**
@@ -1230,6 +1236,48 @@ HWTEST_F(CellularDataTest, EnableIntelligenceSwitch_Test_01, TestSize.Level2)
     ASSERT_TRUE(result2 == TELEPHONY_ERR_SUCCESS);
     sleep(SLEEP_TIME);
     std::cout << "DisableIntelligenceSwitch ..." << std::endl;
+}
+
+/**
+ * @tc.number   InitCellularDataController_Test_01
+ * @tc.name     Test the InitCellularDataController function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, InitCellularDataController_Test_01, TestSize.Level3)
+{
+    if (!HasSimCard(SIM_SLOT_ID_1)) {
+        return;
+    }
+    AccessToken token;
+    int32_t result = CellularDataTest::InitCellularDataController(SIM_SLOT_ID_1);
+    ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
+}
+
+/**
+ * @tc.number   InitCellularDataController_Test_02
+ * @tc.name     Test the InitCellularDataController function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, InitCellularDataController_Test_02, TestSize.Level3)
+{
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+    AccessToken token;
+    int32_t result = CellularDataTest::InitCellularDataController(DEFAULT_SIM_SLOT_ID);
+    ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
+}
+
+/**
+ * @tc.number   InitCellularDataController_Test_03
+ * @tc.name     Test the InitCellularDataController function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, InitCellularDataController_Test_03, TestSize.Level3)
+{
+    AccessToken token;
+    int32_t result = CellularDataTest::InitCellularDataController(VSIM_SLOT_ID);
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
 }
 
 #else  // TEL_TEST_UNSUPPORT

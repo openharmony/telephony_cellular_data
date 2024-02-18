@@ -253,22 +253,41 @@ void CellularDataService::InitModule()
     netCapabilities.push_back(NetCap::NET_CAPABILITY_MMS);
     int32_t simNum = CoreManagerInner::GetInstance().GetMaxSimCount();
     for (int32_t i = 0; i < simNum; ++i) {
-        std::shared_ptr<CellularDataController> cellularDataController = std::make_shared<CellularDataController>(i);
-        if (cellularDataController == nullptr) {
-            TELEPHONY_LOGE("CellularDataService init module failed cellularDataController is null.");
-            continue;
-        }
-        cellularDataControllers_.insert(
-            std::pair<int32_t, std::shared_ptr<CellularDataController>>(i, cellularDataController));
-        for (uint64_t capability : netCapabilities) {
-            NetSupplier netSupplier = { 0 };
-            netSupplier.supplierId = 0;
-            netSupplier.slotId = i;
-            netSupplier.simId = INVALID_SIM_ID;
-            netSupplier.capability = capability;
-            netAgent.AddNetSupplier(netSupplier);
-        }
+        AddNetSupplier(i, netAgent, netCapabilities);
     }
+}
+
+void CellularDataService::AddNetSupplier(int32_t slotId, CellularDataNetAgent &netAgent,
+    std::vector<uint64_t> &netCapabilities)
+{
+    std::shared_ptr<CellularDataController> cellularDataController = std::make_shared<CellularDataController>(slotId);
+    if (cellularDataController == nullptr) {
+        TELEPHONY_LOGE("CellularDataService init module failed cellularDataController is null.");
+        return;
+    }
+    cellularDataControllers_.insert(
+        std::pair<int32_t, std::shared_ptr<CellularDataController>>(slotId, cellularDataController));
+    for (uint64_t capability : netCapabilities) {
+        NetSupplier netSupplier = { 0 };
+        netSupplier.supplierId = 0;
+        netSupplier.slotId = slotId;
+        netSupplier.simId = INVALID_SIM_ID;
+        netSupplier.capability = capability;
+        netAgent.AddNetSupplier(netSupplier);
+    }
+}
+
+int32_t CellularDataService::InitCellularDataController(int32_t slotId)
+{
+    if (slotId != VSIM_SLOT_ID) {
+        return CELLULAR_DATA_INVALID_PARAM;
+    }
+    CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
+    std::vector<uint64_t> netCapabilities;
+    netCapabilities.push_back(NetCap::NET_CAPABILITY_INTERNET);
+    netCapabilities.push_back(NetCap::NET_CAPABILITY_MMS);
+    AddNetSupplier(slotId, netAgent, netCapabilities);
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 bool CellularDataService::CheckParamValid(const int32_t slotId)

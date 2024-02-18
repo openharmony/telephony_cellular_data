@@ -192,6 +192,14 @@ public:
      */
     int32_t IsNeedDoRecovery(int32_t slotId, bool needDoRecovery);
 
+    /**
+     * @brief Init CellularDataController instance.
+     *
+     * @param slotId Card slot identification.
+     * @return 1 set success, 0 set fail
+     */
+    int32_t InitCellularDataController(int32_t slotId);
+
 private:
     class CellularDataDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
