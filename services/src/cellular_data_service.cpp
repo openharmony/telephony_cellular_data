@@ -257,7 +257,7 @@ void CellularDataService::InitModule()
     }
 }
 
-void CellularDataService::AddNetSupplier(CellularDataNetAgent &netAgent, std::vector<uint64_t> netCapabilities,
+void CellularDataService::AddNetSupplier(CellularDataNetAgent &netAgent, std::vector<uint64_t> &netCapabilities,
     int32_t slotId)
 {
     std::shared_ptr<CellularDataController> cellularDataController = std::make_shared<CellularDataController>(slotId);
