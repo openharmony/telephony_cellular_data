@@ -302,13 +302,13 @@ bool CellularDataController::HasInternetCapability(const int32_t cid) const
     return cellularDataHandler_->HasInternetCapability(cid);
 }
 
-bool CellularDataController::ChangeConnectionForMms(bool dataPermittedForMms) const
+bool CellularDataController::ChangeConnectionForDsds(bool enable) const
 {
     if (cellularDataHandler_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler is null", slotId_);
         return false;
     }
-    cellularDataHandler_->ChangeConnectionForMms(dataPermittedForMms);
+    cellularDataHandler_->ChangeConnectionForDsds(enable);
     return true;
 }
 
