@@ -409,7 +409,7 @@ bool CellularDataHandler::SetDataPermittedForMms(bool dataPermittedForMms)
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     SetDataPermitted(defSlotId, !dataPermittedForMms);
     SetDataPermitted(slotId_, dataPermittedForMms);
-    DelayedRefSingleton<CellularDataService>::GetInstance().ChangeConnectionForMms(defSlotId, dataPermittedForMms);
+    DelayedRefSingleton<CellularDataService>::GetInstance().ChangeConnectionForDsds(defSlotId, !dataPermittedForMms);
     return true;
 }
 
@@ -1239,6 +1239,7 @@ void CellularDataHandler::HandleDsdsModeChanged(const AppExecFwk::InnerEvent::Po
             SetDataPermitted(i, false);
         } else {
             SetDataPermitted(i, true);
+            DelayedRefSingleton<CellularDataService>::GetInstance().ChangeConnectionForDsds(i, true);
         }
     }
     if (incallDataStateMachine_ != nullptr) {
@@ -1493,18 +1494,18 @@ bool CellularDataHandler::HasInternetCapability(const int32_t cid) const
     return false;
 }
 
-bool CellularDataHandler::ChangeConnectionForMms(bool dataPermittedForMms)
+bool CellularDataHandler::ChangeConnectionForDsds(bool enable)
 {
     if (dataSwitchSettings_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ is null.", slotId_);
         return false;
     }
-    if (dataPermittedForMms) {
-        dataSwitchSettings_->SetInternalDataOn(false);
-        ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
-    } else {
+    if (enable) {
         dataSwitchSettings_->SetInternalDataOn(true);
         EstablishAllApnsIfConnectable();
+    } else {
+        dataSwitchSettings_->SetInternalDataOn(false);
+        ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
     }
     return true;
 }

@@ -256,7 +256,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_003, Function | MediumTest | 
     cellularDataHandler.ClearConnection(apnHolder, reason);
     cellularDataHandler.EstablishAllApnsIfConnectable();
     cellularDataHandler.ClearAllConnections(reason);
-    cellularDataHandler.ChangeConnectionForMms(false);
+    cellularDataHandler.ChangeConnectionForDsds(false);
     cellularDataHandler.connectionManager_ = std::make_unique<DataConnectionManager>(INVALID_SLOTID).release();
     cellularDataHandler.ClearAllConnections(reason);
     cellularDataHandler.EstablishAllApnsIfConnectable();
@@ -301,7 +301,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_001, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearCellularDataConnections(INVALID_SLOTID));
     DisConnectionReason reason = DisConnectionReason::REASON_NORMAL;
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearAllConnections(INVALID_SLOTID, reason));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ChangeConnectionForMms(INVALID_SLOTID, false));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ChangeConnectionForDsds(INVALID_SLOTID, false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.StrategySwitch(INVALID_SLOTID, false));
     NetRequest request;
     request.ident = "simId12";
@@ -347,7 +347,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataController_001, Function | MediumTest
     controller.HasInternetCapability(0);
     DisConnectionReason reason = DisConnectionReason::REASON_NORMAL;
     ASSERT_FALSE(controller.ClearAllConnections(reason));
-    ASSERT_FALSE(controller.ChangeConnectionForMms(false));
+    ASSERT_FALSE(controller.ChangeConnectionForDsds(false));
     controller.UnRegisterEvents();
     ASSERT_FALSE(controller.HandleApnChanged());
     ASSERT_FALSE(controller.GetCellularDataFlowType());
