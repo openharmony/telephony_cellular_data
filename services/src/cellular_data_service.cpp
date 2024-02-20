@@ -521,7 +521,7 @@ int32_t CellularDataService::ClearAllConnections(const int32_t slotId, DisConnec
                   : static_cast<int32_t>(RequestNetCode::REQUEST_FAILED);
 }
 
-int32_t CellularDataService::ChangeConnectionForMms(const int32_t slotId, bool dataPermittedForMms)
+int32_t CellularDataService::ChangeConnectionForDsds(const int32_t slotId, bool enable)
 {
     std::map<int32_t, std::shared_ptr<CellularDataController>>::const_iterator item =
         cellularDataControllers_.find(slotId);
@@ -529,7 +529,7 @@ int32_t CellularDataService::ChangeConnectionForMms(const int32_t slotId, bool d
         TELEPHONY_LOGE("cellularDataControllers_[%{public}d] is null", slotId);
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    bool result = item->second->ChangeConnectionForMms(dataPermittedForMms);
+    bool result = item->second->ChangeConnectionForDsds(enable);
     return result ? static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)
                   : static_cast<int32_t>(RequestNetCode::REQUEST_FAILED);
 }
