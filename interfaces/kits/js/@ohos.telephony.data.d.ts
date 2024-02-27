@@ -51,6 +51,24 @@ declare namespace data {
   function getDefaultCellularDataSlotIdSync(): number;
 
   /**
+   * Get intelligence switch state.
+   * 
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @returns { boolean } Returns the state of intelligence switch.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CellularData
+   * @systemapi Hide this for inner system use.
+   * @since 12
+   */
+  function getIntelligenceSwitchState(): boolean;
+
+  /**
    * Switch cellular data services to another card, without changing the default settings.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE

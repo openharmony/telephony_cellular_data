@@ -926,6 +926,22 @@ static napi_value EnableIntelligenceSwitch(napi_env env, napi_callback_info info
     return value;
 }
 
+static napi_value GetIntelligenceSwitchState(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 1;
+    napi_value parameters[] = { nullptr };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    bool switchState = false;
+    napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
+    if (parameterCount == 0) {
+        CellularDataClient::GetInstance().GetIntelligenceSwitchState(switchState);
+    }
+    napi_value value = nullptr;
+    NAPI_CALL(env, napi_get_boolean(env, switchState, &value));
+    return value;
+}
+
 EXTERN_C_START
 napi_value RegistCellularData(napi_env env, napi_value exports)
 {
@@ -944,6 +960,7 @@ napi_value RegistCellularData(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("setDefaultCellularDataSlotId", SetDefaultCellularDataSlotId),
         DECLARE_NAPI_FUNCTION("getCellularDataFlowType", GetCellularDataFlowType),
         DECLARE_NAPI_FUNCTION("enableIntelligenceSwitch", EnableIntelligenceSwitch),
+        DECLARE_NAPI_FUNCTION("getIntelligenceSwitchState", GetIntelligenceSwitchState),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     CreateDataConnectState(env, exports);

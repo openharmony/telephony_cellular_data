@@ -73,6 +73,7 @@ public:
     void IsNeedDoRecovery(bool needDoRecovery) const;
     void RegisterDataSettingObserver();
     void UnRegisterDataSettingObserver();
+    int32_t GetIntelligenceSwitchState(bool &switchState);
 
 private:
     std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect();

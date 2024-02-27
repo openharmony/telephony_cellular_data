@@ -141,6 +141,14 @@ public:
      */
     int32_t GetCellularDataFlowType();
 
+    /**
+     * Get the State Of Intelligence Switch
+     *
+     * @param switchState Returns switch state
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t GetIntelligenceSwitchState(bool &switchState);
+
     int32_t HasInternetCapability(int32_t slotId, int32_t cid);
 
     int32_t ClearCellularDataConnections(int32_t slotId);

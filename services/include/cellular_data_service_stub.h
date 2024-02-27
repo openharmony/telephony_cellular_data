@@ -56,6 +56,7 @@ private:
     int32_t OnIsNeedDoRecovery(MessageParcel &data, MessageParcel &reply);
     int32_t OnEnableIntelligenceSwitch(MessageParcel &data, MessageParcel &reply);
     int32_t OnInitCellularDataController(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetIntelligenceSwitchState(MessageParcel &data, MessageParcel &reply);
 
 private:
     using Fun = int32_t (CellularDataServiceStub::*)(MessageParcel &data, MessageParcel &reply);
@@ -102,6 +103,8 @@ private:
             &CellularDataServiceStub::OnEnableIntelligenceSwitch },
         { (uint32_t)CellularDataInterfaceCode::INIT_CELLULAR_DATA_CONTROLLER,
             &CellularDataServiceStub::OnInitCellularDataController },
+        { (uint32_t)CellularDataInterfaceCode::GET_INTELLIGENCE_SWITCH_STATE,
+            &CellularDataServiceStub::OnGetIntelligenceSwitchState },    
     };
 };
 } // namespace Telephony

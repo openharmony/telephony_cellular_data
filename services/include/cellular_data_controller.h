@@ -53,6 +53,7 @@ public:
     int32_t GetDataRecoveryState();
     void IsNeedDoRecovery(bool needDoRecovery) const;
     bool ChangeConnectionForDsds(bool enable) const;
+    int32_t GetIntelligenceSwitchState(bool &switchState);
 
 private:
     void RegisterEvents();
