@@ -21,14 +21,40 @@ namespace OHOS {
 namespace Telephony {
 namespace {
 const std::string TELEPHONY_EXT_WRAPPER_PATH = "libtelephony_ext_service.z.so";
+const std::string TELEPHONY_VSIM_WRAPPER_PATH = "libtel_vsim_symbol.z.so";
 } // namespace
 
 TelephonyExtWrapper::TelephonyExtWrapper() {}
 TelephonyExtWrapper::~TelephonyExtWrapper()
 {
     TELEPHONY_LOGD("TelephonyExtWrapper::~TelephonyExtWrapper() start");
-    dlclose(telephonyExtWrapperHandle_);
-    telephonyExtWrapperHandle_ = nullptr;
+    if (telephonyExtWrapperHandle_ != nullptr) {
+        dlclose(telephonyExtWrapperHandle_);
+        telephonyExtWrapperHandle_ = nullptr;
+    }
+    if (telephonyVSimWrapperHandle_ != nullptr) {
+        dlclose(telephonyVSimWrapperHandle_);
+        telephonyVSimWrapperHandle_ = nullptr;
+    }
+}
+
+void TelephonyExtWrapper::InitTelephonyExtWrapper()
+{
+    TELEPHONY_LOGD("TelephonyExtWrapper::InitTelephonyExtWrapper() start");
+    InitTelephonyExtWrapperForCellularData();
+    InitTelephonyExtWrapperForVSim();
+    TELEPHONY_LOGI("telephony ext wrapper init success");
+}
+
+void TelephonyExtWrapper::InitTelephonyExtWrapperForCellularData()
+{
+    telephonyExtWrapperHandle_ = dlopen(TELEPHONY_EXT_WRAPPER_PATH.c_str(), RTLD_NOW);
+    if (telephonyExtWrapperHandle_ == nullptr) {
+        TELEPHONY_LOGE("libtelephony_ext_service.z.so was not loaded, error: %{public}s", dlerror());
+        return;
+    }
+    InitDataEndSelfCure();
+    InitIsApnAllowedActive();
 }
 
 void TelephonyExtWrapper::InitDataEndSelfCure()
@@ -51,16 +77,22 @@ void TelephonyExtWrapper::InitIsApnAllowedActive()
     TELEPHONY_LOGD("telephony ext wrapper init InitIsApnAllowedActive success");
 }
 
-void TelephonyExtWrapper::InitTelephonyExtWrapper()
+void TelephonyExtWrapper::InitTelephonyExtWrapperForVSim()
 {
-    TELEPHONY_LOGD("TelephonyExtWrapper::InitTelephonyExtWrapper() start");
-    telephonyExtWrapperHandle_ = dlopen(TELEPHONY_EXT_WRAPPER_PATH.c_str(), RTLD_NOW);
-    if (telephonyExtWrapperHandle_ == nullptr) {
-        TELEPHONY_LOGE("libtelephony_ext_service.z.so was not loaded, error: %{public}s", dlerror());
+    TELEPHONY_LOGI("[VSIM] telephony ext wrapper init begin");
+    telephonyVSimWrapperHandle_ = dlopen(TELEPHONY_VSIM_WRAPPER_PATH.c_str(), RTLD_NOW);
+    if (telephonyVSimWrapperHandle_ == nullptr) {
+        TELEPHONY_LOGE("libtel_vsim_symbol.z.so was not loaded, error: %{public}s", dlerror());
         return;
     }
-    InitDataEndSelfCure();
-    InitIsApnAllowedActive();
+    getVSimSlotId_ = (GET_VSIM_SLOT_ID) dlsym(telephonyVSimWrapperHandle_, "GetVSimSlotId");
+    createAllApnItemExt_ = (CREATE_ALL_APN_ITEM_EXT) dlsym(telephonyVSimWrapperHandle_, "CreateAllApnItemExt");
+    if (getVSimSlotId_ == nullptr || createAllApnItemExt_ == nullptr) {
+        TELEPHONY_LOGE("[VSIM] telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+        return;
+    }
+    TELEPHONY_LOGI("[VSIM] telephony ext wrapper init success");
 }
+
 } // namespace Telephony
 } // namespace OHOS

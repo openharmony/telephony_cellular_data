@@ -21,6 +21,7 @@
 #include "string_ex.h"
 #include "tel_profile_util.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -189,6 +190,13 @@ void ApnManager::CreateAllApnItem()
 int32_t ApnManager::CreateAllApnItemByDatabase(int32_t slotId)
 {
     int32_t count = 0;
+    if (TELEPHONY_EXT_WRAPPER.createAllApnItemExt_) {
+        sptr<ApnItem> extraApnItem = std::make_unique<ApnItem>().release();
+        if (TELEPHONY_EXT_WRAPPER.createAllApnItemExt_(slotId, extraApnItem)) {
+            allApnItem_.push_back(extraApnItem);
+            return ++count;
+        }
+    }
     std::u16string operatorNumeric;
     CoreManagerInner::GetInstance().GetSimOperatorNumeric(slotId, operatorNumeric);
     std::string numeric = Str16ToStr8(operatorNumeric);

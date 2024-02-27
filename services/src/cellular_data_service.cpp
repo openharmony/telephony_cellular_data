@@ -267,6 +267,12 @@ void CellularDataService::AddNetSupplier(int32_t slotId, CellularDataNetAgent &n
     }
     cellularDataControllers_.insert(
         std::pair<int32_t, std::shared_ptr<CellularDataController>>(slotId, cellularDataController));
+    if (slotId == CELLULAR_DATA_VSIM_SLOT_ID) {
+        // The SIM card is registered in the Init function. After the AsynchronousRegister function is invoked,
+        // the initialization is successful based on the delay message.
+        // The preceding functions need to be manually called because the VSIM initialization is delayed.
+        cellularDataController->AsynchronousRegister();
+    }
     for (uint64_t capability : netCapabilities) {
         NetSupplier netSupplier = { 0 };
         netSupplier.supplierId = 0;
@@ -279,7 +285,7 @@ void CellularDataService::AddNetSupplier(int32_t slotId, CellularDataNetAgent &n
 
 int32_t CellularDataService::InitCellularDataController(int32_t slotId)
 {
-    if (slotId != VSIM_SLOT_ID) {
+    if (slotId != CELLULAR_DATA_VSIM_SLOT_ID) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
     CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();

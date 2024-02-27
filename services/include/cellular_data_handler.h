@@ -134,6 +134,7 @@ private:
     void OnCleanAllDataConnectionsDone(const AppExecFwk::InnerEvent::Pointer &event);
     void CreateApnItem();
     void UpdatePhysicalConnectionState(bool noActiveConnection);
+    bool IsVSimSlotId(int32_t slotId);
 
 private:
     sptr<ApnManager> apnManager_;

@@ -19,6 +19,8 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
+#include "apn_item.h"
+
 namespace OHOS {
 namespace Telephony {
 class TelephonyExtWrapper final {
@@ -30,14 +32,23 @@ public:
 
     typedef void (*DATA_EDN_SELF_CURE)(int32_t&, int32_t&);
     typedef bool (*IS_APN_ALLOWED_ACTIVE)(int32_t, const char*, bool);
+    /* add for vsim begin */
+    typedef void (*GET_VSIM_SLOT_ID)(int32_t &slotId);
+    typedef bool (*CREATE_ALL_APN_ITEM_EXT)(int32_t slotId, sptr<ApnItem> &apnItem);
+    /* add for vsim end */
 
     DATA_EDN_SELF_CURE dataEndSelfCure_ = nullptr;
     IS_APN_ALLOWED_ACTIVE isApnAllowedActive_ = nullptr;
-
+    GET_VSIM_SLOT_ID getVSimSlotId_ = nullptr;
+    CREATE_ALL_APN_ITEM_EXT createAllApnItemExt_ = nullptr;
 private:
+    void* telephonyExtWrapperHandle_ = nullptr;
+    void* telephonyVSimWrapperHandle_ = nullptr;
+
+    void InitTelephonyExtWrapperForCellularData();
     void InitDataEndSelfCure();
     void InitIsApnAllowedActive();
-    void* telephonyExtWrapperHandle_ = nullptr;
+    void InitTelephonyExtWrapperForVSim();
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()

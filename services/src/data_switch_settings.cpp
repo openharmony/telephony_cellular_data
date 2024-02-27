@@ -31,8 +31,8 @@ void DataSwitchSettings::LoadSwitchValue()
     bool dataRoamingEnabled = false;
     QueryUserDataStatus(dataEnabled);
     QueryUserDataRoamingStatus(dataRoamingEnabled);
-    TELEPHONY_LOGI("userDataOn_:%{public}d userDataRoaming_:%{public}d policyDataOn_:%{public}d",
-        userDataOn_, userDataRoaming_, policyDataOn_);
+    TELEPHONY_LOGI("slotId:%{public}d userDataOn_:%{public}d userDataRoaming_:%{public}d policyDataOn_:%{public}d",
+        slotId_, userDataOn_, userDataRoaming_, policyDataOn_);
 }
 
 bool DataSwitchSettings::IsInternalDataOn() const
@@ -47,6 +47,11 @@ void DataSwitchSettings::SetInternalDataOn(bool internalDataOn)
 
 int32_t DataSwitchSettings::SetUserDataOn(bool userDataOn)
 {
+    // For the VSIM card, no need to save switch state.
+    if (slotId_ == CELLULAR_DATA_VSIM_SLOT_ID) {
+        TELEPHONY_LOGI("SetUserDataOn, no need for slot %{public}d", slotId_);
+        return TELEPHONY_ERR_SUCCESS;
+    }
     std::shared_ptr<CellularDataSettingsRdbHelper> settingsRdbHelper = CellularDataSettingsRdbHelper::GetInstance();
     if (settingsRdbHelper == nullptr) {
         TELEPHONY_LOGE("settingsRdbHelper == nullptr!");
@@ -83,6 +88,12 @@ int32_t DataSwitchSettings::SetIntelliSwitchOn(bool userSwitchOn)
 
 int32_t DataSwitchSettings::QueryUserDataStatus(bool &dataEnabled)
 {
+    // For the VSIM card, the cellular data switch is always ON.
+    if (slotId_ == CELLULAR_DATA_VSIM_SLOT_ID) {
+        userDataOn_ = true;
+        dataEnabled = true;
+        return TELEPHONY_ERR_SUCCESS;
+    }
     std::shared_ptr<CellularDataSettingsRdbHelper> settingsRdbHelper = CellularDataSettingsRdbHelper::GetInstance();
     if (settingsRdbHelper == nullptr) {
         TELEPHONY_LOGE("settingsRdbHelper is nullptr!");
@@ -92,7 +103,7 @@ int32_t DataSwitchSettings::QueryUserDataStatus(bool &dataEnabled)
     int32_t userDataEnable = static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED);
     int32_t ret = settingsRdbHelper->GetValue(userDataEnableUri, CELLULAR_DATA_COLUMN_ENABLE, userDataEnable);
     if (ret != TELEPHONY_ERR_SUCCESS) {
-        TELEPHONY_LOGE("GetValue failed!");
+        TELEPHONY_LOGE("Slot%{public}d: Get data Value failed!", slotId_);
     }
     userDataOn_ = (userDataEnable == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED));
     dataEnabled = userDataOn_;
@@ -121,6 +132,11 @@ int32_t DataSwitchSettings::QueryIntelligenceSwitchStatus(bool &switchEnabled)
 
 int32_t DataSwitchSettings::SetUserDataRoamingOn(bool dataRoamingEnabled)
 {
+    // For the VSIM card, no need to save switch state.
+    if (slotId_ == CELLULAR_DATA_VSIM_SLOT_ID) {
+        TELEPHONY_LOGI("SetUserDataRoamingOn, no need for slot %{public}d", slotId_);
+        return TELEPHONY_ERR_SUCCESS;
+    }
     std::shared_ptr<CellularDataSettingsRdbHelper> settingsRdbHelper = CellularDataSettingsRdbHelper::GetInstance();
     if (settingsRdbHelper == nullptr) {
         TELEPHONY_LOGE("settingsRdbHelper is nullptr!");
@@ -145,12 +161,17 @@ int32_t DataSwitchSettings::SetUserDataRoamingOn(bool dataRoamingEnabled)
 
 int32_t DataSwitchSettings::QueryUserDataRoamingStatus(bool &dataRoamingEnabled)
 {
+    // For the VSIM card, the cellular data roaming switch is always ON.
+    if (slotId_ == CELLULAR_DATA_VSIM_SLOT_ID) {
+        userDataRoaming_ = true;
+        dataRoamingEnabled = true;
+        return TELEPHONY_ERR_SUCCESS;
+    }
     std::shared_ptr<CellularDataSettingsRdbHelper> settingsRdbHelper = CellularDataSettingsRdbHelper::GetInstance();
     if (settingsRdbHelper == nullptr) {
         TELEPHONY_LOGE("settingsRdbHelper is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId_);
     if (simId <= INVALID_SIM_ID) {
         TELEPHONY_LOGE("Slot%{public}d: invalid sim id %{public}d", slotId_, simId);

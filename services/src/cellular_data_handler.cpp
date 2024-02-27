@@ -384,12 +384,12 @@ void CellularDataHandler::EstablishAllApnsIfConnectable()
             TELEPHONY_LOGE("Slot%{public}d: apn is null", slotId_);
             continue;
         }
-        if (apnHolder->IsDataCallEnabled()) {
+        if (apnHolder->IsDataCallEnabled() || IsVSimSlotId(slotId_)) {
             ApnProfileState apnState = apnHolder->GetApnState();
             if (apnState == PROFILE_STATE_FAILED || apnState == PROFILE_STATE_RETRYING) {
                 apnHolder->ReleaseDataConnection();
             }
-            if (apnHolder->IsDataCallConnectable()) {
+            if (apnHolder->IsDataCallConnectable() || IsVSimSlotId(slotId_)) {
                 AttemptEstablishDataConnection(apnHolder);
             }
         }
@@ -433,6 +433,9 @@ bool CellularDataHandler::CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder)
     if (apnHolder == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: apnHolder is null", slotId_);
         return false;
+    }
+    if (IsVSimSlotId(slotId_)) {
+        return true;
     }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
@@ -1366,7 +1369,7 @@ void CellularDataHandler::SetDataPermitted(int32_t slotId, bool dataPermitted)
     }
     bool hasSimCard = false;
     CoreManagerInner::GetInstance().HasSimCard(slotId, hasSimCard);
-    if (!hasSimCard) {
+    if (!hasSimCard && !IsVSimSlotId(slotId)) {
         TELEPHONY_LOGE("Slot%{public}d: no sim :%{public}d", slotId_, slotId);
         return;
     }
@@ -1873,6 +1876,16 @@ void CellularDataHandler::IsNeedDoRecovery(bool needDoRecovery) const
 void CellularDataHandler::OnCleanAllDataConnectionsDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("Slot%{public}d: receive OnCleanAllDataConnectionsDone event", slotId_);
+}
+
+bool CellularDataHandler::IsVSimSlotId(int32_t slotId)
+{
+    if (TELEPHONY_EXT_WRAPPER.getVSimSlotId_) {
+        int vSimSlotId;
+        TELEPHONY_EXT_WRAPPER.getVSimSlotId_(vSimSlotId);
+        return vSimSlotId == slotId;
+    }
+    return false;
 }
 } // namespace Telephony
 } // namespace OHOS
