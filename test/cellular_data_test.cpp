@@ -1308,7 +1308,7 @@ HWTEST_F(CellularDataTest, InitCellularDataController_Test_02, TestSize.Level3)
 HWTEST_F(CellularDataTest, InitCellularDataController_Test_03, TestSize.Level3)
 {
     AccessToken token;
-    int32_t result = CellularDataTest::InitCellularDataController(VSIM_SLOT_ID);
+    int32_t result = CellularDataTest::InitCellularDataController(CELLULAR_DATA_VSIM_SLOT_ID);
     ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
 }
 
