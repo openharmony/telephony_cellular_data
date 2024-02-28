@@ -219,6 +219,7 @@ public:
     static int32_t GetDataConnIpType(int32_t slotId, std::string &ipType);
     static int32_t IsNeedDoRecovery(int32_t slotId, bool needDoRecovery);
     static int32_t InitCellularDataController(int32_t slotId);
+    static int32_t GetIntelligenceSwitchStateTest(bool &state);
 };
 
 bool CellularDataTest::HasSimCard(const int32_t slotId)
@@ -354,6 +355,11 @@ int32_t CellularDataTest::EnableIntelligenceSwitchTest(bool enable)
 int32_t CellularDataTest::GetCellularDataStateTest()
 {
     return CellularDataClient::GetInstance().GetCellularDataState();
+}
+
+int32_t CellularDataTest::GetIntelligenceSwitchStateTest(bool &state)
+{
+    return CellularDataClient::GetInstance().GetIntelligenceSwitchState(state);
 }
 
 int32_t CellularDataTest::EnableCellularDataRoamingTest(int32_t slotId, bool enable)
@@ -1236,6 +1242,32 @@ HWTEST_F(CellularDataTest, EnableIntelligenceSwitch_Test_01, TestSize.Level2)
     ASSERT_TRUE(result2 == TELEPHONY_ERR_SUCCESS);
     sleep(SLEEP_TIME);
     std::cout << "DisableIntelligenceSwitch ..." << std::endl;
+}
+
+/**
+ * @tc.number   GetIntelligenceSwitchState_Test_01
+ * @tc.name     Test Intelligence switch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, GetIntelligenceSwitchState_Test_01, TestSize.Level2)
+{
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+    AccessToken token;
+    CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
+    int32_t result1 = CellularDataTest::EnableIntelligenceSwitchTest(true);
+    ASSERT_TRUE(result1 == TELEPHONY_ERR_SUCCESS);
+    bool res1 = false;
+    CellularDataTest::GetIntelligenceSwitchStateTest(res1);
+    ASSERT_TRUE(res1 == true);
+    std::cout << "Test GetIntelligenceSwitchState Of True..." << std::endl;
+    int32_t result2 = CellularDataTest::EnableIntelligenceSwitchTest(false);
+    ASSERT_TRUE(result2 == TELEPHONY_ERR_SUCCESS);
+    bool res2 = true;
+    CellularDataTest::GetIntelligenceSwitchStateTest(res2);
+    ASSERT_TRUE(res2 == false);
+    std::cout << "Test GetIntelligenceSwitchState Of False..." << std::endl;
 }
 
 /**

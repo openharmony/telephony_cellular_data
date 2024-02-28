@@ -133,6 +133,24 @@ int32_t CellularDataServiceStub::OnEnableCellularDataRoaming(MessageParcel &data
     return result;
 }
 
+int32_t CellularDataServiceStub::OnGetIntelligenceSwitchState(MessageParcel &data, MessageParcel &reply)
+{
+    bool switchState = false;
+    int32_t result = GetIntelligenceSwitchState(switchState);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("write int32 reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteBool(switchState)) {
+        TELEPHONY_LOGE("write bool reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CellularDataServiceStub::OnHandleApnChanged(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();

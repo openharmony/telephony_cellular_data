@@ -121,6 +121,14 @@ public:
      */
     virtual int32_t GetCellularDataFlowType() = 0;
 
+    /**
+     * get intelligence switch state
+     *
+     * @param state the state of intelligence switch
+     * @return return 84082688 invalid parameter, 1 data enable success, 0 enable fail
+     */
+    virtual int32_t GetIntelligenceSwitchState(bool &state) = 0;
+
     virtual int32_t HasInternetCapability(int32_t slotId, int32_t cid) = 0;
 
     virtual int32_t ClearCellularDataConnections(int32_t slotId) = 0;

@@ -182,6 +182,22 @@ int32_t CellularDataHandler::IsCellularDataRoamingEnabled(bool &dataRoamingEnabl
     return dataSwitchSettings_->QueryUserDataRoamingStatus(dataRoamingEnabled);
 }
 
+int32_t CellularDataHandler::GetIntelligenceSwitchState(bool &switchState)
+{
+    if (dataSwitchSettings_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ is null.", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    bool switchEnabled = false;
+    int32_t result = dataSwitchSettings_->QueryIntelligenceSwitchStatus(switchEnabled);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("Slot%{public}d: Query result: %{public}d", slotId_, result);
+    }
+    TELEPHONY_LOGI("GetIntelligenceSwitchState: %{public}d    -- %{public}d", switchState, switchEnabled);
+    switchState = switchEnabled;
+    return result;
+}
+
 int32_t CellularDataHandler::SetCellularDataRoamingEnabled(bool dataRoamingEnabled)
 {
     if (dataSwitchSettings_ == nullptr || apnManager_ == nullptr) {

@@ -69,6 +69,27 @@ int32_t CellularDataServiceProxy::EnableCellularData(bool enable)
     return result;
 }
 
+int32_t CellularDataServiceProxy::GetIntelligenceSwitchState(bool &state)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor());
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::GET_INTELLIGENCE_SWITCH_STATE, data,
+        reply, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    state = reply.ReadBool();
+    return result;
+}
+
 int32_t CellularDataServiceProxy::EnableIntelligenceSwitch(bool enable)
 {
     MessageParcel data;

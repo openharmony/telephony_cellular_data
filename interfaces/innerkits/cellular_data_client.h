@@ -78,6 +78,14 @@ public:
     int32_t GetApnState(int32_t slotId, const std::string &apnType);
 
     /**
+     * Get IntelligenceSwitch State
+     *
+     * @param switchState Returns IntelligenceSwitch State
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t GetIntelligenceSwitchState(bool &switchState);
+
+    /**
      * @brief Get recovery state
      */
     int32_t GetDataRecoveryState();
