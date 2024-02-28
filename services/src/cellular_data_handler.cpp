@@ -1881,7 +1881,7 @@ void CellularDataHandler::OnCleanAllDataConnectionsDone(const AppExecFwk::InnerE
 bool CellularDataHandler::IsVSimSlotId(int32_t slotId)
 {
     if (TELEPHONY_EXT_WRAPPER.getVSimSlotId_) {
-        int vSimSlotId;
+        int vSimSlotId = INVALID_SLOT_ID;
         TELEPHONY_EXT_WRAPPER.getVSimSlotId_(vSimSlotId);
         return vSimSlotId == slotId;
     }
