@@ -198,6 +198,30 @@ void GetCellularDataFlowType(const uint8_t *data, size_t size)
     DelayedSingleton<CellularDataService>::GetInstance()->OnGetCellularDataFlowType(dataMessageParcel, reply);
 }
 
+void RegisterSimAccountCallback(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRegisterSimAccountCallback(dataMessageParcel, reply);
+}
+
+void UnregisterSimAccountCallback(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CellularDataService>::GetInstance()->OnUnregisterSimAccountCallback(dataMessageParcel, reply);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -215,6 +239,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     SetDefaultCellularDataSlotId(data, size);
     HasInternetCapability(data, size);
     ClearCellularDataConnections(data, size);
+    RegisterSimAccountCallback(data, size);
+    UnregisterSimAccountCallback(data, size);
 }
 } // namespace OHOS
 

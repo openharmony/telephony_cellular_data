@@ -43,7 +43,7 @@ public:
      * @brief Whether to enable cellular data user switch
      *
      * @param enable Enable or not.
-     * @return Return 84082688 invalid parameter, 1 data enable success, 0 enable fail.
+     * @return Return 84082688 invalid parameter, 0 data enable success, others enable fail.
      */
     int32_t EnableCellularData(bool enable);
 
@@ -127,7 +127,7 @@ public:
      * @brief Set the slotId that uses the data traffic by default
      *
      * @param slotId card slot identification
-     * @return 1 set success, 0 set fail, 84082688 invalid parameter
+     * @return 0 set success, others set fail, 84082688 invalid parameter
      */
     int32_t SetDefaultCellularDataSlotId(int32_t slotId);
 
