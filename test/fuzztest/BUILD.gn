@@ -22,4 +22,5 @@ group("fuzztest") {
   deps += [ "updateactivemachine_fuzzer:fuzztest" ]
   deps += [ "updatedisconnectmachine_fuzzer:fuzztest" ]
   deps += [ "updateinactivemachine_fuzzer:fuzztest" ]
+  deps += [ "updateincalldatamachine_fuzzer:fuzztest" ]
 }
