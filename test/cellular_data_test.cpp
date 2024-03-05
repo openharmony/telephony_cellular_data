@@ -20,13 +20,12 @@
 #include <stdio.h>
 #include <gtest/gtest.h>
 
-#include "access_token.h"
-#include "accesstoken_kit.h"
 #include "cellular_data_client.h"
 #include "cellular_data_error.h"
 #include "cellular_data_service.h"
 #include "cellular_data_types.h"
 #include "core_service_client.h"
+#include "data_access_token.h"
 #include "gtest/gtest-message.h"
 #include "gtest/gtest-test-part.h"
 #include "gtest/gtest_pred_impl.h"
@@ -54,8 +53,6 @@
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
-using namespace Security::AccessToken;
-using Security::AccessToken::AccessTokenID;
 using namespace OHOS::NetManagerStandard;
 
 static const int32_t SLEEP_TIME = 1;
@@ -66,79 +63,6 @@ static const int32_t PING_CHECK_FAIL = 1;
 static const int32_t MAX_TIMES = 60;
 static const int32_t CMD_BUF_SIZE = 10240;
 static const int32_t NET_REGISTER_TIMEOUT_MS = 20000;
-
-HapInfoParams testInfoParams = {
-    .bundleName = "tel_cellular_data_test",
-    .userID = 1,
-    .instIndex = 0,
-    .appIDDesc = "test",
-    .isSystemApp = true,
-};
-
-PermissionDef testPermGetNetworkInfoDef = {
-    .permissionName = "ohos.permission.GET_NETWORK_INFO",
-    .bundleName = "tel_cellular_data_test",
-    .grantMode = 1, // SYSTEM_GRANT
-    .label = "label",
-    .labelId = 1,
-    .description = "Test cellular data",
-    .descriptionId = 1,
-    .availableLevel = APL_SYSTEM_BASIC,
-};
-
-PermissionStateFull testGetNetworkInfoState = {
-    .grantFlags = { 2 }, // PERMISSION_USER_SET
-    .grantStatus = { PermissionState::PERMISSION_GRANTED },
-    .isGeneral = true,
-    .permissionName = "ohos.permission.GET_NETWORK_INFO",
-    .resDeviceID = { "local" },
-};
-
-PermissionDef testPermSetTelephonyStateDef = {
-    .permissionName = "ohos.permission.SET_TELEPHONY_STATE",
-    .bundleName = "tel_cellular_data_test",
-    .grantMode = 1, // SYSTEM_GRANT
-    .label = "label",
-    .labelId = 1,
-    .description = "Test cellular data",
-    .descriptionId = 1,
-    .availableLevel = APL_SYSTEM_BASIC,
-};
-
-PermissionStateFull testSetTelephonyState = {
-    .grantFlags = { 2 }, // PERMISSION_USER_SET
-    .grantStatus = { PermissionState::PERMISSION_GRANTED },
-    .isGeneral = true,
-    .permissionName = "ohos.permission.SET_TELEPHONY_STATE",
-    .resDeviceID = { "local" },
-};
-
-HapPolicyParams testPolicyParams = {
-    .apl = APL_SYSTEM_BASIC,
-    .domain = "test.domain",
-    .permList = { testPermGetNetworkInfoDef, testPermSetTelephonyStateDef },
-    .permStateList = { testGetNetworkInfoState, testSetTelephonyState },
-};
-
-class AccessToken {
-public:
-    AccessToken()
-    {
-        currentID_ = GetSelfTokenID();
-        AccessTokenIDEx tokenIdEx = AccessTokenKit::AllocHapToken(testInfoParams, testPolicyParams);
-        accessID_ = tokenIdEx.tokenIdExStruct.tokenID;
-        SetSelfTokenID(tokenIdEx.tokenIDEx);
-    }
-    ~AccessToken()
-    {
-        AccessTokenKit::DeleteToken(accessID_);
-        SetSelfTokenID(currentID_);
-    }
-
-private:
-    AccessTokenID currentID_ = 0;
-    AccessTokenID accessID_ = 0;
-};
 
 class TestCallback : public NetManagerStandard::NetConnCallbackStub {
     int32_t NetAvailable(sptr<NetManagerStandard::NetHandle> &netHandle) override
@@ -235,7 +159,7 @@ void CellularDataTest::TearDownTestCase()
         std::cout << "connect coreService server failed!" << std::endl;
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     int32_t slotId = DATA_SLOT_ID_INVALID;
     if (HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         slotId = DEFAULT_SIM_SLOT_ID;
@@ -265,7 +189,7 @@ void CellularDataTest::SetUpTestCase()
         std::cout << "connect coreService server failed!" << std::endl;
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     int32_t slotId = DATA_SLOT_ID_INVALID;
     if (HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         slotId = DEFAULT_SIM_SLOT_ID;
@@ -442,7 +366,7 @@ int32_t CellularDataTest::InitCellularDataController(int32_t slotId)
  */
 HWTEST_F(CellularDataTest, IsCellularDataEnabled_Test, TestSize.Level1)
 {
-    AccessToken token;
+    DataAccessToken token;
     bool dataEnabled = false;
     CellularDataTest::IsCellularDataEnabledTest(dataEnabled);
     ASSERT_TRUE(dataEnabled >= static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_DISABLED));
@@ -458,7 +382,7 @@ HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test, TestSize.Level2)
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     int32_t result = CellularDataTest::GetDefaultCellularDataSlotIdTest();
     if (result < DEFAULT_SIM_SLOT_ID_REMOVE) {
         return;
@@ -496,7 +420,7 @@ HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test_01, TestSize.Level2)
     if (!HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     int32_t result = CellularDataTest::GetDefaultCellularDataSlotIdTest();
     if (result < DEFAULT_SIM_SLOT_ID_REMOVE) {
         return;
@@ -517,7 +441,7 @@ HWTEST_F(CellularDataTest, EnableCellularData_Test_01, TestSize.Level2)
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
     CellularDataTest::EnableCellularDataTest(false);
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED));
@@ -547,7 +471,7 @@ HWTEST_F(CellularDataTest, EnableCellularData_Test_02, TestSize.Level2)
     if (!HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
     CellularDataTest::EnableCellularDataTest(false);
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED));
@@ -577,7 +501,7 @@ HWTEST_F(CellularDataTest, DataRoamingState_ValidSlot_Test_01, TestSize.Level3)
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
     int32_t disabled = CellularDataTest::EnableCellularDataTest(false);
     ASSERT_TRUE(disabled == TELEPHONY_ERR_SUCCESS);
@@ -617,7 +541,7 @@ HWTEST_F(CellularDataTest, DataRoamingState_ValidSlot_Test_02, TestSize.Level3)
     if (!HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
     int32_t disabled = CellularDataTest::EnableCellularDataTest(false);
     ASSERT_TRUE(disabled == TELEPHONY_ERR_SUCCESS);
@@ -657,7 +581,7 @@ HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_01, TestSize
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
     int32_t disabled = CellularDataTest::EnableCellularDataTest(false);
     ASSERT_TRUE(disabled == TELEPHONY_ERR_SUCCESS);
@@ -693,7 +617,7 @@ HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_02, TestSize
     if (!HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
     int32_t disabled = CellularDataTest::EnableCellularDataTest(false);
     ASSERT_TRUE(disabled == TELEPHONY_ERR_SUCCESS);
@@ -729,7 +653,7 @@ HWTEST_F(CellularDataTest, GetCellularDataState_ValidityTest_01, TestSize.Level3
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
     bool dataEnabled = false;
     CellularDataTest::IsCellularDataEnabledTest(dataEnabled);
@@ -764,7 +688,7 @@ HWTEST_F(CellularDataTest, GetCellularDataState_ValidityTest_02, TestSize.Level3
     if (!HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
     bool dataEnabled = false;
     CellularDataTest::IsCellularDataEnabledTest(dataEnabled);
@@ -799,7 +723,7 @@ HWTEST_F(CellularDataTest, DataRoamingState_InValidSlot_Test_01, TestSize.Level3
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     // invalid slot turn on data roaming
     int32_t enable = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID - 1, true);
     ASSERT_TRUE(enable != TELEPHONY_ERR_SUCCESS);
@@ -831,7 +755,7 @@ HWTEST_F(CellularDataTest, DataFlowType_Test_01, TestSize.Level3)
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
     CellularDataTest::EnableCellularDataTest(false);
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED));
@@ -866,7 +790,7 @@ HWTEST_F(CellularDataTest, DataFlowType_Test_02, TestSize.Level3)
     if (!HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
     CellularDataTest::EnableCellularDataTest(false);
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_DISCONNECTED));
@@ -901,7 +825,7 @@ HWTEST_F(CellularDataTest, MmsApn_Test_01, TestSize.Level3)
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     if (callback == nullptr) {
         std::cout << "callback is null" << std::endl;
@@ -949,7 +873,7 @@ HWTEST_F(CellularDataTest, MmsApn_Test_02, TestSize.Level3)
     if (!HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     if (callback == nullptr) {
         std::cout << "callback is null" << std::endl;
@@ -1029,7 +953,7 @@ HWTEST_F(CellularDataTest, ClearCellularDataConnections_Test_01, TestSize.Level3
     if (!HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     int32_t result = CellularDataTest::ClearCellularDataConnections(SIM_SLOT_ID_1);
     ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
 }
@@ -1044,7 +968,7 @@ HWTEST_F(CellularDataTest, ClearCellularDataConnections_Test_02, TestSize.Level3
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     int32_t result = CellularDataTest::ClearCellularDataConnections(DEFAULT_SIM_SLOT_ID);
     ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
 }
@@ -1059,7 +983,7 @@ HWTEST_F(CellularDataTest, ClearAllConnections_Test_01, TestSize.Level3)
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     int32_t result = CellularDataTest::ClearAllConnections(
         DEFAULT_SIM_SLOT_ID, DisConnectionReason::REASON_RETRY_CONNECTION);
     ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
@@ -1075,7 +999,7 @@ HWTEST_F(CellularDataTest, GetApnState_Test_01, TestSize.Level3)
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     int32_t result = CellularDataTest::GetApnState(DEFAULT_SIM_SLOT_ID, "default");
     ASSERT_TRUE(result >= 0 && result <= 5);
 }
@@ -1090,7 +1014,7 @@ HWTEST_F(CellularDataTest, GetDataRecoveryState_Test_01, TestSize.Level3)
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     int32_t result = CellularDataTest::GetDataRecoveryState();
     ASSERT_TRUE(result >= 0 && result <= 3);
 }
@@ -1116,7 +1040,7 @@ HWTEST_F(CellularDataTest, CellularDataDump_Test_01, Function | MediumTest | Lev
  */
 HWTEST_F(CellularDataTest, Telephony_Cellulardata_InitTelephonyExtService_0100, Function | MediumTest | Level1)
 {
-    AccessToken token;
+    DataAccessToken token;
     TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
     if (TELEPHONY_EXT_WRAPPER.telephonyExtWrapperHandle_ == nullptr) {
         TELEPHONY_LOGI("telephonyExtWrapperHandle_ null");
@@ -1136,7 +1060,7 @@ HWTEST_F(CellularDataTest, GetDataConnApnAttr_Test_01, TestSize.Level3)
     if (!HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     ApnItem::Attribute apnAttr;
     int32_t result = CellularDataTest::GetDataConnApnAttr(SIM_SLOT_ID_1, apnAttr);
     ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
@@ -1152,7 +1076,7 @@ HWTEST_F(CellularDataTest, GetDataConnApnAttr_Test_02, TestSize.Level3)
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     ApnItem::Attribute apnAttr;
     int32_t result = CellularDataTest::GetDataConnApnAttr(DEFAULT_SIM_SLOT_ID, apnAttr);
     ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
@@ -1168,7 +1092,7 @@ HWTEST_F(CellularDataTest, GetDataConnIpType_Test_01, TestSize.Level3)
     if (!HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     std::string ipType;
     int32_t result = CellularDataTest::GetDataConnIpType(SIM_SLOT_ID_1, ipType);
     ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
@@ -1184,7 +1108,7 @@ HWTEST_F(CellularDataTest, GetDataConnIpType_Test_02, TestSize.Level3)
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     std::string ipType;
     int32_t result = CellularDataTest::GetDataConnIpType(DEFAULT_SIM_SLOT_ID, ipType);
     ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
@@ -1200,7 +1124,7 @@ HWTEST_F(CellularDataTest, IsNeedDoRecovery_Test_01, TestSize.Level3)
     if (!HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     bool needDoRecovery = true;
     int32_t result = CellularDataTest::IsNeedDoRecovery(SIM_SLOT_ID_1, needDoRecovery);
     ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
@@ -1216,7 +1140,7 @@ HWTEST_F(CellularDataTest, IsNeedDoRecovery_Test_02, TestSize.Level3)
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     bool needDoRecovery = true;
     int32_t result = CellularDataTest::IsNeedDoRecovery(DEFAULT_SIM_SLOT_ID, needDoRecovery);
     ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
@@ -1232,7 +1156,7 @@ HWTEST_F(CellularDataTest, EnableIntelligenceSwitch_Test_01, TestSize.Level2)
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
     int32_t result1 = CellularDataTest::EnableIntelligenceSwitchTest(true);
     ASSERT_TRUE(result1 == TELEPHONY_ERR_SUCCESS);
@@ -1254,7 +1178,7 @@ HWTEST_F(CellularDataTest, GetIntelligenceSwitchState_Test_01, TestSize.Level2)
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
     int32_t result1 = CellularDataTest::EnableIntelligenceSwitchTest(true);
     ASSERT_TRUE(result1 == TELEPHONY_ERR_SUCCESS);
@@ -1280,7 +1204,7 @@ HWTEST_F(CellularDataTest, InitCellularDataController_Test_01, TestSize.Level3)
     if (!HasSimCard(SIM_SLOT_ID_1)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     int32_t result = CellularDataTest::InitCellularDataController(SIM_SLOT_ID_1);
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
 }
@@ -1295,7 +1219,7 @@ HWTEST_F(CellularDataTest, InitCellularDataController_Test_02, TestSize.Level3)
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;
     }
-    AccessToken token;
+    DataAccessToken token;
     int32_t result = CellularDataTest::InitCellularDataController(DEFAULT_SIM_SLOT_ID);
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
 }
@@ -1307,7 +1231,7 @@ HWTEST_F(CellularDataTest, InitCellularDataController_Test_02, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, InitCellularDataController_Test_03, TestSize.Level3)
 {
-    AccessToken token;
+    DataAccessToken token;
     int32_t result = CellularDataTest::InitCellularDataController(CELLULAR_DATA_VSIM_SLOT_ID);
     ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
 }
