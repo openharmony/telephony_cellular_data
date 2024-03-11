@@ -328,6 +328,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_004, Function | MediumTest | 
     controller.cellularDataHandler_->CheckRoamingState(apnHolder);
     controller.cellularDataHandler_->CheckApnState(apnHolder);
     ASSERT_FALSE(controller.cellularDataHandler_->CheckAttachAndSimState(apnHolder));
+    controller.cellularDataHandler_->UnRegisterDataSettingObserver();
     controller.cellularDataHandler_->RemoveAllEvents();
     sleep(SLEEP_TIME_SECONDS);
 }
@@ -373,6 +374,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_005, Function | MediumTest | 
     controller.cellularDataHandler_->HandleFactoryReset(event);
     sptr<ApnHolder> apnHolder = controller.cellularDataHandler_->apnManager_->FindApnHolderById(1);
     ASSERT_FALSE(controller.cellularDataHandler_->HasAnyHigherPriorityConnection(apnHolder));
+    controller.cellularDataHandler_->UnRegisterDataSettingObserver();
     controller.cellularDataHandler_->RemoveAllEvents();
     sleep(SLEEP_TIME_SECONDS);
 }
@@ -628,6 +630,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataController_002, Function | MediumTest
     ASSERT_FALSE(controller.GetCellularDataFlowType());
     controller.UnRegisterEvents();
     if (controller.cellularDataHandler_ != nullptr) {
+        controller.cellularDataHandler_->UnRegisterDataSettingObserver();
         controller.cellularDataHandler_->RemoveAllEvents();
         sleep(SLEEP_TIME_SECONDS);
     }
