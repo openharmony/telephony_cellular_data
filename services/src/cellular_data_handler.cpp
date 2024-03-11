@@ -1877,7 +1877,7 @@ void CellularDataHandler::HandleFactoryReset(const InnerEvent::Pointer &event)
         TELEPHONY_LOGE("Slot%{public}d: apnManager_ is null", slotId_);
         return;
     }
-    apnManager_->ResetApns();
+    apnManager_->ResetApns(slotId_);
 }
 
 void CellularDataHandler::IsNeedDoRecovery(bool needDoRecovery) const

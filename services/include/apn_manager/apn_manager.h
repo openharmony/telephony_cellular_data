@@ -45,7 +45,7 @@ public:
     bool HasAnyConnectedState() const;
     ApnProfileState GetOverallApnState() const;
     sptr<ApnItem> GetRilAttachApn();
-    bool ResetApns();
+    bool ResetApns(int32_t slotId);
 
 private:
     void AddApnHolder(const std::string &apnType, const int32_t priority);
