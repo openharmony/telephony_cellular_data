@@ -178,9 +178,9 @@ static constexpr const char *IDENT_PREFIX = "simId";
 static constexpr const char *DEFAULT_HOSTNAME = "";
 static constexpr const char *DEFAULT_MASK = "";
 static constexpr const char *CELLULAR_DATA_RDB_URI = "datashare:///com.ohos.pdpprofileability";
-static constexpr const char *CELLULAR_DATA_RDB_SELECTION = 
+static constexpr const char *CELLULAR_DATA_RDB_SELECTION =
     "datashare:///com.ohos.pdpprofileability/net/pdp_profile?simId=";
-static constexpr const char *CELLULAR_DATA_RDB_RESET = 
+static constexpr const char *CELLULAR_DATA_RDB_RESET =
     "datashare:///com.ohos.pdpprofileability/net/pdp_profile/reset?simId=";
 static constexpr const char *CELLULAR_DATA_RDB_PREFER =
     "datashare:///com.ohos.pdpprofileability/net/pdp_profile/preferapn";
