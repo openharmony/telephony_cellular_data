@@ -131,7 +131,7 @@ bool CellularDataRdbHelper::QueryMvnoApnsByType(const std::string &mcc, const st
     std::vector<std::string> columns;
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(PdpProfileData::MVNO_TYPE, mvnoType)
-        ->EqualTo(PdpProfileData::MCCMNC, mcc + mnc)
+        ->EqualTo(PdpProfileData::MCCMNC, mcc + mnc);
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
     Uri cellularDataUri(static_cast<std::string>(CELLULAR_DATA_RDB_SELECTION) + std::to_string(simId));
     std::shared_ptr<DataShare::DataShareResultSet> result =
