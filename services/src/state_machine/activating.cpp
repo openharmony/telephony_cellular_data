@@ -64,8 +64,12 @@ bool Activating::RilActivatePdpContextDone(const AppExecFwk::InnerEvent::Pointer
         TELEPHONY_LOGE("connectId is %{public}d, flag is %{public}d", stateMachine->connectId_, resultInfo->flag);
         return false;
     }
+    Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+    if (inActive == nullptr) {
+        TELEPHONY_LOGE("Inactive is null");
+        return false;
+    }
     if (resultInfo->reason != 0) {
-        Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
         DisConnectionReason disReason = DataCallPdpError(resultInfo->reason);
         inActive->SetReason(disReason);
         inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
@@ -73,7 +77,6 @@ bool Activating::RilActivatePdpContextDone(const AppExecFwk::InnerEvent::Pointer
         return true;
     }
     if (resultInfo->active == 0) {
-        Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
         inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
         inActive->SetReason(DisConnectionReason::REASON_RETRY_CONNECTION);
         stateMachine->TransitionTo(stateMachine->inActiveState_);
@@ -151,6 +154,10 @@ bool Activating::RilErrorResponse(const AppExecFwk::InnerEvent::Pointer &event)
     }
     TELEPHONY_LOGI("HRilRadioResponseInfo flag:%{public}d error:%{public}d", rilInfo->flag, rilInfo->error);
     Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+    if (inActive == nullptr) {
+        TELEPHONY_LOGE("Inactive is null");
+        return false;
+    }
     switch (rilInfo->error) {
         case HRilErrType::HRIL_ERR_GENERIC_FAILURE:
         case HRilErrType::HRIL_ERR_CMD_SEND_FAILURE:
@@ -195,6 +202,10 @@ void Activating::ProcessConnectTimeout(const AppExecFwk::InnerEvent::Pointer &ev
         return;
     }
     Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+    if (inActive == nullptr) {
+        TELEPHONY_LOGE("Inactive is null");
+        return;
+    }
     inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
     inActive->SetReason(DisConnectionReason::REASON_RETRY_CONNECTION);
     stateMachine->TransitionTo(stateMachine->inActiveState_);

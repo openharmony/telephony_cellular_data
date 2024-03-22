@@ -49,6 +49,10 @@ void Inactive::StateBegin()
         }
         AppExecFwk::InnerEvent::Pointer event =
             AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_DISCONNECT_DATA_COMPLETE, object);
+        if (event == nullptr) {
+            TELEPHONY_LOGE("Create event failed");
+            return;
+        }
         if (stateMachine->cellularDataHandler_ != nullptr) {
             stateMachine->cellularDataHandler_->SendEvent(event);
         }

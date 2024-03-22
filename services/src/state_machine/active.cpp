@@ -87,6 +87,10 @@ bool Active::ProcessDisconnectDone(const AppExecFwk::InnerEvent::Pointer &event)
 
     DisConnectionReason reason = object->GetReason();
     Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+    if (inActive == nullptr) {
+        TELEPHONY_LOGE("inActive is null");
+        return false;
+    }
     inActive->SetReason(reason);
     stateMachine->FreeConnection(*object);
     stateMachine->TransitionTo(stateMachine->disconnectingState_);
@@ -101,9 +105,21 @@ bool Active::ProcessDisconnectAllDone(const AppExecFwk::InnerEvent::Pointer &eve
         TELEPHONY_LOGE("stateMachine is null");
         return false;
     }
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is null");
+        return false;
+    }
     std::unique_ptr<DataDisconnectParams> object = event->GetUniqueObject<DataDisconnectParams>();
+    if (object == nullptr) {
+        TELEPHONY_LOGE("object is null");
+        return false;
+    }
     DisConnectionReason reason = object->GetReason();
     Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+    if (inActive == nullptr) {
+        TELEPHONY_LOGE("inActive is null");
+        return false;
+    }
     inActive->SetReason(reason);
     stateMachine->FreeConnection(*object);
     stateMachine->TransitionTo(stateMachine->disconnectingState_);
@@ -120,6 +136,10 @@ bool Active::ProcessLostConnection(const AppExecFwk::InnerEvent::Pointer &event)
         return false;
     }
     Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+    if (inActive == nullptr) {
+        TELEPHONY_LOGE("inActive is null");
+        return false;
+    }
     inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
     inActive->SetReason(DisConnectionReason::REASON_RETRY_CONNECTION);
 

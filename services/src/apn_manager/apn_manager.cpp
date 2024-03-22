@@ -123,6 +123,9 @@ void ApnManager::AddApnHolder(const std::string &apnType, const int32_t priority
     sortedApnHolders_.emplace_back(apnHolder);
     sort(sortedApnHolders_.begin(), sortedApnHolders_.end(),
         [](const sptr<ApnHolder> &c1, const sptr<ApnHolder> &c2) {
+            if (c1 == nullptr || c2 == nullptr) {
+                return 0;
+            }
             return c2->GetPriority() - c1->GetPriority();
         });
     TELEPHONY_LOGI("The Apn holder type:%{public}s, size:%{public}zu", apnType.c_str(), sortedApnHolders_.size());
