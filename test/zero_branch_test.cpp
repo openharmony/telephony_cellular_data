@@ -227,6 +227,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | 
     cellularDataHandler.HandleDsdsModeChanged(event);
     cellularDataHandler.SetRilAttachApnResponse(event);
     cellularDataHandler.GetDefaultConfiguration();
+    cellularDataHandler.GetDefaultDataRoamingConfig();
     cellularDataHandler.HandleRadioNrStateChanged(event);
     cellularDataHandler.HandleRadioNrFrequencyChanged(event);
     cellularDataHandler.HandleDBSettingEnableChanged(event);

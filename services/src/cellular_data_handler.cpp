@@ -41,6 +41,7 @@ using namespace AppExecFwk;
 using namespace OHOS::EventFwk;
 using namespace NetManagerStandard;
 static const int32_t ESM_FLAG_INVALID = -1;
+const std::string DEFAULT_DATA_ROAMING = "persist.telephony.defaultdataroaming";
 CellularDataHandler::CellularDataHandler(const EventFwk::CommonEventSubscribeInfo &sp, int32_t slotId)
     : TelEventHandler("CellularDataHandler"), CommonEventSubscriber(sp), slotId_(slotId)
 {}
@@ -175,11 +176,13 @@ int32_t CellularDataHandler::IsCellularDataEnabled(bool &dataEnabled) const
 
 int32_t CellularDataHandler::IsCellularDataRoamingEnabled(bool &dataRoamingEnabled) const
 {
+    dataRoamingEnabled = defaultDataRoamingEnable_;
     if (dataSwitchSettings_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ is null", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return dataSwitchSettings_->QueryUserDataRoamingStatus(dataRoamingEnabled);
+    dataSwitchSettings_->QueryUserDataRoamingStatus(dataRoamingEnabled);
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CellularDataHandler::GetIntelligenceSwitchState(bool &switchState)
@@ -1596,6 +1599,53 @@ bool CellularDataHandler::IsSingleConnectionEnabled(int32_t radioTech)
     return !multipleConnectionsEnabled_;
 }
 
+void CellularDataHandler::GetDefaultDataRoamingConfig()
+{
+    defaultDataRoamingEnable_ = false;
+    OperatorConfig configsForDataRoaming;
+    CoreManagerInner::GetInstance().GetOperatorConfigs(slotId_, configsForDataRoaming);
+    if (configsForDataRoaming.boolValue.find(KEY_DEFAULT_DATA_ROAMING_BOOL) != configsForDataRoaming.boolValue.end()) {
+        defaultDataRoamingEnable_ = configsForDataRoaming.boolValue[KEY_DEFAULT_DATA_ROAMING_BOOL];
+        TELEPHONY_LOGI("Slot%{public}d: OperatorConfig defaultDataRoamingEnable_ = %{public}d", slotId_,
+            defaultDataRoamingEnable_);
+    } else {
+        std::string defaultDataRoaming = DEFAULT_DATA_ROAMING + std::to_string(slotId_);
+        int32_t dataRoaming = static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_DISABLED);
+        dataRoaming = GetIntParameter(defaultDataRoaming.c_str(), dataRoaming);
+        defaultDataRoamingEnable_ =
+            (dataRoaming == static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_ENABLED));
+        TELEPHONY_LOGI(
+            "Slot%{public}d: defaultDataRoamingEnable_ from prop is %{public}d", slotId_, defaultDataRoamingEnable_);
+    }
+    if (dataSwitchSettings_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ is null", slotId_);
+        return;
+    }
+    bool dataRoamingEnabled = false;
+    int32_t ret = dataSwitchSettings_->QueryUserDataRoamingStatus(dataRoamingEnabled);
+    if (ret != TELEPHONY_ERR_SUCCESS && defaultDataRoamingEnable_ != dataSwitchSettings_->IsUserDataRoamingOn()) {
+        dataSwitchSettings_->UpdateUserDataRoamingOn(defaultDataRoamingEnable_);
+        if (apnManager_ == nullptr) {
+            TELEPHONY_LOGE("Slot%{public}d: apnManager_ is null", slotId_);
+            return;
+        }
+        bool roamingState = false;
+        if (CoreManagerInner::GetInstance().GetPsRoamingState(slotId_) > 0) {
+            roamingState = true;
+        }
+        if (roamingState) {
+            ApnProfileState apnState = apnManager_->GetOverallApnState();
+            if (apnState == ApnProfileState::PROFILE_STATE_CONNECTING ||
+                apnState == ApnProfileState::PROFILE_STATE_CONNECTED) {
+                ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
+            }
+            EstablishAllApnsIfConnectable();
+        } else {
+            TELEPHONY_LOGI("Slot%{public}d: Not roaming(%{public}d), not doing anything", slotId_, roamingState);
+        }
+    }
+}
+
 void CellularDataHandler::GetDefaultConfiguration()
 {
     if (connectionManager_ == nullptr) {
@@ -1612,7 +1662,9 @@ void CellularDataHandler::GetDefaultConfiguration()
     TELEPHONY_LOGI("Slot%{public}d: defaultPreferApn_ is %{public}d", slotId_, defaultPreferApn_);
     multipleConnectionsEnabled_ = CellularDataUtils::GetDefaultMultipleConnectionsConfig();
     GetSinglePdpEnabledFromOpCfg();
-    TELEPHONY_LOGI("Slot%{public}d: multipleConnectionsEnabled_ = %{public}d", slotId_, multipleConnectionsEnabled_);
+    GetDefaultDataRoamingConfig();
+    TELEPHONY_LOGI("Slot%{public}d: multipleConnectionsEnabled_ = %{public}d, defaultDataRoamingEnable_ = %{public}d",
+        slotId_, multipleConnectionsEnabled_, defaultDataRoamingEnable_);
 }
 
 void CellularDataHandler::HandleRadioNrStateChanged(const AppExecFwk::InnerEvent::Pointer &event)
@@ -1872,7 +1924,7 @@ void CellularDataHandler::HandleFactoryReset(const InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("Slot%{public}d: factory reset", slotId_);
     SetCellularDataEnable(true);
-    SetCellularDataRoamingEnabled(false);
+    SetCellularDataRoamingEnabled(defaultDataRoamingEnable_);
     if (apnManager_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: apnManager_ is null", slotId_);
         return;

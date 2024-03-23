@@ -34,6 +34,7 @@ public:
     bool IsAllowActiveData() const;
     bool IsUserDataOn();
     bool IsUserDataRoamingOn();
+    void UpdateUserDataRoamingOn(bool dataRoaming);
     int32_t SetUserDataOn(bool userDataOn);
     int32_t SetIntelliSwitchOn(bool userSwitchOn);
     int32_t SetUserDataRoamingOn(bool dataRoamingEnabled);

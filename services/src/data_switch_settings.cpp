@@ -230,5 +230,10 @@ bool DataSwitchSettings::IsUserDataRoamingOn()
 {
     return userDataRoaming_;
 }
+
+void DataSwitchSettings::UpdateUserDataRoamingOn(bool dataRoaming)
+{
+    userDataRoaming_ = dataRoaming;
+}
 } // namespace Telephony
 } // namespace OHOS
