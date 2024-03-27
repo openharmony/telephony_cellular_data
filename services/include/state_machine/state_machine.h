@@ -254,6 +254,10 @@ public:
             TELEPHONY_LOGE("stateMachineEventHandler_ is null");
             return;
         }
+        if (event == nullptr) {
+            TELEPHONY_LOGE("event is null");
+            return;
+        }
         TELEPHONY_LOGI("State machine send event id %{public}u ", event->GetInnerEventId());
         stateMachineEventHandler_->SendEvent(event);
     }

@@ -58,6 +58,10 @@ void Disconnecting::ProcessDisconnectTimeout(const AppExecFwk::InnerEvent::Point
         return;
     }
     Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+    if (inActive == nullptr) {
+        TELEPHONY_LOGE("inActive is null");
+        return;
+    }
     inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
     inActive->SetReason(DisConnectionReason::REASON_RETRY_CONNECTION);
     stateMachine->TransitionTo(stateMachine->inActiveState_);
@@ -72,6 +76,10 @@ void Disconnecting::ProcessRilAdapterHostDied(const AppExecFwk::InnerEvent::Poin
         return;
     }
     Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+    if (inActive == nullptr) {
+        TELEPHONY_LOGE("inActive is null");
+        return;
+    }
     inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
     inActive->SetReason(DisConnectionReason::REASON_RETRY_CONNECTION);
     stateMachine->TransitionTo(stateMachine->inActiveState_);
@@ -85,11 +93,15 @@ void Disconnecting::ProcessRilDeactivateDataCall(const AppExecFwk::InnerEvent::P
         return;
     }
     std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
-    if (stateMachine == nullptr) {
+    if (stateMachine == nullptr || stateMachine->stateMachineEventHandler_ == nullptr) {
         TELEPHONY_LOGE("stateMachine is null");
         return;
     }
     Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+    if (inActive == nullptr) {
+        TELEPHONY_LOGE("inActive is null");
+        return;
+    }
     std::shared_ptr<HRilRadioResponseInfo> rilInfo = event->GetSharedObject<HRilRadioResponseInfo>();
     if (rilInfo == nullptr) {
         TELEPHONY_LOGE("SetupDataCallResultInfo and HRilRadioResponseInfo is null");

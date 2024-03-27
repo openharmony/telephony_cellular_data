@@ -96,6 +96,10 @@ bool CellularDataHandler::ReleaseNet(const NetRequest &request)
     netRequest->ident = request.ident;
     AppExecFwk::InnerEvent::Pointer event =
         InnerEvent::Get(CellularDataEventCode::MSG_REQUEST_NETWORK, netRequest, TYPE_RELEASE_NET);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is null");
+        return false;
+    }
     return SendEvent(event);
 }
 
@@ -672,6 +676,10 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
     TELEPHONY_LOGI("Slot%{public}d: MSG_SM_CONNECT profileId:%{public}d type:%{public}s networkType:%{public}d",
         slotId_, apnItem->attr_.profileId_, apnHolder->GetApnType().c_str(), radioTech);
     InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT, object);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is null");
+        return false;
+    }
     cellularDataStateMachine->SendEvent(event);
     return true;
 }
