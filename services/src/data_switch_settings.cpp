@@ -104,6 +104,7 @@ int32_t DataSwitchSettings::QueryUserDataStatus(bool &dataEnabled)
     int32_t ret = settingsRdbHelper->GetValue(userDataEnableUri, CELLULAR_DATA_COLUMN_ENABLE, userDataEnable);
     if (ret != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("Slot%{public}d: Get data Value failed!", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     userDataOn_ = (userDataEnable == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED));
     dataEnabled = userDataOn_;
