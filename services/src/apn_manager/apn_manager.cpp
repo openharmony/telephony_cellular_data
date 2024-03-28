@@ -227,7 +227,7 @@ int32_t ApnManager::CreateAllApnItemByDatabase(int32_t slotId)
         return mvnoCount;
     }
     std::vector<PdpProfile> apnVec;
-    if (!helper->QueryApns(mcc, mnc, apnVec)) {
+    if (!helper->QueryApns(mcc, mnc, apnVec, slotId)) {
         TELEPHONY_LOGE("query apns from data ability fail");
         return count;
     }
@@ -273,25 +273,25 @@ int32_t ApnManager::CreateMvnoApnItems(int32_t slotId, const std::string &mcc, c
     std::vector<PdpProfile> mvnoApnVec;
     std::u16string spn;
     CoreManagerInner::GetInstance().GetSimSpn(slotId, spn);
-    if (!helper->QueryMvnoApnsByType(mcc, mnc, MvnoType::SPN, Str16ToStr8(spn), mvnoApnVec)) {
+    if (!helper->QueryMvnoApnsByType(mcc, mnc, MvnoType::SPN, Str16ToStr8(spn), mvnoApnVec, slotId)) {
         TELEPHONY_LOGE("query mvno apns by spn fail");
         return count;
     }
     std::u16string imsi;
     CoreManagerInner::GetInstance().GetIMSI(slotId, imsi);
-    if (!helper->QueryMvnoApnsByType(mcc, mnc, MvnoType::IMSI, Str16ToStr8(imsi), mvnoApnVec)) {
+    if (!helper->QueryMvnoApnsByType(mcc, mnc, MvnoType::IMSI, Str16ToStr8(imsi), mvnoApnVec, slotId)) {
         TELEPHONY_LOGE("query mvno apns by imsi fail");
         return count;
     }
     std::u16string gid1;
     CoreManagerInner::GetInstance().GetSimGid1(slotId, gid1);
-    if (!helper->QueryMvnoApnsByType(mcc, mnc, MvnoType::GID1, Str16ToStr8(gid1), mvnoApnVec)) {
+    if (!helper->QueryMvnoApnsByType(mcc, mnc, MvnoType::GID1, Str16ToStr8(gid1), mvnoApnVec, slotId)) {
         TELEPHONY_LOGE("query mvno apns by gid1 fail");
         return count;
     }
     std::u16string iccId;
     CoreManagerInner::GetInstance().GetSimIccId(slotId, iccId);
-    if (!helper->QueryMvnoApnsByType(mcc, mnc, MvnoType::ICCID, Str16ToStr8(iccId), mvnoApnVec)) {
+    if (!helper->QueryMvnoApnsByType(mcc, mnc, MvnoType::ICCID, Str16ToStr8(iccId), mvnoApnVec, slotId)) {
         TELEPHONY_LOGE("query mvno apns by iccId fail");
         return count;
     }
@@ -428,14 +428,14 @@ sptr<ApnItem> ApnManager::GetRilAttachApn()
     return attachApn;
 }
 
-bool ApnManager::ResetApns()
+bool ApnManager::ResetApns(int32_t slotId)
 {
     auto helper = CellularDataRdbHelper::GetInstance();
     if (helper == nullptr) {
         TELEPHONY_LOGE("get cellularDataRdbHelper failed");
         return false;
     }
-    return helper->ResetApns();
+    return helper->ResetApns(slotId);
 }
 } // namespace Telephony
 } // namespace OHOS

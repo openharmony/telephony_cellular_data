@@ -37,18 +37,19 @@ class CellularDataRdbHelper : public DelayedSingleton<CellularDataRdbHelper> {
     DECLARE_DELAYED_SINGLETON(CellularDataRdbHelper);
 
 public:
-    bool QueryApns(const std::string &mcc, const std::string &mnc, std::vector<PdpProfile> &apnVec);
+    bool QueryApns(const std::string &mcc, const std::string &mnc, std::vector<PdpProfile> &apnVec, int32_t slotId);
     bool QueryMvnoApnsByType(const std::string &mcc, const std::string &mnc, const std::string &mvnoType,
-        const std::string &mvnoDataFromSim, std::vector<PdpProfile> &mvnoApnVec);
+        const std::string &mvnoDataFromSim, std::vector<PdpProfile> &mvnoApnVec, int32_t slotId);
     bool QueryPreferApn(int32_t slotId, std::vector<PdpProfile> &apnVec);
     void RegisterObserver(const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
     void UnRegisterObserver(const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
-    bool ResetApns();
+    bool ResetApns(int32_t slotId);
 
 private:
     std::shared_ptr<DataShare::DataShareHelper> CreateDataAbilityHelper();
-    int Update(const DataShare::DataShareValuesBucket &value, const DataShare::DataSharePredicates &predicates);
-    int Insert(const DataShare::DataShareValuesBucket &values);
+    int Update(const DataShare::DataShareValuesBucket &value, const DataShare::DataSharePredicates &predicates,
+        int32_t slotId);
+    int Insert(const DataShare::DataShareValuesBucket &values, int32_t slotId);
     void ReadApnResult(const std::shared_ptr<DataShare::DataShareResultSet> &result, std::vector<PdpProfile> &apnVec);
     void ReadMvnoApnResult(const std::shared_ptr<DataShare::DataShareResultSet> &result,
         const std::string &mvnoDataFromSim, std::vector<PdpProfile> &apnVec);
