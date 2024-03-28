@@ -106,6 +106,7 @@ private:
     bool HasAnyHigherPriorityConnection(const sptr<ApnHolder> &apnHolder);
     void GetConfigurationFor5G();
     void GetDefaultConfiguration();
+    void GetDefaultDataRoamingConfig();
     bool ParseOperatorConfig(const std::u16string &configName);
     void HandleRadioNrStateChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleRadioNrFrequencyChanged(const AppExecFwk::InnerEvent::Pointer &event);
@@ -156,6 +157,7 @@ private:
     bool defaultPreferApn_ = true;
     bool physicalConnectionActiveState_ = false;
     bool multipleConnectionsEnabled_ = false;
+    bool defaultDataRoamingEnable_ = false;
     std::vector<std::string> upLinkThresholds_;
     std::vector<std::string> downLinkThresholds_;
     sptr<CellularDataSettingObserver> settingObserver_;
