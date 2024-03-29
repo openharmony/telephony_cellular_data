@@ -86,7 +86,7 @@ bool Inactive::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
     uint32_t eventCode = event->GetInnerEventId();
     switch (eventCode) {
         case CellularDataEventCode::MSG_SM_CONNECT: {
-            TELEPHONY_LOGI("Inactive::MSG_SM_CONNECT");
+            TELEPHONY_LOGD("Inactive::MSG_SM_CONNECT");
             stateMachine->DoConnect(*(event->GetUniqueObject<DataConnectionParams>()));
             stateMachine->TransitionTo(stateMachine->activatingState_);
             retVal = PROCESSED;
@@ -103,7 +103,6 @@ bool Inactive::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
             break;
         }
         default:
-            TELEPHONY_LOGE("StateProcess handle nothing!");
             break;
     }
     return retVal;

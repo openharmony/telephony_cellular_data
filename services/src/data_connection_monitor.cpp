@@ -104,7 +104,7 @@ __attribute__((no_sanitize("cfi"))) void DataConnectionMonitor::OnStallDetection
 
 void DataConnectionMonitor::StopStallDetectionTimer()
 {
-    TELEPHONY_LOGI("Slot%{public}d: stop stall detection", slotId_);
+    TELEPHONY_LOGD("Slot%{public}d: stop stall detection", slotId_);
     stallDetectionEnabled = false;
     RemoveEvent(CellularDataEventCode::MSG_STALL_DETECTION_EVENT_ID);
 }

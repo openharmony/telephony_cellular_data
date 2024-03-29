@@ -139,7 +139,9 @@ void CellularDataNetAgent::UpdateNetSupplierInfo(
     int32_t supplierId, sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
 {
     int32_t result = NetConnClient::GetInstance().UpdateNetSupplierInfo(supplierId, netSupplierInfo);
-    TELEPHONY_LOGI("Update network result:%{public}d", result);
+    if (result != NETMANAGER_SUCCESS) {
+        TELEPHONY_LOGE("Update network fail, result:%{public}d", result);
+    }
 }
 
 void CellularDataNetAgent::UpdateNetLinkInfo(int32_t supplierId, sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo)

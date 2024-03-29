@@ -55,7 +55,6 @@ bool Activating::RilActivatePdpContextDone(const AppExecFwk::InnerEvent::Pointer
     }
     std::shared_ptr<SetupDataCallResultInfo> resultInfo = event->GetSharedObject<SetupDataCallResultInfo>();
     if (resultInfo == nullptr) {
-        TELEPHONY_LOGE("result info is null");
         return RilErrorResponse(event);
     }
     TELEPHONY_LOGI("callDone active: %{public}d flag: %{public}d, cid: %{public}d, reason: %{public}d",
@@ -166,7 +165,7 @@ bool Activating::RilErrorResponse(const AppExecFwk::InnerEvent::Pointer &event)
             CellularDataHiSysEvent::WriteDataActivateFaultEvent(INVALID_PARAMETER, SWITCH_ON,
                 CellularDataErrorCode::DATA_ERROR_RADIO_RESPONSEINFO_ERROR,
                 "HRilErrType " + std::to_string(static_cast<int32_t>(rilInfo->error)));
-            TELEPHONY_LOGI("Handle supported error responses and retry the connection.");
+            TELEPHONY_LOGD("Handle supported error responses and retry the connection.");
             break;
         }
         case HRilErrType::HRIL_ERR_INVALID_RESPONSE:
