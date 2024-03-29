@@ -35,12 +35,14 @@ public:
     /* add for vsim begin */
     typedef void (*GET_VSIM_SLOT_ID)(int32_t &slotId);
     typedef bool (*CREATE_ALL_APN_ITEM_EXT)(int32_t slotId, sptr<ApnItem> &apnItem);
+    typedef bool (*IS_CARD_ALLOW_DATA)(int32_t simId, int32_t capability);
     /* add for vsim end */
 
     DATA_EDN_SELF_CURE dataEndSelfCure_ = nullptr;
     IS_APN_ALLOWED_ACTIVE isApnAllowedActive_ = nullptr;
     GET_VSIM_SLOT_ID getVSimSlotId_ = nullptr;
     CREATE_ALL_APN_ITEM_EXT createAllApnItemExt_ = nullptr;
+    IS_CARD_ALLOW_DATA isCardAllowData_ = nullptr;
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
     void* telephonyVSimWrapperHandle_ = nullptr;
