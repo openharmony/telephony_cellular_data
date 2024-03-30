@@ -310,7 +310,6 @@ int32_t CellularDataService::InitCellularDataController(int32_t slotId)
     CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
     std::vector<uint64_t> netCapabilities;
     netCapabilities.push_back(NetCap::NET_CAPABILITY_INTERNET);
-    netCapabilities.push_back(NetCap::NET_CAPABILITY_MMS);
     AddNetSupplier(slotId, netAgent, netCapabilities);
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -338,6 +337,13 @@ int32_t CellularDataService::ReleaseNet(const NetRequest &request)
         return CELLULAR_DATA_INVALID_PARAM;
     }
     int32_t simId = std::stoi(requestIdent);
+
+    if (TELEPHONY_EXT_WRAPPER.isCardAllowData_ &&
+        !TELEPHONY_EXT_WRAPPER.isCardAllowData_(simId, request.capability)) {
+        TELEPHONY_LOGE("simId: %{public}d, only vsim enable cellular data", simId);
+        return static_cast<int32_t>(RequestNetCode::REQUEST_FAILED);
+    }
+
     int32_t slotId = CoreManagerInner::GetInstance().GetSlotId(simId);
     if (!CheckParamValid(slotId)) {
         return CELLULAR_DATA_INVALID_PARAM;

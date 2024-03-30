@@ -87,7 +87,8 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForVSim()
     }
     getVSimSlotId_ = (GET_VSIM_SLOT_ID) dlsym(telephonyVSimWrapperHandle_, "GetVSimSlotId");
     createAllApnItemExt_ = (CREATE_ALL_APN_ITEM_EXT) dlsym(telephonyVSimWrapperHandle_, "CreateAllApnItemExt");
-    if (getVSimSlotId_ == nullptr || createAllApnItemExt_ == nullptr) {
+    isCardAllowData_ = (IS_CARD_ALLOW_DATA) dlsym(telephonyVSimWrapperHandle_, "IsCardAllowData");
+    if (getVSimSlotId_ == nullptr || createAllApnItemExt_ == nullptr || isCardAllowData_ == nullptr) {
         TELEPHONY_LOGE("[VSIM] telephony ext wrapper symbol failed, error: %{public}s", dlerror());
         return;
     }
