@@ -100,6 +100,21 @@ void CellularDataNetAgent::UnregisterNetSupplier(const int32_t slotId)
     }
 }
 
+void CellularDataNetAgent::UnregisterNetSupplierForSimUpdate(const int32_t slotId)
+{
+    for (NetSupplier &netSupplier : netSuppliers_) {
+        if (netSupplier.slotId != slotId || netSupplier.simId <= INVALID_SIM_ID) {
+            continue;
+        }
+        auto& netManager = NetConnClient::GetInstance();
+        int32_t result = netManager.UnregisterNetSupplier(netSupplier.supplierId);
+        TELEPHONY_LOGI("Slot%{public}d unregister network result:%{public}d", slotId, result);
+        if (result == NETMANAGER_SUCCESS) {
+            netSupplier.simId = INVALID_SIM_ID;
+        }
+    }
+}
+
 void CellularDataNetAgent::UnregisterAllNetSupplier()
 {
     for (const NetSupplier &netSupplier : netSuppliers_) {

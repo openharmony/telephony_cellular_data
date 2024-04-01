@@ -48,6 +48,7 @@ public:
     int32_t GetPriority() const;
     void RequestCellularData(const NetRequest &netRequest);
     void ReleaseCellularData(const NetRequest &netRequest);
+    void ReleaseAllCellularData();
     bool IsEmergencyType() const;
     bool IsMmsType() const;
     void InitialApnRetryCount();

@@ -1065,6 +1065,20 @@ void CellularDataHandler::HandleDefaultDataSubscriptionChanged()
     }
 }
 
+void CellularDataHandler::ReleaseAllNetworkRequest()
+{
+    if (apnManager_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: apnManager_ is null", slotId_);
+        return;
+    }
+    for (const sptr<ApnHolder> &apnHolder : apnManager_->GetAllApnHolder()) {
+        if (apnHolder == nullptr) {
+            continue;
+        }
+        apnHolder->ReleaseAllCellularData();
+    }
+}
+
 void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
@@ -1083,6 +1097,8 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
             if (simState != SimState::SIM_STATE_READY) {
                 ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
                 if (simState == SimState::SIM_STATE_NOT_PRESENT) {
+                    CellularDataNetAgent::GetInstance().UnregisterNetSupplierForSimUpdate(slotId_);
+                    ReleaseAllNetworkRequest();
                     UnRegisterDataSettingObserver();
                 }
             } else {
@@ -1128,8 +1144,9 @@ void CellularDataHandler::HandleSimAccountLoaded(const InnerEvent::Pointer &even
     TELEPHONY_LOGI("Slot%{public}d", slotId_);
     auto slotId = event->GetParam();
     if (slotId == slotId_) {
+        ReleaseAllNetworkRequest();
         ClearAllConnections(DisConnectionReason::REASON_CHANGE_CONNECTION);
-        CellularDataNetAgent::GetInstance().UnregisterNetSupplier(slotId_);
+        CellularDataNetAgent::GetInstance().UnregisterNetSupplierForSimUpdate(slotId_);
         CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
         if (slotId_ == 0) {
             CellularDataNetAgent::GetInstance().UnregisterPolicyCallback();

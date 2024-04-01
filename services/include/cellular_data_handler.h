@@ -127,6 +127,7 @@ private:
     void IncallDataComplete(const AppExecFwk::InnerEvent::Pointer &event);
     void ResetDataFlowType();
     void ClearConnectionIfRequired();
+    void ReleaseAllNetworkRequest();
     bool GetEsmFlagFromOpCfg();
     void SetInitApnWithNullDp();
     void GetSinglePdpEnabledFromOpCfg();
