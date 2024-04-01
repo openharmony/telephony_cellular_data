@@ -29,7 +29,9 @@ int32_t NetManagerCallBack::RequestNetwork(const std::string &ident, const std::
         return CELLULAR_DATA_INVALID_PARAM;
     }
     NetRequest request;
-    request.capability = *netCaps.begin();
+    for (const auto &netCap : netCaps) {
+        request.capability |= 1L << netCap;
+    }
     request.ident = ident;
     int32_t result = DelayedRefSingleton<CellularDataService>::GetInstance().RequestNet(request);
     return result;
@@ -42,7 +44,9 @@ int32_t NetManagerCallBack::ReleaseNetwork(const std::string &ident, const std::
         return CELLULAR_DATA_INVALID_PARAM;
     }
     NetRequest request;
-    request.capability = *netCaps.begin();
+    for (const auto &netCap : netCaps) {
+        request.capability |= 1L << netCap;
+    }
     request.ident = ident;
     int32_t result = DelayedRefSingleton<CellularDataService>::GetInstance().ReleaseNet(request);
     return result;

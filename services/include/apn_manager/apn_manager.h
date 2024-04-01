@@ -23,6 +23,7 @@
 #include "apn_holder.h"
 #include "apn_item.h"
 #include "cellular_data_rdb_helper.h"
+#include "net_all_capabilities.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -39,11 +40,13 @@ public:
     sptr<ApnHolder> FindApnHolderById(const int32_t id) const;
     static int32_t FindApnIdByApnName(const std::string &type);
     static std::string FindApnNameByApnId(const int32_t id);
-    static int32_t FindApnIdByCapability(const uint64_t capability);
+    static int32_t FindApnIdByCapability(const uint64_t capabilities);
+    static NetManagerStandard::NetCap FindBestCapability(const uint64_t capabilities);
     bool IsDataConnectionNotUsed(const std::shared_ptr<CellularDataStateMachine> &stateMachine) const;
     int32_t CreateAllApnItemByDatabase(int32_t slotId);
     bool HasAnyConnectedState() const;
     ApnProfileState GetOverallApnState() const;
+    ApnProfileState GetOverallDefaultApnState() const;
     sptr<ApnItem> GetRilAttachApn();
     bool ResetApns(int32_t slotId);
 
