@@ -470,7 +470,7 @@ bool CellularDataHandler::CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder)
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     std::string apnType = apnHolder->GetApnType();
-    if (defSlotId != slotId_ && !apnType.compare(DATA_CONTEXT_ROLE_DEFAULT)) {
+    if (defSlotId != slotId_ && !apnType.compare(DATA_CONTEXT_ROLE_DEFAULT) && !GetSmartSwitchState()) {
         TELEPHONY_LOGD("Slot%{public}d: default:%{public}d, current:%{public}d", slotId_, defSlotId, slotId_);
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
             CellularDataErrorCode::DATA_ERROR_CELLULAR_DATA_SLOT_ID_MISMATCH,
@@ -1969,6 +1969,17 @@ bool CellularDataHandler::IsVSimSlotId(int32_t slotId)
         return vSimSlotId == slotId;
     }
     return false;
+}
+
+bool GetSmartSwitchState()
+{
+    bool isIntelliSwitchEnabled = false;
+    int32_t result = GetIntelligenceSwitchState(isIntelliSwitchEnabled);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("Slot%{public}d: GetSmartSwitchState failed", slotId_);
+        return false;
+    }
+    return isIntelliSwitchEnabled;
 }
 } // namespace Telephony
 } // namespace OHOS
