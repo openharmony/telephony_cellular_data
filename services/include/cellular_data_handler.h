@@ -137,6 +137,7 @@ private:
     void CreateApnItem();
     void UpdatePhysicalConnectionState(bool noActiveConnection);
     bool IsVSimSlotId(int32_t slotId);
+    bool GetSmartSwitchState();
 
 private:
     sptr<ApnManager> apnManager_;
