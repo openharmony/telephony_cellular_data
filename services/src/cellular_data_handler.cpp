@@ -439,6 +439,13 @@ bool CellularDataHandler::SetDataPermittedForMms(bool dataPermittedForMms)
 
 bool CellularDataHandler::CheckDataPermittedByDsds()
 {
+    if (TELEPHONY_EXT_WRAPPER.getVSimSlotId_) {
+        int vSimSlotId = INVALID_SLOT_ID;
+        TELEPHONY_EXT_WRAPPER.getVSimSlotId_(vSimSlotId);
+        if (vSimSlotId == CELLULAR_DATA_VSIM_SLOT_ID) {
+            return slotId_ == CELLULAR_DATA_VSIM_SLOT_ID;
+        }
+    }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     int32_t dsdsMode = DSDS_MODE_V2;
