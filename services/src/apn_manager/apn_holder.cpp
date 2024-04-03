@@ -160,6 +160,15 @@ void ApnHolder::ReleaseCellularData(const NetRequest &netRequest)
     }
 }
 
+void ApnHolder::ReleaseAllCellularData()
+{
+    TELEPHONY_LOGI("clear all cellular data");
+    netRequests_.clear();
+    if (netRequests_.empty()) {
+        dataCallEnabled_ = false;
+    }
+}
+
 bool ApnHolder::IsEmergencyType() const
 {
     return apnType_ == DATA_CONTEXT_ROLE_EMERGENCY;

@@ -152,6 +152,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_001, Function | MediumTest | 
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     CellularDataHandler cellularDataHandler { subscriberInfo, 0 };
     NetRequest request { 0, "simId1" };
+    cellularDataHandler.ReleaseAllNetworkRequest();
     ASSERT_FALSE(cellularDataHandler.ReleaseNet(request));
     ASSERT_FALSE(cellularDataHandler.RequestNet(request));
     auto event = AppExecFwk::InnerEvent::Get(0);
@@ -854,6 +855,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataUtils_001, Function | MediumTest | Le
 HWTEST_F(BranchTest, Telephony_ApnHolder_001, Function | MediumTest | Level3)
 {
     sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
+    apnHolder->ReleaseAllCellularData();
     apnHolder->GetNextRetryApn();
     std::vector<sptr<ApnItem>> matchedApns;
     apnHolder->SetAllMatchedApns(matchedApns);

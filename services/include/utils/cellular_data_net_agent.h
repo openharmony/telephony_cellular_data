@@ -51,6 +51,13 @@ public:
     void UnregisterNetSupplier(const int32_t slotId);
 
     /**
+     * Cancel the registration information to the network management for sim state update
+     *
+     * @param slotId card slot identification
+     */
+    void UnregisterNetSupplierForSimUpdate(const int32_t slotId);
+
+    /**
      * Cancel all registration information to the network management
      */
     void UnregisterAllNetSupplier();
