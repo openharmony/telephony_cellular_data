@@ -103,7 +103,7 @@ int32_t ApnManager::FindApnIdByCapability(const uint64_t capability)
         case NetManagerStandard::NetCap::NET_CAPABILITY_MMS:
             return DATA_CONTEXT_ROLE_MMS_ID;
         case NetManagerStandard::NetCap::NET_CAPABILITY_INTERNAL_DEFAULT:
-            return DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID
+            return DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID;
         default:
             return DATA_CONTEXT_ROLE_INVALID_ID;
     }
@@ -120,8 +120,8 @@ NetManagerStandard::NetCap ApnManager::FindBestCapability(const uint64_t capabil
     if (HasNetCap(capabilities, NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET)) {
         netCap = NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET;
     }
-    if (HasNetCap(capabilities, NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET_DEFAULT)) {
-        netCap = NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET_DEFAULT;
+    if (HasNetCap(capabilities, NetManagerStandard::NetCap::NET_CAPABILITY_INTERNAL_DEFAULT)) {
+        netCap = NetManagerStandard::NetCap::NET_CAPABILITY_INTERNAL_DEFAULT;
     }
     if (HasNetCap(capabilities, NetManagerStandard::NetCap::NET_CAPABILITY_MMS)) {
         netCap = NetManagerStandard::NetCap::NET_CAPABILITY_MMS;
@@ -212,7 +212,7 @@ void ApnManager::CreateAllApnItem()
     if (emergencyApnItem != nullptr) {
         allApnItem_.push_back(emergencyApnItem);
     }
-    sptr<ApnItem> internalDefaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_INTERNAL_DEFAULT);
+    auto internalDefaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_INTERNAL_DEFAULT);
     if (internalDefaultApnItem != nullptr) {
         allApnItem_.push_back(internalDefaultApnItem);
     }
@@ -447,18 +447,18 @@ ApnProfileState ApnManager::GetOverallDefaultApnState() const
         if (apnHolder == nullptr) {
             continue;
         }
-        if (apnHolder->GetApnState() == DATA_CONTEXT_ROLE_DEFAULT) {
+        if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DEFAULT) {
             defaultApnState = static_cast<int32_t>(apnHolder->GetApnState());
         }
-        if (apnHolder->GetApnState() == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
+        if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
             internalApnState = static_cast<int32_t>(apnHolder->GetApnState());
         }
     }
     TELEPHONY_LOGI("defaultApnState is %{public}d, internalApnState is %{public}d",
         defaultApnState, internalApnState);
     return defaultApnState > internalApnState ?
-        static_cast<ApnProfileState>(defaultApnState) :
-        static_cast<ApnProfileState>(internalApnState);
+                static_cast<ApnProfileState>(defaultApnState) :
+                static_cast<ApnProfileState>(internalApnState);
 }
 
 sptr<ApnItem> ApnManager::GetRilAttachApn()

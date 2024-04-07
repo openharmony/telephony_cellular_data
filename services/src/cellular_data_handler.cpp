@@ -677,8 +677,8 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
     apnHolder->SetCellularDataStateMachine(cellularDataStateMachine);
     bool roamingState = CoreManagerInner::GetInstance().GetPsRoamingState(slotId_) > 0;
     bool userDataRoaming = dataSwitchSettings_->IsUserDataRoamingOn();
-    if (apnHolder->GetCapability() == NetCap::NET_CAPABILITY_INTERNET ||
-        apnHolder->GetCapability() == NetCap::NET_CAPABILITY_INTERNAL_DEFAULT) {
+    if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DEFAULT ||
+        apnHolder->GetApnType() == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
         ApnProfileState apnState = apnManager_->GetOverallDefaultApnState();
         StateNotification::GetInstance().UpdateCellularDataConnectState(slotId_, apnState, radioTech);
     }
@@ -737,8 +737,8 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
         }
         int32_t networkType = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
         CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, networkType);
-        if (apnHolder->GetCapability() == NetCap::NET_CAPABILITY_INTERNET ||
-            apnHolder->GetCapability() == NetCap::NET_CAPABILITY_INTERNAL_DEFAULT) {
+        if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DEFAULT ||
+            apnHolder->GetApnType() == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
             ApnProfileState apnState = apnManager_->GetOverallDefaultApnState();
             StateNotification::GetInstance().UpdateCellularDataConnectState(
                 slotId_, apnState, networkType);
@@ -768,8 +768,8 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
     apnHolder->SetApnState(PROFILE_STATE_IDLE);
     int32_t networkType = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, networkType);
-    if (apnHolder->GetCapability() == NetCap::NET_CAPABILITY_INTERNET ||
-        apnHolder->GetCapability() == NetCap::NET_CAPABILITY_INTERNAL_DEFAULT) {
+    if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DEFAULT ||
+        apnHolder->GetApnType() == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
         ApnProfileState apnState = apnManager_->GetOverallDefaultApnState();
         StateNotification::GetInstance().UpdateCellularDataConnectState(slotId_, apnState, networkType);
     }
