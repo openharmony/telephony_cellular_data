@@ -1086,6 +1086,28 @@ void CellularDataHandler::ReleaseAllNetworkRequest()
     }
 }
 
+void CellularDataHandler::HandleSimStateChanged()
+{
+    SimState simState = SimState::SIM_STATE_UNKNOWN;
+    CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
+    TELEPHONY_LOGI("Slot%{public}d: sim state is :%{public}d", slotId_, simState);
+    if (simState != SimState::SIM_STATE_READY) {
+        isSimAccountLoaded_ = false;
+        ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
+        if (simState == SimState::SIM_STATE_NOT_PRESENT) {
+            CellularDataNetAgent::GetInstance().UnregisterNetSupplierForSimUpdate(slotId_);
+            ReleaseAllNetworkRequest();
+            UnRegisterDataSettingObserver();
+        }
+    } else {
+        std::u16string iccId;
+        CoreManagerInner::GetInstance().GetSimIccId(slotId_, iccId);
+        if (lastIccId_ != u"" && lastIccId_ == iccId) {
+            EstablishAllApnsIfConnectable();
+        }
+    }
+}
+
 void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
@@ -1094,29 +1116,13 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
     if (dataSwitchSettings_ != nullptr) {
         dataSwitchSettings_->LoadSwitchValue();
     }
-    std::u16string iccId;
     switch (event->GetInnerEventId()) {
         case RadioEvent::RADIO_SIM_STATE_CHANGE: {
-            SimState simState = SimState::SIM_STATE_UNKNOWN;
-            CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
-            TELEPHONY_LOGI("Slot%{public}d: sim state is :%{public}d", slotId_, simState);
-            if (simState != SimState::SIM_STATE_READY) {
-                isSimAccountLoaded_ = false;
-                ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
-                if (simState == SimState::SIM_STATE_NOT_PRESENT) {
-                    CellularDataNetAgent::GetInstance().UnregisterNetSupplierForSimUpdate(slotId_);
-                    ReleaseAllNetworkRequest();
-                    UnRegisterDataSettingObserver();
-                }
-            } else {
-                CoreManagerInner::GetInstance().GetSimIccId(slotId_, iccId);
-                if (lastIccId_ != u"" && lastIccId_ == iccId) {
-                    EstablishAllApnsIfConnectable();
-                }
-            }
+            HandleSimStateChanged();
             break;
         }
         case RadioEvent::RADIO_SIM_RECORDS_LOADED: {
+            std::u16string iccId;
             CoreManagerInner::GetInstance().GetSimIccId(slotId_, iccId);
             SimState simState = SimState::SIM_STATE_UNKNOWN;
             CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
