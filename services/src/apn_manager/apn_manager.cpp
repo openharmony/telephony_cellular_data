@@ -336,7 +336,7 @@ std::vector<sptr<ApnItem>> ApnManager::FilterMatchedApns(const std::string &requ
             matchApnItemList.push_back(apnItem);
         }
     }
-    TELEPHONY_LOGI("apn size is :%{public}zu", matchApnItemList.size());
+    TELEPHONY_LOGD("apn size is :%{public}zu", matchApnItemList.size());
     return matchApnItemList;
 }
 

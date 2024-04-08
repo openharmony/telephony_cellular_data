@@ -768,7 +768,7 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
     if (apnHolder->GetCapability() == NetCap::NET_CAPABILITY_INTERNET) {
         StateNotification::GetInstance().UpdateCellularDataConnectState(slotId_, PROFILE_STATE_IDLE, networkType);
     }
-    TELEPHONY_LOGI("Slot%{public}d: apn type: %{public}s call:%{public}d", slotId_, apnHolder->GetApnType().c_str(),
+    TELEPHONY_LOGD("Slot%{public}d: apn type: %{public}s call:%{public}d", slotId_, apnHolder->GetApnType().c_str(),
         apnHolder->IsDataCallEnabled());
     UpdatePhysicalConnectionState(connectionManager_->isNoActiveConnection());
     if (apnHolder->IsDataCallEnabled()) {
@@ -777,7 +777,7 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
         }
         if (reason == DisConnectionReason::REASON_RETRY_CONNECTION) {
             int64_t delayTime = apnHolder->GetRetryDelay();
-            TELEPHONY_LOGI("Slot%{public}d: Retry apn type: %{public}s", slotId_, apnHolder->GetApnType().c_str());
+            TELEPHONY_LOGD("Slot%{public}d: Retry apn type: %{public}s", slotId_, apnHolder->GetApnType().c_str());
             SendEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, apnId, delayTime);
         }
     }
@@ -1407,7 +1407,7 @@ bool CellularDataHandler::IsRestrictedMode() const
     bool support = (networkType == (int32_t)RadioTech::RADIO_TECHNOLOGY_GSM);
     bool inCall = (lastCallState_ != TelCallStatus::CALL_STATUS_IDLE &&
                    lastCallState_ != TelCallStatus::CALL_STATUS_DISCONNECTED);
-    TELEPHONY_LOGI("Slot%{public}d: radio technology is gsm only:%{public}d and call is busy:%{public}d", slotId_,
+    TELEPHONY_LOGD("Slot%{public}d: radio technology is gsm only:%{public}d and call is busy:%{public}d", slotId_,
         support, inCall);
     return inCall && support;
 }
@@ -1918,7 +1918,6 @@ void CellularDataHandler::GetDataConnApnAttr(ApnItem::Attribute &apnAttr) const
         if (apnHolder->IsDataCallEnabled()) {
             sptr<ApnItem> apnItem = apnHolder->GetCurrentApn();
             if (apnItem == nullptr) {
-                TELEPHONY_LOGE("Slot%{public}d: apnItem is null", slotId_);
                 continue;
             }
             apnAttr = apnItem->attr_;

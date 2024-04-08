@@ -135,7 +135,7 @@ public:
     virtual void ProcessMsg(const AppExecFwk::InnerEvent::Pointer &event)
     {
         sptr<State> tmpState = curState_;
-        TELEPHONY_LOGI("The event id: %{public}u", event->GetInnerEventId());
+        TELEPHONY_LOGD("The event id: %{public}u", event->GetInnerEventId());
         while (tmpState != nullptr && !tmpState->StateProcess(event)) {
             tmpState = tmpState->parent_;
         }
@@ -258,7 +258,7 @@ public:
             TELEPHONY_LOGE("event is null");
             return;
         }
-        TELEPHONY_LOGI("State machine send event id %{public}u ", event->GetInnerEventId());
+        TELEPHONY_LOGD("State machine send event id %{public}u ", event->GetInnerEventId());
         stateMachineEventHandler_->SendEvent(event);
     }
 

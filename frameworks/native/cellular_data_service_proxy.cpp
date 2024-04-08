@@ -466,7 +466,6 @@ int32_t CellularDataServiceProxy::GetDataConnApnAttr(int32_t slotId, ApnItem::At
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = replyParcel.ReadInt32();
-    TELEPHONY_LOGI("end: result=%{public}d", result);
     if (result == TELEPHONY_ERR_SUCCESS) {
         auto apnAttrPtr = replyParcel.ReadRawData(sizeof(ApnItem::Attribute));
         if (apnAttrPtr == nullptr) {
@@ -475,6 +474,8 @@ int32_t CellularDataServiceProxy::GetDataConnApnAttr(int32_t slotId, ApnItem::At
         if (memcpy_s(&apnAttr, sizeof(ApnItem::Attribute), apnAttrPtr, sizeof(ApnItem::Attribute)) != EOK) {
             return TELEPHONY_ERR_MEMCPY_FAIL;
         }
+    } else {
+        TELEPHONY_LOGE("end failed: result=%{public}d", result);
     }
 
     return TELEPHONY_ERR_SUCCESS;
