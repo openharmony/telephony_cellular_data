@@ -97,6 +97,7 @@ private:
     void HandleSettingSwitchChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleVoiceCallChanged(int32_t state);
     void HandleDefaultDataSubscriptionChanged();
+    void HandleSimStateChanged();
     void HandleDsdsModeChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleSimStateOrRecordsChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleSimAccountLoaded(const AppExecFwk::InnerEvent::Pointer &event);
