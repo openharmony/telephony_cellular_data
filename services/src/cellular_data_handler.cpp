@@ -508,7 +508,7 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
             CellularDataErrorCode::DATA_ERROR_SIM_NOT_READY, "It is not emergencyApn and sim not ready");
         return false;
     }
-    return true;
+    return isEmergencyApn || isSimAccountLoaded_;
 }
 
 bool CellularDataHandler::CheckRoamingState(sptr<ApnHolder> &apnHolder)
@@ -1095,13 +1095,13 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
         dataSwitchSettings_->LoadSwitchValue();
     }
     std::u16string iccId;
-    uint32_t eventId = event->GetInnerEventId();
-    switch (eventId) {
+    switch (event->GetInnerEventId()) {
         case RadioEvent::RADIO_SIM_STATE_CHANGE: {
             SimState simState = SimState::SIM_STATE_UNKNOWN;
             CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
             TELEPHONY_LOGI("Slot%{public}d: sim state is :%{public}d", slotId_, simState);
             if (simState != SimState::SIM_STATE_READY) {
+                isSimAccountLoaded_ = false;
                 ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
                 if (simState == SimState::SIM_STATE_NOT_PRESENT) {
                     CellularDataNetAgent::GetInstance().UnregisterNetSupplierForSimUpdate(slotId_);
@@ -1151,6 +1151,7 @@ void CellularDataHandler::HandleSimAccountLoaded(const InnerEvent::Pointer &even
     TELEPHONY_LOGI("Slot%{public}d", slotId_);
     auto slotId = event->GetParam();
     if (slotId == slotId_) {
+        isSimAccountLoaded_ = true;
         ReleaseAllNetworkRequest();
         ClearAllConnections(DisConnectionReason::REASON_CHANGE_CONNECTION);
         CellularDataNetAgent::GetInstance().UnregisterNetSupplierForSimUpdate(slotId_);

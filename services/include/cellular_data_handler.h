@@ -160,6 +160,7 @@ private:
     bool physicalConnectionActiveState_ = false;
     bool multipleConnectionsEnabled_ = false;
     bool defaultDataRoamingEnable_ = false;
+    bool isSimAccountLoaded_ = false;
     std::vector<std::string> upLinkThresholds_;
     std::vector<std::string> downLinkThresholds_;
     sptr<CellularDataSettingObserver> settingObserver_;
