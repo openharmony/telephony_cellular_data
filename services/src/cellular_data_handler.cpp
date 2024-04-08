@@ -180,6 +180,13 @@ int32_t CellularDataHandler::IsCellularDataEnabled(bool &dataEnabled) const
 
 int32_t CellularDataHandler::IsCellularDataRoamingEnabled(bool &dataRoamingEnabled) const
 {
+    if (slotId_ != CELLULAR_DATA_VSIM_SLOT_ID) {
+        int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId_);
+        if (simId <= INVALID_SIM_ID) {
+            TELEPHONY_LOGE("Slot%{public}d: invalid sim id %{public}d", slotId_, simId);
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
+    }
     dataRoamingEnabled = defaultDataRoamingEnable_;
     if (dataSwitchSettings_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ is null", slotId_);
