@@ -28,7 +28,7 @@
 #include "cellular_data_state_machine.h"
 #include "common_event_manager.h"
 #include "data_switch_settings.h"
-#include "hril_data_parcel.h"
+#include "tel_ril_data_parcel.h"
 #include "incall_data_state_machine.h"
 #include "inner_event.h"
 #include "radio_event.h"

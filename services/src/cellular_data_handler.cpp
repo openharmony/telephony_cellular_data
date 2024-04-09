@@ -26,7 +26,7 @@
 #include "common_event_support.h"
 #include "core_manager_inner.h"
 #include "hitrace_meter.h"
-#include "hril_call_parcel.h"
+#include "tel_ril_call_parcel.h"
 #include "net_specifier.h"
 #include "radio_event.h"
 #include "str_convert.h"
@@ -1254,7 +1254,7 @@ void CellularDataHandler::HandleRadioStateChanged(const AppExecFwk::InnerEvent::
         TELEPHONY_LOGE("Slot%{public}d: radio off or not available apnManager or event is null!", slotId_);
         return;
     }
-    std::shared_ptr<HRilInt32Parcel> object = event->GetSharedObject<HRilInt32Parcel>();
+    std::shared_ptr<Int32Parcel> object = event->GetSharedObject<Int32Parcel>();
     if (object == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: object is nullptr!", slotId_);
         return;
@@ -1286,7 +1286,7 @@ void CellularDataHandler::HandleDsdsModeChanged(const AppExecFwk::InnerEvent::Po
         TELEPHONY_LOGE("Slot%{public}d: event is null!", slotId_);
         return;
     }
-    std::shared_ptr<HRilInt32Parcel> object = event->GetSharedObject<HRilInt32Parcel>();
+    std::shared_ptr<Int32Parcel> object = event->GetSharedObject<Int32Parcel>();
     if (object == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: object is null!", slotId_);
         return;

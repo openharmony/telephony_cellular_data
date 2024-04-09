@@ -15,7 +15,7 @@
 
 #include "disconnecting.h"
 
-#include "hril_data_parcel.h"
+#include "tel_ril_data_parcel.h"
 #include "telephony_log_wrapper.h"
 #include "radio_event.h"
 
