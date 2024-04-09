@@ -142,16 +142,16 @@ bool Activating::RilErrorResponse(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGE("stateMachine is null");
         return false;
     }
-    std::shared_ptr<HRilRadioResponseInfo> rilInfo = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> rilInfo = event->GetSharedObject<RadioResponseInfo>();
     if (rilInfo == nullptr) {
-        TELEPHONY_LOGE("SetupDataCallResultInfo and HRilRadioResponseInfo is null");
+        TELEPHONY_LOGE("SetupDataCallResultInfo and RadioResponseInfo is null");
         return false;
     }
     if (stateMachine->connectId_ != rilInfo->flag) {
         TELEPHONY_LOGE("connectId is %{public}d, flag is %{public}d", stateMachine->connectId_, rilInfo->flag);
         return false;
     }
-    TELEPHONY_LOGI("HRilRadioResponseInfo flag:%{public}d error:%{public}d", rilInfo->flag, rilInfo->error);
+    TELEPHONY_LOGI("RadioResponseInfo flag:%{public}d error:%{public}d", rilInfo->flag, rilInfo->error);
     Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
     if (inActive == nullptr) {
         TELEPHONY_LOGE("Inactive is null");

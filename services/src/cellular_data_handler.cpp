@@ -1443,7 +1443,7 @@ void CellularDataHandler::SetDataPermittedResponse(const AppExecFwk::InnerEvent:
     }
     std::shared_ptr<TelRilResponseInfo<int32_t>> rilInfo = event->GetSharedObject<TelRilResponseInfo<int32_t>>();
     if (rilInfo == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: HRilRadioResponseInfo is null", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: RadioResponseInfo is null", slotId_);
         return;
     }
     if (rilInfo->errorNo != 0) {
@@ -1512,7 +1512,7 @@ void CellularDataHandler::SetRilAttachApnResponse(const AppExecFwk::InnerEvent::
     }
     std::shared_ptr<TelRilResponseInfo<int32_t>> rilInfo = event->GetSharedObject<TelRilResponseInfo<int32_t>>();
     if (rilInfo == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: HRilRadioResponseInfo is null", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: RadioResponseInfo is null", slotId_);
         return;
     }
     if (rilInfo->errorNo != 0) {
