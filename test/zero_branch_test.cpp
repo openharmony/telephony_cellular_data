@@ -152,6 +152,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_001, Function | MediumTest | 
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     CellularDataHandler cellularDataHandler { subscriberInfo, 0 };
     NetRequest request { 0, "simId1" };
+    cellularDataHandler.HandleSimStateChanged();
     cellularDataHandler.ReleaseAllNetworkRequest();
     ASSERT_FALSE(cellularDataHandler.ReleaseNet(request));
     ASSERT_FALSE(cellularDataHandler.RequestNet(request));
