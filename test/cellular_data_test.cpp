@@ -17,7 +17,6 @@
 #include <string>
 
 #define private public
-#include <stdio.h>
 #include <gtest/gtest.h>
 
 #include "cellular_data_client.h"
@@ -42,7 +41,6 @@
 #include "permission_def.h"
 #include "permission_state_full.h"
 #include "refbase.h"
-#include "stdio.h"
 #include "telephony_ext_wrapper.h"
 #include "telephony_types.h"
 #include "token_setproc.h"

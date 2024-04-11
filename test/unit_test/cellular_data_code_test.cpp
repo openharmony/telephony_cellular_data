@@ -368,7 +368,7 @@ public:
         std::map<int32_t, Fun>::iterator it = testFunMap.find(testId);
         if (it != testFunMap.end()) {
             (*(it->second))();
-        } else if (TEST_DATA_PACKAGE_EXIT == testId) {
+        } else if (testId == TEST_DATA_PACKAGE_EXIT) {
             std::cout << "exit..." << std::endl;
             return false;
         } else {
