@@ -1406,28 +1406,29 @@ HWTEST_F(BranchTest, CellularDataSettingsRdbHelper_Test_01, Function | MediumTes
 
 /**
  * @tc.number   FindBestCapability_Test_01
- * @tc.name     test error branch
+ * @tc.name     test branch
  * @tc.desc     Function test
  */
 HWTEST_F(BranchTest, FindBestCapability_Test_01, Function | MediumTest | Level3)
 {
     auto apnManager = std::make_shared<ApnManager>();
-    uint64_t capabilities = 1L << NetManagerStandard::NetCap::NET_CAPABILITY_MMS;
-    auto ret = apnManager->FindBestCapability(capabilities);
-    EXPECT_EQ(ret, NetManagerStandard::NetCap::NET_CAPABILITY_MMS);
 
-    capabilities = 1L << NetManagerStandard::NetCap::NET_CAPABILITY_INTERNAL_DEFAULT;
+    uint64_t capabilities = 1L << NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET;
+    auto ret = apnManager->FindBestCapability(capabilities);
+    EXPECT_EQ(ret, NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET);
+
+    capabilities |= 1L << NetManagerStandard::NetCap::NET_CAPABILITY_INTERNAL_DEFAULT;
     ret = apnManager->FindBestCapability(capabilities);
     EXPECT_EQ(ret, NetManagerStandard::NetCap::NET_CAPABILITY_INTERNAL_DEFAULT);
 
-    capabilities = 1L << NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET;
+    capabilities |= 1L << NetManagerStandard::NetCap::NET_CAPABILITY_MMS;
     ret = apnManager->FindBestCapability(capabilities);
-    EXPECT_EQ(ret, NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET);
+    EXPECT_EQ(ret, NetManagerStandard::NetCap::NET_CAPABILITY_MMS);
 }
 
 /**
  * @tc.number   GetOverallDefaultApnState_Test_01
- * @tc.name     test error branch
+ * @tc.name     test branch
  * @tc.desc     Function test
  */
 HWTEST_F(BranchTest, GetOverallDefaultApnState_Test_01, Function | MediumTest | Level3)
@@ -1437,10 +1438,10 @@ HWTEST_F(BranchTest, GetOverallDefaultApnState_Test_01, Function | MediumTest | 
     auto &apnHolders = apnManager->apnHolders_;
     for (auto &apnHolder : apnHolders) {
         if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DEFAULT) {
-            apnHolder->SetApnType(ApnProfileState::PROFILE_STATE_IDLE);
+            apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_IDLE);
         }
         if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
-            apnHolder->SetApnType(ApnProfileState::PROFILE_STATE_IDLE);
+            apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_IDLE);
         }
     }
     auto ret = apnManager->GetOverallDefaultApnState();
@@ -1448,24 +1449,24 @@ HWTEST_F(BranchTest, GetOverallDefaultApnState_Test_01, Function | MediumTest | 
 
     for (auto &apnHolder : apnHolders) {
         if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DEFAULT) {
-            apnHolder->SetApnType(ApnProfileState::PROFILE_STATE_CONNECTING);
+            apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_CONNECTING);
         }
         if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
-            apnHolder->SetApnType(ApnProfileState::PROFILE_STATE_IDLE);
+            apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_IDLE);
         }
     }
-    auto ret = apnManager->GetOverallDefaultApnState();
+    ret = apnManager->GetOverallDefaultApnState();
     EXPECT_EQ(ret, ApnProfileState::PROFILE_STATE_CONNECTING);
 
     for (auto &apnHolder : apnHolders) {
         if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DEFAULT) {
-            apnHolder->SetApnType(ApnProfileState::PROFILE_STATE_IDLE);
+            apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_IDLE);
         }
         if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
-            apnHolder->SetApnType(ApnProfileState::PROFILE_STATE_CONNECTING);
+            apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_CONNECTING);
         }
     }
-    auto ret = apnManager->GetOverallDefaultApnState();
+    ret = apnManager->GetOverallDefaultApnState();
     EXPECT_EQ(ret, ApnProfileState::PROFILE_STATE_CONNECTING);
 }
 } // namespace Telephony
