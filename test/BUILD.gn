@@ -32,7 +32,6 @@ ohos_unittest("tel_cellular_data_test") {
     "$SOURCE_DIR/services/include/utils",
     "$SOURCE_DIR/services/include/apn_manager",
     "$SOURCE_DIR/services/telephony_ext_wrapper/include",
-    "interfaces/innerkits",
   ]
 
   deps = [

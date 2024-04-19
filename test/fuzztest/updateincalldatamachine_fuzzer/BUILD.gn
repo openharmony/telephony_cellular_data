@@ -49,6 +49,7 @@ ohos_fuzztest("UpdateIncallDataMachineFuzzTest") {
     "core_service:tel_core_service_api",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
+    "netmanager_base:net_conn_manager_if",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
     "init:libbegetutil",
