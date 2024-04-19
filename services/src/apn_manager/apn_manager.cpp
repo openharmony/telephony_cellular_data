@@ -116,7 +116,7 @@ static bool HasNetCap(const uint64_t capabilities, const NetManagerStandard::Net
 
 NetManagerStandard::NetCap ApnManager::FindBestCapability(const uint64_t capabilities)
 {
-    NetManagerStandard::NetCap netCap = NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET;
+    NetManagerStandard::NetCap netCap = NetManagerStandard::NetCap::NET_CAPABILITY_END;
     if (HasNetCap(capabilities, NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET)) {
         netCap = NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET;
     }
