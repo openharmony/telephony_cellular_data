@@ -52,6 +52,7 @@ ohos_fuzztest("UpdateIncallDataMachineFuzzTest") {
     "eventhandler:libeventhandler",
     "hilog:libhilog",
     "init:libbegetutil",
+    "netmanager_base:net_conn_manager_if",
     "relational_store:native_rdb",
     "telephony_data:tel_telephony_data",
   ]

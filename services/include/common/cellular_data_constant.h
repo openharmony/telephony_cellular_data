@@ -121,7 +121,8 @@ enum DataContextRolesId {
     DATA_CONTEXT_ROLE_DUN_ID = 4,
     DATA_CONTEXT_ROLE_IMS_ID = 5,
     DATA_CONTEXT_ROLE_IA_ID = 6,
-    DATA_CONTEXT_ROLE_EMERGENCY_ID = 7
+    DATA_CONTEXT_ROLE_EMERGENCY_ID = 7,
+    DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID = 8,
 };
 
 enum class DataContextPriority : int32_t { PRIORITY_LOW, PRIORITY_NORMAL, PRIORITY_HIGH };
@@ -155,8 +156,10 @@ static constexpr const char *DATA_CONTEXT_ROLE_DUN = "dun";
 static constexpr const char *DATA_CONTEXT_ROLE_IMS = "ims";
 static constexpr const char *DATA_CONTEXT_ROLE_IA = "ia";
 static constexpr const char *DATA_CONTEXT_ROLE_EMERGENCY = "emergency";
+static constexpr const char *DATA_CONTEXT_ROLE_INTERNAL_DEFAULT = "internal_default";
 static const int32_t DATA_PROFILE_DEFAULT = 0;
 static const int32_t DATA_PROFILE_MMS = 1;
+static const int32_t DATA_PROFILE_INTERNAL_DEFAULT = 2;
 static const int32_t CMCC_MCC_MNC = 46002;
 static const int32_t DEFAULT_AUTH_TYPE = 0;
 static const int32_t DEFAULT_MTU = 1500;

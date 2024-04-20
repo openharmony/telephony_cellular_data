@@ -270,6 +270,7 @@ void CellularDataService::InitModule()
     std::vector<uint64_t> netCapabilities;
     netCapabilities.push_back(NetCap::NET_CAPABILITY_INTERNET);
     netCapabilities.push_back(NetCap::NET_CAPABILITY_MMS);
+    netCapabilities.push_back(NetCap::NET_CAPABILITY_INTERNAL_DEFAULT);
     int32_t simNum = CoreManagerInner::GetInstance().GetMaxSimCount();
     for (int32_t i = 0; i < simNum; ++i) {
         AddNetSupplier(i, netAgent, netCapabilities);
