@@ -2035,5 +2035,67 @@ bool CellularDataHandler::GetSmartSwitchState()
     }
     return isIntelliSwitchEnabled;
 }
+
+std::shared_ptr<CellularDataStateMachine> CellularDataHandler::CheckForCompatibleDataConnection(
+    sptr<ApnHolder> &apnHolder)
+{
+    std::shared_ptr<CellularDataStateMachine> potentialDc = nullptr;
+    if (apnHolder == nullptr || apnManager_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: CheckForCompatibleDataConnection failed, apnHolder or apnManager_null",
+            slotId_);
+        return potentialDc;
+    }
+    std::vector<sptr<ApnItem>> dunApnList;
+    if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DUN) {
+        apnManager_->FetchDunApns(dunApnList, slotId_);
+    }
+    if (dunApnList.size() == 0) {
+        return potentialDc;
+    }
+    if (connectionManager_ == nullptr) {
+        return potentialDc;
+    }
+    auto allDCs = connectionManager_->GetAllConnectionMachine();
+    bool isRoaming = false;
+    int32_t result = IsCellularDataRoamingEnabled(isRoaming);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        isRoaming = false;
+    }
+    for(const auto& curDc : allDCs) {
+        if (curDc == nullptr) {
+            continue;
+        }
+        sptr<ApnItem> apnItem = curDc->GetApnItem();
+        for(sptr<ApnItem> dunItem : dunApnList) {
+            if (!apnHolder->IsCompatibleApnItem(apnItem, dunItem, isRoaming)) {
+                continue;
+            }
+            if (curDc->IsActiveState()) {
+                return curDc;
+            } else if (curDc->IsActivatingState()) {
+                potentialDc = curDc;
+            } else if (curDc->IsDisconnectingState()) {
+                if (potentialDc == nullptr) {
+                    potentialDc = curDc;
+                }
+            }
+        }
+    }
+    return potentialDc;
+}
+
+bool CellularDataHandler::IsGsm()
+{
+    bool isGsm = false;
+    CoreManagerInner::GetInstance().IsGsm(slotId_, isGsm);
+    return isGsm;
+}
+
+bool CellularDataHandler::IsCdma()
+{
+    bool isCdma = false;
+    CoreManagerInner::GetInstance().IsCdma(slotId_, isCdma);
+    return isCdma;
+}
 } // namespace Telephony
 } // namespace OHOS
