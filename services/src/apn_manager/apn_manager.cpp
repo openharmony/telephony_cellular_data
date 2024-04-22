@@ -35,7 +35,7 @@ const std::map<std::string, int32_t> ApnManager::apnIdApnNameMap_ {
     {DATA_CONTEXT_ROLE_IA,        DATA_CONTEXT_ROLE_IA_ID},
     {DATA_CONTEXT_ROLE_EMERGENCY, DATA_CONTEXT_ROLE_EMERGENCY_ID},
     {DATA_CONTEXT_ROLE_INTERNAL_DEFAULT, DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID},
-	{DATA_CONTEXT_ROLE_XCAP,      DATA_CONTEXT_ROLE_XCAP_ID}
+    {DATA_CONTEXT_ROLE_XCAP,      DATA_CONTEXT_ROLE_XCAP_ID}
 };
 constexpr const char *CT_MCC_MNC_1 = "46003";
 constexpr const char *CT_MCC_MNC_2 = "46011";
@@ -56,7 +56,7 @@ void ApnManager::InitApnHolders()
     AddApnHolder(DATA_CONTEXT_ROLE_DEFAULT, static_cast<int32_t>(DataContextPriority::PRIORITY_LOW));
     AddApnHolder(DATA_CONTEXT_ROLE_MMS, static_cast<int32_t>(DataContextPriority::PRIORITY_NORMAL));
     AddApnHolder(DATA_CONTEXT_ROLE_INTERNAL_DEFAULT, static_cast<int32_t>(DataContextPriority::PRIORITY_LOW));
-	AddApnHolder(DATA_CONTEXT_ROLE_XCAP, static_cast<int32_t>(DataContextPriority::PRIORITY_NORMAL));
+    AddApnHolder(DATA_CONTEXT_ROLE_XCAP, static_cast<int32_t>(DataContextPriority::PRIORITY_NORMAL));
     AddApnHolder(DATA_CONTEXT_ROLE_DUN, static_cast<int32_t>(DataContextPriority::PRIORITY_NORMAL));
     AddApnHolder(DATA_CONTEXT_ROLE_IA, static_cast<int32_t>(DataContextPriority::PRIORITY_HIGH));
     AddApnHolder(DATA_CONTEXT_ROLE_SUPL, static_cast<int32_t>(DataContextPriority::PRIORITY_NORMAL));
@@ -109,7 +109,7 @@ int32_t ApnManager::FindApnIdByCapability(const uint64_t capability)
             return DATA_CONTEXT_ROLE_MMS_ID;
         case NetManagerStandard::NetCap::NET_CAPABILITY_INTERNAL_DEFAULT:
             return DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID;
-		case NetManagerStandard::NetCap::NET_CAPABILITY_IA:
+        case NetManagerStandard::NetCap::NET_CAPABILITY_IA:
             return DATA_CONTEXT_ROLE_IA_ID;
         case NetManagerStandard::NetCap::NET_CAPABILITY_XCAP:
             return DATA_CONTEXT_ROLE_XCAP_ID;
@@ -241,9 +241,10 @@ void ApnManager::CreateAllApnItem()
     if (internalDefaultApnItem != nullptr) {
         allApnItem_.push_back(internalDefaultApnItem);
     }
-    sptr<ApnItem> xcapApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_XCAP);
+    auto xcapApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_XCAP);
     if (xcapApnItem != nullptr) {
-        allApnItem_.push_back(xcapApnItem);	
+        allApnItem_.push_back(xcapApnItem);
+    }
 }
 
 int32_t ApnManager::CreateAllApnItemByDatabase(int32_t slotId)
