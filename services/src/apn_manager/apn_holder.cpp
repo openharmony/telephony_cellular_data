@@ -243,9 +243,8 @@ bool ApnHolder::IsSameApnItem(const sptr<ApnItem> &newApnItem,
         std::strcmp(newApnItem->attr_.mmsIpAddress_, oldApnItem->attr_.mmsIpAddress_) == 0;
 }
 
-bool ApnHolder::IsCompatibleApnItem(const sptr<ApnItem> &newApnItem,
-                              const sptr<ApnItem> &oldApnItem,
-                              bool roamingState)
+bool ApnHolder::IsCompatibleApnItem(const sptr<ApnItem> &newApnItem, const sptr<ApnItem> &oldApnItem,
+    bool roamingState)
 {
     if (newApnItem == nullptr || oldApnItem == nullptr) {
         TELEPHONY_LOGE("newApnItem or oldApnItem is null");

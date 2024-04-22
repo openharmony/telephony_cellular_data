@@ -660,7 +660,7 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
         return false;
     }
     std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine = nullptr;
-    if (apnHolder->GetApnType() != DATA_CONTEXT_ROLE_DUN || IsGsm()) {
+    if (apnHolder->GetApnType() != DATA_CONTEXT_ROLE_DUN) {
         cellularDataStateMachine = CheckForCompatibleDataConnection(apnHolder);
         if (cellularDataStateMachine != nullptr) {
             sptr<ApnItem> dcApnItem = cellularDataStateMachine->GetApnItem();
@@ -2062,11 +2062,8 @@ std::shared_ptr<CellularDataStateMachine> CellularDataHandler::CheckForCompatibl
         isRoaming = false;
     }
     for(const auto& curDc : allDCs) {
-        if (curDc == nullptr) {
-            continue;
-        }
         sptr<ApnItem> apnItem = curDc->GetApnItem();
-        for(sptr<ApnItem> dunItem : dunApnList) {
+        for(const auto& dunItem : dunApnList) {
             if (!apnHolder->IsCompatibleApnItem(apnItem, dunItem, isRoaming)) {
                 continue;
             }
