@@ -1332,6 +1332,390 @@ HWTEST_F(CellularDataTest, SecondaryCardRequest_Test_02, TestSize.Level3)
     std::cout << "UnregisterNetConnCallback result [" << result << "]" << std::endl;
 }
 
+/**
+ * @tc.number   SUPL_Apn_Test_01
+ * @tc.name     Test the SUPL apn function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, SUPL_Apn_Test_01, TestSize.Level3)
+{
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+    DataAccessToken token;
+    sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
+    if (callback == nullptr) {
+        std::cout << "callback is null" << std::endl;
+        return;
+    }
+    NetSpecifier netSpecifier;
+    NetAllCapabilities netAllCapabilities;
+    netAllCapabilities.netCaps_.insert(NetCap::NET_CAPABILITY_SUPL);
+    netAllCapabilities.bearerTypes_.insert(NetBearType::BEARER_CELLULAR);
+    int32_t simId = CoreServiceClient::GetInstance().GetSimId(DEFAULT_SIM_SLOT_ID);
+    netSpecifier.ident_ = "simId" + std::to_string(simId);
+    netSpecifier.netCapabilities_ = netAllCapabilities;
+    sptr<NetSpecifier> specifier = new (std::nothrow) NetSpecifier(netSpecifier);
+    if (specifier == nullptr) {
+        std::cout << "specifier is null" << std::endl;
+        return;
+    }
+    int32_t result = NetConnClient::GetInstance().RegisterNetConnCallback(specifier, callback, NET_REGISTER_TIMEOUT_MS);
+    std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
+    auto suplCallback = static_cast<TestCallback *>(callback.GetRefPtr());
+    if (suplCallback == nullptr) {
+        std::cout << "suplCallback is null" << std::endl;
+        return;
+    }
+    int32_t count = 0;
+    while (count < MAX_TIMES) {
+        sleep(SLEEP_TIME);
+        if (suplCallback->isCallback_ == true) {
+            break;
+        }
+        count++;
+    }
+    ASSERT_TRUE(suplCallback->isCallback_);
+    result = NetConnClient::GetInstance().UnregisterNetConnCallback(callback);
+    std::cout << "UnregisterNetConnCallback result [" << result << "]" << std::endl;
+}
+
+/**
+ * @tc.number   SUPL_Apn_Test_02
+ * @tc.name     Test the SUPL apn function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, SUPL_Apn_Test_02, TestSize.Level3)
+{
+    if (!HasSimCard(SIM_SLOT_ID_1)) {
+        return;
+    }
+    DataAccessToken token;
+    sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
+    if (callback == nullptr) {
+        std::cout << "callback is null" << std::endl;
+        return;
+    }
+    NetSpecifier netSpecifier;
+    NetAllCapabilities netAllCapabilities;
+    netAllCapabilities.netCaps_.insert(NetCap::NET_CAPABILITY_SUPL);
+    netAllCapabilities.bearerTypes_.insert(NetBearType::BEARER_CELLULAR);
+    int32_t simId = CoreServiceClient::GetInstance().GetSimId(SIM_SLOT_ID_1);
+    netSpecifier.ident_ = "simId" + std::to_string(simId);
+    netSpecifier.netCapabilities_ = netAllCapabilities;
+    sptr<NetSpecifier> specifier = new (std::nothrow) NetSpecifier(netSpecifier);
+    if (specifier == nullptr) {
+        std::cout << "specifier is null" << std::endl;
+        return;
+    }
+    int32_t result = NetConnClient::GetInstance().RegisterNetConnCallback(specifier, callback, NET_REGISTER_TIMEOUT_MS);
+    std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
+    auto suplCallback = static_cast<TestCallback *>(callback.GetRefPtr());
+    if (suplCallback == nullptr) {
+        std::cout << "suplCallback is null" << std::endl;
+        return;
+    }
+    int32_t count = 0;
+    while (count < MAX_TIMES) {
+        sleep(SLEEP_TIME);
+        if (suplCallback->isCallback_ == true) {
+            break;
+        }
+        count++;
+    }
+    ASSERT_TRUE(suplCallback->isCallback_);
+    result = NetConnClient::GetInstance().UnregisterNetConnCallback(callback);
+    std::cout << "UnregisterNetConnCallback result [" << result << "]" << std::endl;
+}
+
+/**
+ * @tc.number   DUN_Apn_Test_01
+ * @tc.name     Test the DUN apn function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, DUN_Apn_Test_01, TestSize.Level3)
+{
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+    DataAccessToken token;
+    sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
+    if (callback == nullptr) {
+        std::cout << "callback is null" << std::endl;
+        return;
+    }
+    NetSpecifier netSpecifier;
+    NetAllCapabilities netAllCapabilities;
+    netAllCapabilities.netCaps_.insert(NetCap::NET_CAPABILITY_DUN);
+    netAllCapabilities.bearerTypes_.insert(NetBearType::BEARER_CELLULAR);
+    int32_t simId = CoreServiceClient::GetInstance().GetSimId(DEFAULT_SIM_SLOT_ID);
+    netSpecifier.ident_ = "simId" + std::to_string(simId);
+    netSpecifier.netCapabilities_ = netAllCapabilities;
+    sptr<NetSpecifier> specifier = new (std::nothrow) NetSpecifier(netSpecifier);
+    if (specifier == nullptr) {
+        std::cout << "specifier is null" << std::endl;
+        return;
+    }
+    int32_t result = NetConnClient::GetInstance().RegisterNetConnCallback(specifier, callback, NET_REGISTER_TIMEOUT_MS);
+    std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
+    auto dunCallback = static_cast<TestCallback *>(callback.GetRefPtr());
+    if (dunCallback == nullptr) {
+        std::cout << "dunCallback is null" << std::endl;
+        return;
+    }
+    int32_t count = 0;
+    while (count < MAX_TIMES) {
+        sleep(SLEEP_TIME);
+        if (dunCallback->isCallback_ == true) {
+            break;
+        }
+        count++;
+    }
+    ASSERT_TRUE(dunCallback->isCallback_);
+    result = NetConnClient::GetInstance().UnregisterNetConnCallback(callback);
+    std::cout << "UnregisterNetConnCallback result [" << result << "]" << std::endl;
+}
+
+/**
+ * @tc.number   DUN_Apn_Test_02
+ * @tc.name     Test the DUN apn function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, DUN_Apn_Test_02, TestSize.Level3)
+{
+    if (!HasSimCard(SIM_SLOT_ID_1)) {
+        return;
+    }
+    DataAccessToken token;
+    sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
+    if (callback == nullptr) {
+        std::cout << "callback is null" << std::endl;
+        return;
+    }
+    NetSpecifier netSpecifier;
+    NetAllCapabilities netAllCapabilities;
+    netAllCapabilities.netCaps_.insert(NetCap::NET_CAPABILITY_DUN);
+    netAllCapabilities.bearerTypes_.insert(NetBearType::BEARER_CELLULAR);
+    int32_t simId = CoreServiceClient::GetInstance().GetSimId(SIM_SLOT_ID_1);
+    netSpecifier.ident_ = "simId" + std::to_string(simId);
+    netSpecifier.netCapabilities_ = netAllCapabilities;
+    sptr<NetSpecifier> specifier = new (std::nothrow) NetSpecifier(netSpecifier);
+    if (specifier == nullptr) {
+        std::cout << "specifier is null" << std::endl;
+        return;
+    }
+    int32_t result = NetConnClient::GetInstance().RegisterNetConnCallback(specifier, callback, NET_REGISTER_TIMEOUT_MS);
+    std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
+    auto dunCallback = static_cast<TestCallback *>(callback.GetRefPtr());
+    if (dunCallback == nullptr) {
+        std::cout << "dunCallback is null" << std::endl;
+        return;
+    }
+    int32_t count = 0;
+    while (count < MAX_TIMES) {
+        sleep(SLEEP_TIME);
+        if (dunCallback->isCallback_ == true) {
+            break;
+        }
+        count++;
+    }
+    ASSERT_TRUE(dunCallback->isCallback_);
+    result = NetConnClient::GetInstance().UnregisterNetConnCallback(callback);
+    std::cout << "UnregisterNetConnCallback result [" << result << "]" << std::endl;
+}
+
+/**
+ * @tc.number   IA_Apn_Test_01
+ * @tc.name     Test the IA apn function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, IA_Apn_Test_01, TestSize.Level3)
+{
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+    DataAccessToken token;
+    sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
+    if (callback == nullptr) {
+        std::cout << "callback is null" << std::endl;
+        return;
+    }
+    NetSpecifier netSpecifier;
+    NetAllCapabilities netAllCapabilities;
+    netAllCapabilities.netCaps_.insert(NetCap::NET_CAPABILITY_IA);
+    netAllCapabilities.bearerTypes_.insert(NetBearType::BEARER_CELLULAR);
+    int32_t simId = CoreServiceClient::GetInstance().GetSimId(DEFAULT_SIM_SLOT_ID);
+    netSpecifier.ident_ = "simId" + std::to_string(simId);
+    netSpecifier.netCapabilities_ = netAllCapabilities;
+    sptr<NetSpecifier> specifier = new (std::nothrow) NetSpecifier(netSpecifier);
+    if (specifier == nullptr) {
+        std::cout << "specifier is null" << std::endl;
+        return;
+    }
+    int32_t result = NetConnClient::GetInstance().RegisterNetConnCallback(specifier, callback, NET_REGISTER_TIMEOUT_MS);
+    std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
+    auto iaCallback = static_cast<TestCallback *>(callback.GetRefPtr());
+    if (iaCallback == nullptr) {
+        std::cout << "iaCallback is null" << std::endl;
+        return;
+    }
+    int32_t count = 0;
+    while (count < MAX_TIMES) {
+        sleep(SLEEP_TIME);
+        if (iaCallback->isCallback_ == true) {
+            break;
+        }
+        count++;
+    }
+    ASSERT_TRUE(iaCallback->isCallback_);
+    result = NetConnClient::GetInstance().UnregisterNetConnCallback(callback);
+    std::cout << "UnregisterNetConnCallback result [" << result << "]" << std::endl;
+}
+
+/**
+ * @tc.number   IA_Apn_Test_02
+ * @tc.name     Test the IA apn function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, IA_Apn_Test_02, TestSize.Level3)
+{
+    if (!HasSimCard(SIM_SLOT_ID_1)) {
+        return;
+    }
+    DataAccessToken token;
+    sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
+    if (callback == nullptr) {
+        std::cout << "callback is null" << std::endl;
+        return;
+    }
+    NetSpecifier netSpecifier;
+    NetAllCapabilities netAllCapabilities;
+    netAllCapabilities.netCaps_.insert(NetCap::NET_CAPABILITY_IA);
+    netAllCapabilities.bearerTypes_.insert(NetBearType::BEARER_CELLULAR);
+    int32_t simId = CoreServiceClient::GetInstance().GetSimId(SIM_SLOT_ID_1);
+    netSpecifier.ident_ = "simId" + std::to_string(simId);
+    netSpecifier.netCapabilities_ = netAllCapabilities;
+    sptr<NetSpecifier> specifier = new (std::nothrow) NetSpecifier(netSpecifier);
+    if (specifier == nullptr) {
+        std::cout << "specifier is null" << std::endl;
+        return;
+    }
+    int32_t result = NetConnClient::GetInstance().RegisterNetConnCallback(specifier, callback, NET_REGISTER_TIMEOUT_MS);
+    std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
+    auto iaCallback = static_cast<TestCallback *>(callback.GetRefPtr());
+    if (iaCallback == nullptr) {
+        std::cout << "iaCallback is null" << std::endl;
+        return;
+    }
+    int32_t count = 0;
+    while (count < MAX_TIMES) {
+        sleep(SLEEP_TIME);
+        if (iaCallback->isCallback_ == true) {
+            break;
+        }
+        count++;
+    }
+    ASSERT_TRUE(iaCallback->isCallback_);
+    result = NetConnClient::GetInstance().UnregisterNetConnCallback(callback);
+    std::cout << "UnregisterNetConnCallback result [" << result << "]" << std::endl;
+}
+
+/**
+ * @tc.number   XCAP_Apn_Test_01
+ * @tc.name     Test the XCAP apn function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, XCAP_Apn_Test_01, TestSize.Level3)
+{
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+    DataAccessToken token;
+    sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
+    if (callback == nullptr) {
+        std::cout << "callback is null" << std::endl;
+        return;
+    }
+    NetSpecifier netSpecifier;
+    NetAllCapabilities netAllCapabilities;
+    netAllCapabilities.netCaps_.insert(NetCap::NET_CAPABILITY_XCAP);
+    netAllCapabilities.bearerTypes_.insert(NetBearType::BEARER_CELLULAR);
+    int32_t simId = CoreServiceClient::GetInstance().GetSimId(DEFAULT_SIM_SLOT_ID);
+    netSpecifier.ident_ = "simId" + std::to_string(simId);
+    netSpecifier.netCapabilities_ = netAllCapabilities;
+    sptr<NetSpecifier> specifier = new (std::nothrow) NetSpecifier(netSpecifier);
+    if (specifier == nullptr) {
+        std::cout << "specifier is null" << std::endl;
+        return;
+    }
+    int32_t result = NetConnClient::GetInstance().RegisterNetConnCallback(specifier, callback, NET_REGISTER_TIMEOUT_MS);
+    std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
+    auto xcapCallback = static_cast<TestCallback *>(callback.GetRefPtr());
+    if (xcapCallback == nullptr) {
+        std::cout << "xcapCallback is null" << std::endl;
+        return;
+    }
+    int32_t count = 0;
+    while (count < MAX_TIMES) {
+        sleep(SLEEP_TIME);
+        if (xcapCallback->isCallback_ == true) {
+            break;
+        }
+        count++;
+    }
+    ASSERT_TRUE(xcapCallback->isCallback_);
+    result = NetConnClient::GetInstance().UnregisterNetConnCallback(callback);
+    std::cout << "UnregisterNetConnCallback result [" << result << "]" << std::endl;
+}
+
+/**
+ * @tc.number   XCAP_Apn_Test_02
+ * @tc.name     Test the XCAP apn function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, XCAP_Apn_Test_02, TestSize.Level3)
+{
+    if (!HasSimCard(SIM_SLOT_ID_1)) {
+        return;
+    }
+    DataAccessToken token;
+    sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
+    if (callback == nullptr) {
+        std::cout << "callback is null" << std::endl;
+        return;
+    }
+    NetSpecifier netSpecifier;
+    NetAllCapabilities netAllCapabilities;
+    netAllCapabilities.netCaps_.insert(NetCap::NET_CAPABILITY_XCAP);
+    netAllCapabilities.bearerTypes_.insert(NetBearType::BEARER_CELLULAR);
+    int32_t simId = CoreServiceClient::GetInstance().GetSimId(SIM_SLOT_ID_1);
+    netSpecifier.ident_ = "simId" + std::to_string(simId);
+    netSpecifier.netCapabilities_ = netAllCapabilities;
+    sptr<NetSpecifier> specifier = new (std::nothrow) NetSpecifier(netSpecifier);
+    if (specifier == nullptr) {
+        std::cout << "specifier is null" << std::endl;
+        return;
+    }
+    int32_t result = NetConnClient::GetInstance().RegisterNetConnCallback(specifier, callback, NET_REGISTER_TIMEOUT_MS);
+    std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
+    auto xcapCallback = static_cast<TestCallback *>(callback.GetRefPtr());
+    if (xcapCallback == nullptr) {
+        std::cout << "xcapCallback is null" << std::endl;
+        return;
+    }
+    int32_t count = 0;
+    while (count < MAX_TIMES) {
+        sleep(SLEEP_TIME);
+        if (xcapCallback->isCallback_ == true) {
+            break;
+        }
+        count++;
+    }
+    ASSERT_TRUE(xcapCallback->isCallback_);
+    result = NetConnClient::GetInstance().UnregisterNetConnCallback(callback);
+    std::cout << "UnregisterNetConnCallback result [" << result << "]" << std::endl;
+}
+
 #else  // TEL_TEST_UNSUPPORT
 /**
  * @tc.number   DataMock_Test_01
