@@ -54,6 +54,7 @@ public:
     void InitialApnRetryCount();
     bool IsSameMatchedApns(std::vector<sptr<ApnItem>> newMatchedApns, bool roamingState);
     bool IsSameApnItem(const sptr<ApnItem> &newApnItem, const sptr<ApnItem> &oldApnItem, bool roamingState);
+    bool IsCompatibleApnItem(const sptr<ApnItem> &newApnItem, const sptr<ApnItem> &oldApnItem, bool roamingState);
 
 private:
     ApnHolder(ApnHolder &apnHolder) = default;

@@ -39,6 +39,26 @@ bool CellularDataStateMachine::IsInactiveState() const
     return currentState_ == inActiveState_;
 }
 
+bool CellularDataStateMachine::IsActivatingState() const
+{
+    return currentState_ == activatingState_;
+}
+
+bool CellularDataStateMachine::IsDisconnectingState() const
+{
+    return currentState_ == disconnectingState_;
+}
+
+bool CellularDataStateMachine::IsActiveState() const
+{
+    return currentState_ == activeState_;
+}
+
+bool CellularDataStateMachine::IsDefaultState() const
+{
+    return currentState_ == defaultState_;
+}
+
 void CellularDataStateMachine::SetCapability(uint64_t capability)
 {
     capability_ = capability;

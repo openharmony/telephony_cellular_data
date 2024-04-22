@@ -23,7 +23,11 @@ namespace OHOS {
 namespace Telephony {
 const std::map<std::string, int32_t> ApnHolder::apnTypeDataProfileMap_ {
     {DATA_CONTEXT_ROLE_DEFAULT, DATA_PROFILE_DEFAULT},
-    {DATA_CONTEXT_ROLE_MMS,     DATA_PROFILE_MMS}
+    {DATA_CONTEXT_ROLE_MMS, DATA_PROFILE_MMS},
+    {DATA_CONTEXT_ROLE_SUPL, DATA_PROFILE_SUPL},
+    {DATA_CONTEXT_ROLE_DUN, DATA_PROFILE_DUN},
+    {DATA_CONTEXT_ROLE_IA, DATA_PROFILE_IA},
+    {DATA_CONTEXT_ROLE_XCAP, DATA_PROFILE_XCAP}
 };
 
 ApnHolder::ApnHolder(const std::string &apnType, const int32_t priority) : apnType_(apnType), priority_(priority) {}
@@ -235,6 +239,32 @@ bool ApnHolder::IsSameApnItem(const sptr<ApnItem> &newApnItem,
         std::strcmp(newApnItem->attr_.user_, oldApnItem->attr_.user_) == 0 &&
         std::strcmp(newApnItem->attr_.password_, oldApnItem->attr_.password_) == 0 &&
         std::strcmp(newApnItem->attr_.homeUrl_, oldApnItem->attr_.homeUrl_) == 0 &&
+        std::strcmp(newApnItem->attr_.proxyIpAddress_, oldApnItem->attr_.proxyIpAddress_) == 0 &&
+        std::strcmp(newApnItem->attr_.mmsIpAddress_, oldApnItem->attr_.mmsIpAddress_) == 0;
+}
+
+bool ApnHolder::IsCompatibleApnItem(const sptr<ApnItem> &newApnItem,
+                              const sptr<ApnItem> &oldApnItem,
+                              bool roamingState)
+{
+    if (newApnItem == nullptr || oldApnItem == nullptr) {
+        TELEPHONY_LOGE("newApnItem or oldApnItem is null");
+        return false;
+    }
+    bool isSameProtocol = false;
+    if (roamingState) {
+        isSameProtocol = std::strcmp(newApnItem->attr_.roamingProtocol_, oldApnItem->attr_.roamingProtocol_) == 0;
+    } else {
+        isSameProtocol = std::strcmp(newApnItem->attr_.protocol_, oldApnItem->attr_.protocol_) == 0;
+    }
+    return isSameProtocol && newApnItem->attr_.profileId_ == oldApnItem->attr_.profileId_ &&
+        newApnItem->attr_.authType_ == oldApnItem->attr_.authType_ &&
+        std::strcmp(newApnItem->attr_.types_, oldApnItem->attr_.types_) == 0 &&
+        std::strcmp(newApnItem->attr_.numeric_, oldApnItem->attr_.numeric_) == 0 &&
+        std::strcmp(newApnItem->attr_.apn_, oldApnItem->attr_.apn_) == 0 &&
+        std::strcmp(newApnItem->attr_.apnName_, oldApnItem->attr_.apnName_) == 0 &&
+        std::strcmp(newApnItem->attr_.user_, oldApnItem->attr_.user_) == 0 &&
+        std::strcmp(newApnItem->attr_.password_, oldApnItem->attr_.password_) == 0 &&
         std::strcmp(newApnItem->attr_.proxyIpAddress_, oldApnItem->attr_.proxyIpAddress_) == 0 &&
         std::strcmp(newApnItem->attr_.mmsIpAddress_, oldApnItem->attr_.mmsIpAddress_) == 0;
 }
