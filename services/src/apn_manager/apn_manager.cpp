@@ -113,7 +113,7 @@ int32_t ApnManager::FindApnIdByCapability(const uint64_t capability)
             return DATA_CONTEXT_ROLE_IA_ID;
         case NetManagerStandard::NetCap::NET_CAPABILITY_XCAP:
             return DATA_CONTEXT_ROLE_XCAP_ID;
-		case NetManagerStandard::NetCap::NET_CAPABILITY_SUPL:
+        case NetManagerStandard::NetCap::NET_CAPABILITY_SUPL:
             return DATA_CONTEXT_ROLE_SUPL_ID;
         case NetManagerStandard::NetCap::NET_CAPABILITY_DUN:
             return DATA_CONTEXT_ROLE_DUN_ID;
