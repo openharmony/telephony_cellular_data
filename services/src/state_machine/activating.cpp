@@ -17,7 +17,7 @@
 
 #include "cellular_data_event_code.h"
 #include "cellular_data_hisysevent.h"
-#include "hril_data_parcel.h"
+#include "tel_ril_data_parcel.h"
 #include "inactive.h"
 #include "radio_event.h"
 #include "telephony_log_wrapper.h"
@@ -95,36 +95,36 @@ bool Activating::RilActivatePdpContextDone(const AppExecFwk::InnerEvent::Pointer
 DisConnectionReason Activating::DataCallPdpError(int32_t reason)
 {
     switch (reason) {
-        case HRilPdpErrorReason::HRIL_PDP_ERR_RETRY:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_UNKNOWN:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_SHORTAGE_RESOURCES:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_ACTIVATION_REJECTED_UNSPECIFIED:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_SERVICE_OPTION_TEMPORARILY_OUT_OF_ORDER:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_APN_NOT_SUPPORTED_IN_CURRENT_RAT_PLMN:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_APN_RESTRICTION_VALUE_INCOMPATIBLE: {
+        case PdpErrorReason::PDP_ERR_RETRY:
+        case PdpErrorReason::PDP_ERR_UNKNOWN:
+        case PdpErrorReason::PDP_ERR_SHORTAGE_RESOURCES:
+        case PdpErrorReason::PDP_ERR_ACTIVATION_REJECTED_UNSPECIFIED:
+        case PdpErrorReason::PDP_ERR_SERVICE_OPTION_TEMPORARILY_OUT_OF_ORDER:
+        case PdpErrorReason::PDP_ERR_APN_NOT_SUPPORTED_IN_CURRENT_RAT_PLMN:
+        case PdpErrorReason::PDP_ERR_APN_RESTRICTION_VALUE_INCOMPATIBLE: {
             TELEPHONY_LOGE("DataCall: The connection failed, try again");
             return DisConnectionReason::REASON_RETRY_CONNECTION;
         }
-        case HRilPdpErrorReason::HRIL_PDP_ERR_MULT_ACCESSES_PDN_NOT_ALLOWED:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_OPERATOR_DETERMINED_BARRING:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_MISSING_OR_UNKNOWN_APN:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_UNKNOWN_PDP_ADDR_OR_TYPE:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_USER_VERIFICATION:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_ACTIVATION_REJECTED_GGSN:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_SERVICE_OPTION_NOT_SUPPORTED:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_REQUESTED_SERVICE_OPTION_NOT_SUBSCRIBED:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_NSAPI_ALREADY_USED:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_IPV4_ONLY_ALLOWED:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_IPV6_ONLY_ALLOWED:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_IPV4V6_ONLY_ALLOWED:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_NON_IP_ONLY_ALLOWED:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_MAX_NUM_OF_PDP_CONTEXTS:
-        case HRilPdpErrorReason::HRIL_PDP_ERR_PROTOCOL_ERRORS: {
+        case PdpErrorReason::PDP_ERR_MULT_ACCESSES_PDN_NOT_ALLOWED:
+        case PdpErrorReason::PDP_ERR_OPERATOR_DETERMINED_BARRING:
+        case PdpErrorReason::PDP_ERR_MISSING_OR_UNKNOWN_APN:
+        case PdpErrorReason::PDP_ERR_UNKNOWN_PDP_ADDR_OR_TYPE:
+        case PdpErrorReason::PDP_ERR_USER_VERIFICATION:
+        case PdpErrorReason::PDP_ERR_ACTIVATION_REJECTED_GGSN:
+        case PdpErrorReason::PDP_ERR_SERVICE_OPTION_NOT_SUPPORTED:
+        case PdpErrorReason::PDP_ERR_REQUESTED_SERVICE_OPTION_NOT_SUBSCRIBED:
+        case PdpErrorReason::PDP_ERR_NSAPI_ALREADY_USED:
+        case PdpErrorReason::PDP_ERR_IPV4_ONLY_ALLOWED:
+        case PdpErrorReason::PDP_ERR_IPV6_ONLY_ALLOWED:
+        case PdpErrorReason::PDP_ERR_IPV4V6_ONLY_ALLOWED:
+        case PdpErrorReason::PDP_ERR_NON_IP_ONLY_ALLOWED:
+        case PdpErrorReason::PDP_ERR_MAX_NUM_OF_PDP_CONTEXTS:
+        case PdpErrorReason::PDP_ERR_PROTOCOL_ERRORS: {
             TELEPHONY_LOGE("DataCall: The connection failed, not try again");
             return DisConnectionReason::REASON_CLEAR_CONNECTION;
         }
         default: {
-            if (reason > HRIL_PDP_ERR_PROTOCOL_ERRORS && reason < HRIL_PDP_ERR_APN_RESTRICTION_VALUE_INCOMPATIBLE) {
+            if (reason > PDP_ERR_PROTOCOL_ERRORS && reason < PDP_ERR_APN_RESTRICTION_VALUE_INCOMPATIBLE) {
                 TELEPHONY_LOGE("DataCall: The protocol error, not try again");
                 return DisConnectionReason::REASON_CLEAR_CONNECTION;
             }
@@ -142,35 +142,35 @@ bool Activating::RilErrorResponse(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGE("stateMachine is null");
         return false;
     }
-    std::shared_ptr<HRilRadioResponseInfo> rilInfo = event->GetSharedObject<HRilRadioResponseInfo>();
+    std::shared_ptr<RadioResponseInfo> rilInfo = event->GetSharedObject<RadioResponseInfo>();
     if (rilInfo == nullptr) {
-        TELEPHONY_LOGE("SetupDataCallResultInfo and HRilRadioResponseInfo is null");
+        TELEPHONY_LOGE("SetupDataCallResultInfo and RadioResponseInfo is null");
         return false;
     }
     if (stateMachine->connectId_ != rilInfo->flag) {
         TELEPHONY_LOGE("connectId is %{public}d, flag is %{public}d", stateMachine->connectId_, rilInfo->flag);
         return false;
     }
-    TELEPHONY_LOGI("HRilRadioResponseInfo flag:%{public}d error:%{public}d", rilInfo->flag, rilInfo->error);
+    TELEPHONY_LOGI("RadioResponseInfo flag:%{public}d error:%{public}d", rilInfo->flag, rilInfo->error);
     Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
     if (inActive == nullptr) {
         TELEPHONY_LOGE("Inactive is null");
         return false;
     }
     switch (rilInfo->error) {
-        case HRilErrType::HRIL_ERR_GENERIC_FAILURE:
-        case HRilErrType::HRIL_ERR_CMD_SEND_FAILURE:
-        case HRilErrType::HRIL_ERR_NULL_POINT: {
+        case ErrType::ERR_GENERIC_FAILURE:
+        case ErrType::ERR_CMD_SEND_FAILURE:
+        case ErrType::ERR_NULL_POINT: {
             inActive->SetReason(DisConnectionReason::REASON_RETRY_CONNECTION);
             CellularDataHiSysEvent::WriteDataActivateFaultEvent(INVALID_PARAMETER, SWITCH_ON,
                 CellularDataErrorCode::DATA_ERROR_RADIO_RESPONSEINFO_ERROR,
-                "HRilErrType " + std::to_string(static_cast<int32_t>(rilInfo->error)));
+                "ErrType " + std::to_string(static_cast<int32_t>(rilInfo->error)));
             TELEPHONY_LOGD("Handle supported error responses and retry the connection.");
             break;
         }
-        case HRilErrType::HRIL_ERR_INVALID_RESPONSE:
-        case HRilErrType::HRIL_ERR_CMD_NO_CARRIER:
-        case HRilErrType::HRIL_ERR_HDF_IPC_FAILURE:
+        case ErrType::ERR_INVALID_RESPONSE:
+        case ErrType::ERR_CMD_NO_CARRIER:
+        case ErrType::ERR_HDF_IPC_FAILURE:
             inActive->SetReason(DisConnectionReason::REASON_CLEAR_CONNECTION);
             TELEPHONY_LOGI("Handle the supported error response and clear the connection.");
             break;

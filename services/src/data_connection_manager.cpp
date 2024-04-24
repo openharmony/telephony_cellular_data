@@ -20,7 +20,7 @@
 #include "cellular_data_state_machine.h"
 #include "cellular_data_utils.h"
 #include "core_manager_inner.h"
-#include "hril_data_parcel.h"
+#include "tel_ril_data_parcel.h"
 #include "operator_config_types.h"
 #include "radio_event.h"
 #include "telephony_log_wrapper.h"
