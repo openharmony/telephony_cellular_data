@@ -539,6 +539,10 @@ int32_t CellularDataService::ClearCellularDataConnections(const int32_t slotId)
 
 int32_t CellularDataService::ClearAllConnections(const int32_t slotId, DisConnectionReason reason)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     std::map<int32_t, std::shared_ptr<CellularDataController>>::const_iterator item =
         cellularDataControllers_.find(slotId);
     if (item == cellularDataControllers_.end() || item->second == nullptr) {
