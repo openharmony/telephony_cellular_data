@@ -371,7 +371,7 @@ bool CellularDataClient::IsCellularDataSysAbilityExist() __attribute__((no_sanit
     }
     sptr<IRemoteObject> remote = sm->CheckSystemAbility(TELEPHONY_CELLULAR_DATA_SYS_ABILITY_ID);
     if (remote == nullptr) {
-        TELEPHONY_LOGE("No CesServiceAbility");
+        TELEPHONY_LOGE("No TcdServiceAbility");
         return false;
     }
     return true;
