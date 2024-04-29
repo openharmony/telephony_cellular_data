@@ -57,13 +57,7 @@ sptr<ICellularDataManager> CellularDataClient::GetProxy()
         return proxy_;
     }
 
-    sptr<ISystemAbilityManager> sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (sam == nullptr) {
-        TELEPHONY_LOGE("Failed to get system ability manager");
-        return nullptr;
-    }
-    sptr<IRemoteObject> obj = sam->CheckSystemAbility(TELEPHONY_CELLULAR_DATA_SYS_ABILITY_ID);
-    if (obj == nullptr) {
+    if (IsCommonEventServiceAbilityExist()) {
         TELEPHONY_LOGE("Failed to get cellular data service");
         return nullptr;
     }
@@ -366,6 +360,21 @@ int32_t CellularDataClient::IsNeedDoRecovery(int32_t slotId, bool needDoRecovery
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return proxy->IsNeedDoRecovery(slotId, needDoRecovery);
+}
+
+bool CellularDataClient::IsCellularDataSysAbilityExist() __attribute__((no_sanitize("cfi")))
+{
+    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (sm == nullptr) {
+        TELEPHONY_LOGE("IsCellularDataSysAbilityExist Get ISystemAbilityManager failed, no SystemAbilityManager");
+        return false;
+    }
+    sptr<IRemoteObject> remote = sm->CheckSystemAbility(TELEPHONY_CELLULAR_DATA_SYS_ABILITY_ID);
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("No CesServiceAbility");
+        return false;
+    }
+    return true;
 }
 } // namespace Telephony
 } // namespace OHOS

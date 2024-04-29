@@ -210,6 +210,7 @@ private:
     void RegisterSimAccountCallback();
     void UnregisterSimAccountCallback();
     bool IsValidSlotId(int32_t slotId);
+    bool IsCellularDataSysAbilityExist();
 
 private:
     std::mutex mutexProxy_;
