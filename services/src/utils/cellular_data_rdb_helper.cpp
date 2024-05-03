@@ -78,7 +78,7 @@ bool CellularDataRdbHelper::ResetApns(int32_t slotId)
     }
     TELEPHONY_LOGI("Reset apns");
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
-    Uri resetApnUri(static_cast<std::string>(CELLULAR_DATA_RDB_RESET));
+    Uri resetApnUri(CELLULAR_DATA_RDB_RESET);
     DataShare::DataSharePredicates predicates;
     DataShare::DataShareValuesBucket values;
     values.Put(SIM_ID, simId);
@@ -99,7 +99,7 @@ bool CellularDataRdbHelper::QueryApns(
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(PdpProfileData::MCCMNC, mcc + mnc);
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
-    Uri cellularDataUri(static_cast<std::string>(CELLULAR_DATA_RDB_SELECTION) + "?Proxy=true&simId=" + std::to_string(simId));
+    Uri cellularDataUri(std::string(CELLULAR_DATA_RDB_SELECTION) + "?Proxy=true&simId=" + std::to_string(simId));
     std::shared_ptr<DataShare::DataShareResultSet> result =
         dataShareHelper->Query(cellularDataUri, predicates, columns);
     if (result == nullptr) {
@@ -131,7 +131,7 @@ bool CellularDataRdbHelper::QueryMvnoApnsByType(const std::string &mcc, const st
     predicates.EqualTo(PdpProfileData::MVNO_TYPE, mvnoType)
         ->EqualTo(PdpProfileData::MCCMNC, mcc + mnc);
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
-    Uri cellularDataUri(static_cast<std::string>(CELLULAR_DATA_RDB_SELECTION) + "?Proxy=true&simId=" + std::to_string(simId));
+    Uri cellularDataUri(std::string(CELLULAR_DATA_RDB_SELECTION) + "?Proxy=true&simId=" + std::to_string(simId));
     std::shared_ptr<DataShare::DataShareResultSet> result =
         dataShareHelper->Query(cellularDataUri, predicates, columns);
     if (result == nullptr) {
