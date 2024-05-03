@@ -19,6 +19,7 @@
 #include "core_manager_inner.h"
 #include "telephony_log_wrapper.h"
 
+static constexpr const char *SIM_ID = "sim_id";
 namespace OHOS {
 namespace Telephony {
 CellularDataRdbHelper::CellularDataRdbHelper() : cellularDataUri_(CELLULAR_DATA_RDB_SELECTION) {}
@@ -42,7 +43,7 @@ std::shared_ptr<DataShare::DataShareHelper> CellularDataRdbHelper::CreateDataAbi
 }
 
 int CellularDataRdbHelper::Update(
-    const DataShare::DataShareValuesBucket &value, const DataShare::DataSharePredicates &predicates, int32_t slotId)
+    const DataShare::DataShareValuesBucket &value, const DataShare::DataSharePredicates &predicates)
 {
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAbilityHelper();
     if (dataShareHelper == nullptr) {
@@ -50,14 +51,12 @@ int CellularDataRdbHelper::Update(
         return NULL_POINTER_EXCEPTION;
     }
     TELEPHONY_LOGI("Cellular data RDB helper update");
-    int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
-    Uri cellularDataUri(static_cast<std::string>(CELLULAR_DATA_RDB_SELECTION) + std::to_string(simId));
-    int32_t result = dataShareHelper->Update(cellularDataUri, predicates, value);
+    int32_t result = dataShareHelper->Update(cellularDataUri_, predicates, value);
     dataShareHelper->Release();
     return result;
 }
 
-int CellularDataRdbHelper::Insert(const DataShare::DataShareValuesBucket &values, int32_t slotId)
+int CellularDataRdbHelper::Insert(const DataShare::DataShareValuesBucket &values)
 {
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAbilityHelper();
     if (dataShareHelper == nullptr) {
@@ -65,9 +64,7 @@ int CellularDataRdbHelper::Insert(const DataShare::DataShareValuesBucket &values
         return NULL_POINTER_EXCEPTION;
     }
     TELEPHONY_LOGI("Cellular data RDB helper insert");
-    int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
-    Uri cellularDataUri(static_cast<std::string>(CELLULAR_DATA_RDB_SELECTION) + std::to_string(simId));
-    int32_t result = dataShareHelper->Insert(cellularDataUri, values);
+    int32_t result = dataShareHelper->Insert(cellularDataUri_, values);
     dataShareHelper->Release();
     return result;
 }
@@ -81,9 +78,10 @@ bool CellularDataRdbHelper::ResetApns(int32_t slotId)
     }
     TELEPHONY_LOGI("Reset apns");
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
-    Uri resetApnUri(static_cast<std::string>(CELLULAR_DATA_RDB_RESET) + std::to_string(simId));
+    Uri resetApnUri(static_cast<std::string>(CELLULAR_DATA_RDB_RESET));
     DataShare::DataSharePredicates predicates;
     DataShare::DataShareValuesBucket values;
+    value.Put(SIM_ID, simId);
     int32_t result = dataShareHelper->Update(resetApnUri, predicates, values);
     dataShareHelper->Release();
     return result >= 0;
@@ -101,7 +99,7 @@ bool CellularDataRdbHelper::QueryApns(
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(PdpProfileData::MCCMNC, mcc + mnc);
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
-    Uri cellularDataUri(static_cast<std::string>(CELLULAR_DATA_RDB_SELECTION) + std::to_string(simId));
+    Uri cellularDataUri(static_cast<std::string>(CELLULAR_DATA_RDB_SELECTION) + "?Proxy=true&simId=" + std::to_string(simId));
     std::shared_ptr<DataShare::DataShareResultSet> result =
         dataShareHelper->Query(cellularDataUri, predicates, columns);
     if (result == nullptr) {
@@ -133,7 +131,7 @@ bool CellularDataRdbHelper::QueryMvnoApnsByType(const std::string &mcc, const st
     predicates.EqualTo(PdpProfileData::MVNO_TYPE, mvnoType)
         ->EqualTo(PdpProfileData::MCCMNC, mcc + mnc);
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
-    Uri cellularDataUri(static_cast<std::string>(CELLULAR_DATA_RDB_SELECTION) + std::to_string(simId));
+    Uri cellularDataUri(static_cast<std::string>(CELLULAR_DATA_RDB_SELECTION) + "?Proxy=true&simId=" + std::to_string(simId));
     std::shared_ptr<DataShare::DataShareResultSet> result =
         dataShareHelper->Query(cellularDataUri, predicates, columns);
     if (result == nullptr) {
@@ -141,7 +139,7 @@ bool CellularDataRdbHelper::QueryMvnoApnsByType(const std::string &mcc, const st
         dataShareHelper->Release();
         return false;
     }
-    ReadMvnoApnResult(result, mvnoDataFromSim, mvnoApnVec);
+    ReadMvnoApnResult(result, mvnoDataFromSim, mvnoApnVec);`
     result->Close();
     dataShareHelper->Release();
     return true;
@@ -283,8 +281,10 @@ void CellularDataRdbHelper::RegisterObserver(const sptr<AAFwk::IDataAbilityObser
     }
     Uri preferApnUri(CELLULAR_DATA_RDB_PREFER);
     Uri resetApnUri(CELLULAR_DATA_RDB_RESET);
+    Uri initApnUri(CELLULAR_DATA_RDB_INIT);
     dataShareHelper->RegisterObserver(resetApnUri, dataObserver);
     dataShareHelper->RegisterObserver(preferApnUri, dataObserver);
+    dataShareHelper->RegisterObserver(initApnUri, dataObserver);
     dataShareHelper->RegisterObserver(cellularDataUri_, dataObserver);
     dataShareHelper->Release();
     TELEPHONY_LOGI("RegisterObserver Success");
@@ -299,8 +299,10 @@ void CellularDataRdbHelper::UnRegisterObserver(const sptr<AAFwk::IDataAbilityObs
     }
     Uri preferApnUri(CELLULAR_DATA_RDB_PREFER);
     Uri resetApnUri(CELLULAR_DATA_RDB_RESET);
+    Uri initApnUri(CELLULAR_DATA_RDB_INIT);
     dataShareHelper->UnregisterObserver(resetApnUri, dataObserver);
     dataShareHelper->UnregisterObserver(preferApnUri, dataObserver);
+    dataShareHelper->UnregisterObserver(initApnUri, dataObserver);
     dataShareHelper->UnregisterObserver(cellularDataUri_, dataObserver);
     dataShareHelper->Release();
     TELEPHONY_LOGI("UnRegisterObserver Success");
