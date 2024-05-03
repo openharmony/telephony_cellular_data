@@ -81,7 +81,7 @@ bool CellularDataRdbHelper::ResetApns(int32_t slotId)
     Uri resetApnUri(static_cast<std::string>(CELLULAR_DATA_RDB_RESET));
     DataShare::DataSharePredicates predicates;
     DataShare::DataShareValuesBucket values;
-    value.Put(SIM_ID, simId);
+    values.Put(SIM_ID, simId);
     int32_t result = dataShareHelper->Update(resetApnUri, predicates, values);
     dataShareHelper->Release();
     return result >= 0;
@@ -139,7 +139,7 @@ bool CellularDataRdbHelper::QueryMvnoApnsByType(const std::string &mcc, const st
         dataShareHelper->Release();
         return false;
     }
-    ReadMvnoApnResult(result, mvnoDataFromSim, mvnoApnVec);`
+    ReadMvnoApnResult(result, mvnoDataFromSim, mvnoApnVec);
     result->Close();
     dataShareHelper->Release();
     return true;
