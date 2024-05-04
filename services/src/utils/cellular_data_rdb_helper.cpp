@@ -19,7 +19,7 @@
 #include "core_manager_inner.h"
 #include "telephony_log_wrapper.h"
 
-static constexpr const char *SIM_ID = "sim_id";
+static constexpr const char *SIM_ID = "simId";
 namespace OHOS {
 namespace Telephony {
 CellularDataRdbHelper::CellularDataRdbHelper() : cellularDataUri_(CELLULAR_DATA_RDB_SELECTION) {}
