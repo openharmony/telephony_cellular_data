@@ -45,7 +45,8 @@ void DataServiceExtWrapper::InitDataServiceExtWrapper()
         return;
     }
 
-    requestTcpAndDnsPackets_ = (REQUEST_TCP_AND_DNS_PACKETS)dlsym(DataServiceExtWrapperHandle_, "SendGetTcpSumToKernel");
+    requestTcpAndDnsPackets_ = (REQUEST_TCP_AND_DNS_PACKETS)dlsym(DataServiceExtWrapperHandle_,
+        "SendTcpPktCollecToKernel");
     // Check whether all function pointers are empty.
     if (requestTcpAndDnsPackets_ == nullptr) {
         TELEPHONY_LOGE("data service ext wrapper symbol failed, error: %{public}s", dlerror());
