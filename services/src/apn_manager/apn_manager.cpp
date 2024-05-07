@@ -25,7 +25,9 @@
 
 namespace OHOS {
 namespace Telephony {
-const std::map<std::string, int32_t> ApnManager::apnIdApnNameMap_{{DATA_CONTEXT_ROLE_ALL, DATA_CONTEXT_ROLE_ALL_ID},
+const std::map<std::string, int32_t> ApnManager::apnIdApnNameMap_
+{
+    {DATA_CONTEXT_ROLE_ALL, DATA_CONTEXT_ROLE_ALL_ID},
     {DATA_CONTEXT_ROLE_DEFAULT, DATA_CONTEXT_ROLE_DEFAULT_ID},
     {DATA_CONTEXT_ROLE_MMS, DATA_CONTEXT_ROLE_MMS_ID},
     {DATA_CONTEXT_ROLE_SUPL, DATA_CONTEXT_ROLE_SUPL_ID},
@@ -34,7 +36,8 @@ const std::map<std::string, int32_t> ApnManager::apnIdApnNameMap_{{DATA_CONTEXT_
     {DATA_CONTEXT_ROLE_IA, DATA_CONTEXT_ROLE_IA_ID},
     {DATA_CONTEXT_ROLE_EMERGENCY, DATA_CONTEXT_ROLE_EMERGENCY_ID},
     {DATA_CONTEXT_ROLE_INTERNAL_DEFAULT, DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID},
-    {DATA_CONTEXT_ROLE_XCAP, DATA_CONTEXT_ROLE_XCAP_ID}};
+    {DATA_CONTEXT_ROLE_XCAP, DATA_CONTEXT_ROLE_XCAP_ID}
+};
 constexpr const char *CT_MCC_MNC_1 = "46003";
 constexpr const char *CT_MCC_MNC_2 = "46011";
 constexpr const char *GC_ICCID = "8985231";
