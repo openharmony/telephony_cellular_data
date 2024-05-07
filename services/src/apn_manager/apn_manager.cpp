@@ -171,7 +171,8 @@ void ApnManager::AddApnHolder(const std::string &apnType, const int32_t priority
     apnHolders_.push_back(apnHolder);
     apnIdApnHolderMap_.insert(std::pair<int32_t, sptr<ApnHolder>>(apnId, apnHolder));
     sortedApnHolders_.emplace_back(apnHolder);
-    sort(sortedApnHolders_.begin(), sortedApnHolders_.end(), [](const sptr<ApnHolder> &c1, const sptr<ApnHolder> &c2) {
+    sort(sortedApnHolders_.begin(), sortedApnHolders_.end(),
+        [](const sptr<ApnHolder> &c1, const sptr<ApnHolder> &c2) {
         if (c1 == nullptr || c2 == nullptr) {
             return 0;
         }
@@ -309,7 +310,7 @@ void ApnManager::GetCTOperator(int32_t slotId, std::string &numeric)
         if (!iccId.compare(0, ICCID_LEN_MINIMUM, GC_ICCID) || !spn.compare(GC_SPN)) {
             numeric = GC_MCC_MNC;
         } else if (!iccId.compare(0, ICCID_LEN_MINIMUM, MO_ICCID_1) ||
-                   !iccId.compare(0, ICCID_LEN_MINIMUM, MO_ICCID_2)) {
+            !iccId.compare(0, ICCID_LEN_MINIMUM, MO_ICCID_2)) {
             std::u16string tempPlmn;
             CoreManagerInner::GetInstance().GetSimOperatorNumeric(slotId, tempPlmn);
             std::string plmn = Str16ToStr8(tempPlmn);
@@ -363,9 +364,7 @@ int32_t ApnManager::MakeSpecificApnItem(std::vector<PdpProfile> &apnVec)
     int32_t count = 0;
     for (PdpProfile &apnData : apnVec) {
         TELEPHONY_LOGI("profileId = %{public}d, profileName = %{public}s, mvnoType = %{public}s",
-            apnData.profileId,
-            apnData.profileName.c_str(),
-            apnData.mvnoType.c_str());
+            apnData.profileId, apnData.profileName.c_str(), apnData.mvnoType.c_str());
         if (apnData.profileId == preferId_ && apnData.apnTypes.empty()) {
             apnData.apnTypes = DATA_CONTEXT_ROLE_DEFAULT;
         }
@@ -376,9 +375,8 @@ int32_t ApnManager::MakeSpecificApnItem(std::vector<PdpProfile> &apnVec)
         }
     }
     int32_t preferId = preferId_;
-    auto it = std::find_if(allApnItem_.begin(), allApnItem_.end(), [preferId](auto &apn) {
-        return apn != nullptr && apn->attr_.profileId_ == preferId;
-    });
+    auto it = std::find_if(allApnItem_.begin(), allApnItem_.end(),
+        [preferId](auto &apn) { return apn != nullptr && apn->attr_.profileId_ == preferId; });
     if (it != allApnItem_.end()) {
         sptr<ApnItem> apnItem = *it;
         allApnItem_.erase(it);
@@ -490,7 +488,8 @@ ApnProfileState ApnManager::GetOverallDefaultApnState() const
             internalApnState = static_cast<int32_t>(apnHolder->GetApnState());
         }
     }
-    TELEPHONY_LOGI("defaultApnState is %{public}d, internalApnState is %{public}d", defaultApnState, internalApnState);
+    TELEPHONY_LOGI("defaultApnState is %{public}d, internalApnState is %{public}d", defaultApnState,
+        internalApnState);
     return defaultApnState > internalApnState ? static_cast<ApnProfileState>(defaultApnState)
                                               : static_cast<ApnProfileState>(internalApnState);
 }
