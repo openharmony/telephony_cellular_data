@@ -182,11 +182,13 @@ static constexpr const char *DEFAULT_HOSTNAME = "";
 static constexpr const char *DEFAULT_MASK = "";
 static constexpr const char *CELLULAR_DATA_RDB_URI = "datashare:///com.ohos.pdpprofileability";
 static constexpr const char *CELLULAR_DATA_RDB_SELECTION =
-    "datashare:///com.ohos.pdpprofileability/net/pdp_profile?simId=";
+    "datashare:///com.ohos.pdpprofileability/net/pdp_profile";
 static constexpr const char *CELLULAR_DATA_RDB_RESET =
-    "datashare:///com.ohos.pdpprofileability/net/pdp_profile/reset?simId=";
+    "datashare:///com.ohos.pdpprofileability/net/pdp_profile/reset";
 static constexpr const char *CELLULAR_DATA_RDB_PREFER =
     "datashare:///com.ohos.pdpprofileability/net/pdp_profile/preferapn";
+static constexpr const char *CELLULAR_DATA_RDB_INIT =
+    "datashare:///com.ohos.pdpprofileability/net/pdp_profile/init";
 static constexpr const char *CELLULAR_DATA_SETTING_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
 static constexpr const char *CELLULAR_DATA_SETTING_DATA_ENABLE_URI =

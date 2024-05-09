@@ -47,9 +47,8 @@ public:
 
 private:
     std::shared_ptr<DataShare::DataShareHelper> CreateDataAbilityHelper();
-    int Update(const DataShare::DataShareValuesBucket &value, const DataShare::DataSharePredicates &predicates,
-        int32_t slotId);
-    int Insert(const DataShare::DataShareValuesBucket &values, int32_t slotId);
+    int Update(const DataShare::DataShareValuesBucket &value, const DataShare::DataSharePredicates &predicates);
+    int Insert(const DataShare::DataShareValuesBucket &values);
     void ReadApnResult(const std::shared_ptr<DataShare::DataShareResultSet> &result, std::vector<PdpProfile> &apnVec);
     void ReadMvnoApnResult(const std::shared_ptr<DataShare::DataShareResultSet> &result,
         const std::string &mvnoDataFromSim, std::vector<PdpProfile> &apnVec);
