@@ -98,6 +98,9 @@ void CellularDataClient::OnRemoteDied(const wptr<IRemoteObject> &remote)
     if ((serviceRemote != nullptr) && (serviceRemote == remote.promote())) {
         serviceRemote->RemoveDeathRecipient(deathRecipient_);
         proxy_ = nullptr;
+        defaultCellularDataSlotId_ = INVALID_MAIN_CARD_SLOTID;
+        defaultCellularDataSimId_ = 0;
+        registerStatus_ = false;
         TELEPHONY_LOGE("on remote died");
     }
 }
