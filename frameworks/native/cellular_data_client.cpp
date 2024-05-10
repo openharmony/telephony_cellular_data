@@ -382,5 +382,20 @@ int32_t CellularDataClient::GetIntelligenceSwitchState(bool &switchState)
     }
     return proxy->GetIntelligenceSwitchState(switchState);
 }
+
+bool CellularDataClient::IsCellularDataSysAbilityExist(sptr<IRemoteObject> &object) __attribute__((no_sanitize("cfi")))
+{
+    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (sm == nullptr) {
+        TELEPHONY_LOGE("IsCellularDataSysAbilityExist Get ISystemAbilityManager failed, no SystemAbilityManager");
+        return false;
+    }
+    object = sm->CheckSystemAbility(TELEPHONY_CELLULAR_DATA_SYS_ABILITY_ID);
+    if (object == nullptr) {
+        TELEPHONY_LOGE("No CesServiceAbility");
+        return false;
+    }
+    return true;
+}
 } // namespace Telephony
 } // namespace OHOS
