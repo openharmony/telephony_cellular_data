@@ -57,13 +57,8 @@ sptr<ICellularDataManager> CellularDataClient::GetProxy()
         return proxy_;
     }
 
-    sptr<ISystemAbilityManager> sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (sam == nullptr) {
-        TELEPHONY_LOGE("Failed to get system ability manager");
-        return nullptr;
-    }
-    sptr<IRemoteObject> obj = sam->CheckSystemAbility(TELEPHONY_CELLULAR_DATA_SYS_ABILITY_ID);
-    if (obj == nullptr) {
+    sptr<IRemoteObject> obj;
+    if (IsCellularDataSysAbilityExist(obj)) {
         TELEPHONY_LOGE("Failed to get cellular data service");
         return nullptr;
     }
