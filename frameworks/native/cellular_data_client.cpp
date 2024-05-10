@@ -58,7 +58,7 @@ sptr<ICellularDataManager> CellularDataClient::GetProxy()
     }
 
     sptr<IRemoteObject> obj;
-    if (IsCellularDataSysAbilityExist(obj)) {
+    if (!IsCellularDataSysAbilityExist(obj)) {
         TELEPHONY_LOGE("Failed to get cellular data service");
         return nullptr;
     }
