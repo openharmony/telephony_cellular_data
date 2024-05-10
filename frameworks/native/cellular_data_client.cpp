@@ -57,7 +57,7 @@ sptr<ICellularDataManager> CellularDataClient::GetProxy()
         return proxy_;
     }
 
-    if (IsCommonEventServiceAbilityExist()) {
+    if (IsCellularDataSysAbilityExist()) {
         TELEPHONY_LOGE("Failed to get cellular data service");
         return nullptr;
     }
