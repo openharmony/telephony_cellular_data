@@ -57,7 +57,8 @@ sptr<ICellularDataManager> CellularDataClient::GetProxy()
         return proxy_;
     }
 
-    if (IsCellularDataSysAbilityExist()) {
+    sptr<IRemoteObject> obj;
+    if (IsCellularDataSysAbilityExist(obj)) {
         TELEPHONY_LOGE("Failed to get cellular data service");
         return nullptr;
     }
@@ -362,15 +363,15 @@ int32_t CellularDataClient::IsNeedDoRecovery(int32_t slotId, bool needDoRecovery
     return proxy->IsNeedDoRecovery(slotId, needDoRecovery);
 }
 
-bool CellularDataClient::IsCellularDataSysAbilityExist() __attribute__((no_sanitize("cfi")))
+bool CellularDataClient::IsCellularDataSysAbilityExist(sptr<IRemoteObject> &object) __attribute__((no_sanitize("cfi")))
 {
     sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sm == nullptr) {
         TELEPHONY_LOGE("IsCellularDataSysAbilityExist Get ISystemAbilityManager failed, no SystemAbilityManager");
         return false;
     }
-    sptr<IRemoteObject> remote = sm->CheckSystemAbility(TELEPHONY_CELLULAR_DATA_SYS_ABILITY_ID);
-    if (remote == nullptr) {
+    object = sm->CheckSystemAbility(TELEPHONY_CELLULAR_DATA_SYS_ABILITY_ID);
+    if (object == nullptr) {
         TELEPHONY_LOGE("No TcdServiceAbility");
         return false;
     }
