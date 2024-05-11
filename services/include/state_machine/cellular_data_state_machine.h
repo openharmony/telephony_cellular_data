@@ -47,6 +47,10 @@ public:
     ~CellularDataStateMachine() = default;
     bool operator==(const CellularDataStateMachine &stateMachine) const;
     bool IsInactiveState() const;
+    bool IsActivatingState() const;
+    bool IsDisconnectingState() const;
+    bool IsActiveState() const;
+    bool IsDefaultState() const;
     sptr<State> GetCurrentState() const;
     void SetCapability(uint64_t capability);
     uint64_t GetCapability() const;

@@ -35,7 +35,7 @@ public:
     std::vector<sptr<ApnHolder>> GetAllApnHolder() const;
     std::vector<sptr<ApnHolder>> GetSortApnHolder() const;
     void CreateAllApnItem();
-    std::vector<sptr<ApnItem>> FilterMatchedApns(const std::string &requestApnType);
+    std::vector<sptr<ApnItem>> FilterMatchedApns(const std::string &requestApnType, const int32_t slotId);
     void InitApnHolders();
     sptr<ApnHolder> FindApnHolderById(const int32_t id) const;
     static int32_t FindApnIdByApnName(const std::string &type);
@@ -49,6 +49,8 @@ public:
     ApnProfileState GetOverallDefaultApnState() const;
     sptr<ApnItem> GetRilAttachApn();
     bool ResetApns(int32_t slotId);
+    void FetchDunApns(std::vector<sptr<ApnItem>> &matchApnItemList, const int32_t slotId);
+    bool IsPreferredApnUserEdited();
 
 private:
     void AddApnHolder(const std::string &apnType, const int32_t priority);

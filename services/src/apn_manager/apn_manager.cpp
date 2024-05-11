@@ -25,16 +25,18 @@
 
 namespace OHOS {
 namespace Telephony {
-const std::map<std::string, int32_t> ApnManager::apnIdApnNameMap_ {
-    {DATA_CONTEXT_ROLE_ALL,       DATA_CONTEXT_ROLE_ALL_ID},
-    {DATA_CONTEXT_ROLE_DEFAULT,   DATA_CONTEXT_ROLE_DEFAULT_ID},
-    {DATA_CONTEXT_ROLE_MMS,       DATA_CONTEXT_ROLE_MMS_ID},
-    {DATA_CONTEXT_ROLE_SUPL,      DATA_CONTEXT_ROLE_SUPL_ID},
-    {DATA_CONTEXT_ROLE_DUN,       DATA_CONTEXT_ROLE_DUN_ID},
-    {DATA_CONTEXT_ROLE_IMS,       DATA_CONTEXT_ROLE_IMS_ID},
-    {DATA_CONTEXT_ROLE_IA,        DATA_CONTEXT_ROLE_IA_ID},
+const std::map<std::string, int32_t> ApnManager::apnIdApnNameMap_
+{
+    {DATA_CONTEXT_ROLE_ALL, DATA_CONTEXT_ROLE_ALL_ID},
+    {DATA_CONTEXT_ROLE_DEFAULT, DATA_CONTEXT_ROLE_DEFAULT_ID},
+    {DATA_CONTEXT_ROLE_MMS, DATA_CONTEXT_ROLE_MMS_ID},
+    {DATA_CONTEXT_ROLE_SUPL, DATA_CONTEXT_ROLE_SUPL_ID},
+    {DATA_CONTEXT_ROLE_DUN, DATA_CONTEXT_ROLE_DUN_ID},
+    {DATA_CONTEXT_ROLE_IMS, DATA_CONTEXT_ROLE_IMS_ID},
+    {DATA_CONTEXT_ROLE_IA, DATA_CONTEXT_ROLE_IA_ID},
     {DATA_CONTEXT_ROLE_EMERGENCY, DATA_CONTEXT_ROLE_EMERGENCY_ID},
-    {DATA_CONTEXT_ROLE_INTERNAL_DEFAULT, DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID}
+    {DATA_CONTEXT_ROLE_INTERNAL_DEFAULT, DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID},
+    {DATA_CONTEXT_ROLE_XCAP, DATA_CONTEXT_ROLE_XCAP_ID}
 };
 constexpr const char *CT_MCC_MNC_1 = "46003";
 constexpr const char *CT_MCC_MNC_2 = "46011";
@@ -55,6 +57,10 @@ void ApnManager::InitApnHolders()
     AddApnHolder(DATA_CONTEXT_ROLE_DEFAULT, static_cast<int32_t>(DataContextPriority::PRIORITY_LOW));
     AddApnHolder(DATA_CONTEXT_ROLE_MMS, static_cast<int32_t>(DataContextPriority::PRIORITY_NORMAL));
     AddApnHolder(DATA_CONTEXT_ROLE_INTERNAL_DEFAULT, static_cast<int32_t>(DataContextPriority::PRIORITY_LOW));
+    AddApnHolder(DATA_CONTEXT_ROLE_XCAP, static_cast<int32_t>(DataContextPriority::PRIORITY_NORMAL));
+    AddApnHolder(DATA_CONTEXT_ROLE_DUN, static_cast<int32_t>(DataContextPriority::PRIORITY_NORMAL));
+    AddApnHolder(DATA_CONTEXT_ROLE_IA, static_cast<int32_t>(DataContextPriority::PRIORITY_HIGH));
+    AddApnHolder(DATA_CONTEXT_ROLE_SUPL, static_cast<int32_t>(DataContextPriority::PRIORITY_NORMAL));
 }
 
 sptr<ApnHolder> ApnManager::FindApnHolderById(const int32_t id) const
@@ -104,6 +110,14 @@ int32_t ApnManager::FindApnIdByCapability(const uint64_t capability)
             return DATA_CONTEXT_ROLE_MMS_ID;
         case NetManagerStandard::NetCap::NET_CAPABILITY_INTERNAL_DEFAULT:
             return DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID;
+        case NetManagerStandard::NetCap::NET_CAPABILITY_IA:
+            return DATA_CONTEXT_ROLE_IA_ID;
+        case NetManagerStandard::NetCap::NET_CAPABILITY_XCAP:
+            return DATA_CONTEXT_ROLE_XCAP_ID;
+        case NetManagerStandard::NetCap::NET_CAPABILITY_SUPL:
+            return DATA_CONTEXT_ROLE_SUPL_ID;
+        case NetManagerStandard::NetCap::NET_CAPABILITY_DUN:
+            return DATA_CONTEXT_ROLE_DUN_ID;
         default:
             return DATA_CONTEXT_ROLE_INVALID_ID;
     }
@@ -126,6 +140,18 @@ NetManagerStandard::NetCap ApnManager::FindBestCapability(const uint64_t capabil
     if (HasNetCap(capabilities, NetManagerStandard::NetCap::NET_CAPABILITY_MMS)) {
         netCap = NetManagerStandard::NetCap::NET_CAPABILITY_MMS;
     }
+    if (HasNetCap(capabilities, NetManagerStandard::NetCap::NET_CAPABILITY_SUPL)) {
+        netCap = NetManagerStandard::NetCap::NET_CAPABILITY_SUPL;
+    }
+    if (HasNetCap(capabilities, NetManagerStandard::NetCap::NET_CAPABILITY_DUN)) {
+        netCap = NetManagerStandard::NetCap::NET_CAPABILITY_DUN;
+    }
+    if (HasNetCap(capabilities, NetManagerStandard::NetCap::NET_CAPABILITY_XCAP)) {
+        netCap = NetManagerStandard::NetCap::NET_CAPABILITY_XCAP;
+    }
+    if (HasNetCap(capabilities, NetManagerStandard::NetCap::NET_CAPABILITY_IA)) {
+        netCap = NetManagerStandard::NetCap::NET_CAPABILITY_IA;
+    }
     return netCap;
 }
 
@@ -147,11 +173,11 @@ void ApnManager::AddApnHolder(const std::string &apnType, const int32_t priority
     sortedApnHolders_.emplace_back(apnHolder);
     sort(sortedApnHolders_.begin(), sortedApnHolders_.end(),
         [](const sptr<ApnHolder> &c1, const sptr<ApnHolder> &c2) {
-            if (c1 == nullptr || c2 == nullptr) {
-                return 0;
-            }
-            return c2->GetPriority() - c1->GetPriority();
-        });
+        if (c1 == nullptr || c2 == nullptr) {
+            return 0;
+        }
+        return c2->GetPriority() - c1->GetPriority();
+    });
     TELEPHONY_LOGI("The Apn holder type:%{public}s, size:%{public}zu", apnType.c_str(), sortedApnHolders_.size());
 }
 
@@ -215,6 +241,10 @@ void ApnManager::CreateAllApnItem()
     auto internalDefaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_INTERNAL_DEFAULT);
     if (internalDefaultApnItem != nullptr) {
         allApnItem_.push_back(internalDefaultApnItem);
+    }
+    auto xcapApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_XCAP);
+    if (xcapApnItem != nullptr) {
+        allApnItem_.push_back(xcapApnItem);
     }
 }
 
@@ -333,8 +363,8 @@ int32_t ApnManager::MakeSpecificApnItem(std::vector<PdpProfile> &apnVec)
     allApnItem_.clear();
     int32_t count = 0;
     for (PdpProfile &apnData : apnVec) {
-        TELEPHONY_LOGI("profileId = %{public}d, profileName = %{public}s, mvnoType = %{public}s", apnData.profileId,
-            apnData.profileName.c_str(), apnData.mvnoType.c_str());
+        TELEPHONY_LOGI("profileId = %{public}d, profileName = %{public}s, mvnoType = %{public}s",
+            apnData.profileId, apnData.profileName.c_str(), apnData.mvnoType.c_str());
         if (apnData.profileId == preferId_ && apnData.apnTypes.empty()) {
             apnData.apnTypes = DATA_CONTEXT_ROLE_DEFAULT;
         }
@@ -355,10 +385,14 @@ int32_t ApnManager::MakeSpecificApnItem(std::vector<PdpProfile> &apnVec)
     return count;
 }
 
-std::vector<sptr<ApnItem>> ApnManager::FilterMatchedApns(const std::string &requestApnType)
+std::vector<sptr<ApnItem>> ApnManager::FilterMatchedApns(const std::string &requestApnType, const int32_t slotId)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     std::vector<sptr<ApnItem>> matchApnItemList;
+    if (requestApnType == DATA_CONTEXT_ROLE_DUN) {
+        FetchDunApns(matchApnItemList, slotId);
+        return matchApnItemList;
+    }
     for (const sptr<ApnItem> &apnItem : allApnItem_) {
         if (apnItem->CanDealWithType(requestApnType)) {
             matchApnItemList.push_back(apnItem);
@@ -454,11 +488,10 @@ ApnProfileState ApnManager::GetOverallDefaultApnState() const
             internalApnState = static_cast<int32_t>(apnHolder->GetApnState());
         }
     }
-    TELEPHONY_LOGI("defaultApnState is %{public}d, internalApnState is %{public}d",
-        defaultApnState, internalApnState);
-    return defaultApnState > internalApnState ?
-                static_cast<ApnProfileState>(defaultApnState) :
-                static_cast<ApnProfileState>(internalApnState);
+    TELEPHONY_LOGI("defaultApnState is %{public}d, internalApnState is %{public}d", defaultApnState,
+        internalApnState);
+    return defaultApnState > internalApnState ? static_cast<ApnProfileState>(defaultApnState)
+                                              : static_cast<ApnProfileState>(internalApnState);
 }
 
 sptr<ApnItem> ApnManager::GetRilAttachApn()
@@ -493,5 +526,45 @@ bool ApnManager::ResetApns(int32_t slotId)
     }
     return helper->ResetApns(slotId);
 }
-} // namespace Telephony
-} // namespace OHOS
+
+void ApnManager::FetchDunApns(std::vector<sptr<ApnItem>> &matchApnItemList, const int32_t slotId)
+{
+    bool roamingState = CoreManagerInner::GetInstance().GetPsRoamingState(slotId) > 0;
+    if (roamingState && !IsPreferredApnUserEdited()) {
+        TELEPHONY_LOGI("FetchDunApns: Dun apn is not used in roaming network");
+        return;
+    }
+    int32_t preferId = preferId_;
+    sptr<ApnItem> preferredApn = nullptr;
+    auto it = std::find_if(allApnItem_.begin(), allApnItem_.end(), [preferId](auto &apn) {
+        return apn != nullptr && apn->attr_.profileId_ == preferId;
+    });
+    if (it != allApnItem_.end()) {
+        preferredApn = *it;
+    }
+    if (preferredApn != nullptr && preferredApn->CanDealWithType(DATA_CONTEXT_ROLE_DUN)) {
+        matchApnItemList.insert(matchApnItemList.begin(), preferredApn);
+    }
+    if (matchApnItemList.empty()) {
+        for (const auto &item : allApnItem_) {
+            if (item->CanDealWithType(DATA_CONTEXT_ROLE_DUN)) {
+                matchApnItemList.push_back(item);
+            }
+        }
+    }
+}
+
+bool ApnManager::IsPreferredApnUserEdited()
+{
+    bool isUserEdited = false;
+    int32_t preferId = preferId_;
+    auto it = std::find_if(allApnItem_.begin(), allApnItem_.end(), [preferId](auto &apn) {
+        return apn->attr_.profileId_ == preferId;
+    });
+    if (it != allApnItem_.end() && *it != nullptr) {
+        isUserEdited = (*it)->attr_.isEdited_;
+    }
+    return isUserEdited;
+}
+}  // namespace Telephony
+}  // namespace OHOS

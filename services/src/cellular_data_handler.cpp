@@ -592,7 +592,7 @@ bool CellularDataHandler::CheckApnState(sptr<ApnHolder> &apnHolder)
         TELEPHONY_LOGI("Slot%{public}d: APN holder is not idle", slotId_);
         return false;
     }
-    std::vector<sptr<ApnItem>> matchedApns = apnManager_->FilterMatchedApns(apnHolder->GetApnType());
+    std::vector<sptr<ApnItem>> matchedApns = apnManager_->FilterMatchedApns(apnHolder->GetApnType(), slotId_);
     if (matchedApns.empty()) {
         TELEPHONY_LOGE("Slot%{public}d: AttemptEstablishDataConnection:matchedApns is empty", slotId_);
         return false;
@@ -659,32 +659,44 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
         TELEPHONY_LOGE("Slot%{public}d: apnItem is null", slotId_);
         return false;
     }
-    if (IsSingleConnectionEnabled(radioTech)) {
-        if (HasAnyHigherPriorityConnection(apnHolder)) {
-            TELEPHONY_LOGE("Slot%{public}d: has higher priority connection", slotId_);
-            return false;
-        }
-        ApnProfileState apnState = apnManager_->GetOverallApnState();
-        if (apnState == ApnProfileState::PROFILE_STATE_CONNECTING ||
-            apnState == ApnProfileState::PROFILE_STATE_CONNECTED) {
-            ClearAllConnections(DisConnectionReason::REASON_CHANGE_CONNECTION);
-            return false;
+    std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine = nullptr;
+    if (apnHolder->GetApnType() != DATA_CONTEXT_ROLE_DUN) {
+        cellularDataStateMachine = CheckForCompatibleDataConnection(apnHolder);
+        if (cellularDataStateMachine != nullptr) {
+            sptr<ApnItem> dcApnItem = cellularDataStateMachine->GetApnItem();
+            if (dcApnItem != nullptr) {
+                apnItem = dcApnItem;
+            }
         }
     }
-    std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine = FindIdleCellularDataConnection();
     if (cellularDataStateMachine == nullptr) {
-        cellularDataStateMachine = CreateCellularDataConnect();
+        if (IsSingleConnectionEnabled(radioTech)) {
+            if (HasAnyHigherPriorityConnection(apnHolder)) {
+                TELEPHONY_LOGE("Slot%{public}d: has higher priority connection", slotId_);
+                return false;
+            }
+            ApnProfileState apnState = apnManager_->GetOverallApnState();
+            if (apnState == ApnProfileState::PROFILE_STATE_CONNECTING ||
+                apnState == ApnProfileState::PROFILE_STATE_CONNECTED) {
+                ClearAllConnections(DisConnectionReason::REASON_CHANGE_CONNECTION);
+                return false;
+            }
+        }
+        cellularDataStateMachine = FindIdleCellularDataConnection();
         if (cellularDataStateMachine == nullptr) {
-            TELEPHONY_LOGE("Slot%{public}d: cellularDataStateMachine is null", slotId_);
-            return false;
+            cellularDataStateMachine = CreateCellularDataConnect();
+            if (cellularDataStateMachine == nullptr) {
+                TELEPHONY_LOGE("Slot%{public}d: cellularDataStateMachine is null", slotId_);
+                return false;
+            }
+            cellularDataStateMachine->Init();
+            if (connectionManager_ == nullptr) {
+                TELEPHONY_LOGE("Slot%{public}d: connectionManager_ is null", slotId_);
+                return false;
+            }
+            connectionManager_->AddConnectionStateMachine(cellularDataStateMachine);
         }
-        cellularDataStateMachine->Init();
-        if (connectionManager_ == nullptr) {
-            TELEPHONY_LOGE("Slot%{public}d: connectionManager_ is null", slotId_);
-            return false;
-        }
-        connectionManager_->AddConnectionStateMachine(cellularDataStateMachine);
-    }
+    }    
     cellularDataStateMachine->SetCapability(apnHolder->GetCapability());
     apnHolder->SetCurrentApn(apnItem);
     apnHolder->SetApnState(PROFILE_STATE_CONNECTING);
@@ -1351,7 +1363,7 @@ void CellularDataHandler::ClearConnectionIfRequired()
         }
         ApnProfileState apnState = apnHolder->GetApnState();
         std::string apnType = apnHolder->GetApnType();
-        std::vector<sptr<ApnItem>> matchedApns = apnManager_->FilterMatchedApns(apnType);
+        std::vector<sptr<ApnItem>> matchedApns = apnManager_->FilterMatchedApns(apnType, slotId_);
         if (matchedApns.empty()) {
             TELEPHONY_LOGE("Slot%{public}d: matchedApns is empty", slotId_);
             continue;
@@ -2022,6 +2034,65 @@ bool CellularDataHandler::GetSmartSwitchState()
         return false;
     }
     return isIntelliSwitchEnabled;
+}
+
+std::shared_ptr<CellularDataStateMachine> CellularDataHandler::CheckForCompatibleDataConnection(
+    sptr<ApnHolder> &apnHolder)
+{
+    std::shared_ptr<CellularDataStateMachine> potentialDc = nullptr;
+    if (apnHolder == nullptr || apnManager_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: CheckForCompatibleDataConnection failed, apnHolder or apnManager_null",
+            slotId_);
+        return potentialDc;
+    }
+    std::vector<sptr<ApnItem>> dunApnList;
+    if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DUN) {
+        apnManager_->FetchDunApns(dunApnList, slotId_);
+    }
+    if (dunApnList.size() == 0) {
+        return potentialDc;
+    }
+    if (connectionManager_ == nullptr) {
+        return potentialDc;
+    }
+    auto allDCs = connectionManager_->GetAllConnectionMachine();
+    bool isRoaming = false;
+    int32_t result = IsCellularDataRoamingEnabled(isRoaming);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        isRoaming = false;
+    }
+    for(const auto& curDc : allDCs) {
+        sptr<ApnItem> apnItem = curDc->GetApnItem();
+        for(const auto& dunItem : dunApnList) {
+            if (!apnHolder->IsCompatibleApnItem(apnItem, dunItem, isRoaming)) {
+                continue;
+            }
+            if (curDc->IsActiveState()) {
+                return curDc;
+            } else if (curDc->IsActivatingState()) {
+                potentialDc = curDc;
+            } else if (curDc->IsDisconnectingState()) {
+                if (potentialDc == nullptr) {
+                    potentialDc = curDc;
+                }
+            }
+        }
+    }
+    return potentialDc;
+}
+
+bool CellularDataHandler::IsGsm()
+{
+    bool isGsm = false;
+    CoreManagerInner::GetInstance().IsGsm(slotId_, isGsm);
+    return isGsm;
+}
+
+bool CellularDataHandler::IsCdma()
+{
+    bool isCdma = false;
+    CoreManagerInner::GetInstance().IsCdma(slotId_, isCdma);
+    return isCdma;
 }
 } // namespace Telephony
 } // namespace OHOS
