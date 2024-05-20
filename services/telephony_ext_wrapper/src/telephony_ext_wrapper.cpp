@@ -55,6 +55,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCellularData()
     }
     InitDataEndSelfCure();
     InitIsApnAllowedActive();
+    InitSendDataSwitchChangeInfo();
 }
 
 void TelephonyExtWrapper::InitDataEndSelfCure()
@@ -93,6 +94,17 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForVSim()
         return;
     }
     TELEPHONY_LOGI("[VSIM] telephony ext wrapper init success");
+}
+
+void TelephonyExtWrapper::InitSendDataSwitchChangeInfo()
+{
+    sendDataSwitchChangeInfo_ =
+        (SEND_DATA_SWITCH_CHANGE_INFO)dlsym(telephonyExtWrapperHandle_, "SendDataSwitchChangeInfo");
+    if (sendDataSwitchChangeInfo_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol SendDataSwitchChangeInfo failed, error: %{public}s", dlerror());
+        return;
+    }
+    TELEPHONY_LOGD("telephony ext wrapper init SendDataSwitchChangeInfo success");
 }
 
 } // namespace Telephony
