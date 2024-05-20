@@ -1230,6 +1230,10 @@ HWTEST_F(CellularDataTest, InitCellularDataController_Test_02, TestSize.Level3)
 HWTEST_F(CellularDataTest, InitCellularDataController_Test_03, TestSize.Level3)
 {
     DataAccessToken token;
+    int32_t ret = DelayedRefSingleton<CoreServiceClient>::GetInstance().InitExtraModule(CELLULAR_DATA_VSIM_SLOT_ID);
+    if (ret != TELEPHONY_SUCCESS) {
+        return;
+    }
     int32_t result = CellularDataTest::InitCellularDataController(CELLULAR_DATA_VSIM_SLOT_ID);
     ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
 }
