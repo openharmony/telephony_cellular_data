@@ -34,6 +34,8 @@
 #include "telephony_log_wrapper.h"
 #include "telephony_types.h"
 #include "telephony_ext_wrapper.h"
+#include "telephony_permission.h"
+#include "ipc_skeleton.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -150,6 +152,16 @@ int32_t CellularDataHandler::SetCellularDataEnable(bool userDataOn)
         TELEPHONY_LOGI("Slot%{public}d: The status of the cellular data switch has not changed", slotId_);
         return TELEPHONY_ERR_SUCCESS;
     }
+
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (TELEPHONY_EXT_WRAPPER.sendDataSwitchChangeInfo_) {
+        int32_t callingUid = IPCSkeleton::GetCallingUid();
+        std::string bundleName = "";
+        TelephonyPermission::GetBundleNameByUid(callingUid, bundleName);
+        TELEPHONY_EXT_WRAPPER.sendDataSwitchChangeInfo_(bundleName.c_str(), userDataOn);
+    }
+#endif
+
     return dataSwitchSettings_->SetUserDataOn(userDataOn);
 }
 

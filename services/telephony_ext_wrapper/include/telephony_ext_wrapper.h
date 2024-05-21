@@ -37,12 +37,14 @@ public:
     typedef bool (*CREATE_ALL_APN_ITEM_EXT)(int32_t slotId, sptr<ApnItem> &apnItem);
     typedef bool (*IS_CARD_ALLOW_DATA)(int32_t simId, int32_t capability);
     /* add for vsim end */
+    typedef void (*SEND_DATA_SWITCH_CHANGE_INFO)(const char*, bool);
 
     DATA_EDN_SELF_CURE dataEndSelfCure_ = nullptr;
     IS_APN_ALLOWED_ACTIVE isApnAllowedActive_ = nullptr;
     GET_VSIM_SLOT_ID getVSimSlotId_ = nullptr;
     CREATE_ALL_APN_ITEM_EXT createAllApnItemExt_ = nullptr;
     IS_CARD_ALLOW_DATA isCardAllowData_ = nullptr;
+    SEND_DATA_SWITCH_CHANGE_INFO sendDataSwitchChangeInfo_ = nullptr;
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
     void* telephonyVSimWrapperHandle_ = nullptr;
@@ -51,6 +53,7 @@ private:
     void InitDataEndSelfCure();
     void InitIsApnAllowedActive();
     void InitTelephonyExtWrapperForVSim();
+    void InitSendDataSwitchChangeInfo();
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
