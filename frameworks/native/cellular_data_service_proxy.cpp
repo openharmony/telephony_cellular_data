@@ -387,7 +387,7 @@ int32_t CellularDataServiceProxy::ClearAllConnections(int32_t slotId, DisConnect
     return result;
 }
 
-int32_t CellularDataServiceProxy::RegisterSimAccountCallback(const sptr<SimAccountCallback> &callback)
+int32_t CellularDataServiceProxy::RegisterSimAccountCallback(const sptr<SimAccountCallback> callback)
 {
     if (callback == nullptr) {
         TELEPHONY_LOGE("callback is nullptr!");
@@ -400,7 +400,7 @@ int32_t CellularDataServiceProxy::RegisterSimAccountCallback(const sptr<SimAccou
         TELEPHONY_LOGE("write interface token failed!");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    if (!data.WriteRemoteObject(callback->AsObject().GetRefPtr())) {
+    if (!data.WriteRemoteObject(callback->AsObject())) {
         TELEPHONY_LOGE("write remote object failed!");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }

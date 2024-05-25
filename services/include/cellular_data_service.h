@@ -75,7 +75,7 @@ public:
     int64_t GetSpendTime();
     int32_t GetApnState(int32_t slotId, const std::string &apnType) override;
     int32_t GetDataRecoveryState() override;
-    int32_t RegisterSimAccountCallback(const sptr<SimAccountCallback> &callback) override;
+    int32_t RegisterSimAccountCallback(const sptr<SimAccountCallback> callback) override;
     int32_t UnregisterSimAccountCallback() override;
     int32_t GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr) override;
     int32_t GetDataConnIpType(int32_t slotId, std::string &ipType) override;
