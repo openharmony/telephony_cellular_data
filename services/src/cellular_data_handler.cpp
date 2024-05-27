@@ -858,11 +858,10 @@ void CellularDataHandler::HandleSortConnection()
     if (state == PROFILE_STATE_IDLE || state == PROFILE_STATE_FAILED) {
         for (const sptr<ApnHolder> &sortApnHolder : apnManager_->GetSortApnHolder()) {
             if (sortApnHolder->IsDataCallEnabled()) {
-                int64_t delayTime = sortApnHolder->GetRetryDelay();
                 int32_t apnId = apnManager_->FindApnIdByApnName(sortApnHolder->GetApnType());
                 TELEPHONY_LOGI("Slot%{public}d: HandleSortConnection the apn type is %{public}s", slotId_,
                     sortApnHolder->GetApnType().c_str());
-                SendEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, apnId, delayTime);
+                SendEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, apnId, 0);
                 break;
             }
         }
