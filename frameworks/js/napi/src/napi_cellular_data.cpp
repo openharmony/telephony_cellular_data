@@ -242,6 +242,22 @@ static napi_value IsCellularDataEnabled(napi_env env, napi_callback_info info)
         NativeIsCellularDataEnabled, IsCellularDataEnabledCallback);
 }
 
+static napi_value IsCellularDataEnabledSync(napi_env env, napi_callback_info info)
+{
+    bool isEnabled = false;
+    napi_value value = nullptr;
+    if (IsCellularDataManagerInited()) {
+        auto errorCode = CellularDataClient::GetInstance().IsCellularDataEnabled(isEnabled);
+        if (errorCode != TELEPHONY_SUCCESS) {
+            return value;
+        }
+    } else {
+        return value;
+    }
+    NAPI_CALL(env, napi_create_int32(env, isEnabled, &value));
+    return value;
+}
+
 static void NativeEnableCellularData(napi_env env, void *data)
 {
     auto asyncContext = static_cast<AsyncContext *>(data);
@@ -585,6 +601,34 @@ static napi_value IsCellularDataRoamingEnabled(napi_env env, napi_callback_info 
     }
     return NapiUtil::HandleAsyncWork(env, asyncContext.release(), "IsCellularDataRoamingEnabled",
         NativeIsCellularDataRoamingEnabled, IsCellularDataRoamingEnabledCallback);
+}
+
+static napi_value IsCellularDataRoamingEnabledSync(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 0;
+    napi_value parameters[] = { nullptr };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    int32_t slotId;
+    bool dataRoamingEnabled = false;
+    napi_value value = nullptr;
+    napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
+    napi_get_value_int32(env, parameters[0], &slotId);
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("IsCellularDataRoamingEnabledSync slotId is invalid");
+        return value;
+    }
+    if (IsCellularDataManagerInited()) {
+        auto &dataManager = CellularDataClient::GetInstance();
+        auto errorCode = dataManager.IsCellularDataRoamingEnabled(slotId, dataRoamingEnabled);
+        if (errorCode != TELEPHONY_SUCCESS) {
+            return value;
+        }
+    } else {
+        return value;
+    }
+    NAPI_CALL(env, napi_create_int32(env, dataRoamingEnabled, &value));
+    return value;
 }
 
 static bool MatchGetDefaultCellularDataSlotIdParameters(
@@ -949,11 +993,13 @@ napi_value RegistCellularData(napi_env env, napi_value exports)
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("getCellularDataState", GetCellularDataState),
         DECLARE_NAPI_FUNCTION("isCellularDataEnabled", IsCellularDataEnabled),
+        DECLARE_NAPI_FUNCTION("isCellularDataEnabledSync", IsCellularDataEnabledSync),
         DECLARE_NAPI_FUNCTION("enableCellularData", EnableCellularData),
         DECLARE_NAPI_FUNCTION("disableCellularData", DisableCellularData),
         DECLARE_NAPI_FUNCTION("enableCellularDataRoaming", EnableCellularDataRoaming),
         DECLARE_NAPI_FUNCTION("disableCellularDataRoaming", DisableCellularDataRoaming),
         DECLARE_NAPI_FUNCTION("isCellularDataRoamingEnabled", IsCellularDataRoamingEnabled),
+        DECLARE_NAPI_FUNCTION("isCellularDataRoamingEnabledSync", IsCellularDataRoamingEnabledSync),
         DECLARE_NAPI_FUNCTION("getDefaultCellularDataSlotId", GetDefaultCellularDataSlotId),
         DECLARE_NAPI_FUNCTION("getDefaultCellularDataSimId", GetDefaultCellularDataSimId),
         DECLARE_NAPI_FUNCTION("getDefaultCellularDataSlotIdSync", GetDefaultCellularDataSlotIdSync),
