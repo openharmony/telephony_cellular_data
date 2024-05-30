@@ -223,7 +223,7 @@ int32_t CellularDataService::GetApnState(int32_t slotId, const std::string &apnT
 int32_t CellularDataService::GetDataRecoveryState()
 {
     int32_t state = 0;
-    for (auto controller : cellularDataControllers_) {
+    for (const auto &controller : cellularDataControllers_) {
         auto cellularDataController = controller.second;
         if (cellularDataController == nullptr) {
             continue;
