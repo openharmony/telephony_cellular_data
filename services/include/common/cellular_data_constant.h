@@ -126,7 +126,7 @@ enum DataContextRolesId {
     DATA_CONTEXT_ROLE_XCAP_ID = 9
 };
 
-enum class DataContextPriority : int32_t { PRIORITY_LOW, PRIORITY_NORMAL, PRIORITY_HIGH };
+enum class DataContextPriority : int32_t { PRIORITY_NONE, PRIORITY_LOW, PRIORITY_NORMAL, PRIORITY_HIGH };
 
 enum TelCallStatus {
     CALL_STATUS_UNKNOWN = -1,
