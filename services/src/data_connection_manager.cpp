@@ -278,7 +278,10 @@ void CcmDefaultState::UpdateNetworkInfo(const AppExecFwk::InnerEvent::Pointer &e
             TELEPHONY_LOGE("get active connection by cid is :=  %{public}d flag:=  %{public}d ", it.cid, it.flag);
             continue;
         }
-        dataConnect->UpdateNetworkInfo(it);
+        if (!dataConnect->UpdateNetworkInfoInHandler(it)) {
+            TELEPHONY_LOGW("Update in handler failed cid %{public}d flag %{public}d ", it.cid, it.flag);
+            dataConnect->UpdateNetworkInfo(it);
+        }
     }
 }
 

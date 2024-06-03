@@ -427,5 +427,15 @@ void CellularDataStateMachine::SetConnectionTcpBuffer(const std::string &tcpBuff
 {
     tcpBuffer_ = tcpBuffer;
 }
+
+bool CellularDataStateMachine::UpdateNetworkInfoInHandler(SetupDataCallResultInfo &info)
+{
+    if (!cellularDataHandler_) {
+        TELEPHONY_LOGE("cellularDataHandler is null!");
+        return false;
+    }
+    auto netInfo = std::make_shared<SetupDataCallResultInfo>(info);
+    return cellularDataHandler_->SendEvent(CellularDataEventCode::MSG_DATA_CALL_LIST_CHANGED, netInfo);
+}
 } // namespace Telephony
 } // namespace OHOS
