@@ -66,6 +66,7 @@ public:
     static const uint32_t MSG_SM_INCALL_DATA_DSDS_CHANGED = BASE + 39;
     static const uint32_t MSG_INCALL_DATA_COMPLETE = BASE + 40;
     static const uint32_t MSG_SM_RIL_ADAPTER_HOST_DIED = BASE + 41;
+    static const uint32_t MSG_DATA_CALL_LIST_CHANGED = BASE + 42;
 };
 } // namespace Telephony
 } // namespace OHOS
