@@ -238,6 +238,7 @@ std::string CellularDataStateMachine::GetIpType(std::vector<AddressInfo> ipInfoA
 
 std::string CellularDataStateMachine::GetIpType()
 {
+    std::lock_guard<std::mutex> guard(mtx_);
     return ipType_;
 }
 
@@ -345,6 +346,7 @@ void CellularDataStateMachine::UpdateNetworkInfo(const SetupDataCallResultInfo &
 
 void CellularDataStateMachine::UpdateNetworkInfo()
 {
+    std::lock_guard<std::mutex> guard(mtx_);
     int32_t slotId = GetSlotId();
     CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
     netLinkInfo_->tcpBufferSizes_ = tcpBuffer_;
@@ -425,6 +427,7 @@ void CellularDataStateMachine::SetConnectionBandwidth(const uint32_t upBandwidth
 
 void CellularDataStateMachine::SetConnectionTcpBuffer(const std::string &tcpBuffer)
 {
+    std::lock_guard<std::mutex> guard(mtx_);
     tcpBuffer_ = tcpBuffer;
 }
 
