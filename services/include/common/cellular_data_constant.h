@@ -197,6 +197,7 @@ static constexpr const char *CELLULAR_DATA_RDB_INIT =
     "datashare:///com.ohos.pdpprofileability/net/pdp_profile/init";
 static constexpr const char *CELLULAR_DATA_SETTING_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
+static constexpr const char *CELLULAR_DATA_SETTING_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
 static constexpr const char *CELLULAR_DATA_SETTING_DATA_ENABLE_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=cellular_data_enable";
 static constexpr const char *CELLULAR_DATA_SETTING_DATA_ROAMING_URI =
