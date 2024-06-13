@@ -40,7 +40,7 @@ std::shared_ptr<DataShare::DataShareHelper> CellularDataSettingsRdbHelper::Creat
         TELEPHONY_LOGE("CellularDataRdbHelper GetSystemAbility Service Failed.");
         return nullptr;
     }
-    return DataShare::DataShareHelper::Creator(remoteObj, CELLULAR_DATA_SETTING_URI);
+    return DataShare::DataShareHelper::Creator(remoteObj, CELLULAR_DATA_SETTING_URI, CELLULAR_DATA_SETTING_EXT_URI);
 }
 
 void CellularDataSettingsRdbHelper::UnRegisterSettingsObserver(
