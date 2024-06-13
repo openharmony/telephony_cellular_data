@@ -56,6 +56,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCellularData()
     InitDataEndSelfCure();
     InitIsApnAllowedActive();
     InitSendDataSwitchChangeInfo();
+    InitIsAllCellularDataAllowed();
 }
 
 void TelephonyExtWrapper::InitDataEndSelfCure()
@@ -107,5 +108,26 @@ void TelephonyExtWrapper::InitSendDataSwitchChangeInfo()
     TELEPHONY_LOGD("telephony ext wrapper init SendDataSwitchChangeInfo success");
 }
 
+void TelephonyExtWrapper::InitIsAllCellularDataAllowed()
+{
+    isAllCellularDataAllowed_ =
+        (SEND_DATA_SWITCH_CHANGE_INFO)dlsym(telephonyExtWrapperHandle_, "IsAllCellularDataAllowed");
+    if (isAllCellularDataAllowed_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol IsAllCellularDataAllowed failed, error: %{public}s", dlerror());
+        return;
+    }
+    TELEPHONY_LOGD("telephony ext wrapper init IsAllCellularDataAllowed success");
+}
+
+void TelephonyExtWrapper::InitRegisterApnHoler(sptr<ApnHolder> ApnHolder)
+{
+    registerApnHoler_ =
+        (SEND_DATA_SWITCH_CHANGE_INFO)dlsym(telephonyExtWrapperHandle_, "RegisterApnHoler");
+    if (registerApnHoler_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol RegisterApnHoler failed, error: %{public}s", dlerror());
+        return;
+    }
+    TELEPHONY_LOGD("telephony ext wrapper init RegisterApnHoler success");
+}
 } // namespace Telephony
 } // namespace OHOS

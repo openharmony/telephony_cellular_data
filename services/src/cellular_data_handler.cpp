@@ -28,6 +28,7 @@
 #include "hitrace_meter.h"
 #include "tel_ril_call_parcel.h"
 #include "net_specifier.h"
+#include "net_all_capabilities.h"
 #include "radio_event.h"
 #include "str_convert.h"
 #include "string_ex.h"
@@ -36,7 +37,7 @@
 #include "telephony_ext_wrapper.h"
 #include "telephony_permission.h"
 #include "ipc_skeleton.h"
-
+#include "telephony_ext_client.h"
 namespace OHOS {
 namespace Telephony {
 using namespace AppExecFwk;
@@ -69,6 +70,13 @@ void CellularDataHandler::Init()
     apnManager_->InitApnHolders();
     apnManager_->CreateAllApnItem();
     dataSwitchSettings_->LoadSwitchValue();
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (TELEPHONY_EXT_WRAPPER.RegisterApnHoler_) {
+        int32_t id = ApnManager::FindApnIdByCapability(NetManagerStandard::NET_CAPABILITY_INTERNET);
+        sptr<ApnHolder> apnHolder = apnManager_->FindApnHolderById(id);
+        TELEPHONY_EXT_WRAPPER.registerApnHoler_(apnHolder);
+    }
+#endif
     GetConfigurationFor5G();
     SetRilLinkBandwidths();
 }
@@ -132,6 +140,7 @@ bool CellularDataHandler::RequestNet(const NetRequest &request)
     }
     netRequest->capability = capability;
     netRequest->ident = request.ident;
+    netRequest->registerType = request.registerType;
     AppExecFwk::InnerEvent::Pointer event =
         InnerEvent::Get(CellularDataEventCode::MSG_REQUEST_NETWORK, netRequest, TYPE_REQUEST_NET);
     return SendEvent(event);
@@ -908,18 +917,35 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
     NetRequest request;
     request.ident = netRequest->ident;
     request.capability = netRequest->capability;
+    request.registerType = request->registerType;
     int32_t id = ApnManager::FindApnIdByCapability(request.capability);
     sptr<ApnHolder> apnHolder = apnManager_->FindApnHolderById(id);
     if (apnHolder == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: apnHolder is null.", slotId_);
         return;
     }
-    if (event->GetParam() == TYPE_REQUEST_NET) {
-        apnHolder->RequestCellularData(request);
-    } else {
-        apnHolder->ReleaseCellularData(request);
-        if (apnHolder->IsDataCallEnabled()) {
+    bool isInControl = false;
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (TELEPHONY_EXT_WRAPPER.isAllCellularDataAllowed_) {
+        isInControl = !TELEPHONY_EXT_WRAPPER.isAllCellularDataAllowed_(request.capability, request.registerType);
+    }
+#endif
+    if (isInControl) {
+        if (event->GetParam() == TYPE_REQUEST_NET) {
+            TELEPHONY_LOGE("not allow reqeust cellular data because of in controled");
             return;
+        } else {
+            TELEPHONY_LOGE("release all cellular data");
+            apnHolder->ReleaseAllCellularData();
+        }
+    } else {
+        if (event->GetParam() == TYPE_REQUEST_NET) {
+            apnHolder->RequestCellularData(request);
+        } else {
+            apnHolder->ReleaseAllCellularData(request);
+            if (apnHolder->IsDataCallEnabled()) {
+                return;
+            }
         }
     }
     InnerEvent::Pointer innerEvent = InnerEvent::Get(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, id);
