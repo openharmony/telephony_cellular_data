@@ -366,6 +366,7 @@ void CellularDataController::SystemAbilityStatusChangeListener::OnAddSystemAbili
             TELEPHONY_LOGI("DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID running");
             if (handler_ != nullptr) {
                 handler_->RegisterDataSettingObserver();
+                handler_->SendEvent(CellularDataEventCode::MSG_DB_SETTING_ENABLE_CHANGED, 0, 0);
             }
             break;
         default:
