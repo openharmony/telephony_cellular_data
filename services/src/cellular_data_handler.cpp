@@ -37,7 +37,6 @@
 #include "telephony_ext_wrapper.h"
 #include "telephony_permission.h"
 #include "ipc_skeleton.h"
-#include "telephony_ext_client.h"
 namespace OHOS {
 namespace Telephony {
 using namespace AppExecFwk;
@@ -910,7 +909,7 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
     NetRequest request;
     request.ident = netRequest->ident;
     request.capability = netRequest->capability;
-    request.registerType = request->registerType;
+    request.registerType = netRequest->registerType;
     int32_t id = ApnManager::FindApnIdByCapability(request.capability);
     sptr<ApnHolder> apnHolder = apnManager_->FindApnHolderById(id);
     if (apnHolder == nullptr) {
@@ -920,24 +919,26 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
     bool isAllCellularDataAllowed = true;
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     if (TELEPHONY_EXT_WRAPPER.isAllCellularDataAllowed_) {
-        isAllCellularDataAllowed = TELEPHONY_EXT_WRAPPER.isAllCellularDataAllowed_(request.capability, request.registerType);
+        isAllCellularDataAllowed = TELEPHONY_EXT_WRAPPER.isAllCellularDataAllowed_(request.capability,
+            request.registerType);
     }
 #endif
     if (isAllCellularDataAllowed) {
+        TELEPHONY_LOGD("allow cellular data");
         if (event->GetParam() == TYPE_REQUEST_NET) {
             apnHolder->RequestCellularData(request);
         } else {
-            apnHolder->ReleaseAllCellularData(request);
+            apnHolder->ReleaseCellularData(request);
             if (apnHolder->IsDataCallEnabled()) {
                 return;
             }
         }
     } else {
         if (event->GetParam() == TYPE_REQUEST_NET) {
-            TELEPHONY_LOGE("not allow reqeust cellular data because of in controled");
+            TELEPHONY_LOGD("not allow reqeust cellular data because of in controled");
             return;
         } else {
-            TELEPHONY_LOGE("release all cellular data");
+            TELEPHONY_LOGI("release all cellular data");
             apnHolder->ReleaseAllCellularData();
             return;
         }

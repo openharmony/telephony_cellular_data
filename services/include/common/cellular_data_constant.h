@@ -63,7 +63,7 @@ enum RegisterType {
     UNKOWN,
     REGISTER,
     REQUEST
-}
+};
 struct NetRequest {
     uint64_t capability = 0;
     std::string ident = "";
