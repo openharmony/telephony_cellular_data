@@ -60,14 +60,14 @@ struct NetSupplier {
     int32_t simId = 0;
 };
 enum RegisterType {
-    INVALID_TYPE,
+    UNKOWN,
     REGISTER,
     REQUEST
 }
 struct NetRequest {
     uint64_t capability = 0;
     std::string ident = "";
-    int32_t registerType = INVALID_TYPE;
+    int32_t registerType = UNKOWN;
 };
 
 static const uint32_t DEFAULT_BANDWIDTH = 14;

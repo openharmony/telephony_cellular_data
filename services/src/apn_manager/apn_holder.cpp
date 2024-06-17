@@ -18,9 +18,28 @@
 #include "cellular_data_event_code.h"
 #include "cellular_data_state_machine.h"
 #include "data_disconnect_params.h"
-
+#include "apn_manager.h"
 namespace OHOS {
 namespace Telephony {
+#ifdef __cplusplus
+extern "C" {
+#endif
+void ReleaseAllCellularDataForInternet()
+{
+    using namespace OHOS::Telephony;
+    OHOS::sptr<ApnManager> apnManager = std::make_unique<ApnManager>().release();
+    if (!apnManager) {
+        return;
+    }
+    apnManager->InitApnHolders();
+    int32_t id = ApnManager::FindApnIdByCapability(OHOS::NetManagerStandard::NET_CAPABILITY_INTERNET);
+    OHOS::sptr<ApnHolder> apnHolder = apnManager->FindApnHolderById(id);
+    apnHolder->ReleaseAllCellularData();
+}
+#ifdef __cplusplus
+}
+#endif
+}
 const std::map<std::string, int32_t> ApnHolder::apnTypeDataProfileMap_ {
     {DATA_CONTEXT_ROLE_DEFAULT, DATA_PROFILE_DEFAULT},
     {DATA_CONTEXT_ROLE_MMS, DATA_PROFILE_MMS},

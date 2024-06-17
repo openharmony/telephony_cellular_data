@@ -17,10 +17,19 @@
 #define APN_HOLDER_H
 
 #include <map>
-
+#include <memory>
 #include "apn_item.h"
 #include "cellular_data_constant.h"
 #include "connection_retry_policy.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+    void ReleaseAllCellularData();
+
+#ifdef __cplusplus
+}
+#endif
 
 namespace OHOS {
 namespace Telephony {

@@ -70,13 +70,6 @@ void CellularDataHandler::Init()
     apnManager_->InitApnHolders();
     apnManager_->CreateAllApnItem();
     dataSwitchSettings_->LoadSwitchValue();
-#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
-    if (TELEPHONY_EXT_WRAPPER.RegisterApnHoler_) {
-        int32_t id = ApnManager::FindApnIdByCapability(NetManagerStandard::NET_CAPABILITY_INTERNET);
-        sptr<ApnHolder> apnHolder = apnManager_->FindApnHolderById(id);
-        TELEPHONY_EXT_WRAPPER.registerApnHoler_(apnHolder);
-    }
-#endif
     GetConfigurationFor5G();
     SetRilLinkBandwidths();
 }
@@ -924,21 +917,13 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
         TELEPHONY_LOGE("Slot%{public}d: apnHolder is null.", slotId_);
         return;
     }
-    bool isInControl = false;
+    bool isAllCellularDataAllowed = true;
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     if (TELEPHONY_EXT_WRAPPER.isAllCellularDataAllowed_) {
-        isInControl = !TELEPHONY_EXT_WRAPPER.isAllCellularDataAllowed_(request.capability, request.registerType);
+        isAllCellularDataAllowed = TELEPHONY_EXT_WRAPPER.isAllCellularDataAllowed_(request.capability, request.registerType);
     }
 #endif
-    if (isInControl) {
-        if (event->GetParam() == TYPE_REQUEST_NET) {
-            TELEPHONY_LOGE("not allow reqeust cellular data because of in controled");
-            return;
-        } else {
-            TELEPHONY_LOGE("release all cellular data");
-            apnHolder->ReleaseAllCellularData();
-        }
-    } else {
+    if (isAllCellularDataAllowed) {
         if (event->GetParam() == TYPE_REQUEST_NET) {
             apnHolder->RequestCellularData(request);
         } else {
@@ -946,6 +931,15 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
             if (apnHolder->IsDataCallEnabled()) {
                 return;
             }
+        }
+    } else {
+        if (event->GetParam() == TYPE_REQUEST_NET) {
+            TELEPHONY_LOGE("not allow reqeust cellular data because of in controled");
+            return;
+        } else {
+            TELEPHONY_LOGE("release all cellular data");
+            apnHolder->ReleaseAllCellularData();
+            return;
         }
     }
     InnerEvent::Pointer innerEvent = InnerEvent::Get(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, id);
