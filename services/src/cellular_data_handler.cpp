@@ -28,6 +28,7 @@
 #include "hitrace_meter.h"
 #include "tel_ril_call_parcel.h"
 #include "net_specifier.h"
+#include "net_all_capabilities.h"
 #include "radio_event.h"
 #include "str_convert.h"
 #include "string_ex.h"
@@ -36,7 +37,6 @@
 #include "telephony_ext_wrapper.h"
 #include "telephony_permission.h"
 #include "ipc_skeleton.h"
-
 namespace OHOS {
 namespace Telephony {
 using namespace AppExecFwk;
@@ -132,6 +132,7 @@ bool CellularDataHandler::RequestNet(const NetRequest &request)
     }
     netRequest->capability = capability;
     netRequest->ident = request.ident;
+    netRequest->registerType = request.registerType;
     AppExecFwk::InnerEvent::Pointer event =
         InnerEvent::Get(CellularDataEventCode::MSG_REQUEST_NETWORK, netRequest, TYPE_REQUEST_NET);
     return SendEvent(event);
@@ -908,17 +909,37 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
     NetRequest request;
     request.ident = netRequest->ident;
     request.capability = netRequest->capability;
+    request.registerType = netRequest->registerType;
     int32_t id = ApnManager::FindApnIdByCapability(request.capability);
     sptr<ApnHolder> apnHolder = apnManager_->FindApnHolderById(id);
     if (apnHolder == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: apnHolder is null.", slotId_);
         return;
     }
-    if (event->GetParam() == TYPE_REQUEST_NET) {
-        apnHolder->RequestCellularData(request);
+    bool isAllCellularDataAllowed = true;
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (TELEPHONY_EXT_WRAPPER.isAllCellularDataAllowed_) {
+        isAllCellularDataAllowed = TELEPHONY_EXT_WRAPPER.isAllCellularDataAllowed_(request.capability,
+            request.registerType);
+    }
+#endif
+    if (isAllCellularDataAllowed) {
+        TELEPHONY_LOGD("allow cellular data");
+        if (event->GetParam() == TYPE_REQUEST_NET) {
+            apnHolder->RequestCellularData(request);
+        } else {
+            apnHolder->ReleaseCellularData(request);
+            if (apnHolder->IsDataCallEnabled()) {
+                return;
+            }
+        }
     } else {
-        apnHolder->ReleaseCellularData(request);
-        if (apnHolder->IsDataCallEnabled()) {
+        if (event->GetParam() == TYPE_REQUEST_NET) {
+            TELEPHONY_LOGD("not allow reqeust cellular data because of in controled");
+            return;
+        } else {
+            TELEPHONY_LOGI("release all cellular data");
+            apnHolder->ReleaseAllCellularData();
             return;
         }
     }

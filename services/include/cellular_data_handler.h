@@ -35,7 +35,7 @@
 #include "state_notification.h"
 #include "tel_event_handler.h"
 #include "tel_profile_util.h"
-
+#include "cellular_data_constant.h"
 namespace OHOS {
 namespace Telephony {
 class CellularDataHandler : public TelEventHandler, public EventFwk::CommonEventSubscriber {
