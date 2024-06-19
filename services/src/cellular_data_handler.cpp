@@ -516,7 +516,8 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
     bool attached = coreInner.GetPsRegState(slotId_) == (int32_t)RegServiceState::REG_STATE_IN_SERVICE;
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     coreInner.GetSimState(slotId_, simState);
-    TELEPHONY_LOGD("Slot%{public}d: attached: %{public}d simState: %{public}d", slotId_, attached, simState);
+    TELEPHONY_LOGD("Slot%{public}d: attached: %{public}d simState: %{public}d isSimAccountLoaded: %{public}d",
+        slotId_, attached, simState, isSimAccountLoaded_);
     bool isMmsApn = apnHolder->IsMmsType();
     if (isMmsApn && (simState == SimState::SIM_STATE_READY)) {
         if (SetDataPermittedForMms(true) && !attached) {
