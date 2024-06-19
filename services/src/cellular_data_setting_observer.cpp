@@ -44,6 +44,9 @@ void CellularDataSettingObserver::OnChange()
     TELEPHONY_LOGI("cellular data switch is %{public}d", value);
     auto cellularDataHandler = cellularDataHandler_.lock();
     if (cellularDataHandler != nullptr) {
+        if (cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_DB_SETTING_ENABLE_CHANGED)) {
+            return;
+        }
         cellularDataHandler->SendEvent(CellularDataEventCode::MSG_DB_SETTING_ENABLE_CHANGED, value, 0);
     }
 }
