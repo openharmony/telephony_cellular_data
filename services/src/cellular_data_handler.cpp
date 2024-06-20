@@ -162,8 +162,12 @@ int32_t CellularDataHandler::SetCellularDataEnable(bool userDataOn)
         TELEPHONY_EXT_WRAPPER.sendDataSwitchChangeInfo_(bundleName.c_str(), userDataOn);
     }
 #endif
-
-    return dataSwitchSettings_->SetUserDataOn(userDataOn);
+    int32_t resultDataSwitch = dataSwitchSettings_->SetUserDataOn(userDataOn);
+    if (resultDataSwitch == TELEPHONY_ERR_SUCCESS &&
+        !HasInnerEvent(CellularDataEventCode::MSG_DB_SETTING_ENABLE_CHANGED)) {
+        SendEvent(CellularDataEventCode::MSG_DB_SETTING_ENABLE_CHANGED, userDataOn, 0);
+    }
+    return resultDataSwitch;
 }
 
 int32_t CellularDataHandler::SetIntelligenceSwitchEnable(bool userSwitchOn)
