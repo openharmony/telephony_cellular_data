@@ -163,7 +163,8 @@ int32_t CellularDataHandler::SetCellularDataEnable(bool userDataOn)
     }
 #endif
     int32_t resultDataSwitch = dataSwitchSettings_->SetUserDataOn(userDataOn);
-    if (resultDataSwitch == TELEPHONY_ERR_SUCCESS && !HasInnerEvent(CellularDataEventCode::MSG_DB_SETTING_ENABLE_CHANGED)) {
+    if (resultDataSwitch == TELEPHONY_ERR_SUCCESS &&
+        !HasInnerEvent(CellularDataEventCode::MSG_DB_SETTING_ENABLE_CHANGED)) {
         cellularDataHandler->SendEvent(CellularDataEventCode::MSG_DB_SETTING_ENABLE_CHANGED, userDataOn, 0);
     }
     return resultDataSwitch;
