@@ -56,7 +56,7 @@ base/telephony/cellular_data/
 | function isCellularDataEnabled(callback: AsyncCallback\<boolean>): void; | 获取蜂窝数据开关是否打开 | ohos.permission.GET_NETWORK_INFO |
 | function getCellularDataState(callback: AsyncCallback\<DataConnectState>): void; | 获取蜂窝数据状态         | ohos.permission.GET_NETWORK_INFO |
 
-完整的JS API说明以及实例代码请参考：[蜂窝数据](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/reference/apis/js-apis-telephony-data.md)。
+完整的JS API说明以及实例代码请参考：[蜂窝数据](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/reference/apis-telephony-kit/js-apis-telephony-data.md)。
 
 ## 使用说明<a name="section160mcpsimp"></a>
 
