@@ -57,6 +57,8 @@ private:
     int32_t OnEnableIntelligenceSwitch(MessageParcel &data, MessageParcel &reply);
     int32_t OnInitCellularDataController(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetIntelligenceSwitchState(MessageParcel &data, MessageParcel &reply);
+    int32_t SetTimer(uint32_t code);
+    void CancelTimer(int32_t id);
 
 private:
     using Fun = int32_t (CellularDataServiceStub::*)(MessageParcel &data, MessageParcel &reply);
@@ -105,6 +107,12 @@ private:
             &CellularDataServiceStub::OnInitCellularDataController },
         { (uint32_t)CellularDataInterfaceCode::GET_INTELLIGENCE_SWITCH_STATE,
             &CellularDataServiceStub::OnGetIntelligenceSwitchState },    
+    };
+    std::map<uint32_t, std::string> collieCodeStringMap_ = {
+        { uint32_t(CellularDataInterfaceCode::GET_CELLULAR_DATA_STATE), "GET_CELLULAR_DATA_STATE" },
+        { uint32_t(CellularDataInterfaceCode::IS_CELLULAR_DATA_ENABLED), "IS_CELLULAR_DATA_ENABLED" },
+        { uint32_t(CellularDataInterfaceCode::ENABLE_CELLULAR_DATA), "ENABLE_CELLULAR_DATA" },
+        { uint32_t(CellularDataInterfaceCode::GET_DEFAULT_SLOT_ID), "GET_DEFAULT_SLOT_ID" },
     };
 };
 } // namespace Telephony

@@ -37,6 +37,7 @@
                 "core_service",
                 "data_share",
                 "eventhandler",
+                "hicollie",
                 "hilog",
                 "hisysevent",
                 "hitrace",
