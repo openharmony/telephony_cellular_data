@@ -493,6 +493,15 @@ bool CellularDataHandler::CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder)
     if (IsVSimSlotId(slotId_)) {
         return true;
     }
+
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (TELEPHONY_EXT_WRAPPER.isDualCellularCardAllowed_) {
+        if (TELEPHONY_EXT_WRAPPER.isDualCellularCardAllowed_()) {
+            return true;
+        }
+    }
+#endif
+
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     std::string apnType = apnHolder->GetApnType();
