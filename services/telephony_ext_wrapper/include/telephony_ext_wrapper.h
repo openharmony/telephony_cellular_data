@@ -47,7 +47,7 @@ public:
     IS_CARD_ALLOW_DATA isCardAllowData_ = nullptr;
     SEND_DATA_SWITCH_CHANGE_INFO sendDataSwitchChangeInfo_ = nullptr;
     IS_ALL_CELLULAR_DATA_ALLOWED isAllCellularDataAllowed_ = nullptr;
-    IS_DUAL_CELLULAR_CARD_ALLOWED isDualCellularCardAllowd_ = nullptr;
+    IS_DUAL_CELLULAR_CARD_ALLOWED isDualCellularCardAllowed_ = nullptr;
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
     void* telephonyVSimWrapperHandle_ = nullptr;
@@ -58,7 +58,7 @@ private:
     void InitTelephonyExtWrapperForVSim();
     void InitSendDataSwitchChangeInfo();
     void InitIsAllCellularDataAllowed();
-    void InitIsDualCellularCardAllowd();
+    void InitIsDualCellularCardAllowed();
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()

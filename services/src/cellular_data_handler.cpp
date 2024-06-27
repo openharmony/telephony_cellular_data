@@ -495,8 +495,8 @@ bool CellularDataHandler::CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder)
     }
 
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
-    if (TELEPHONY_EXT_WRAPPER.isDualCellularCardAllowd_) {
-        if (TELEPHONY_EXT_WRAPPER.isDualCellularCardAllowd_()) {
+    if (TELEPHONY_EXT_WRAPPER.isDualCellularCardAllowed_) {
+        if (TELEPHONY_EXT_WRAPPER.isDualCellularCardAllowed_()) {
             return true;
         }
     }

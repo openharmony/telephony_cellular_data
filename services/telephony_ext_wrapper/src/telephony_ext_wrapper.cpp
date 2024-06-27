@@ -57,7 +57,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCellularData()
     InitIsApnAllowedActive();
     InitSendDataSwitchChangeInfo();
     InitIsAllCellularDataAllowed();
-    InitIsDualCellularCardAllowd();
+    InitIsDualCellularCardAllowed();
 }
 
 void TelephonyExtWrapper::InitDataEndSelfCure()
@@ -120,16 +120,16 @@ void TelephonyExtWrapper::InitIsAllCellularDataAllowed()
     TELEPHONY_LOGD("telephony ext wrapper init IsAllCellularDataAllowed success");
 }
 
-void TelephonyExtWrapper::InitIsDualCellularCardAllowd()
+void TelephonyExtWrapper::InitIsDualCellularCardAllowed()
 {
-    isDualCellularCardAllowd_ =
-        (IS_DUAL_CELLULAR_CARD_ALLOWED)dlsym(telephonyExtWrapperHandle_, "IsDualCellularCardAllowd");
-    if (isDualCellularCardAllowd_ == nullptr) {
-        TELEPHONY_LOGE("telephony ext wrapper symbol IsDualCellularCardAllowd failed,\
+    isDualCellularCardAllowed_ =
+        (IS_DUAL_CELLULAR_CARD_ALLOWED)dlsym(telephonyExtWrapperHandle_, "IsDualCellularCardAllowed");
+    if (isDualCellularCardAllowed_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol IsDualCellularCardAllowed failed,\
             error: %{public}s", dlerror());
         return;
     }
-    TELEPHONY_LOGD("telephony ext wrapper init IsDualCellularCardAllowd success");
+    TELEPHONY_LOGD("telephony ext wrapper init IsDualCellularCardAllowed success");
 }
 
 } // namespace Telephony
