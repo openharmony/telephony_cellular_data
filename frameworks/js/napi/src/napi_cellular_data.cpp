@@ -46,6 +46,12 @@ static inline bool IsValidSlotId(int32_t slotId)
     return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT));
 }
 
+static inline bool IsValidSlotIdEx(int32_t slotId)
+{
+    // One more slot for VSim.
+    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT + 1));
+}
+
 static bool MatchCellularDataParameters(napi_env env, const napi_value parameters[], const size_t parameterCount)
 {
     switch (parameterCount) {
@@ -651,7 +657,7 @@ static void NativeGetDefaultCellularDataSlotId(napi_env env, void *data)
         return;
     }
     int32_t result = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
-    if (IsValidSlotId(result) || result == DEFAULT_SIM_SLOT_ID_REMOVE) {
+    if (IsValidSlotIdEx(result) || result == DEFAULT_SIM_SLOT_ID_REMOVE) {
         context->slotId = result;
         context->resolved = true;
     } else {
