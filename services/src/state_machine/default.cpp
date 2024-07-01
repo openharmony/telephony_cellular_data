@@ -105,7 +105,9 @@ bool Default::ProcessDataConnectionDrsOrRatChanged(const AppExecFwk::InnerEvent:
     CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
     int32_t supplierId = netAgent.GetSupplierId(stateMachine->GetSlotId(), stateMachine->GetCapability());
     netAgent.UpdateNetSupplierInfo(supplierId, stateMachine->netSupplierInfo_);
-    netAgent.UpdateNetLinkInfo(supplierId, stateMachine->netLinkInfo_);
+    if (stateMachine->IsActiveState() || stateMachine->IsActivatingState()) {
+        netAgent.UpdateNetLinkInfo(supplierId, stateMachine->netLinkInfo_);
+    }
     int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     CoreManagerInner::GetInstance().GetPsRadioTech(stateMachine->GetSlotId(), radioTech);
     netAgent.RegisterSlotType(supplierId, radioTech);
