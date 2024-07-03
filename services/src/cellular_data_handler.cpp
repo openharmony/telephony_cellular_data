@@ -616,7 +616,7 @@ bool CellularDataHandler::CheckApnState(sptr<ApnHolder> &apnHolder)
     }
 
     if (apnHolder->GetApnState() != PROFILE_STATE_IDLE) {
-        TELEPHONY_LOGI("Slot%{public}d: APN holder is not idle", slotId_);
+        TELEPHONY_LOGD("Slot%{public}d: APN holder is not idle", slotId_);
         return false;
     }
     std::vector<sptr<ApnItem>> matchedApns = apnManager_->FilterMatchedApns(apnHolder->GetApnType(), slotId_);

@@ -276,7 +276,7 @@ int32_t CellularDataServiceProxy::GetDefaultCellularDataSimId(int32_t &simId)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
-    TELEPHONY_LOGI("end: result=%{public}d", result);
+    TELEPHONY_LOGD("end: result=%{public}d", result);
     if (result == TELEPHONY_ERR_SUCCESS) {
         simId = reply.ReadInt32();
     }
