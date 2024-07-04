@@ -1489,9 +1489,31 @@ DisConnectionReason CellularDataHandler::GetDisConnectionReason()
     return disconnectionReason_;
 }
 
+bool CellularDataHandler::IsPhoneActiviated() const
+{
+    if (apnManager_ == nullptr) {
+        return false;
+    }
+    for (const sptr<ApnHolder> &apnHolder : apnManager_->GetAllApnHolder()) {
+        if (apnHolder == nullptr || !apnHolder->IsDataCallEnabled()) {
+            continue;
+        }
+        TELEPHONY_LOGD("Slot%{public}d: IsPhoneActiviated - Get state machine.", slotId_);
+        std::shared_ptr<CellularDataStateMachine> stateMachine = apnHolder->GetCellularDataStateMachine();
+        if (stateMachine != nullptr && (stateMachine->IsActiveState() || stateMachine->IsActivatingState())) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void CellularDataHandler::SetDataPermitted(int32_t slotId, bool dataPermitted)
 {
     TELEPHONY_LOGI("Slot%{public}d: dataPermitted is %{public}d.", slotId, dataPermitted);
+    if (dataPermitted && IsPhoneActiviated()) {
+        TELEPHONY_LOGI("Phone is activated, no need to set data permit.");
+        return;
+    }
     int32_t maxSimCount = CoreManagerInner::GetInstance().GetMaxSimCount();
     if (maxSimCount <= 1) {
         TELEPHONY_LOGE("Slot%{public}d: maxSimCount is: %{public}d", slotId_, maxSimCount);
