@@ -1000,8 +1000,14 @@ void CellularDataHandler::OnReceiveEvent(const EventFwk::CommonEventData &data)
         }
         GetConfigurationFor5G();
     } else if (action == CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
+        if (slotId_ != slotId) {
+            return;
+        }
         HandleScreenStateChanged(true);
     } else if (action == CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
+        if (slotId_ != slotId) {
+            return;
+        }
         HandleScreenStateChanged(false);
     } else {
         TELEPHONY_LOGI("Slot%{public}d: action=%{public}s code=%{public}d", slotId_, action.c_str(), data.GetCode());
