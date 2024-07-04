@@ -152,7 +152,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_001, Function | MediumTest | 
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     CellularDataHandler cellularDataHandler { subscriberInfo, 0 };
-    NetRequest request { 0, "simId1" };
+    NetRequest request { 0, "slotId1" };
     cellularDataHandler.HandleSimStateChanged();
     cellularDataHandler.ReleaseAllNetworkRequest();
     cellularDataHandler.CreateApnItem();
@@ -226,7 +226,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | 
     cellularDataHandler.HandleImsCallChanged(0);
     cellularDataHandler.HandleVoiceCallChanged(0);
     cellularDataHandler.HandleSimStateOrRecordsChanged(event);
-    cellularDataHandler.HandleSimAccountLoaded(event);
     cellularDataHandler.HandleRadioStateChanged(event);
     cellularDataHandler.HandleDsdsModeChanged(event);
     cellularDataHandler.SetRilAttachApnResponse(event);
@@ -311,7 +310,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_004, Function | MediumTest | 
     CellularDataController controller { 0 };
     controller.Init();
     ASSERT_FALSE(controller.cellularDataHandler_ == nullptr);
-    NetRequest request { 0, "simId1" };
+    NetRequest request { 0, "slotId1" };
     controller.cellularDataHandler_->ReleaseNet(request);
     controller.cellularDataHandler_->RequestNet(request);
     auto event = AppExecFwk::InnerEvent::Get(0);
@@ -381,7 +380,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_005, Function | MediumTest | 
     controller.cellularDataHandler_->HandleImsCallChanged(0);
     controller.cellularDataHandler_->HandleVoiceCallChanged(0);
     controller.cellularDataHandler_->HandleSimStateOrRecordsChanged(event);
-    controller.cellularDataHandler_->HandleSimAccountLoaded(event);
     controller.cellularDataHandler_->HandleRadioStateChanged(event);
     controller.cellularDataHandler_->HandleDsdsModeChanged(event);
     controller.cellularDataHandler_->SetRilAttachApnResponse(event);
@@ -515,9 +513,9 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_001, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.StrategySwitch(INVALID_SLOTID, false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.StrategySwitch(DEFAULT_SIM_SLOT_ID, false));
     NetRequest request;
-    request.ident = "simId12";
+    request.ident = "slotId12";
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.RequestNet(request));
-    request.ident = "simId2";
+    request.ident = "slotId2";
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ReleaseNet(request));
     ASSERT_TRUE(service.CheckParamValid(DEFAULT_SIM_SLOT_ID));
     ASSERT_FALSE(service.CheckParamValid(INVALID_SLOTID));
@@ -557,9 +555,9 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_002, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ChangeConnectionForDsds(INVALID_SLOTID, false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.StrategySwitch(INVALID_SLOTID, false));
     NetRequest request;
-    request.ident = "simId12";
+    request.ident = "slotId12";
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.RequestNet(request));
-    request.ident = "simId2";
+    request.ident = "slotId2";
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ReleaseNet(request));
     ASSERT_FALSE(service.CheckParamValid(INVALID_SLOTID));
     ASSERT_FALSE(service.CheckParamValid(INVALID_SLOTID_TWO));
@@ -616,9 +614,9 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_003, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ChangeConnectionForDsds(DEFAULT_SIM_SLOT_ID, false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ChangeConnectionForDsds(DEFAULT_SIM_SLOT_ID, true));
     NetRequest request;
-    request.ident = "simId12";
+    request.ident = "slotId12";
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.RequestNet(request));
-    request.ident = "simId2";
+    request.ident = "slotId2";
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ReleaseNet(request));
     ASSERT_FALSE(service.CheckParamValid(DEFAULT_SIM_SLOT_ID));
     ASSERT_FALSE(service.CheckParamValid(INVALID_SLOTID));

@@ -57,7 +57,6 @@ struct NetSupplier {
     uint32_t supplierId = 0;
     uint64_t capability = 0;
     int32_t slotId = 0;
-    int32_t simId = 0;
 };
 enum RegisterType {
     UNKOWN,
@@ -188,7 +187,7 @@ static constexpr const char *DATA_METERED_CONTEXT_ROLES = "default";
 static constexpr const char *IS_CELLULAR_DATA_ENABLE = "isCellularDataEnable";
 static constexpr const char *IS_ROAMING = "isRoaming";
 static constexpr const char *SETTING_SWITCH = "settingSwitch";
-static constexpr const char *IDENT_PREFIX = "simId";
+static constexpr const char *IDENT_PREFIX = "slotId";
 static constexpr const char *DEFAULT_HOSTNAME = "";
 static constexpr const char *DEFAULT_MASK = "";
 static constexpr const char *CELLULAR_DATA_RDB_URI = "datashare:///com.ohos.pdpprofileability";
