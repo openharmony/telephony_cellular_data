@@ -461,5 +461,14 @@ void DataConnectionManager::IsNeedDoRecovery(bool needDoRecovery) const
         connectionMonitor_->IsNeedDoRecovery(needDoRecovery);
     }
 }
+
+void DataConnectionManager::HandleScreenStateChanged(bool isScreenOn) const
+{
+    if (connectionMonitor_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: connection monitor is null", slotId_);
+        return;
+    }
+    connectionMonitor_->HandleScreenStateChanged(isScreenOn);
+}
 } // namespace Telephony
 } // namespace OHOS
