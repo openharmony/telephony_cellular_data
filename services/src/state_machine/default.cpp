@@ -130,12 +130,16 @@ bool Default::ProcessDataConnectionRoamOff(const AppExecFwk::InnerEvent::Pointer
 
 bool Default::ProcessDataCallListChanged(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("Default::ProcessDataCallListChanged");
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is null");
+        return false;
+    }
     std::shared_ptr<SetupDataCallResultInfo> info = event->GetSharedObject<SetupDataCallResultInfo>();
     if (info == nullptr) {
         TELEPHONY_LOGE("info is null");
         return false;
     }
+    TELEPHONY_LOGI("Default::ProcessDataCallListChanged");
     std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
     if (stateMachine == nullptr) {
         TELEPHONY_LOGE("stateMachine is null");

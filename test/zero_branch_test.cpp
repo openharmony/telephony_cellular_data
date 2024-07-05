@@ -279,7 +279,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_003, Function | MediumTest | 
     cellularDataHandler.AttemptEstablishDataConnection(apnHolder);
     cellularDataHandler.connectionManager_ = nullptr;
     auto event = AppExecFwk::InnerEvent::Get(0);
-    cellularDataHandler.HandleUpdateNetInfo(event);
     cellularDataHandler.ClearConnectionIfRequired();
     event = nullptr;
     cellularDataHandler.MsgEstablishDataConnection(event);
@@ -451,7 +450,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_007, Function | MediumTest | 
     sptr<ApnHolder> apnHolder = controller.cellularDataHandler_->apnManager_->FindApnHolderById(1);
     std::string str = "";
     controller.cellularDataHandler_->CheckForCompatibleDataConnection(apnHolder);
-    controller.cellularDataHandler_->HandleUpdateNetInfo(event);
     controller.cellularDataHandler_->PsRadioEmergencyStateOpen(event);
     controller.cellularDataHandler_->PsRadioEmergencyStateClose(event);
     controller.cellularDataHandler_->IsNeedDoRecovery(true);
@@ -1308,6 +1306,7 @@ HWTEST_F(BranchTest, Default_Test_01, Function | MediumTest | Level3)
     ASSERT_FALSE(mDefault->ProcessDataConnectionDrsOrRatChanged(event));
     ASSERT_FALSE(mDefault->ProcessDataConnectionRoamOn(event));
     ASSERT_FALSE(mDefault->ProcessDataConnectionRoamOff(event));
+    ASSERT_FALSE(mDefault->ProcessDataCallListChanged(event));
 }
 
 /**
