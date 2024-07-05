@@ -42,6 +42,7 @@ private:
     bool ProcessDataConnectionDrsOrRatChanged(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessDataConnectionRoamOn(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessDataConnectionRoamOff(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessDataCallListChanged(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     using Fun = bool (Default::*)(const AppExecFwk::InnerEvent::Pointer &data);
@@ -52,6 +53,7 @@ private:
         {CellularDataEventCode::MSG_SM_DRS_OR_RAT_CHANGED, &Default::ProcessDataConnectionDrsOrRatChanged},
         {CellularDataEventCode::MSG_SM_DATA_ROAM_ON, &Default::ProcessDataConnectionRoamOn},
         {CellularDataEventCode::MSG_SM_DATA_ROAM_OFF, &Default::ProcessDataConnectionRoamOff},
+        {CellularDataEventCode::MSG_DATA_CALL_LIST_CHANGED, &Default::ProcessDataCallListChanged},
     };
     std::weak_ptr<CellularDataStateMachine> stateMachine_;
 };

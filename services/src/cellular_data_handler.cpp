@@ -2144,28 +2144,6 @@ std::shared_ptr<CellularDataStateMachine> CellularDataHandler::CheckForCompatibl
     return potentialDc;
 }
 
-void CellularDataHandler::HandleUpdateNetInfo(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    TELEPHONY_LOGI("Slot%{public}d: receive HandleUpdateNetInfo event", slotId_);
-    std::shared_ptr<SetupDataCallResultInfo> info = event->GetSharedObject<SetupDataCallResultInfo>();
-    if (connectionManager_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: connectionManager is null", slotId_);
-        return;
-    }
-
-    if (info == nullptr) {
-        TELEPHONY_LOGE("Info is null");
-        return;
-    }
-
-    std::shared_ptr<CellularDataStateMachine> dataConnect = connectionManager_->GetActiveConnectionByCid(info->cid);
-    if (dataConnect == nullptr) {
-        TELEPHONY_LOGE("get active connection by cid is :=  %{public}d flag:=  %{public}d ", info->cid, info->flag);
-        return;
-    }
-    dataConnect->UpdateNetworkInfo(*info);
-}
-
 bool CellularDataHandler::IsGsm()
 {
     bool isGsm = false;
