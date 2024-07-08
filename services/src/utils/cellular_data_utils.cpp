@@ -50,46 +50,6 @@ std::vector<AddressInfo> CellularDataUtils::ParseIpAddr(const std::string &addre
     return ipInfoArray;
 }
 
-bool CellularDataUtils::ParseDotIpData(const std::string &address, AddressInfo &ipInfo)
-{
-    bool bOnlyAddress = false;
-    int prefixLen = 0;
-    // a1.a2.a3.a4.m1.m2.m3.m4
-    // a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11.a12.a13.a14.a15.a16.m1.m2.m3.m4.m5.m6.m7.m8.m9.m10.m11.m12.m13.m14.m15.m16
-    std::vector<std::string> ipSubData = Split(ipInfo.ip, ".");
-    if (ipSubData.size() > MIN_IPV6_ITEM) {
-        ipInfo.type = INetAddr::IpType::IPV6;
-        ipInfo.ip = ipSubData[0];
-        for (int32_t i = 1; i < MIN_IPV6_ITEM; ++i) {
-            ipInfo.ip += "." + ipSubData[i];
-        }
-        ipInfo.netMask = ipSubData[MIN_IPV6_ITEM];
-        for (size_t j = MIN_IPV6_ITEM; j < ipSubData.size(); ++j) {
-            ipInfo.netMask += "." + ipSubData[j];
-        }
-        prefixLen = GetPrefixLen(ipSubData, MIN_IPV6_ITEM);
-    } else if (ipSubData.size() > MAX_IPV4_ITEM) {
-        ipInfo.type = INetAddr::IpType::IPV6;
-        bOnlyAddress = true;
-    } else if (ipSubData.size() > MIN_IPV4_ITEM) {
-        ipInfo.type = INetAddr::IpType::IPV4;
-        ipInfo.ip = ipSubData[0];
-        for (int32_t i = 1; i < MIN_IPV4_ITEM; ++i) {
-            ipInfo.ip += "." + ipSubData[i];
-        }
-        ipInfo.netMask = ipSubData[MIN_IPV4_ITEM];
-        for (size_t j = MIN_IPV4_ITEM; j < ipSubData.size(); ++j) {
-            ipInfo.netMask += "." + ipSubData[j];
-        }
-        prefixLen = GetPrefixLen(ipSubData, MIN_IPV4_ITEM);
-    } else {
-        ipInfo.type = INetAddr::IpType::IPV4;
-        bOnlyAddress = true;
-    }
-    ipInfo.prefixLen = prefixLen;
-    return bOnlyAddress;
-}
-
 std::vector<AddressInfo> CellularDataUtils::ParseNormalIpAddr(const std::string &address)
 {
     std::vector<AddressInfo> ipInfoArray;
@@ -145,24 +105,6 @@ std::vector<std::string> CellularDataUtils::Split(const std::string &input, cons
         vec.push_back(input.substr(start, input.size() - start));
     }
     return vec;
-}
-
-bool CellularDataUtils::IsDigit(const std::string &data)
-{
-    if (data.empty()) {
-        TELEPHONY_LOGE("data is null");
-        return false;
-    }
-    for (size_t i = 0; i < data.size(); ++i) {
-        if (data[0] == '-') {
-            continue;
-        }
-        if (!isdigit(data[i])) {
-            TELEPHONY_LOGE("data %{public}s is not digit!", data.c_str());
-            return false;
-        }
-    }
-    return true;
 }
 
 int32_t CellularDataUtils::GetPrefixLen(const std::string &netmask, const std::string& flag)

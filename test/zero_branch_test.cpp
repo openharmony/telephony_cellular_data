@@ -1026,13 +1026,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataUtils_001, Function | MediumTest | Le
         CellularDataUtils::ConvertRadioTechToRadioName(static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_IWLAN)));
     ASSERT_EQ(
         "NR", CellularDataUtils::ConvertRadioTechToRadioName(static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_NR)));
-    ASSERT_FALSE(CellularDataUtils::IsDigit(""));
     ASSERT_TRUE(CellularDataUtils::Split("", "").empty());
-    AddressInfo info;
-    ASSERT_TRUE(CellularDataUtils::ParseDotIpData(
-        "a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11.a12.a13.a14.a15.a16.m1.m2.m3.m4.m5.m6.m7.m8.m9.m10.m11.m12.m13.m14.m15.m16",
-        info));
-    ASSERT_TRUE(CellularDataUtils::ParseDotIpData("a1.a2.a3.a4.m1.m2.m3.m4", info));
     EXPECT_GE(DelayedSingleton<CellularDataClient>::GetInstance()->GetCellularDataFlowType(), 0);
     auto recipient =
         std::make_shared<CellularDataClient::CellularDataDeathRecipient>(CellularDataClient::GetInstance());
@@ -1678,6 +1672,67 @@ HWTEST_F(BranchTest, GetOverallDefaultApnState_Test_01, Function | MediumTest | 
     }
     ret = apnManager->GetOverallDefaultApnState();
     EXPECT_EQ(ret, ApnProfileState::PROFILE_STATE_CONNECTING);
+}
+
+/**
+ * @tc.number   ParseIpAddr_001
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, ParseIpAddr_001, Function | MediumTest | Level0)
+{
+    std::string address = "";
+    std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(address);
+    EXPECT_EQ(ipInfoArray.size(), 0);
+}
+
+/**
+ * @tc.number   ParseIpAddr_002
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, ParseIpAddr_002, Function | MediumTest | Level0)
+{
+    std::string address = "192.000.1.1/24";
+    std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(address);
+    EXPECT_EQ(ipInfoArray.size(), 0);
+}
+
+/**
+ * @tc.number   ParseIpAddr_003
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, ParseIpAddr_003, Function | MediumTest | Level0)
+{
+    std::string address = "192.000.1.1/24 192.000.1.2/24";
+    std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(address);
+    EXPECT_EQ(ipInfoArray.size(), 2);
+}
+
+/**
+ * @tc.number   ParseIpAddr_004
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, ParseIpAddr_004, Function | MediumTest | Level0)
+{
+    std::string address = "2001:0000:0000:0000:0000:0000:0000:0000/64";
+    std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(address);
+    EXPECT_EQ(ipInfoArray.size(), 0);
+}
+
+/**
+ * @tc.number   ParseIpAddr_005
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, ParseIpAddr_005, Function | MediumTest | Level0)
+{
+    std::string address = "2001:0000:0000:0000:0000:0000:0000:0000/64 2001:0000:0000:0000:0000:0000:0000:0000/64";
+    std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(address);
+    EXPECT_EQ(ipInfoArray.size(), 2);
+}
 }
 } // namespace Telephony
 } // namespace OHOS
