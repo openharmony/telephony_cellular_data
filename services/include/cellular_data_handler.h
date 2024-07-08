@@ -144,6 +144,7 @@ private:
     std::shared_ptr<CellularDataStateMachine> CheckForCompatibleDataConnection(sptr<ApnHolder> &apnHolder);
     bool IsGsm();
     bool IsCdma();
+    void HandleScreenStateChanged(bool isScreenOn) const;
     bool IsPhoneActiviated() const;
 
 private:

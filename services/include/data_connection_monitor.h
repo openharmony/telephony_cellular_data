@@ -108,6 +108,8 @@ public:
 
     void IsNeedDoRecovery(bool needDoRecovery);
 
+    void HandleScreenStateChanged(bool isScreenOn);
+
 private:
     bool IsAggressiveRecovery();
     int32_t GetStallDetectionPeriod();
@@ -116,7 +118,8 @@ private:
     std::unique_ptr<TrafficManagement> trafficManager_;
     std::unique_ptr<TrafficManagement> stallDetectionTrafficManager_;
     bool updateNetStat_ = false;
-    bool stallDetectionEnabled = false;
+    bool stallDetectionEnabled_ = false;
+    bool isScreenOn_ = false;
     int64_t noRecvPackets_ = 0;
     RecoveryState dataRecoveryState_ = RecoveryState::STATE_REQUEST_CONTEXT_LIST;
     CellDataFlowType dataFlowType_ = CellDataFlowType::DATA_FLOW_TYPE_NONE;

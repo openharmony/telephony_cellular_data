@@ -994,9 +994,28 @@ void CellularDataHandler::OnReceiveEvent(const EventFwk::CommonEventData &data)
             return;
         }
         GetConfigurationFor5G();
+    } else if (action == CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
+        if (slotId_ != slotId) {
+            return;
+        }
+        HandleScreenStateChanged(true);
+    } else if (action == CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
+        if (slotId_ != slotId) {
+            return;
+        }
+        HandleScreenStateChanged(false);
     } else {
         TELEPHONY_LOGI("Slot%{public}d: action=%{public}s code=%{public}d", slotId_, action.c_str(), data.GetCode());
     }
+}
+
+void CellularDataHandler::HandleScreenStateChanged(bool isScreenOn) const
+{
+    if (connectionManager_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: connectionManager is null!", slotId_);
+        return;
+    }
+    connectionManager_->HandleScreenStateChanged(isScreenOn);
 }
 
 void CellularDataHandler::HandleSettingSwitchChanged(const InnerEvent::Pointer &event)
