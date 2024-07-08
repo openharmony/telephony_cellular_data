@@ -1733,6 +1733,5 @@ HWTEST_F(BranchTest, ParseIpAddr_005, Function | MediumTest | Level0)
     std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(address);
     EXPECT_EQ(ipInfoArray.size(), 2);
 }
-}
 } // namespace Telephony
 } // namespace OHOS
