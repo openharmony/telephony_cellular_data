@@ -65,7 +65,7 @@ public:
     void SetConnectionBandwidth(const uint32_t upBandwidth, const uint32_t downBandwidth);
     void SetConnectionTcpBuffer(const std::string &tcpBuffer);
     void SplitProxyIpAddress(const std::string &proxyIpAddress, std::string &host, uint16_t &port);
-    bool UpdateNetworkInfoInHandler(SetupDataCallResultInfo &info);
+    void UpdateNetworkInfoIfInActive(SetupDataCallResultInfo &info);
 
 protected:
     sptr<State> activeState_;
