@@ -47,7 +47,7 @@ bool Default::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
     uint32_t eventCode = event->GetInnerEventId();
     std::map<uint32_t, Fun>::iterator it = eventIdFunMap_.find(eventCode);
     if (it != eventIdFunMap_.end()) {
-        return (this->*(it->second))(event);
+        return it->second(event);
     }
     return false;
 }
@@ -126,6 +126,29 @@ bool Default::ProcessDataConnectionRoamOff(const AppExecFwk::InnerEvent::Pointer
 {
     TELEPHONY_LOGI("Default::EVENT_DATA_CONNECTION_ROAM_OFF");
     return false;
+}
+
+bool Default::ProcessDataCallListChanged(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is null");
+        return false;
+    }
+    std::shared_ptr<SetupDataCallResultInfo> info = event->GetSharedObject<SetupDataCallResultInfo>();
+    if (info == nullptr) {
+        TELEPHONY_LOGE("info is null");
+        return false;
+    }
+    TELEPHONY_LOGI("Default::ProcessDataCallListChanged");
+    std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
+    if (stateMachine == nullptr) {
+        TELEPHONY_LOGE("stateMachine is null");
+        return false;
+    }
+    if (stateMachine->IsActivatingState() || stateMachine->IsActiveState()) {
+        stateMachine->UpdateNetworkInfo(*info);
+    }
+    return true;
 }
 } // namespace Telephony
 } // namespace OHOS

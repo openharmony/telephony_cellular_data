@@ -56,6 +56,7 @@ public:
     void UpdateCallState(int32_t state);
     int32_t GetDataRecoveryState();
     void IsNeedDoRecovery(bool needDoRecovery) const;
+    void HandleScreenStateChanged(bool isScreenOn) const;
 
 private:
     void UpdateBandWidthsUseLte();

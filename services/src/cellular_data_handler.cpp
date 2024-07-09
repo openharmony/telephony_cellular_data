@@ -967,7 +967,7 @@ void CellularDataHandler::ProcessEvent(const InnerEvent::Pointer &event)
     uint32_t eventCode = event->GetInnerEventId();
     std::map<uint32_t, Fun>::iterator it = eventIdMap_.find(eventCode);
     if (it != eventIdMap_.end()) {
-        (this->*(it->second))(event);
+        it->second(event);
     }
 }
 
@@ -994,9 +994,28 @@ void CellularDataHandler::OnReceiveEvent(const EventFwk::CommonEventData &data)
             return;
         }
         GetConfigurationFor5G();
+    } else if (action == CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
+        if (slotId_ != slotId) {
+            return;
+        }
+        HandleScreenStateChanged(true);
+    } else if (action == CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
+        if (slotId_ != slotId) {
+            return;
+        }
+        HandleScreenStateChanged(false);
     } else {
         TELEPHONY_LOGI("Slot%{public}d: action=%{public}s code=%{public}d", slotId_, action.c_str(), data.GetCode());
     }
+}
+
+void CellularDataHandler::HandleScreenStateChanged(bool isScreenOn) const
+{
+    if (connectionManager_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: connectionManager is null!", slotId_);
+        return;
+    }
+    connectionManager_->HandleScreenStateChanged(isScreenOn);
 }
 
 void CellularDataHandler::HandleSettingSwitchChanged(const InnerEvent::Pointer &event)
@@ -1481,9 +1500,31 @@ DisConnectionReason CellularDataHandler::GetDisConnectionReason()
     return disconnectionReason_;
 }
 
+bool CellularDataHandler::IsPhoneActiviated() const
+{
+    if (apnManager_ == nullptr) {
+        return false;
+    }
+    for (const sptr<ApnHolder> &apnHolder : apnManager_->GetAllApnHolder()) {
+        if (apnHolder == nullptr || !apnHolder->IsDataCallEnabled()) {
+            continue;
+        }
+        TELEPHONY_LOGD("Slot%{public}d: IsPhoneActiviated - Get state machine.", slotId_);
+        std::shared_ptr<CellularDataStateMachine> stateMachine = apnHolder->GetCellularDataStateMachine();
+        if (stateMachine != nullptr && (stateMachine->IsActiveState() || stateMachine->IsActivatingState())) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void CellularDataHandler::SetDataPermitted(int32_t slotId, bool dataPermitted)
 {
     TELEPHONY_LOGI("Slot%{public}d: dataPermitted is %{public}d.", slotId, dataPermitted);
+    if (dataPermitted && IsPhoneActiviated()) {
+        TELEPHONY_LOGI("Phone is activated, no need to set data permit.");
+        return;
+    }
     int32_t maxSimCount = CoreManagerInner::GetInstance().GetMaxSimCount();
     if (maxSimCount <= 1) {
         TELEPHONY_LOGE("Slot%{public}d: maxSimCount is: %{public}d", slotId_, maxSimCount);
@@ -2112,28 +2153,6 @@ std::shared_ptr<CellularDataStateMachine> CellularDataHandler::CheckForCompatibl
         }
     }
     return potentialDc;
-}
-
-void CellularDataHandler::HandleUpdateNetInfo(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    TELEPHONY_LOGI("Slot%{public}d: receive HandleUpdateNetInfo event", slotId_);
-    std::shared_ptr<SetupDataCallResultInfo> info = event->GetSharedObject<SetupDataCallResultInfo>();
-    if (connectionManager_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: connectionManager is null", slotId_);
-        return;
-    }
-
-    if (info == nullptr) {
-        TELEPHONY_LOGE("Info is null");
-        return;
-    }
-
-    std::shared_ptr<CellularDataStateMachine> dataConnect = connectionManager_->GetActiveConnectionByCid(info->cid);
-    if (dataConnect == nullptr) {
-        TELEPHONY_LOGE("get active connection by cid is :=  %{public}d flag:=  %{public}d ", info->cid, info->flag);
-        return;
-    }
-    dataConnect->UpdateNetworkInfo(*info);
 }
 
 bool CellularDataHandler::IsGsm()

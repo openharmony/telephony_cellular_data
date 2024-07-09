@@ -50,7 +50,7 @@ int32_t CellularDataServiceStub::OnRemoteRequest(
     if (it != eventIdFunMap_.end()) {
         if (it->second != nullptr) {
             int32_t idTimer = SetTimer(code);
-            int32_t result = (this->*(it->second))(data, reply);
+            int32_t result = it->second(data, reply);
             CancelTimer(idTimer);
             return result;
         }
