@@ -86,12 +86,16 @@ private:
     bool ProcessDsdsChanged(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
-    using Fun = bool (IdleState::*)(const AppExecFwk::InnerEvent::Pointer &data);
+    using Fun = std::function<bool(const AppExecFwk::InnerEvent::Pointer &data)>;
     std::map<uint32_t, Fun> eventIdFunMap_ {
-        { CellularDataEventCode::MSG_SM_INCALL_DATA_CALL_STARTED, &IdleState::ProcessCallStarted },
-        { CellularDataEventCode::MSG_SM_INCALL_DATA_CALL_ENDED, &IdleState::ProcessCallEnded },
-        { CellularDataEventCode::MSG_SM_INCALL_DATA_SETTINGS_ON, &IdleState::ProcessSettingsOn },
-        { CellularDataEventCode::MSG_SM_INCALL_DATA_DSDS_CHANGED, &IdleState::ProcessDsdsChanged },
+        { CellularDataEventCode::MSG_SM_INCALL_DATA_CALL_STARTED,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessCallStarted(data); } },
+        { CellularDataEventCode::MSG_SM_INCALL_DATA_CALL_ENDED,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessCallEnded(data); } },
+        { CellularDataEventCode::MSG_SM_INCALL_DATA_SETTINGS_ON,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessSettingsOn(data); } },
+        { CellularDataEventCode::MSG_SM_INCALL_DATA_DSDS_CHANGED,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessDsdsChanged(data); } },
     };
     std::weak_ptr<IncallDataStateMachine> stateMachine_;
 };
@@ -113,12 +117,16 @@ private:
     bool ProcessDsdsChanged(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
-    using Fun = bool (SecondaryActiveState::*)(const AppExecFwk::InnerEvent::Pointer &data);
+    using Fun = std::function<bool(const AppExecFwk::InnerEvent::Pointer &data)>;
     std::map<uint32_t, Fun> eventIdFunMap_ {
-        { CellularDataEventCode::MSG_SM_INCALL_DATA_SETTINGS_ON, &SecondaryActiveState::ProcessSettingsOn },
-        { CellularDataEventCode::MSG_SM_INCALL_DATA_CALL_ENDED, &SecondaryActiveState::ProcessCallEnded },
-        { CellularDataEventCode::MSG_SM_INCALL_DATA_SETTINGS_OFF, &SecondaryActiveState::ProcessSettingsOff },
-        { CellularDataEventCode::MSG_SM_INCALL_DATA_DSDS_CHANGED, &SecondaryActiveState::ProcessDsdsChanged },
+        { CellularDataEventCode::MSG_SM_INCALL_DATA_SETTINGS_ON,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessSettingsOn(data); } },
+        { CellularDataEventCode::MSG_SM_INCALL_DATA_CALL_ENDED,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessCallEnded(data); } },
+        { CellularDataEventCode::MSG_SM_INCALL_DATA_SETTINGS_OFF,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessSettingsOff(data); } },
+        { CellularDataEventCode::MSG_SM_INCALL_DATA_DSDS_CHANGED,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessDsdsChanged(data); } },
     };
     std::weak_ptr<IncallDataStateMachine> stateMachine_;
 };
