@@ -967,7 +967,7 @@ void CellularDataHandler::ProcessEvent(const InnerEvent::Pointer &event)
     uint32_t eventCode = event->GetInnerEventId();
     std::map<uint32_t, Fun>::iterator it = eventIdMap_.find(eventCode);
     if (it != eventIdMap_.end()) {
-        (this->*(it->second))(event);
+        it->second(event);
     }
 }
 

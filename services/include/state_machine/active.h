@@ -53,21 +53,38 @@ private:
     void RefreshTcpBufferSizes();
 
 private:
-    using Fun = bool (Active::*)(const AppExecFwk::InnerEvent::Pointer &data);
+    using Fun = std::function<bool(const AppExecFwk::InnerEvent::Pointer &data)>;
     std::map<uint32_t, Fun> eventIdFunMap_ {
-        { CellularDataEventCode::MSG_SM_CONNECT, &Active::ProcessConnectDone },
-        { CellularDataEventCode::MSG_SM_DISCONNECT, &Active::ProcessDisconnectDone },
-        { CellularDataEventCode::MSG_SM_DISCONNECT_ALL, &Active::ProcessDisconnectAllDone },
-        { CellularDataEventCode::MSG_SM_LOST_CONNECTION, &Active::ProcessLostConnection },
-        { CellularDataEventCode::MSG_SM_LINK_CAPABILITY_CHANGED, &Active::ProcessLinkCapabilityChanged },
-        { CellularDataEventCode::MSG_SM_DATA_ROAM_ON, &Active::ProcessDataConnectionRoamOn },
-        { CellularDataEventCode::MSG_SM_DATA_ROAM_OFF, &Active::ProcessDataConnectionRoamOff },
-        { CellularDataEventCode::MSG_SM_VOICE_CALL_STARTED, &Active::ProcessDataConnectionVoiceCallStartedOrEnded },
-        { CellularDataEventCode::MSG_SM_VOICE_CALL_ENDED, &Active::ProcessDataConnectionVoiceCallStartedOrEnded },
-        { CellularDataEventCode::MSG_SM_RIL_ADAPTER_HOST_DIED, &Active::ProcessRilAdapterHostDied },
-        { RadioEvent::RADIO_NR_STATE_CHANGED, &Active::ProcessNrStateChanged },
-        { RadioEvent::RADIO_NR_FREQUENCY_CHANGED, &Active::ProcessNrFrequencyChanged },
-        { RadioEvent::RADIO_RIL_SETUP_DATA_CALL, &Active::ProcessDataConnectionComplete },
+        { CellularDataEventCode::MSG_SM_CONNECT,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessConnectDone(data); } },
+        { CellularDataEventCode::MSG_SM_DISCONNECT,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessDisconnectDone(data); } },
+        { CellularDataEventCode::MSG_SM_DISCONNECT_ALL,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessDisconnectAllDone(data); } },
+        { CellularDataEventCode::MSG_SM_LOST_CONNECTION,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessLostConnection(data); } },
+        { CellularDataEventCode::MSG_SM_LINK_CAPABILITY_CHANGED,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessLinkCapabilityChanged(data); } },
+        { CellularDataEventCode::MSG_SM_DATA_ROAM_ON,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessDataConnectionRoamOn(data); } },
+        { CellularDataEventCode::MSG_SM_DATA_ROAM_OFF,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessDataConnectionRoamOff(data); } },
+        { CellularDataEventCode::MSG_SM_VOICE_CALL_STARTED,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) {
+                return ProcessDataConnectionVoiceCallStartedOrEnded(data);
+            } },
+        { CellularDataEventCode::MSG_SM_VOICE_CALL_ENDED,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) {
+                return ProcessDataConnectionVoiceCallStartedOrEnded(data);
+            } },
+        { CellularDataEventCode::MSG_SM_RIL_ADAPTER_HOST_DIED,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessRilAdapterHostDied(data); } },
+        { RadioEvent::RADIO_NR_STATE_CHANGED,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessNrStateChanged(data); } },
+        { RadioEvent::RADIO_NR_FREQUENCY_CHANGED,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessNrFrequencyChanged(data); } },
+        { RadioEvent::RADIO_RIL_SETUP_DATA_CALL,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessDataConnectionComplete(data); } },
     };
     std::weak_ptr<CellularDataStateMachine> stateMachine_;
 };

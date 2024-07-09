@@ -54,7 +54,7 @@ bool Active::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
     std::map<uint32_t, Fun>::iterator it = eventIdFunMap_.find(eventCode);
     if (it != eventIdFunMap_.end()) {
         if (it->second != nullptr) {
-            return (this->*(it->second))(event);
+            return it->second(event);
         }
     }
     return retVal;

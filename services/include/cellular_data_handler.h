@@ -20,6 +20,7 @@
 #include <memory>
 
 #include "apn_manager.h"
+#include "cellular_data_constant.h"
 #include "cellular_data_event_code.h"
 #include "cellular_data_incall_observer.h"
 #include "cellular_data_rdb_observer.h"
@@ -28,14 +29,13 @@
 #include "cellular_data_state_machine.h"
 #include "common_event_manager.h"
 #include "data_switch_settings.h"
-#include "tel_ril_data_parcel.h"
 #include "incall_data_state_machine.h"
 #include "inner_event.h"
 #include "radio_event.h"
 #include "state_notification.h"
 #include "tel_event_handler.h"
 #include "tel_profile_util.h"
-#include "cellular_data_constant.h"
+#include "tel_ril_data_parcel.h"
 namespace OHOS {
 namespace Telephony {
 class CellularDataHandler : public TelEventHandler, public EventFwk::CommonEventSubscriber {
@@ -175,37 +175,64 @@ private:
     sptr<CellularDataRdbObserver> cellularDataRdbObserver_;
     std::shared_ptr<IncallDataStateMachine> incallDataStateMachine_;
 
-    using Fun = void (CellularDataHandler::*)(const AppExecFwk::InnerEvent::Pointer &event);
+    using Fun = std::function<void(const AppExecFwk::InnerEvent::Pointer &event)>;
     std::map<uint32_t, Fun> eventIdMap_ {
-        { RadioEvent::RADIO_PS_CONNECTION_ATTACHED, &CellularDataHandler::RadioPsConnectionAttached },
-        { RadioEvent::RADIO_PS_CONNECTION_DETACHED, &CellularDataHandler::RadioPsConnectionDetached },
-        { RadioEvent::RADIO_PS_ROAMING_OPEN, &CellularDataHandler::RoamingStateOn },
-        { RadioEvent::RADIO_PS_ROAMING_CLOSE, &CellularDataHandler::RoamingStateOff },
-        { RadioEvent::RADIO_EMERGENCY_STATE_OPEN, &CellularDataHandler::PsRadioEmergencyStateOpen },
-        { RadioEvent::RADIO_EMERGENCY_STATE_CLOSE, &CellularDataHandler::PsRadioEmergencyStateClose },
+        { RadioEvent::RADIO_PS_CONNECTION_ATTACHED,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { RadioPsConnectionAttached(event); } },
+        { RadioEvent::RADIO_PS_CONNECTION_DETACHED,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { RadioPsConnectionDetached(event); } },
+        { RadioEvent::RADIO_PS_ROAMING_OPEN,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { RoamingStateOn(event); } },
+        { RadioEvent::RADIO_PS_ROAMING_CLOSE,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { RoamingStateOff(event); } },
+        { RadioEvent::RADIO_EMERGENCY_STATE_OPEN,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { PsRadioEmergencyStateOpen(event); } },
+        { RadioEvent::RADIO_EMERGENCY_STATE_CLOSE,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { PsRadioEmergencyStateClose(event); } },
         { CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION_COMPLETE,
-            &CellularDataHandler::EstablishDataConnectionComplete },
-        { CellularDataEventCode::MSG_DISCONNECT_DATA_COMPLETE, &CellularDataHandler::DisconnectDataComplete },
-        { CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, &CellularDataHandler::MsgEstablishDataConnection },
-        { CellularDataEventCode::MSG_SETTING_SWITCH, &CellularDataHandler::HandleSettingSwitchChanged },
-        { CellularDataEventCode::MSG_REQUEST_NETWORK, &CellularDataHandler::MsgRequestNetwork },
-        { RadioEvent::RADIO_STATE_CHANGED, &CellularDataHandler::HandleRadioStateChanged },
-        { RadioEvent::RADIO_DSDS_MODE_CHANGED, &CellularDataHandler::HandleDsdsModeChanged },
-        { RadioEvent::RADIO_SIM_STATE_CHANGE, &CellularDataHandler::HandleSimStateOrRecordsChanged },
-        { RadioEvent::RADIO_SIM_RECORDS_LOADED, &CellularDataHandler::HandleSimStateOrRecordsChanged },
-        { RadioEvent::RADIO_SIM_ACCOUNT_LOADED, &CellularDataHandler::HandleSimAccountLoaded },
-        { RadioEvent::RADIO_PS_RAT_CHANGED, &CellularDataHandler::PsDataRatChanged },
-        { CellularDataEventCode::MSG_APN_CHANGED, &CellularDataHandler::HandleApnChanged },
-        { CellularDataEventCode::MSG_SET_RIL_ATTACH_APN, &CellularDataHandler::SetRilAttachApnResponse },
-        { RadioEvent::RADIO_NR_STATE_CHANGED, &CellularDataHandler::HandleRadioNrStateChanged },
-        { RadioEvent::RADIO_NR_FREQUENCY_CHANGED, &CellularDataHandler::HandleRadioNrFrequencyChanged },
-        { CellularDataEventCode::MSG_DB_SETTING_ENABLE_CHANGED, &CellularDataHandler::HandleDBSettingEnableChanged },
-        { CellularDataEventCode::MSG_DB_SETTING_ROAMING_CHANGED, &CellularDataHandler::HandleDBSettingRoamingChanged },
-        { CellularDataEventCode::MSG_DB_SETTING_INCALL_CHANGED, &CellularDataHandler::HandleDBSettingIncallChanged },
-        { CellularDataEventCode::MSG_INCALL_DATA_COMPLETE, &CellularDataHandler::IncallDataComplete },
-        { RadioEvent::RADIO_RIL_ADAPTER_HOST_DIED, &CellularDataHandler::OnRilAdapterHostDied },
-        { RadioEvent::RADIO_FACTORY_RESET, &CellularDataHandler::HandleFactoryReset },
-        { RadioEvent::RADIO_CLEAN_ALL_DATA_CONNECTIONS, &CellularDataHandler::OnCleanAllDataConnectionsDone },
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { EstablishDataConnectionComplete(event); } },
+        { CellularDataEventCode::MSG_DISCONNECT_DATA_COMPLETE,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { DisconnectDataComplete(event); } },
+        { CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { MsgEstablishDataConnection(event); } },
+        { CellularDataEventCode::MSG_SETTING_SWITCH,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleSettingSwitchChanged(event); } },
+        { CellularDataEventCode::MSG_REQUEST_NETWORK,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { MsgRequestNetwork(event); } },
+        { RadioEvent::RADIO_STATE_CHANGED,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleRadioStateChanged(event); } },
+        { RadioEvent::RADIO_DSDS_MODE_CHANGED,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleDsdsModeChanged(event); } },
+        { RadioEvent::RADIO_SIM_STATE_CHANGE,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleSimStateOrRecordsChanged(event); } },
+        { RadioEvent::RADIO_SIM_RECORDS_LOADED,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleSimStateOrRecordsChanged(event); } },
+        { RadioEvent::RADIO_SIM_ACCOUNT_LOADED,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleSimAccountLoaded(event); } },
+        { RadioEvent::RADIO_PS_RAT_CHANGED,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { PsDataRatChanged(event); } },
+        { CellularDataEventCode::MSG_APN_CHANGED,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleApnChanged(event); } },
+        { CellularDataEventCode::MSG_SET_RIL_ATTACH_APN,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { SetRilAttachApnResponse(event); } },
+        { RadioEvent::RADIO_NR_STATE_CHANGED,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleRadioNrStateChanged(event); } },
+        { RadioEvent::RADIO_NR_FREQUENCY_CHANGED,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleRadioNrFrequencyChanged(event); } },
+        { CellularDataEventCode::MSG_DB_SETTING_ENABLE_CHANGED,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleDBSettingEnableChanged(event); } },
+        { CellularDataEventCode::MSG_DB_SETTING_ROAMING_CHANGED,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleDBSettingRoamingChanged(event); } },
+        { CellularDataEventCode::MSG_DB_SETTING_INCALL_CHANGED,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleDBSettingIncallChanged(event); } },
+        { CellularDataEventCode::MSG_INCALL_DATA_COMPLETE,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { IncallDataComplete(event); } },
+        { RadioEvent::RADIO_RIL_ADAPTER_HOST_DIED,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { OnRilAdapterHostDied(event); } },
+        { RadioEvent::RADIO_FACTORY_RESET,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleFactoryReset(event); } },
+        { RadioEvent::RADIO_CLEAN_ALL_DATA_CONNECTIONS,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { OnCleanAllDataConnectionsDone(event); } },
     };
 };
 } // namespace Telephony

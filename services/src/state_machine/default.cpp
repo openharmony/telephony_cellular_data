@@ -47,7 +47,7 @@ bool Default::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
     uint32_t eventCode = event->GetInnerEventId();
     std::map<uint32_t, Fun>::iterator it = eventIdFunMap_.find(eventCode);
     if (it != eventIdFunMap_.end()) {
-        return (this->*(it->second))(event);
+        return it->second(event);
     }
     return false;
 }
