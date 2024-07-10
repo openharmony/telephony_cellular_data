@@ -40,7 +40,22 @@ std::shared_ptr<DataShare::DataShareHelper> CellularDataSettingsRdbHelper::Creat
         TELEPHONY_LOGE("CellularDataRdbHelper GetSystemAbility Service Failed.");
         return nullptr;
     }
-    return DataShare::DataShareHelper::Creator(remoteObj, CELLULAR_DATA_SETTING_URI, CELLULAR_DATA_SETTING_EXT_URI);
+    sptr<IRemoteObject> distributedData = saManager->GetSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
+    if (distributedData == nullptr) {
+        TELEPHONY_LOGE("CellularDataRdbHelper: distributedData is not started.");
+        return nullptr;
+    }
+    auto [ret, helper] =
+        DataShare::DataShareHelper::Create(remoteObj, CELLULAR_DATA_SETTING_URI, CELLULAR_DATA_SETTING_EXT_URI);
+    if (ret == DataShare::E_OK) {
+        return helper;
+    } else if (ret == DataShare::E_DATA_SHARE_NOT_READY) {
+        TELEPHONY_LOGE("CellularDataRdbHelper: datashare not ready.");
+        return nullptr;
+    } else {
+        TELEPHONY_LOGE("CellularDataRdbHelper: create datashare fail, ret = %{public}d.", ret);
+        return nullptr;
+    }
 }
 
 void CellularDataSettingsRdbHelper::UnRegisterSettingsObserver(
