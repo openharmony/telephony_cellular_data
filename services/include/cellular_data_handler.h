@@ -144,7 +144,6 @@ private:
     bool IsGsm();
     bool IsCdma();
     void HandleScreenStateChanged(bool isScreenOn) const;
-    bool IsPhoneActiviated() const;
 
 private:
     sptr<ApnManager> apnManager_;
