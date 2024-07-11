@@ -98,9 +98,9 @@ private:
     void HandleVoiceCallChanged(int32_t state);
     void HandleDefaultDataSubscriptionChanged();
     void HandleSimStateChanged();
-    void HandleSimRecordsLoaded(int32_t slotId);
     void HandleDsdsModeChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleSimStateOrRecordsChanged(const AppExecFwk::InnerEvent::Pointer &event);
+    void HandleSimAccountLoaded(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleRadioStateChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void PsDataRatChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void SetRilAttachApnResponse(const AppExecFwk::InnerEvent::Pointer &event);
@@ -166,7 +166,7 @@ private:
     bool physicalConnectionActiveState_ = false;
     bool multipleConnectionsEnabled_ = false;
     bool defaultDataRoamingEnable_ = false;
-    bool isSimLoaded_ = false;
+    bool isSimAccountLoaded_ = false;
     std::vector<std::string> upLinkThresholds_;
     std::vector<std::string> downLinkThresholds_;
     sptr<CellularDataSettingObserver> settingObserver_;
@@ -207,6 +207,8 @@ private:
             [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleSimStateOrRecordsChanged(event); } },
         { RadioEvent::RADIO_SIM_RECORDS_LOADED,
             [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleSimStateOrRecordsChanged(event); } },
+        { RadioEvent::RADIO_SIM_ACCOUNT_LOADED,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleSimAccountLoaded(event); } },
         { RadioEvent::RADIO_PS_RAT_CHANGED,
             [this](const AppExecFwk::InnerEvent::Pointer &event) { PsDataRatChanged(event); } },
         { CellularDataEventCode::MSG_APN_CHANGED,

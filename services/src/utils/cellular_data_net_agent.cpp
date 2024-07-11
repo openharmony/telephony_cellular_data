@@ -50,16 +50,21 @@ bool CellularDataNetAgent::RegisterNetSupplier(const int32_t slotId)
             TELEPHONY_LOGE("capabilities(%{public}" PRIu64 ") not support", netSupplier.capability);
             continue;
         }
+        int32_t simId = CoreManagerInner::GetInstance().GetSimId(netSupplier.slotId);
+        if (simId <= INVALID_SIM_ID) {
+            TELEPHONY_LOGE("Slot%{public}d Invalid simId: %{public}d", slotId, simId);
+            continue;
+        }
         std::set<NetCap> netCap { static_cast<NetCap>(netSupplier.capability) };
         uint32_t supplierId = 0;
         int32_t result = netManager.RegisterNetSupplier(
-            NetBearType::BEARER_CELLULAR, std::string(IDENT_PREFIX) + std::to_string(netSupplier.slotId),
-            netCap, supplierId);
+            NetBearType::BEARER_CELLULAR, std::string(IDENT_PREFIX) + std::to_string(simId), netCap, supplierId);
         TELEPHONY_LOGI(
             "Slot%{public}d Register network supplierId: %{public}d,result:%{public}d", slotId, supplierId, result);
         if (result == NETMANAGER_SUCCESS) {
             flag = true;
             netSupplier.supplierId = supplierId;
+            netSupplier.simId = simId;
             int32_t regCallback = netManager.RegisterNetSupplierCallback(netSupplier.supplierId, callBack_);
             TELEPHONY_LOGI("Register supplier callback(%{public}d)", regCallback);
             sptr<NetSupplierInfo> netSupplierInfo = new (std::nothrow) NetSupplierInfo();
@@ -80,8 +85,13 @@ bool CellularDataNetAgent::RegisterNetSupplier(const int32_t slotId)
 
 void CellularDataNetAgent::UnregisterNetSupplier(const int32_t slotId)
 {
+    int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
+    if (simId <= INVALID_SIM_ID) {
+        TELEPHONY_LOGE("Slot%{public}d Invalid simId: %{public}d", slotId, simId);
+        return;
+    }
     for (const NetSupplier &netSupplier : netSuppliers_) {
-        if (netSupplier.slotId != slotId) {
+        if (netSupplier.simId != simId) {
             continue;
         }
         auto& netManager = NetConnClient::GetInstance();
@@ -93,12 +103,15 @@ void CellularDataNetAgent::UnregisterNetSupplier(const int32_t slotId)
 void CellularDataNetAgent::UnregisterNetSupplierForSimUpdate(const int32_t slotId)
 {
     for (NetSupplier &netSupplier : netSuppliers_) {
-        if (netSupplier.slotId != slotId) {
+        if (netSupplier.slotId != slotId || netSupplier.simId <= INVALID_SIM_ID) {
             continue;
         }
         auto& netManager = NetConnClient::GetInstance();
         int32_t result = netManager.UnregisterNetSupplier(netSupplier.supplierId);
         TELEPHONY_LOGI("Slot%{public}d unregister network result:%{public}d", slotId, result);
+        if (result == NETMANAGER_SUCCESS) {
+            netSupplier.simId = INVALID_SIM_ID;
+        }
     }
 }
 
