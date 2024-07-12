@@ -524,8 +524,8 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
     bool attached = coreInner.GetPsRegState(slotId_) == (int32_t)RegServiceState::REG_STATE_IN_SERVICE;
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     coreInner.GetSimState(slotId_, simState);
-    TELEPHONY_LOGD("Slot%{public}d: attached: %{public}d simState: %{public}d isSimLoaded: %{public}d",
-        slotId_, attached, simState, isSimLoaded_);
+    TELEPHONY_LOGD("Slot%{public}d: attached: %{public}d simState: %{public}d isSimAccountLoaded: %{public}d",
+        slotId_, attached, simState, isSimAccountLoaded_);
     bool isMmsApn = apnHolder->IsMmsType();
     if (isMmsApn && (simState == SimState::SIM_STATE_READY)) {
         if (SetDataPermittedForMms(true) && !attached) {
@@ -543,7 +543,7 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
             CellularDataErrorCode::DATA_ERROR_SIM_NOT_READY, "It is not emergencyApn and sim not ready");
         return false;
     }
-    return isEmergencyApn || isSimLoaded_;
+    return isEmergencyApn || isSimAccountLoaded_;
 }
 
 bool CellularDataHandler::CheckRoamingState(sptr<ApnHolder> &apnHolder)
@@ -1183,7 +1183,7 @@ void CellularDataHandler::HandleSimStateChanged()
     CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
     TELEPHONY_LOGI("Slot%{public}d: sim state is :%{public}d", slotId_, simState);
     if (simState != SimState::SIM_STATE_READY) {
-        isSimLoaded_ = false;
+        isSimAccountLoaded_ = false;
         ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
         if (simState == SimState::SIM_STATE_NOT_PRESENT) {
             CellularDataNetAgent::GetInstance().UnregisterNetSupplierForSimUpdate(slotId_);
@@ -1213,8 +1213,24 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
             break;
         }
         case RadioEvent::RADIO_SIM_RECORDS_LOADED: {
-            auto slotId = event->GetParam();
-            HandleSimRecordsLoaded(slotId);
+            std::u16string iccId;
+            CoreManagerInner::GetInstance().GetSimIccId(slotId_, iccId);
+            SimState simState = SimState::SIM_STATE_UNKNOWN;
+            CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
+            if (simState != SimState::SIM_STATE_READY || iccId == u"") {
+                TELEPHONY_LOGI("sim state error or iccId nullptr");
+                break;
+            }
+            if (iccId != lastIccId_) {
+                if (dataSwitchSettings_ != nullptr) {
+                    dataSwitchSettings_->SetPolicyDataOn(true);
+                }
+                lastIccId_ = iccId;
+            } else if (lastIccId_ == iccId) {
+                TELEPHONY_LOGI("Slot%{public}d: sim state changed, but iccId not changed.", slotId_);
+                // the sim card status has changed to ready, so try to connect
+                EstablishAllApnsIfConnectable();
+            }
             break;
         }
         default:
@@ -1222,25 +1238,20 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
     }
 }
 
-void CellularDataHandler::HandleSimRecordsLoaded(int32_t slotId)
+void CellularDataHandler::HandleSimAccountLoaded(const InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("SlotId_ %{public}d, current Slot%{public}d", slotId_, slotId);
-    std::u16string iccId;
-    CoreManagerInner::GetInstance().GetSimIccId(slotId_, iccId);
-    SimState simState = SimState::SIM_STATE_UNKNOWN;
-    CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
-    if (simState != SimState::SIM_STATE_READY || iccId == u"") {
-        TELEPHONY_LOGI("sim state error or iccId nullptr");
+    if (event == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: event is null", slotId_);
         return;
     }
-    if (iccId != lastIccId_) {
-        if (dataSwitchSettings_ != nullptr) {
-            dataSwitchSettings_->SetPolicyDataOn(true);
-        }
-        lastIccId_ = iccId;
+    TELEPHONY_LOGI("Slot%{public}d", slotId_);
+    if (isSimAccountLoaded_) {
+        TELEPHONY_LOGE("Slot%{public}d has already loaded", slotId_);
+        return;
     }
+    auto slotId = event->GetParam();
     if (slotId == slotId_) {
-        isSimLoaded_ = true;
+        isSimAccountLoaded_ = true;
         ReleaseAllNetworkRequest();
         ClearAllConnections(DisConnectionReason::REASON_CHANGE_CONNECTION);
         CellularDataNetAgent::GetInstance().UnregisterNetSupplierForSimUpdate(slotId_);
