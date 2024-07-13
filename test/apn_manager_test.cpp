@@ -81,7 +81,7 @@ HWTEST_F(ApnManagerTest, FindApnNameByApnId_001, Function | MediumTest | Level1)
 {
     int32_t id = 1;
     std::string result = apnManager->FindApnNameByApnId(id);
-    ASSERT_EQ(result, DATA_CONTEXT_ROLE_DEFAULT_ID);
+    ASSERT_EQ(result, DATA_CONTEXT_ROLE_DEFAULT);
 }
 
 /**
@@ -93,7 +93,7 @@ HWTEST_F(ApnManagerTest, FindApnNameByApnId_002, Function | MediumTest | Level1)
 {
     int32_t id = 2;
     std::string result = apnManager->FindApnNameByApnId(id);
-    ASSERT_EQ(result, DATA_CONTEXT_ROLE_MMS_ID);
+    ASSERT_EQ(result, DATA_CONTEXT_ROLE_MMS);
 }
 
 /**
