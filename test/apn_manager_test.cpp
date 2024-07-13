@@ -80,7 +80,7 @@ std::shared_ptr<CellularDataStateMachine> StateMachineTest::CreateCellularDataSt
 HWTEST_F(ApnManagerTest, FindApnNameByApnId_001, Function | MediumTest | Level1)
 {
     int32_t id = 1;
-    std::string result = apnManager->FindApnNameByApnId(id)；
+    std::string result = apnManager->FindApnNameByApnId(id);
     ASSERT_EQ(result, DATA_CONTEXT_ROLE_DEFAULT_ID);
 }
 
@@ -92,7 +92,7 @@ HWTEST_F(ApnManagerTest, FindApnNameByApnId_001, Function | MediumTest | Level1)
 HWTEST_F(ApnManagerTest, FindApnNameByApnId_002, Function | MediumTest | Level1)
 {
     int32_t id = 2;
-    std::string result = apnManager->FindApnNameByApnId(id)；
+    std::string result = apnManager->FindApnNameByApnId(id);
     ASSERT_EQ(result, DATA_CONTEXT_ROLE_MMS_ID);
 }
 
@@ -480,7 +480,7 @@ HWTEST_F(ApnManagerTest, HasAnyConnectedState_003, Function | MediumTest | Level
 {
     std::vector<sptr<ApnHolder>> apnHolders;
     sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
-    apnHolder.SetApnState(ApnProfileState::PROFILE_STATE_CONNECTED);
+    apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_CONNECTED);
     apnHolders.push_back(apnHolder);
     apnManager->apnHolders_ = apnHolders;
     bool result = apnManager->HasAnyConnectedState();
@@ -496,7 +496,7 @@ HWTEST_F(ApnManagerTest, HasAnyConnectedState_004, Function | MediumTest | Level
 {
     std::vector<sptr<ApnHolder>> apnHolders;
     sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
-    apnHolder.SetApnState(ApnProfileState::PROFILE_STATE_DISCONNECTING);
+    apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_DISCONNECTING);
     apnHolders.push_back(apnHolder);
     apnManager->apnHolders_ = apnHolders;
     bool result = apnManager->HasAnyConnectedState();
