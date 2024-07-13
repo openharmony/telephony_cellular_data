@@ -1744,7 +1744,7 @@ HWTEST_F(BranchTest, ParseIpAddr_005, Function | MediumTest | Level0)
 HWTEST_F(BranchTest, GetPrefixLen_001, Function | MediumTest | Level0)
 {
     std::vector<std::string> netmask;
-    int32_t result = CellularDataUtils::GetPrefixLen(netmask, 0)
+    int32_t result = CellularDataUtils::GetPrefixLen(netmask, 0);
     EXPECT_EQ(result, 0);
 }
 
@@ -1756,7 +1756,7 @@ HWTEST_F(BranchTest, GetPrefixLen_001, Function | MediumTest | Level0)
 HWTEST_F(BranchTest, GetPrefixLen_002, Function | MediumTest | Level0)
 {
     std::vector<std::string> netmask = {"255", "invalid", "255"};
-    int32_t result = CellularDataUtils::GetPrefixLen(netmask, 0)
+    int32_t result = CellularDataUtils::GetPrefixLen(netmask, 0);
     EXPECT_EQ(result, 8);
 }
 
@@ -1768,7 +1768,7 @@ HWTEST_F(BranchTest, GetPrefixLen_002, Function | MediumTest | Level0)
 HWTEST_F(BranchTest, GetPrefixLen_003, Function | MediumTest | Level0)
 {
     std::vector<std::string> netmask = {"255", "0", "255"};
-    int32_t result = CellularDataUtils::GetPrefixLen(netmask, 0)
+    int32_t result = CellularDataUtils::GetPrefixLen(netmask, 0);
     EXPECT_EQ(result, 8);
 }
 
@@ -1780,7 +1780,7 @@ HWTEST_F(BranchTest, GetPrefixLen_003, Function | MediumTest | Level0)
 HWTEST_F(BranchTest, GetPrefixLen_004, Function | MediumTest | Level0)
 {
     std::vector<std::string> netmask = {"255", "254", "255"};
-    int32_t result = CellularDataUtils::GetPrefixLen(netmask, 0)
+    int32_t result = CellularDataUtils::GetPrefixLen(netmask, 0);
     EXPECT_EQ(result, 15);
 }
 
@@ -1792,7 +1792,7 @@ HWTEST_F(BranchTest, GetPrefixLen_004, Function | MediumTest | Level0)
 HWTEST_F(BranchTest, GetPrefixLen_005, Function | MediumTest | Level0)
 {
     std::vector<std::string> netmask = {"255", "256", "255"};
-    int32_t result = CellularDataUtils::GetPrefixLen(netmask, 0)
+    int32_t result = CellularDataUtils::GetPrefixLen(netmask, 0);
     EXPECT_EQ(result, 8);
 }
 
@@ -1804,7 +1804,7 @@ HWTEST_F(BranchTest, GetPrefixLen_005, Function | MediumTest | Level0)
 HWTEST_F(BranchTest, GetPrefixLen_006, Function | MediumTest | Level0)
 {
     std::vector<std::string> netmask = {"255", "254", "255"};
-    int32_t result = CellularDataUtils::GetPrefixLen(netmask, 0)
+    int32_t result = CellularDataUtils::GetPrefixLen(netmask, 0);
     EXPECT_EQ(result, 15);
 }
 
@@ -1816,7 +1816,7 @@ HWTEST_F(BranchTest, GetPrefixLen_006, Function | MediumTest | Level0)
 HWTEST_F(BranchTest, GetPrefixLen_007, Function | MediumTest | Level0)
 {
     std::vector<std::string> netmask = {"255", "255", "255"};
-    int32_t result = CellularDataUtils::GetPrefixLen(netmask, 0)
+    int32_t result = CellularDataUtils::GetPrefixLen(netmask, 0);
     EXPECT_EQ(result, 24);
 }
 
