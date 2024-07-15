@@ -54,6 +54,30 @@ public:
     void IsNeedDoRecovery(bool needDoRecovery) const;
     bool ChangeConnectionForDsds(bool enable) const;
     int32_t GetIntelligenceSwitchState(bool &switchState);
+    inline std::shared_ptr<CellularDataHandler> GetCellularDataHandler() const
+    {
+        return cellularDataHandler_;
+    }
+    inline void SetCellularDataHandler(std::shared_ptr<CellularDataHandler> cellularDataHandler)
+    {
+        cellularDataHandler_ = cellularDataHandler;
+    }
+    inline sptr<ISystemAbilityStatusChange> GetSystemAbilityListener() const
+    {
+        return systemAbilityListener_;
+    }
+    inline void SetSystemAbilityListener(sptr<ISystemAbilityStatusChange> systemAbilityListener)
+    {
+        systemAbilityListener_ = systemAbilityListener;
+    }
+    inline int32_t GetSlotId() const
+    {
+        return slotId_;
+    }
+    inline void SetSlotId(int32_t slotId)
+    {
+        slotId_ = slotId;
+    }
 
 private:
     void RegisterEvents();
@@ -62,7 +86,7 @@ private:
 private:
     std::shared_ptr<CellularDataHandler> cellularDataHandler_;
     sptr<ISystemAbilityStatusChange> systemAbilityListener_ = nullptr;
-    const int32_t slotId_;
+    int32_t slotId_;
 
 private:
     class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {

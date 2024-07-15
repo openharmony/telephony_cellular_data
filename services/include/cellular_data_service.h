@@ -87,9 +87,11 @@ public:
 private:
     bool Init();
     void InitModule();
-    bool CheckParamValid(const int32_t slotId);
     void UnRegisterAllNetSpecifier();
     void AddNetSupplier(int32_t slotId, CellularDataNetAgent &netAgent, std::vector<uint64_t> &netCapabilities);
+    void ClearCellularDataControllers();
+    void AddCellularDataControllers(int32_t slotId, std::shared_ptr<CellularDataController> cellularDataController);
+    std::shared_ptr<CellularDataController> GetCellularDataController(int32_t slotId);
 
 private:
     std::map<int32_t, std::shared_ptr<CellularDataController>> cellularDataControllers_;
@@ -97,6 +99,8 @@ private:
     int64_t beginTime_ = 0L;
     int64_t endTime_ = 0L;
     ServiceRunningState state_;
+    std::mutex mapLock_;
+    std::shared_ptr<CellularDataController> cellularDataController_;
 };
 } // namespace Telephony
 } // namespace OHOS
