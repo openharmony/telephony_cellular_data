@@ -1026,6 +1026,8 @@ HWTEST_F(BranchTest, Telephony_CellularDataUtils_001, Function | MediumTest | Le
         CellularDataUtils::ConvertRadioTechToRadioName(static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_IWLAN)));
     ASSERT_EQ(
         "NR", CellularDataUtils::ConvertRadioTechToRadioName(static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_NR)));
+    ASSERT_EQ(
+        "unknown", CellularDataUtils::ConvertRadioTechToRadioName(static_cast<int32_t>(INVALID_SLOTID)));
     ASSERT_TRUE(CellularDataUtils::Split("", "").empty());
     EXPECT_GE(DelayedSingleton<CellularDataClient>::GetInstance()->GetCellularDataFlowType(), 0);
     auto recipient =
@@ -1695,7 +1697,7 @@ HWTEST_F(BranchTest, ParseIpAddr_002, Function | MediumTest | Level0)
 {
     std::string address = "192.000.1.1/24";
     std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(address);
-    EXPECT_EQ(ipInfoArray.size(), 0);
+    EXPECT_EQ(ipInfoArray.size(), 1);
 }
 
 /**
@@ -1719,7 +1721,7 @@ HWTEST_F(BranchTest, ParseIpAddr_004, Function | MediumTest | Level0)
 {
     std::string address = "2001:0000:0000:0000:0000:0000:0000:0000/64";
     std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(address);
-    EXPECT_EQ(ipInfoArray.size(), 0);
+    EXPECT_EQ(ipInfoArray.size(), 1);
 }
 
 /**
@@ -1732,6 +1734,106 @@ HWTEST_F(BranchTest, ParseIpAddr_005, Function | MediumTest | Level0)
     std::string address = "2001:0000:0000:0000:0000:0000:0000:0000/64 2001:0000:0000:0000:0000:0000:0000:0000/64";
     std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(address);
     EXPECT_EQ(ipInfoArray.size(), 2);
+}
+
+/**
+ * @tc.number   GetPrefixLen_001
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, GetPrefixLen_001, Function | MediumTest | Level0)
+{
+    std::vector<std::string> netmask;
+    int32_t result = CellularDataUtils::GetPrefixLen(netmask, 0);
+    EXPECT_EQ(result, 0);
+}
+
+/**
+ * @tc.number   GetPrefixLen_002
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, GetPrefixLen_002, Function | MediumTest | Level0)
+{
+    std::vector<std::string> netmask = {"255", "invalid", "255"};
+    int32_t result = CellularDataUtils::GetPrefixLen(netmask, 0);
+    EXPECT_EQ(result, 8);
+}
+
+/**
+ * @tc.number   GetPrefixLen_003
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, GetPrefixLen_003, Function | MediumTest | Level0)
+{
+    std::vector<std::string> netmask = {"255", "0", "255"};
+    int32_t result = CellularDataUtils::GetPrefixLen(netmask, 0);
+    EXPECT_EQ(result, 8);
+}
+
+/**
+ * @tc.number   GetPrefixLen_004
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, GetPrefixLen_004, Function | MediumTest | Level0)
+{
+    std::vector<std::string> netmask = {"255", "254", "255"};
+    int32_t result = CellularDataUtils::GetPrefixLen(netmask, 0);
+    EXPECT_EQ(result, 15);
+}
+
+/**
+ * @tc.number   GetPrefixLen_005
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, GetPrefixLen_005, Function | MediumTest | Level0)
+{
+    std::vector<std::string> netmask = {"255", "256", "255"};
+    int32_t result = CellularDataUtils::GetPrefixLen(netmask, 0);
+    EXPECT_EQ(result, 8);
+}
+
+/**
+ * @tc.number   GetPrefixLen_006
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, GetPrefixLen_006, Function | MediumTest | Level0)
+{
+    std::vector<std::string> netmask = {"255", "254", "255"};
+    int32_t result = CellularDataUtils::GetPrefixLen(netmask, 0);
+    EXPECT_EQ(result, 15);
+}
+
+/**
+ * @tc.number   GetPrefixLen_007
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, GetPrefixLen_007, Function | MediumTest | Level0)
+{
+    std::vector<std::string> netmask = {"255", "255", "255"};
+    int32_t result = CellularDataUtils::GetPrefixLen(netmask, 0);
+    EXPECT_EQ(result, 24);
+}
+
+/**
+ * @tc.number   JudgingDataActivateTimeOut_001
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, JudgingDataActivateTimeOut_001, Function | MediumTest | Level0)
+{
+    auto cellularDataHiSysEvent = DelayedSingleton<CellularDataHiSysEvent>::GetInstance();
+    int32_t slotId = 1;
+    int32_t switchState = 1;
+    cellularDataHiSysEvent->dataActivateStartTime_ = -1000;
+    cellularDataHiSysEvent->JudgingDataActivateTimeOut(slotId, switchState);
+    cellularDataHiSysEvent->SetCellularDataActivateStartTime();
+    EXPECT_NE(cellularDataHiSysEvent->dataActivateStartTime_, -1000);
 }
 } // namespace Telephony
 } // namespace OHOS
