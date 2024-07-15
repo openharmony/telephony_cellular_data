@@ -24,7 +24,7 @@
 #include "pdp_profile_data.h"
 
 namespace OHOS {
-namespace Telephony{
+namespace Telephony {
 using namespace testing::ext;
 
 class ApnManagerTest : public testing::Test {
@@ -39,11 +39,13 @@ void ApnManagerTest::SetUpTestCase() {}
 
 void ApnManagerTest::TearDownTestCase() {}
 
-void ApnManagerTest::SetUp() {
+void ApnManagerTest::SetUp()
+{
     apnManager = std::make_shared<ApnManager>();
 }
 
-void ApnManagerTest::TearDown() {
+void ApnManagerTest::TearDown()
+{
     apnManager.reset();
 }
 
