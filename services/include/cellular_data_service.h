@@ -100,7 +100,7 @@ private:
     int64_t endTime_ = 0L;
     ServiceRunningState state_;
     std::mutex mapLock_;
-    std::shared_ptr<CellularDataController> cellularDataController_;
+    bool initEndFlag_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -140,6 +140,7 @@ bool CellularDataService::Init()
             TELEPHONY_LOGE("CellularDataController is null");
         }
     }
+    initEndFlag_ = true;
     return true;
 }
 
@@ -638,7 +639,7 @@ int32_t CellularDataService::IsNeedDoRecovery(int32_t slotId, bool needDoRecover
 
 std::shared_ptr<CellularDataController> CellularDataService::GetCellularDataController(int32_t slotId)
 {
-    if (slotId < 0) {
+    if (slotId < 0 || !initEndFlag_) {
         return nullptr;
     }
     std::lock_guard<std::mutex> guard(mapLock_);
@@ -648,16 +649,7 @@ std::shared_ptr<CellularDataController> CellularDataService::GetCellularDataCont
         return nullptr;
     }
 
-    if (cellularDataController_ == nullptr) {
-        cellularDataController_ = std::make_shared<CellularDataController>(slotId);
-    }
-    if (cellularDataController_->GetSlotId() != slotId) {
-        cellularDataController_->SetSlotId(slotId);
-    }
-    cellularDataController_->SetCellularDataHandler(item->second->GetCellularDataHandler());
-    cellularDataController_->SetSystemAbilityListener(item->second->GetSystemAbilityListener());
-
-    return cellularDataController_;
+    return item->second;
 }
 } // namespace Telephony
 } // namespace OHOS
