@@ -100,7 +100,7 @@ private:
     int64_t endTime_ = 0L;
     ServiceRunningState state_;
     std::mutex mapLock_;
-    bool initEndFlag_ = false;
+    bool isInitSuccess_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
