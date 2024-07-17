@@ -517,9 +517,9 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_001, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.RequestNet(request));
     request.ident = "simId2";
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ReleaseNet(request));
-    ASSERT_TRUE(service.CheckParamValid(DEFAULT_SIM_SLOT_ID));
-    ASSERT_FALSE(service.CheckParamValid(INVALID_SLOTID));
-    ASSERT_FALSE(service.CheckParamValid(INVALID_SLOTID_TWO));
+    ASSERT_TRUE(service.GetCellularDataController(DEFAULT_SIM_SLOT_ID) != nullptr);
+    ASSERT_FALSE(service.GetCellularDataController(INVALID_SLOTID) != nullptr);
+    ASSERT_FALSE(service.GetCellularDataController(INVALID_SLOTID_TWO) != nullptr);
 }
 
 /**
@@ -559,8 +559,8 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_002, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.RequestNet(request));
     request.ident = "simId2";
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ReleaseNet(request));
-    ASSERT_FALSE(service.CheckParamValid(INVALID_SLOTID));
-    ASSERT_FALSE(service.CheckParamValid(INVALID_SLOTID_TWO));
+    ASSERT_FALSE(service.GetCellularDataController(INVALID_SLOTID) != nullptr);
+    ASSERT_FALSE(service.GetCellularDataController(INVALID_SLOTID_TWO) != nullptr);
     ASSERT_NE(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(DEFAULT_SIM_SLOT_ID, std::string()));
     ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(INVALID_SLOTID, std::string()));
     ASSERT_EQ(service.GetDataRecoveryState(), 0);
@@ -618,9 +618,9 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_003, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.RequestNet(request));
     request.ident = "simId2";
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ReleaseNet(request));
-    ASSERT_FALSE(service.CheckParamValid(DEFAULT_SIM_SLOT_ID));
-    ASSERT_FALSE(service.CheckParamValid(INVALID_SLOTID));
-    ASSERT_FALSE(service.CheckParamValid(INVALID_SLOTID_TWO));
+    ASSERT_FALSE(service.GetCellularDataController(DEFAULT_SIM_SLOT_ID) != nullptr);
+    ASSERT_FALSE(service.GetCellularDataController(INVALID_SLOTID) != nullptr);
+    ASSERT_FALSE(service.GetCellularDataController(INVALID_SLOTID_TWO) != nullptr);
 }
 
 /**
