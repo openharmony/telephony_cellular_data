@@ -630,7 +630,7 @@ int32_t CellularDataService::IsNeedDoRecovery(int32_t slotId, bool needDoRecover
 {
     std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
     if (cellularDataController == nullptr) {
-        TELEPHONY_LOGE("cellularDataControllers_[%{public}d] is null", slotId);
+        TELEPHONY_LOGE("cellularDataControllers is null, slotId=%{public}d", slotId);
         return CELLULAR_DATA_INVALID_PARAM;
     }
     cellularDataController->IsNeedDoRecovery(needDoRecovery);
@@ -640,7 +640,7 @@ int32_t CellularDataService::IsNeedDoRecovery(int32_t slotId, bool needDoRecover
 std::shared_ptr<CellularDataController> CellularDataService::GetCellularDataController(int32_t slotId)
 {
     if (slotId < 0 || !isInitSuccess_) {
-        TELEPHONY_LOGE("Invalid slotId or Init is not success. slotId=%{publicd}, is InitSuccess=%{public}d",
+        TELEPHONY_LOGE("Invalid slotId or Init is not success. slotId=%{public}d, isInitSuccess=%{public}d",
             slotId, (int32_t)isInitSuccess_);
         return nullptr;
     }
