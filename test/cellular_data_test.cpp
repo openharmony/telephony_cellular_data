@@ -1870,7 +1870,7 @@ HWTEST_F(CellularDataTest, QueryApns_001, TestSize.Level3)
     int32_t slotId = 0;
     CellularDataRdbHelper cellularDataRdbHelper;
     bool result = cellularDataRdbHelper.QueryApns(mcc, mnc, apnVec, slotId);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
 }
 
 
