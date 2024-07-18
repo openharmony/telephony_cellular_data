@@ -1880,8 +1880,8 @@ HWTEST_F(BranchTest, MakePdpProfile_001, TestSize.Level3)
     apnBean.roamPdpProtocol = "";
     CellularDataRdbHelper cellularDataRdbHelper;
     cellularDataRdbHelper.MakePdpProfile(result, i, apnBean);
-    ASSERT_TEQ("IP", apnBean.pdpProtocol);
-    ASSERT_TEQ("IP", apnBean.roamPdpProtocol);
+    ASSERT_EQ("IP", apnBean.pdpProtocol);
+    ASSERT_EQ("IP", apnBean.roamPdpProtocol);
 }
 
 /**
@@ -1898,8 +1898,8 @@ HWTEST_F(BranchTest, MakePdpProfile_002, TestSize.Level3)
     apnBean.roamPdpProtocol = "abc";
     CellularDataRdbHelper cellularDataRdbHelper;
     cellularDataRdbHelper.MakePdpProfile(result, i, apnBean);
-    ASSERT_TEQ("ABC", apnBean.pdpProtocol);
-    ASSERT_TEQ("abc", apnBean.roamPdpProtocol);
+    ASSERT_EQ("ABC", apnBean.pdpProtocol);
+    ASSERT_EQ("abc", apnBean.roamPdpProtocol);
 }
 } // namespace Telephony
 } // namespace OHOS

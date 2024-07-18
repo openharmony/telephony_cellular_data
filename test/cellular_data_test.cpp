@@ -1736,7 +1736,7 @@ HWTEST_F(CellularDataTest, RequestNetwork_001, TestSize.Level3)
         callback_ = std::make_unique<NetManagerCallBack>().release();
     }
     int32_t result = callback_->RequestNetwork(ident, netCaps, registerType);
-    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM)
+    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
 
 /**
@@ -1753,7 +1753,7 @@ HWTEST_F(CellularDataTest, RequestNetwork_002, TestSize.Level3)
         callback_ = std::make_unique<NetManagerCallBack>().release();
     }
     int32_t result = callback_->RequestNetwork(ident, netCaps, registerType);
-    ASSERT_NE(result, CELLULAR_DATA_INVALID_PARAM)
+    ASSERT_NE(result, CELLULAR_DATA_INVALID_PARAM);
 }
 
 /**
@@ -1765,12 +1765,11 @@ HWTEST_F(CellularDataTest, ReleaseNetwork_001, TestSize.Level3)
 {
     std::string ident = "testIdent";
     std::set<NetCap> netCaps;
-    int32_t registerType = 1;
     if (callback_ == nullptr) {
         callback_ = std::make_unique<NetManagerCallBack>().release();
     }
     int32_t result = callback_->ReleaseNetwork(ident, netCaps);
-    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM)
+    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
 
 /**
@@ -1782,12 +1781,11 @@ HWTEST_F(CellularDataTest, ReleaseNetwork_002, TestSize.Level3)
 {
     std::string ident = "testIdent";
     std::set<NetCap> netCaps = { NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET };
-    int32_t registerType = 1;
     if (callback_ == nullptr) {
         callback_ = std::make_unique<NetManagerCallBack>().release();
     }
     int32_t result = callback_->ReleaseNetwork(ident, netCaps);
-    ASSERT_NE(result, CELLULAR_DATA_INVALID_PARAM)
+    ASSERT_NE(result, CELLULAR_DATA_INVALID_PARAM);
 }
 
 /**
@@ -1801,7 +1799,7 @@ HWTEST_F(CellularDataTest, NetStrategySwitch_001, TestSize.Level3)
         tacticsCallBack_ = std::make_unique<NetManagerTacticsCallBack>().release();
     }
     int32_t result = tacticsCallBack_->NetStrategySwitch("", true);
-    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM)
+    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
 
 /**
@@ -1815,7 +1813,7 @@ HWTEST_F(CellularDataTest, NetStrategySwitch_002, TestSize.Level3)
         tacticsCallBack_ = std::make_unique<NetManagerTacticsCallBack>().release();
     }
     int32_t result = tacticsCallBack_->NetStrategySwitch("abc", true);
-    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM)
+    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
 
 /**
@@ -1829,7 +1827,7 @@ HWTEST_F(CellularDataTest, NetStrategySwitch_003, TestSize.Level3)
         tacticsCallBack_ = std::make_unique<NetManagerTacticsCallBack>().release();
     }
     int32_t result = tacticsCallBack_->NetStrategySwitch("123", true);
-    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM)
+    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
 
 /**
@@ -1840,8 +1838,9 @@ HWTEST_F(CellularDataTest, NetStrategySwitch_003, TestSize.Level3)
 HWTEST_F(CellularDataTest, RdbUpdate_001, TestSize.Level3)
 {
     DataShare::DataShareValuesBucket values;
+    DataShare::DataSharePredicates predicates;
     CellularDataRdbHelper cellularDataRdbHelper;
-    int result = cellularDataRdbHelper.Update(values);
+    int result = cellularDataRdbHelper.Update(values, predicates);
     ASSERT_EQ(result, NULL_POINTER_EXCEPTION);
 }
 
