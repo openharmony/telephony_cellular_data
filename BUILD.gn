@@ -117,6 +117,11 @@ ohos_shared_library("tel_cellular_data") {
     defines += [ "HICOLLIE_ENABLE" ]
   }
 
+  cflags_cc = [
+    "-O2",
+    "-D_FORTIFY_SOURCE=2",
+  ]
+
   defines += telephony_extra_defines
 
   part_name = "cellular_data"
