@@ -22,6 +22,7 @@ namespace OHOS {
 namespace Telephony {
 using namespace NetManagerStandard;
 class NetManagerTacticsCallBack : public NetPolicyCallbackStub {
+private:
     int32_t NetStrategySwitch(const std::string &simId, bool enable) override;
 };
 } // Telephony

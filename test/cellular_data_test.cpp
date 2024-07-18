@@ -142,6 +142,8 @@ public:
     static int32_t IsNeedDoRecovery(int32_t slotId, bool needDoRecovery);
     static int32_t InitCellularDataController(int32_t slotId);
     static int32_t GetIntelligenceSwitchStateTest(bool &state);
+    sptr<NetManagerCallBack> callback_ = nullptr;
+    sptr<NetManagerTacticsCallBack> tacticsCallBack_;
 };
 
 bool CellularDataTest::HasSimCard(const int32_t slotId)
@@ -1718,6 +1720,223 @@ HWTEST_F(CellularDataTest, XCAP_Apn_Test_02, TestSize.Level3)
     ASSERT_TRUE(xcapCallback->isCallback_);
     result = NetConnClient::GetInstance().UnregisterNetConnCallback(callback);
     std::cout << "UnregisterNetConnCallback result [" << result << "]" << std::endl;
+}
+
+/**
+ * @tc.number   RequestNetwork_001
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, RequestNetwork_001, TestSize.Level3)
+{
+    std::string ident = "testIdent";
+    std::set<NetCap> netCaps;
+    int32_t registerType = 1;
+    if (callback_ == nullptr) {
+        callback_ = std::make_unique<NetManagerCallBack>().release();
+    }
+    int32_t result = callback_->RequestNetwork(ident, netCaps, registerType);
+    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM)
+}
+
+/**
+ * @tc.number   RequestNetwork_002
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, RequestNetwork_002, TestSize.Level3)
+{
+    std::string ident = "testIdent";
+    std::set<NetCap> netCaps = { NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET };
+    int32_t registerType = 1;
+    if (callback_ == nullptr) {
+        callback_ = std::make_unique<NetManagerCallBack>().release();
+    }
+    int32_t result = callback_->RequestNetwork(ident, netCaps, registerType);
+    ASSERT_NE(result, CELLULAR_DATA_INVALID_PARAM)
+}
+
+/**
+ * @tc.number   ReleaseNetwork_001
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, ReleaseNetwork_001, TestSize.Level3)
+{
+    std::string ident = "testIdent";
+    std::set<NetCap> netCaps;
+    int32_t registerType = 1;
+    if (callback_ == nullptr) {
+        callback_ = std::make_unique<NetManagerCallBack>().release();
+    }
+    int32_t result = callback_->ReleaseNetwork(ident, netCaps);
+    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM)
+}
+
+/**
+ * @tc.number   ReleaseNetwork_002
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, ReleaseNetwork_002, TestSize.Level3)
+{
+    std::string ident = "testIdent";
+    std::set<NetCap> netCaps = { NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET };
+    int32_t registerType = 1;
+    if (callback_ == nullptr) {
+        callback_ = std::make_unique<NetManagerCallBack>().release();
+    }
+    int32_t result = callback_->ReleaseNetwork(ident, netCaps);
+    ASSERT_NE(result, CELLULAR_DATA_INVALID_PARAM)
+}
+
+/**
+ * @tc.number   NetStrategySwitch_001
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, NetStrategySwitch_001, TestSize.Level3)
+{
+    if (tacticsCallBack_ == nullptr) {
+        tacticsCallBack_ = std::make_unique<NetManagerTacticsCallBack>().release();
+    }
+    int32_t result = tacticsCallBack_->NetStrategySwitch("", true);
+    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM)
+}
+
+/**
+ * @tc.number   NetStrategySwitch_002
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, NetStrategySwitch_002, TestSize.Level3)
+{
+    if (tacticsCallBack_ == nullptr) {
+        tacticsCallBack_ = std::make_unique<NetManagerTacticsCallBack>().release();
+    }
+    int32_t result = tacticsCallBack_->NetStrategySwitch("abc", true);
+    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM)
+}
+
+/**
+ * @tc.number   NetStrategySwitch_003
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, NetStrategySwitch_003, TestSize.Level3)
+{
+    if (tacticsCallBack_ == nullptr) {
+        tacticsCallBack_ = std::make_unique<NetManagerTacticsCallBack>().release();
+    }
+    int32_t result = tacticsCallBack_->NetStrategySwitch("123", true);
+    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM)
+}
+
+/**
+ * @tc.number   RdbUpdate_001
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, RdbUpdate_001, TestSize.Level3)
+{
+    DataShare::DataShareValuesBucket values;
+    CellularDataRdbHelper cellularDataRdbHelper;
+    int result = cellularDataRdbHelper.Update(values);
+    ASSERT_EQ(result, NULL_POINTER_EXCEPTION);
+}
+
+/**
+ * @tc.number   RdbInsert_001
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, RdbInsert_001, TestSize.Level3)
+{
+    DataShare::DataShareValuesBucket values;
+    CellularDataRdbHelper cellularDataRdbHelper;
+    int result = cellularDataRdbHelper.Insert(values);
+    ASSERT_EQ(result, NULL_POINTER_EXCEPTION);
+}
+
+/**
+ * @tc.number   QueryApns_001
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, QueryApns_001, TestSize.Level3)
+{
+    std::string mcc = "123";
+    std::string mnc = "456";
+    std::vector<PdpProfile> apnVec;
+    int32_t slotId = 0;
+    CellularDataRdbHelper cellularDataRdbHelper;
+    bool result = cellularDataRdbHelper.QueryApns(mcc, mnc, apnVec, slotId);
+    ASSERT_TRUE(result);
+}
+
+
+/**
+ * @tc.number   QueryMvnoApnsByType_001
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, QueryMvnoApnsByType_001, TestSize.Level3)
+{
+    std::string mcc = "123";
+    std::string mnc = "456";
+    std::string mvnoType = "789";
+    std::string mvnoDataFromSim = "";
+    std::vector<PdpProfile> mvnoApnVec;
+    int32_t slotId = 0;
+    CellularDataRdbHelper cellularDataRdbHelper;
+    bool result = cellularDataRdbHelper.QueryMvnoApnsByType(mcc, mnc, mvnoType, mvnoDataFromSim, mvnoApnVec, slotId);
+    ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.number   QueryMvnoApnsByType_002
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, QueryMvnoApnsByType_002, TestSize.Level3)
+{
+    std::string mcc = "123";
+    std::string mnc = "456";
+    std::string mvnoType = "789";
+    std::string mvnoDataFromSim = "012";
+    std::vector<PdpProfile> mvnoApnVec;
+    int32_t slotId = 0;
+    CellularDataRdbHelper cellularDataRdbHelper;
+    bool result = cellularDataRdbHelper.QueryMvnoApnsByType(mcc, mnc, mvnoType, mvnoDataFromSim, mvnoApnVec, slotId);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.number   ReadApnResult_001
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, ReadApnResult_001, TestSize.Level3)
+{
+    std::shared_ptr<DataShare::DataShareResultSet> result = nullptr;
+    std::vector<PdpProfile> apnVec;
+    CellularDataRdbHelper cellularDataRdbHelper;
+    cellularDataRdbHelper.ReadApnResult(nullptr, apnVec);
+    ASSERT_TRUE(apnVec.empty());
+}
+
+/**
+ * @tc.number   ReadApnResult_002
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, ReadApnResult_002, TestSize.Level3)
+{
+    std::shared_ptr<DataShare::DataShareResultSet> result = std::make_shared<DataShare::DataShareResultSet>();
+    std::vector<PdpProfile> apnVec;
+    CellularDataRdbHelper cellularDataRdbHelper;
+    cellularDataRdbHelper.ReadApnResult(nullptr, apnVec);
+    ASSERT_TRUE(apnVec.empty());
 }
 
 #else  // TEL_TEST_UNSUPPORT

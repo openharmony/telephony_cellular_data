@@ -1835,5 +1835,71 @@ HWTEST_F(BranchTest, JudgingDataActivateTimeOut_001, Function | MediumTest | Lev
     cellularDataHiSysEvent->SetCellularDataActivateStartTime();
     EXPECT_NE(cellularDataHiSysEvent->dataActivateStartTime_, -1000);
 }
+
+/**
+ * @tc.number   ReadMvnoApnResult_001
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, ReadMvnoApnResult_001, TestSize.Level3)
+{
+    std::shared_ptr<DataShare::DataShareResultSet> result = nullptr;
+    std::string mvnoDataFromSim = "mvnoDataFromSim";
+    std::vector<PdpProfile> apnVec;
+    CellularDataRdbHelper cellularDataRdbHelper;
+    cellularDataRdbHelper.ReadMvnoApnResult(nullptr, mvnoDataFromSim, apnVec);
+    ASSERT_TRUE(apnVec.empty());
+}
+
+/**
+ * @tc.number   ReadMvnoApnResult_002
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, ReadMvnoApnResult_002, TestSize.Level3)
+{
+    std::shared_ptr<DataShare::DataShareResultSet> result = std::make_shared<DataShare::DataShareResultSet>();
+    std::string mvnoDataFromSim = "mvnoDataFromSim";
+    std::vector<PdpProfile> apnVec;
+    CellularDataRdbHelper cellularDataRdbHelper;
+    cellularDataRdbHelper.ReadMvnoApnResult(nullptr, mvnoDataFromSim, apnVec);
+    ASSERT_TRUE(apnVec.empty());
+}
+
+/**
+ * @tc.number   MakePdpProfile_001
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, MakePdpProfile_001, TestSize.Level3)
+{
+    std::shared_ptr<DataShare::DataShareResultSet> result = std::make_shared<DataShare::DataShareResultSet>();
+    int i = 0;
+    PdpProfile apnBean;
+    apnBean.pdpProtocol = "";
+    apnBean.roamPdpProtocol = "";
+    CellularDataRdbHelper cellularDataRdbHelper;
+    cellularDataRdbHelper.MakePdpProfile(result, i, apnBean);
+    ASSERT_TEQ("IP", apnBean.pdpProtocol);
+    ASSERT_TEQ("IP", apnBean.roamPdpProtocol);
+}
+
+/**
+ * @tc.number   MakePdpProfile_002
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, MakePdpProfile_002, TestSize.Level3)
+{
+    std::shared_ptr<DataShare::DataShareResultSet> result = std::make_shared<DataShare::DataShareResultSet>();
+    int i = 0;
+    PdpProfile apnBean;
+    apnBean.pdpProtocol = "ABC";
+    apnBean.roamPdpProtocol = "abc";
+    CellularDataRdbHelper cellularDataRdbHelper;
+    cellularDataRdbHelper.MakePdpProfile(result, i, apnBean);
+    ASSERT_TEQ("ABC", apnBean.pdpProtocol);
+    ASSERT_TEQ("abc", apnBean.roamPdpProtocol);
+}
 } // namespace Telephony
 } // namespace OHOS
