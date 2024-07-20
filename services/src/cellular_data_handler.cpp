@@ -1004,6 +1004,8 @@ void CellularDataHandler::OnReceiveEvent(const EventFwk::CommonEventData &data)
             return;
         }
         HandleScreenStateChanged(false);
+    } else if (action == CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
+        RegisterDataSettingObserver();
     } else {
         TELEPHONY_LOGI("Slot%{public}d: action=%{public}s code=%{public}d", slotId_, action.c_str(), data.GetCode());
     }
