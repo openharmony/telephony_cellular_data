@@ -112,6 +112,11 @@ ohos_shared_library("tel_cellular_data") {
     defines += [ "ABILITY_POWER_SUPPORT" ]
   }
 
+  if (telephony_hicollie_able) {
+    external_deps += [ "hicollie:libhicollie" ]
+    defines += [ "HICOLLIE_ENABLE" ]
+  }
+
   defines += telephony_extra_defines
 
   part_name = "cellular_data"

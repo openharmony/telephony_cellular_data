@@ -305,7 +305,6 @@ void CellularDataService::AddNetSupplier(int32_t slotId, CellularDataNetAgent &n
         NetSupplier netSupplier = { 0 };
         netSupplier.supplierId = 0;
         netSupplier.slotId = slotId;
-        netSupplier.simId = INVALID_SIM_ID;
         netSupplier.capability = capability;
         netAgent.AddNetSupplier(netSupplier);
     }
@@ -345,8 +344,7 @@ int32_t CellularDataService::ReleaseNet(const NetRequest &request)
     if (!IsValidDecValue(requestIdent)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    int32_t simId = std::stoi(requestIdent);
-    int32_t slotId = CoreManagerInner::GetInstance().GetSlotId(simId);
+    int32_t slotId = std::stoi(requestIdent);
     if (!CheckParamValid(slotId)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
@@ -360,12 +358,12 @@ int32_t CellularDataService::RequestNet(const NetRequest &request)
     if (!IsValidDecValue(requestIdent)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    int32_t simId = std::stoi(requestIdent);
+    int32_t slotId = std::stoi(requestIdent);
+    int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
     if (TELEPHONY_EXT_WRAPPER.isCardAllowData_ &&
         !TELEPHONY_EXT_WRAPPER.isCardAllowData_(simId, request.capability)) {
         return static_cast<int32_t>(RequestNetCode::REQUEST_FAILED);
     }
-    int32_t slotId = CoreManagerInner::GetInstance().GetSlotId(simId);
     if (!CheckParamValid(slotId)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }

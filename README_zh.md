@@ -7,7 +7,10 @@
 -   [使用说明](#section160mcpsimp)
     -   [获取蜂窝数据开关是否打开](#section192mcpsimp)
     -   [获取蜂窝数据状态](#section213mcpsimp)
-
+    - [获取蜂窝移动数据是否启用](#section234mcpsimp)
+    
+      [获取蜂窝数据漫游是否启用](#section255mcpsimp)
+    
 -   [相关仓](#section234mcpsimp)
 
 ## 简介<a name="section117mcpsimp"></a>
@@ -51,23 +54,25 @@ base/telephony/cellular_data/
 
 <a name="table133mcpsimp"></a>
 
-| 接口名称                                                     | 接口描述                 | 所需权限                         |
-| ------------------------------------------------------------ | ------------------------ | -------------------------------- |
-| function isCellularDataEnabled(callback: AsyncCallback\<boolean>): void; | 获取蜂窝数据开关是否打开 | ohos.permission.GET_NETWORK_INFO |
-| function getCellularDataState(callback: AsyncCallback\<DataConnectState>): void; | 获取蜂窝数据状态         | ohos.permission.GET_NETWORK_INFO |
+| 接口名称                                                     | 接口描述                                                     | 所需权限                         |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | -------------------------------- |
+| function isCellularDataEnabled(callback: AsyncCallback\<boolean>): void; | 获取蜂窝数据开关是否打开                                     | ohos.permission.GET_NETWORK_INFO |
+| function getCellularDataState(callback: AsyncCallback\<DataConnectState>): void; | 获取蜂窝数据状态                                             | ohos.permission.GET_NETWORK_INFO |
+| function isCellularDataEnabledSync(): boolean;               | 获取蜂窝移动数据服务是否启用                                 | ohos.permission.GET_NETWORK_INFO |
+| function isCellularDataRoamingEnabledSync(slotId: number): boolean; | 获取蜂窝数据漫游服务是否启用（参数slotId为SIM卡id，0表示卡一，1表示卡二） | ohos.permission.GET_NETWORK_INFO |
 
-完整的JS API说明以及实例代码请参考：[蜂窝数据](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/reference/apis/js-apis-telephony-data.md)。
+完整的JS API说明以及实例代码请参考：[蜂窝数据](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/reference/apis-telephony-kit/js-apis-telephony-data.md)。
 
 ## 使用说明<a name="section160mcpsimp"></a>
 
 ### 获取蜂窝数据开关是否打开<a name="section192mcpsimp"></a>
 
-1.  可以通过callback或者Promise的方式调用IsCellularDataEnabled获取蜂窝数据开关是否打开。
+1.  可以通过callback或者Promise的方式调用isCellularDataEnabled获取蜂窝数据开关是否打开。
 2.  该接口为异步接口，相关执行结果会从callback中返回。
 
     ```
     import data from "@ohos.telephony.data";
-
+    
     // 调用接口【callback方式】
     data.isCellularDataEnabled((err, value) => {
       if (err) {
@@ -90,6 +95,43 @@ base/telephony/cellular_data/
     });
     ```
 
+### 获取蜂窝移动数据服务是否启用<a name="section234mcpsimp"></a>
+
+1.  可以通过调用isCellularDataEnabledSync获取蜂窝移动数据服务是否启用。
+2.  该接口为同步接口，相关执行结果会从isCellularDataEnabledSync中返回。
+
+    ```
+    import data from "@ohos.telephony.data";
+    
+    try {
+    	// 调用接口【Sync方式】
+    	let isEnabled: boolean = data.isCellularDataEnabledSync();
+    	// 调用接口成功
+        console.log(`isCellularDataEnabledSync success : ${isEnabled}`);
+    } catch (error) {
+    	// 调用接口失败
+        console.log(`isCellularDataEnabledSync failed`);  
+    }
+    ```
+
+### 获取蜂窝数据漫游服务是否启用<a name="section255mcpsimp"></a>
+
+1.  可以通过调用isCellularDataRoamingEnabledSync获取蜂窝数据漫游服务是否启用。
+2.  该接口为同步接口，相关执行结果会从isCellularDataRoamingEnabledSync中返回。
+
+    ```
+    import data from "@ohos.telephony.data";
+    
+    try {
+    	// 调用接口【Sync方式】
+    	let isEnabled: boolean = data.isCellularDataRoamingEnabledSync(0);
+    	// 调用接口成功
+        console.log(`isCellularDataRoamingEnabledSync success : ${isEnabled}`);
+    } catch (error) {
+    	// 调用接口失败
+        console.log(`isCellularDataRoamingEnabledSync failed`);  
+    }    
+    ```
 
 ### 获取蜂窝数据状态<a name="section213mcpsimp"></a>
 

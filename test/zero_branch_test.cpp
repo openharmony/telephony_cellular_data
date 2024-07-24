@@ -23,6 +23,7 @@
 #include "cellular_data_constant.h"
 #include "cellular_data_controller.h"
 #include "cellular_data_dump_helper.h"
+#include "cellular_data_error.h"
 #include "cellular_data_handler.h"
 #include "cellular_data_hisysevent.h"
 #include "cellular_data_rdb_observer.h"
@@ -151,9 +152,10 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_001, Function | MediumTest | 
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     CellularDataHandler cellularDataHandler { subscriberInfo, 0 };
-    NetRequest request { 0, "simId1" };
+    NetRequest request { 0, "slotId1" };
     cellularDataHandler.HandleSimStateChanged();
     cellularDataHandler.ReleaseAllNetworkRequest();
+    cellularDataHandler.CreateApnItem();
     ASSERT_FALSE(cellularDataHandler.ReleaseNet(request));
     ASSERT_FALSE(cellularDataHandler.RequestNet(request));
     auto event = AppExecFwk::InnerEvent::Get(0);
@@ -224,7 +226,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | 
     cellularDataHandler.HandleImsCallChanged(0);
     cellularDataHandler.HandleVoiceCallChanged(0);
     cellularDataHandler.HandleSimStateOrRecordsChanged(event);
-    cellularDataHandler.HandleSimAccountLoaded(event);
     cellularDataHandler.HandleRadioStateChanged(event);
     cellularDataHandler.HandleDsdsModeChanged(event);
     cellularDataHandler.SetRilAttachApnResponse(event);
@@ -267,6 +268,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_003, Function | MediumTest | 
     cellularDataHandler.EstablishAllApnsIfConnectable();
     cellularDataHandler.ClearAllConnections(reason);
     cellularDataHandler.ChangeConnectionForDsds(false);
+    cellularDataHandler.ChangeConnectionForDsds(true);
     cellularDataHandler.connectionManager_ = std::make_unique<DataConnectionManager>(INVALID_SLOTID).release();
     cellularDataHandler.ClearAllConnections(reason);
     cellularDataHandler.EstablishAllApnsIfConnectable();
@@ -276,11 +278,23 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_003, Function | MediumTest | 
     cellularDataHandler.AttemptEstablishDataConnection(apnHolder);
     cellularDataHandler.connectionManager_ = nullptr;
     auto event = AppExecFwk::InnerEvent::Get(0);
+    cellularDataHandler.ClearConnectionIfRequired();
     event = nullptr;
     cellularDataHandler.MsgEstablishDataConnection(event);
     ASSERT_FALSE(cellularDataHandler.HasAnyHigherPriorityConnection(apnHolder));
     cellularDataHandler.connectionManager_ = std::make_unique<DataConnectionManager>(INVALID_SLOTID).release();
     ASSERT_FALSE(cellularDataHandler.HasInternetCapability(INVALID_CID));
+    ASSERT_EQ(cellularDataHandler.GetDataRecoveryState(), 0);
+    cellularDataHandler.DisconnectDataComplete(event);
+    std::string str = "";
+    ASSERT_EQ(cellularDataHandler.GetDataConnIpType(), str);
+    cellularDataHandler.apnManager_ = nullptr;
+    ASSERT_EQ(cellularDataHandler.GetDataConnIpType(), str);
+    cellularDataHandler.CheckForCompatibleDataConnection(apnHolder);
+    event = AppExecFwk::InnerEvent::Get(0);
+    cellularDataHandler.HandleDBSettingRoamingChanged(event);
+    cellularDataHandler.ClearConnectionIfRequired();
+    ASSERT_EQ(nullptr, cellularDataHandler.FindIdleCellularDataConnection());
     cellularDataHandler.RemoveAllEvents();
     sleep(SLEEP_TIME_SECONDS);
 }
@@ -295,12 +309,15 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_004, Function | MediumTest | 
     CellularDataController controller { 0 };
     controller.Init();
     ASSERT_FALSE(controller.cellularDataHandler_ == nullptr);
-    NetRequest request { 0, "simId1" };
+    NetRequest request { 0, "slotId1" };
     controller.cellularDataHandler_->ReleaseNet(request);
     controller.cellularDataHandler_->RequestNet(request);
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
     controller.cellularDataHandler_->ProcessEvent(event);
+    controller.cellularDataHandler_->PsDataRatChanged(event);
+    ApnItem::Attribute apnAttr;
+    controller.cellularDataHandler_->GetDataConnApnAttr(apnAttr);
     EventFwk::CommonEventData data;
     controller.cellularDataHandler_->OnReceiveEvent(data);
     ASSERT_EQ(controller.cellularDataHandler_->SetCellularDataEnable(true), TELEPHONY_ERR_SUCCESS);
@@ -362,7 +379,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_005, Function | MediumTest | 
     controller.cellularDataHandler_->HandleImsCallChanged(0);
     controller.cellularDataHandler_->HandleVoiceCallChanged(0);
     controller.cellularDataHandler_->HandleSimStateOrRecordsChanged(event);
-    controller.cellularDataHandler_->HandleSimAccountLoaded(event);
     controller.cellularDataHandler_->HandleRadioStateChanged(event);
     controller.cellularDataHandler_->HandleDsdsModeChanged(event);
     controller.cellularDataHandler_->SetRilAttachApnResponse(event);
@@ -375,9 +391,79 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_005, Function | MediumTest | 
     controller.cellularDataHandler_->OnRilAdapterHostDied(event);
     controller.cellularDataHandler_->OnCleanAllDataConnectionsDone(event);
     controller.cellularDataHandler_->HandleFactoryReset(event);
+    controller.cellularDataHandler_->PsDataRatChanged(event);
     sptr<ApnHolder> apnHolder = controller.cellularDataHandler_->apnManager_->FindApnHolderById(1);
     ASSERT_FALSE(controller.cellularDataHandler_->HasAnyHigherPriorityConnection(apnHolder));
     controller.cellularDataHandler_->UnRegisterDataSettingObserver();
+    controller.cellularDataHandler_->RemoveAllEvents();
+    sleep(SLEEP_TIME_SECONDS);
+}
+
+/**
+ * @tc.number   Telephony_CellularDataHandler_006
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataHandler_006, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    CellularDataHandler cellularDataHandler { subscriberInfo, 0 };
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    event = nullptr;
+    cellularDataHandler.apnManager_ = std::make_unique<ApnManager>().release();
+    sptr<ApnHolder> apnHolder;
+    std::string str = "";
+    ASSERT_EQ(ApnProfileState::PROFILE_STATE_IDLE, cellularDataHandler.GetCellularDataState());
+    cellularDataHandler.CheckForCompatibleDataConnection(apnHolder);
+    cellularDataHandler.PsRadioEmergencyStateOpen(event);
+    cellularDataHandler.PsRadioEmergencyStateClose(event);
+    cellularDataHandler.IsNeedDoRecovery(true);
+    cellularDataHandler.HandleSortConnection();
+    ASSERT_EQ(cellularDataHandler.IsSingleConnectionEnabled(1), true);
+    ASSERT_EQ(cellularDataHandler.GetDataConnIpType(), str);
+    ASSERT_EQ(cellularDataHandler.GetDataRecoveryState(), -1);
+    ASSERT_FALSE(cellularDataHandler.IsGsm());
+    ASSERT_FALSE(cellularDataHandler.IsCdma());
+    cellularDataHandler.lastCallState_ = 0;
+    cellularDataHandler.HandleCallChanged(0);
+    cellularDataHandler.dataSwitchSettings_ = nullptr;
+    ASSERT_NE(cellularDataHandler.SetIntelligenceSwitchEnable(true), TELEPHONY_ERR_SUCCESS);
+    cellularDataHandler.RemoveAllEvents();
+    sleep(SLEEP_TIME_SECONDS);
+}
+
+/**
+ * @tc.number   Telephony_CellularDataHandler_007
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataHandler_007, Function | MediumTest | Level1)
+{
+    CellularDataController controller { 0 };
+    controller.Init();
+    ASSERT_FALSE(controller.cellularDataHandler_ == nullptr);
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    sptr<ApnHolder> apnHolder = controller.cellularDataHandler_->apnManager_->FindApnHolderById(1);
+    std::string str = "";
+    controller.cellularDataHandler_->CheckForCompatibleDataConnection(apnHolder);
+    controller.cellularDataHandler_->PsRadioEmergencyStateOpen(event);
+    controller.cellularDataHandler_->PsRadioEmergencyStateClose(event);
+    controller.cellularDataHandler_->IsNeedDoRecovery(true);
+    controller.cellularDataHandler_->CreateIncallDataStateMachine(1);
+    controller.cellularDataHandler_->HandleSettingSwitchChanged(event);
+    ASSERT_TRUE(controller.cellularDataHandler_->SetDataPermittedForMms(true));
+    controller.cellularDataHandler_->IncallDataComplete(event);
+    controller.cellularDataHandler_->HandleImsCallChanged(0);
+    controller.cellularDataHandler_->HandleSortConnection();
+    ASSERT_EQ(controller.cellularDataHandler_->IsSingleConnectionEnabled(1), false);
+    ASSERT_EQ(controller.cellularDataHandler_->GetDataConnIpType(), str);
+    ASSERT_NE(controller.cellularDataHandler_->GetDataRecoveryState(), -1);
+    ASSERT_FALSE(controller.cellularDataHandler_->IsGsm());
+    ASSERT_FALSE(controller.cellularDataHandler_->IsCdma());
+    ASSERT_EQ(controller.cellularDataHandler_->SetIntelligenceSwitchEnable(true), TELEPHONY_ERR_SUCCESS);
+    controller.cellularDataHandler_->ClearConnectionIfRequired();
     controller.cellularDataHandler_->RemoveAllEvents();
     sleep(SLEEP_TIME_SECONDS);
 }
@@ -425,9 +511,9 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_001, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.StrategySwitch(INVALID_SLOTID, false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.StrategySwitch(DEFAULT_SIM_SLOT_ID, false));
     NetRequest request;
-    request.ident = "simId12";
+    request.ident = "slotId12";
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.RequestNet(request));
-    request.ident = "simId2";
+    request.ident = "slotId2";
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ReleaseNet(request));
     ASSERT_TRUE(service.CheckParamValid(DEFAULT_SIM_SLOT_ID));
     ASSERT_FALSE(service.CheckParamValid(INVALID_SLOTID));
@@ -450,6 +536,8 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_002, Function | MediumTest | 
     bool dataEnabled = false;
     bool dataRoamingEnabled = false;
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.IsCellularDataEnabled(dataEnabled));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableIntelligenceSwitch(false));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableIntelligenceSwitch(true));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetCellularDataState());
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.IsCellularDataRoamingEnabled(INVALID_SLOTID, dataRoamingEnabled));
@@ -465,12 +553,18 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_002, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ChangeConnectionForDsds(INVALID_SLOTID, false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.StrategySwitch(INVALID_SLOTID, false));
     NetRequest request;
-    request.ident = "simId12";
+    request.ident = "slotId12";
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.RequestNet(request));
-    request.ident = "simId2";
+    request.ident = "slotId2";
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ReleaseNet(request));
     ASSERT_FALSE(service.CheckParamValid(INVALID_SLOTID));
     ASSERT_FALSE(service.CheckParamValid(INVALID_SLOTID_TWO));
+    ASSERT_NE(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(DEFAULT_SIM_SLOT_ID, std::string()));
+    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(INVALID_SLOTID, std::string()));
+    ASSERT_EQ(service.GetDataRecoveryState(), 0);
+    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.InitCellularDataController(2));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.InitCellularDataController(INVALID_SLOTID));
+    service.GetFlowDataInfoDump();
     service.OnStop();
 }
 
@@ -518,13 +612,78 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_003, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ChangeConnectionForDsds(DEFAULT_SIM_SLOT_ID, false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ChangeConnectionForDsds(DEFAULT_SIM_SLOT_ID, true));
     NetRequest request;
-    request.ident = "simId12";
+    request.ident = "slotId12";
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.RequestNet(request));
-    request.ident = "simId2";
+    request.ident = "slotId2";
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ReleaseNet(request));
     ASSERT_FALSE(service.CheckParamValid(DEFAULT_SIM_SLOT_ID));
     ASSERT_FALSE(service.CheckParamValid(INVALID_SLOTID));
     ASSERT_FALSE(service.CheckParamValid(INVALID_SLOTID_TWO));
+}
+
+/**
+ * @tc.number   Telephony_CellularDataService_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataService_004, Function | MediumTest | Level3)
+{
+    DataAccessToken token;
+    CellularDataService service;
+    std::vector<std::u16string> strV;
+    ASSERT_EQ(TELEPHONY_ERR_FAIL, service.Dump(INVALID_FD, strV));
+    service.state_ = ServiceRunningState::STATE_RUNNING;
+    service.OnStart();
+    service.InitModule();
+    service.GetFlowDataInfoDump();
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableIntelligenceSwitch(false));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableIntelligenceSwitch(true));
+    ASSERT_NE(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(DEFAULT_SIM_SLOT_ID, std::string()));
+    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(INVALID_SLOTID, std::string()));
+    ASSERT_EQ(service.GetDataRecoveryState(), 0);
+    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.InitCellularDataController(2));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.InitCellularDataController(INVALID_SLOTID));
+    ApnItem::Attribute apnAttr;
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDataConnApnAttr(INVALID_SLOTID, apnAttr));
+    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.GetDataConnApnAttr(DEFAULT_SIM_SLOT_ID, apnAttr));
+    std::string ipType;
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDataConnIpType(INVALID_SLOTID, ipType));
+    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.GetDataConnIpType(DEFAULT_SIM_SLOT_ID, ipType));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.IsNeedDoRecovery(INVALID_SLOTID, true));
+    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.IsNeedDoRecovery(DEFAULT_SIM_SLOT_ID, true));
+}
+
+/**
+ * @tc.number   Telephony_CellularDataService_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataService_005, Function | MediumTest | Level3)
+{
+    DataAccessToken token;
+    CellularDataService service;
+    std::vector<std::u16string> strV;
+    ASSERT_EQ(TELEPHONY_ERR_FAIL, service.Dump(INVALID_FD, strV));
+    service.state_ = ServiceRunningState::STATE_RUNNING;
+    service.OnStart();
+    service.InitModule();
+    service.cellularDataControllers_.clear();
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableIntelligenceSwitch(false));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableIntelligenceSwitch(true));
+    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(DEFAULT_SIM_SLOT_ID, std::string()));
+    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(INVALID_SLOTID, std::string()));
+    ASSERT_EQ(service.GetDataRecoveryState(), 0);
+    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.InitCellularDataController(2));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.InitCellularDataController(INVALID_SLOTID));
+    service.GetFlowDataInfoDump();
+    ApnItem::Attribute apnAttr;
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDataConnApnAttr(INVALID_SLOTID, apnAttr));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDataConnApnAttr(DEFAULT_SIM_SLOT_ID, apnAttr));
+    std::string ipType;
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDataConnIpType(INVALID_SLOTID, ipType));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDataConnIpType(DEFAULT_SIM_SLOT_ID, ipType));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.IsNeedDoRecovery(INVALID_SLOTID, true));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.IsNeedDoRecovery(DEFAULT_SIM_SLOT_ID, true));
 }
 
 /**
@@ -640,6 +799,29 @@ HWTEST_F(BranchTest, Telephony_CellularDataController_002, Function | MediumTest
 }
 
 /**
+ * @tc.number  CellularDataController_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataController_003, Function | MediumTest | Level3)
+{
+    CellularDataController controller { 0 };
+    controller.RegisterEvents();
+    controller.Init();
+    ApnItem::Attribute apnAttr;
+    controller.GetDataConnApnAttr(apnAttr);
+    std::string str = "";
+    ASSERT_EQ(controller.GetDataConnIpType(), str);
+    ASSERT_EQ(controller.GetDataRecoveryState(), 0);
+    controller.IsNeedDoRecovery(true);
+    controller.cellularDataHandler_ = nullptr;
+    controller.GetDataConnApnAttr(apnAttr);
+    ASSERT_EQ(controller.GetDataConnIpType(), str);
+    ASSERT_EQ(controller.GetDataRecoveryState(), 0);
+    controller.IsNeedDoRecovery(true);
+}
+
+/**
  * @tc.number  CellularDataConnectionManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -662,6 +844,10 @@ HWTEST_F(BranchTest, Telephony_CellularDataConnectionManager_001, Function | Med
     con.RegisterRadioObserver();
     con.UnRegisterRadioObserver();
     con.UpdateBandWidthsUseLte();
+    con.GetActiveConnection();
+    con.IsBandwidthSourceModem();
+    ASSERT_EQ(-1, con.GetDataRecoveryState());
+    con.IsNeedDoRecovery(true);
     ASSERT_TRUE(con.GetActiveConnectionByCid(0) == nullptr);
     ASSERT_TRUE(con.isNoActiveConnection());
     auto event = AppExecFwk::InnerEvent::Get(0);
@@ -710,6 +896,10 @@ HWTEST_F(BranchTest, Telephony_CellularDataConnectionManager_002, Function | Med
     con.UnRegisterRadioObserver();
     con.uplinkUseLte_ = true;
     con.UpdateBandWidthsUseLte();
+    con.GetActiveConnection();
+    con.IsBandwidthSourceModem();
+    ASSERT_NE(-1, con.GetDataRecoveryState());
+    con.IsNeedDoRecovery(true);
     con.GetActiveConnectionByCid(0);
     con.isNoActiveConnection();
     auto event = AppExecFwk::InnerEvent::Get(0);
@@ -834,13 +1024,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataUtils_001, Function | MediumTest | Le
         CellularDataUtils::ConvertRadioTechToRadioName(static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_IWLAN)));
     ASSERT_EQ(
         "NR", CellularDataUtils::ConvertRadioTechToRadioName(static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_NR)));
-    ASSERT_FALSE(CellularDataUtils::IsDigit(""));
     ASSERT_TRUE(CellularDataUtils::Split("", "").empty());
-    AddressInfo info;
-    ASSERT_TRUE(CellularDataUtils::ParseDotIpData(
-        "a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11.a12.a13.a14.a15.a16.m1.m2.m3.m4.m5.m6.m7.m8.m9.m10.m11.m12.m13.m14.m15.m16",
-        info));
-    ASSERT_TRUE(CellularDataUtils::ParseDotIpData("a1.a2.a3.a4.m1.m2.m3.m4", info));
     EXPECT_GE(DelayedSingleton<CellularDataClient>::GetInstance()->GetCellularDataFlowType(), 0);
     auto recipient =
         std::make_shared<CellularDataClient::CellularDataDeathRecipient>(CellularDataClient::GetInstance());
@@ -1114,6 +1298,7 @@ HWTEST_F(BranchTest, Default_Test_01, Function | MediumTest | Level3)
     ASSERT_FALSE(mDefault->ProcessDataConnectionDrsOrRatChanged(event));
     ASSERT_FALSE(mDefault->ProcessDataConnectionRoamOn(event));
     ASSERT_FALSE(mDefault->ProcessDataConnectionRoamOff(event));
+    ASSERT_FALSE(mDefault->ProcessDataCallListChanged(event));
 }
 
 /**
@@ -1301,6 +1486,7 @@ HWTEST_F(BranchTest, DataSwitchSettings_Test_01, Function | MediumTest | Level3)
     bool status = true;
     dataSwitchSettings->QueryUserDataStatus(status);
     dataSwitchSettings->QueryUserDataRoamingStatus(status);
+    dataSwitchSettings->QueryIntelligenceSwitchStatus(status);
     dataSwitchSettings->SetPolicyDataOn(true);
     ASSERT_TRUE(dataSwitchSettings->IsPolicyDataOn());
     dataSwitchSettings->IsAllowActiveData();
@@ -1312,6 +1498,9 @@ HWTEST_F(BranchTest, DataSwitchSettings_Test_01, Function | MediumTest | Level3)
     dataSwitchSettings->IsUserDataRoamingOn();
     dataSwitchSettings->SetInternalDataOn(true);
     ASSERT_TRUE(dataSwitchSettings->IsInternalDataOn());
+    dataSwitchSettings->SetIntelliSwitchOn(true);
+    dataSwitchSettings->UpdateUserDataRoamingOn(false);
+    ASSERT_FALSE(dataSwitchSettings->IsUserDataRoamingOn());
 }
 
 /**
@@ -1370,6 +1559,8 @@ HWTEST_F(BranchTest, CellularDataUtils_Test_01, Function | MediumTest | Level3)
     dataConnectionMonitor->SetRadioState(0, RadioEvent::RADIO_ON);
     dataConnectionMonitor->GetPreferredNetworkPara();
     dataConnectionMonitor->GetDataFlowType();
+    dataConnectionMonitor->IsNeedDoRecovery(true);
+    dataConnectionMonitor->IsNeedDoRecovery(false);
     auto cellularDataService = DelayedSingleton<CellularDataService>::GetInstance();
     MessageParcel data;
     MessageParcel reply;
@@ -1387,6 +1578,14 @@ HWTEST_F(BranchTest, CellularDataUtils_Test_01, Function | MediumTest | Level3)
     EXPECT_GE(cellularDataService->OnClearCellularDataConnections(data, reply), 0);
     EXPECT_GE(cellularDataService->OnRegisterSimAccountCallback(data, reply), 0);
     EXPECT_GE(cellularDataService->OnUnregisterSimAccountCallback(data, reply), 0);
+    EXPECT_GE(cellularDataService->OnEnableIntelligenceSwitch(data, reply), 0);
+    EXPECT_GE(cellularDataService->OnGetDataConnApnAttr(data, reply), 0);
+    EXPECT_GE(cellularDataService->OnGetDataConnIpType(data, reply), 0);
+    EXPECT_GE(cellularDataService->OnGetApnState(data, reply), 0);
+    EXPECT_GE(cellularDataService->OnGetRecoveryState(data, reply), 0);
+    EXPECT_GE(cellularDataService->OnIsNeedDoRecovery(data, reply), 0);
+    EXPECT_GE(cellularDataService->OnIsNeedDoRecovery(data, reply), 0);
+    EXPECT_GE(cellularDataService->OnClearAllConnections(data, reply), 0);
 }
 
 /**
@@ -1471,6 +1670,66 @@ HWTEST_F(BranchTest, GetOverallDefaultApnState_Test_01, Function | MediumTest | 
     }
     ret = apnManager->GetOverallDefaultApnState();
     EXPECT_EQ(ret, ApnProfileState::PROFILE_STATE_CONNECTING);
+}
+
+/**
+ * @tc.number   ParseIpAddr_001
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, ParseIpAddr_001, Function | MediumTest | Level0)
+{
+    std::string address = "";
+    std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(address);
+    EXPECT_EQ(ipInfoArray.size(), 0);
+}
+
+/**
+ * @tc.number   ParseIpAddr_002
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, ParseIpAddr_002, Function | MediumTest | Level0)
+{
+    std::string address = "192.000.1.1/24";
+    std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(address);
+    EXPECT_EQ(ipInfoArray.size(), 0);
+}
+
+/**
+ * @tc.number   ParseIpAddr_003
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, ParseIpAddr_003, Function | MediumTest | Level0)
+{
+    std::string address = "192.000.1.1/24 192.000.1.2/24";
+    std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(address);
+    EXPECT_EQ(ipInfoArray.size(), 2);
+}
+
+/**
+ * @tc.number   ParseIpAddr_004
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, ParseIpAddr_004, Function | MediumTest | Level0)
+{
+    std::string address = "2001:0000:0000:0000:0000:0000:0000:0000/64";
+    std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(address);
+    EXPECT_EQ(ipInfoArray.size(), 0);
+}
+
+/**
+ * @tc.number   ParseIpAddr_005
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, ParseIpAddr_005, Function | MediumTest | Level0)
+{
+    std::string address = "2001:0000:0000:0000:0000:0000:0000:0000/64 2001:0000:0000:0000:0000:0000:0000:0000/64";
+    std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(address);
+    EXPECT_EQ(ipInfoArray.size(), 2);
 }
 } // namespace Telephony
 } // namespace OHOS

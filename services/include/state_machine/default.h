@@ -42,16 +42,26 @@ private:
     bool ProcessDataConnectionDrsOrRatChanged(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessDataConnectionRoamOn(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessDataConnectionRoamOff(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessDataCallListChanged(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
-    using Fun = bool (Default::*)(const AppExecFwk::InnerEvent::Pointer &data);
+    using Fun = std::function<bool(const AppExecFwk::InnerEvent::Pointer &data)>;
     std::map<uint32_t, Fun> eventIdFunMap_ {
-        {CellularDataEventCode::MSG_SM_CONNECT, &Default::ProcessConnectDone},
-        {CellularDataEventCode::MSG_SM_DISCONNECT, &Default::ProcessDisconnectDone},
-        {CellularDataEventCode::MSG_SM_DISCONNECT_ALL, &Default::ProcessDisconnectAllDone},
-        {CellularDataEventCode::MSG_SM_DRS_OR_RAT_CHANGED, &Default::ProcessDataConnectionDrsOrRatChanged},
-        {CellularDataEventCode::MSG_SM_DATA_ROAM_ON, &Default::ProcessDataConnectionRoamOn},
-        {CellularDataEventCode::MSG_SM_DATA_ROAM_OFF, &Default::ProcessDataConnectionRoamOff},
+        { CellularDataEventCode::MSG_SM_CONNECT,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessConnectDone(data); } },
+        { CellularDataEventCode::MSG_SM_DISCONNECT,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessDisconnectDone(data); } },
+        { CellularDataEventCode::MSG_SM_DISCONNECT_ALL,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessDisconnectAllDone(data); } },
+        { CellularDataEventCode::MSG_SM_DRS_OR_RAT_CHANGED,
+            [this](
+                const AppExecFwk::InnerEvent::Pointer &data) { return ProcessDataConnectionDrsOrRatChanged(data); } },
+        { CellularDataEventCode::MSG_SM_DATA_ROAM_ON,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessDataConnectionRoamOn(data); } },
+        { CellularDataEventCode::MSG_SM_DATA_ROAM_OFF,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessDataConnectionRoamOff(data); } },
+        { CellularDataEventCode::MSG_DATA_CALL_LIST_CHANGED,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessDataCallListChanged(data); } },
     };
     std::weak_ptr<CellularDataStateMachine> stateMachine_;
 };

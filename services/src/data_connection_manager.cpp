@@ -278,10 +278,7 @@ void CcmDefaultState::UpdateNetworkInfo(const AppExecFwk::InnerEvent::Pointer &e
             TELEPHONY_LOGE("get active connection by cid is :=  %{public}d flag:=  %{public}d ", it.cid, it.flag);
             continue;
         }
-        if (!dataConnect->UpdateNetworkInfoInHandler(it)) {
-            TELEPHONY_LOGW("Update in handler failed cid %{public}d flag %{public}d ", it.cid, it.flag);
-            dataConnect->UpdateNetworkInfo(it);
-        }
+        dataConnect->UpdateNetworkInfoIfInActive(it);
     }
 }
 
@@ -460,6 +457,15 @@ void DataConnectionManager::IsNeedDoRecovery(bool needDoRecovery) const
     if (connectionMonitor_ != nullptr) {
         connectionMonitor_->IsNeedDoRecovery(needDoRecovery);
     }
+}
+
+void DataConnectionManager::HandleScreenStateChanged(bool isScreenOn) const
+{
+    if (connectionMonitor_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: connection monitor is null", slotId_);
+        return;
+    }
+    connectionMonitor_->HandleScreenStateChanged(isScreenOn);
 }
 } // namespace Telephony
 } // namespace OHOS

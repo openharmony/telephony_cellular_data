@@ -162,7 +162,6 @@ int32_t CellularDataHandler::SetCellularDataEnable(bool userDataOn)
         TELEPHONY_EXT_WRAPPER.sendDataSwitchChangeInfo_(bundleName.c_str(), userDataOn);
     }
 #endif
-
     return dataSwitchSettings_->SetUserDataOn(userDataOn);
 }
 
@@ -489,6 +488,15 @@ bool CellularDataHandler::CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder)
     if (IsVSimSlotId(slotId_)) {
         return true;
     }
+
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (TELEPHONY_EXT_WRAPPER.isDualCellularCardAllowed_) {
+        if (TELEPHONY_EXT_WRAPPER.isDualCellularCardAllowed_()) {
+            return true;
+        }
+    }
+#endif
+
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     std::string apnType = apnHolder->GetApnType();
@@ -516,7 +524,8 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
     bool attached = coreInner.GetPsRegState(slotId_) == (int32_t)RegServiceState::REG_STATE_IN_SERVICE;
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     coreInner.GetSimState(slotId_, simState);
-    TELEPHONY_LOGD("Slot%{public}d: attached: %{public}d simState: %{public}d", slotId_, attached, simState);
+    TELEPHONY_LOGD("Slot%{public}d: attached: %{public}d simState: %{public}d isSimLoaded: %{public}d",
+        slotId_, attached, simState, isSimLoaded_);
     bool isMmsApn = apnHolder->IsMmsType();
     if (isMmsApn && (simState == SimState::SIM_STATE_READY)) {
         if (SetDataPermittedForMms(true) && !attached) {
@@ -534,7 +543,7 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
             CellularDataErrorCode::DATA_ERROR_SIM_NOT_READY, "It is not emergencyApn and sim not ready");
         return false;
     }
-    return isEmergencyApn || isSimAccountLoaded_;
+    return isEmergencyApn || isSimLoaded_;
 }
 
 bool CellularDataHandler::CheckRoamingState(sptr<ApnHolder> &apnHolder)
@@ -602,7 +611,7 @@ bool CellularDataHandler::CheckApnState(sptr<ApnHolder> &apnHolder)
     }
 
     if (apnHolder->GetApnState() != PROFILE_STATE_IDLE) {
-        TELEPHONY_LOGI("Slot%{public}d: APN holder is not idle", slotId_);
+        TELEPHONY_LOGD("Slot%{public}d: APN holder is not idle", slotId_);
         return false;
     }
     std::vector<sptr<ApnItem>> matchedApns = apnManager_->FilterMatchedApns(apnHolder->GetApnType(), slotId_);
@@ -958,7 +967,7 @@ void CellularDataHandler::ProcessEvent(const InnerEvent::Pointer &event)
     uint32_t eventCode = event->GetInnerEventId();
     std::map<uint32_t, Fun>::iterator it = eventIdMap_.find(eventCode);
     if (it != eventIdMap_.end()) {
-        (this->*(it->second))(event);
+        it->second(event);
     }
 }
 
@@ -985,9 +994,28 @@ void CellularDataHandler::OnReceiveEvent(const EventFwk::CommonEventData &data)
             return;
         }
         GetConfigurationFor5G();
+    } else if (action == CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
+        if (slotId_ != slotId) {
+            return;
+        }
+        HandleScreenStateChanged(true);
+    } else if (action == CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
+        if (slotId_ != slotId) {
+            return;
+        }
+        HandleScreenStateChanged(false);
     } else {
         TELEPHONY_LOGI("Slot%{public}d: action=%{public}s code=%{public}d", slotId_, action.c_str(), data.GetCode());
     }
+}
+
+void CellularDataHandler::HandleScreenStateChanged(bool isScreenOn) const
+{
+    if (connectionManager_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: connectionManager is null!", slotId_);
+        return;
+    }
+    connectionManager_->HandleScreenStateChanged(isScreenOn);
 }
 
 void CellularDataHandler::HandleSettingSwitchChanged(const InnerEvent::Pointer &event)
@@ -1155,7 +1183,7 @@ void CellularDataHandler::HandleSimStateChanged()
     CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
     TELEPHONY_LOGI("Slot%{public}d: sim state is :%{public}d", slotId_, simState);
     if (simState != SimState::SIM_STATE_READY) {
-        isSimAccountLoaded_ = false;
+        isSimLoaded_ = false;
         ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
         if (simState == SimState::SIM_STATE_NOT_PRESENT) {
             CellularDataNetAgent::GetInstance().UnregisterNetSupplierForSimUpdate(slotId_);
@@ -1185,25 +1213,8 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
             break;
         }
         case RadioEvent::RADIO_SIM_RECORDS_LOADED: {
-            std::u16string iccId;
-            CoreManagerInner::GetInstance().GetSimIccId(slotId_, iccId);
-            SimState simState = SimState::SIM_STATE_UNKNOWN;
-            CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
-            TELEPHONY_LOGI("Slot%{public}d: sim records loaded state is :%{public}d", slotId_, simState);
-            if (simState != SimState::SIM_STATE_READY || iccId == u"") {
-                TELEPHONY_LOGI("sim state error or iccId nullptr");
-                break;
-            }
-            if (iccId != lastIccId_) {
-                if (dataSwitchSettings_ != nullptr) {
-                    dataSwitchSettings_->SetPolicyDataOn(true);
-                }
-                lastIccId_ = iccId;
-            } else if (lastIccId_ == iccId) {
-                TELEPHONY_LOGI("Slot%{public}d: sim state changed, but iccId not changed.", slotId_);
-                // the sim card status has changed to ready, so try to connect
-                EstablishAllApnsIfConnectable();
-            }
+            auto slotId = event->GetParam();
+            HandleSimRecordsLoaded(slotId);
             break;
         }
         default:
@@ -1211,16 +1222,25 @@ void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::Inner
     }
 }
 
-void CellularDataHandler::HandleSimAccountLoaded(const InnerEvent::Pointer &event)
+void CellularDataHandler::HandleSimRecordsLoaded(int32_t slotId)
 {
-    if (event == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: event is null", slotId_);
+    TELEPHONY_LOGI("SlotId_ %{public}d, current Slot%{public}d", slotId_, slotId);
+    std::u16string iccId;
+    CoreManagerInner::GetInstance().GetSimIccId(slotId_, iccId);
+    SimState simState = SimState::SIM_STATE_UNKNOWN;
+    CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
+    if (simState != SimState::SIM_STATE_READY || iccId == u"") {
+        TELEPHONY_LOGI("sim state error or iccId nullptr");
         return;
     }
-    TELEPHONY_LOGI("Slot%{public}d", slotId_);
-    auto slotId = event->GetParam();
+    if (iccId != lastIccId_) {
+        if (dataSwitchSettings_ != nullptr) {
+            dataSwitchSettings_->SetPolicyDataOn(true);
+        }
+        lastIccId_ = iccId;
+    }
     if (slotId == slotId_) {
-        isSimAccountLoaded_ = true;
+        isSimLoaded_ = true;
         ReleaseAllNetworkRequest();
         ClearAllConnections(DisConnectionReason::REASON_CHANGE_CONNECTION);
         CellularDataNetAgent::GetInstance().UnregisterNetSupplierForSimUpdate(slotId_);
@@ -1368,11 +1388,15 @@ void CellularDataHandler::HandleDsdsModeChanged(const AppExecFwk::InnerEvent::Po
     CoreManagerInner::GetInstance().SetDsdsMode(object->data);
     int32_t defaultSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
     int32_t simNum = CoreManagerInner::GetInstance().GetMaxSimCount();
+    bool dataEnableStatus = true;
+    IsCellularDataEnabled(dataEnableStatus);
     for (int32_t i = 0; i < simNum; ++i) {
         if (defaultSlotId != i && object->data == DSDS_MODE_V2) {
             SetDataPermitted(i, false);
         } else {
-            SetDataPermitted(i, true);
+            if (dataEnableStatus) {
+                SetDataPermitted(i, true);
+            }
             DelayedRefSingleton<CellularDataService>::GetInstance().ChangeConnectionForDsds(i, true);
         }
     }
@@ -2111,28 +2135,6 @@ std::shared_ptr<CellularDataStateMachine> CellularDataHandler::CheckForCompatibl
         }
     }
     return potentialDc;
-}
-
-void CellularDataHandler::HandleUpdateNetInfo(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    TELEPHONY_LOGI("Slot%{public}d: receive HandleUpdateNetInfo event", slotId_);
-    std::shared_ptr<SetupDataCallResultInfo> info = event->GetSharedObject<SetupDataCallResultInfo>();
-    if (connectionManager_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: connectionManager is null", slotId_);
-        return;
-    }
-
-    if (info == nullptr) {
-        TELEPHONY_LOGE("Info is null");
-        return;
-    }
-
-    std::shared_ptr<CellularDataStateMachine> dataConnect = connectionManager_->GetActiveConnectionByCid(info->cid);
-    if (dataConnect == nullptr) {
-        TELEPHONY_LOGE("get active connection by cid is :=  %{public}d flag:=  %{public}d ", info->cid, info->flag);
-        return;
-    }
-    dataConnect->UpdateNetworkInfo(*info);
 }
 
 bool CellularDataHandler::IsGsm()
