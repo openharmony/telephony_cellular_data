@@ -252,7 +252,7 @@ int32_t ApnManager::CreateAllApnItemByDatabase(int32_t slotId)
 {
     int32_t count = 0;
     if (TELEPHONY_EXT_WRAPPER.createAllApnItemExt_) {
-        sptr<ApnItem> extraApnItem = ApnItem::MakeDefaultApn("default,supl");
+        sptr<ApnItem> extraApnItem = ApnItem::MakeDefaultApn("default");
         if (TELEPHONY_EXT_WRAPPER.createAllApnItemExt_(slotId, extraApnItem)) {
             std::lock_guard<std::mutex> lock(mutex_);
             allApnItem_.clear();
