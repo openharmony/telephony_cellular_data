@@ -20,6 +20,7 @@ config("cellular_data_util_config") {
     "$SUBSYSTEM_DIR/interfaces/innerkits",
     "$SUBSYSTEM_DIR/services/include/apn_manager",
     "$SUBSYSTEM_DIR/services/include/common",
+    "$SUBSYSTEM_DIR/services/include/utils",
     "$TELEPHONY_DATA_DIR/interfaces/innerkits/include",
   ]
 
