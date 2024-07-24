@@ -49,8 +49,7 @@ static inline bool IsValidSlotId(int32_t slotId)
 static inline bool IsValidSlotIdEx(int32_t slotId)
 {
     // One more slot for VSim.
-    int32_t maxSimCount = (IS_SUPPORT_VSIM ? SIM_SLOT_COUNT + 1 : SIM_SLOT_COUNT);
-    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < maxSimCount));
+    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT + 1));
 }
 
 static bool MatchCellularDataParameters(napi_env env, const napi_value parameters[], const size_t parameterCount)

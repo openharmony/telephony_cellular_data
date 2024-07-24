@@ -63,11 +63,6 @@ enum RegisterType {
     REGISTER,
     REQUEST
 };
-struct NetRequest {
-    uint64_t capability = 0;
-    std::string ident = "";
-    int32_t registerType = UNKOWN;
-};
 
 static const uint32_t DEFAULT_BANDWIDTH = 14;
 struct LinkBandwidthInfo {
