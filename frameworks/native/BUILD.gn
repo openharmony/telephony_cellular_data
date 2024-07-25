@@ -65,7 +65,7 @@ ohos_shared_library("tel_cellular_data_api") {
     "ipc:ipc_single",
     "samgr:samgr_proxy",
     "telephony_data:tel_telephony_data",
-    "netmanager_base:net_conn_manager_if"
+    "netmanager_base:net_conn_manager_if",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CellularDataApi\"",
