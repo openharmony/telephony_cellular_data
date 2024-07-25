@@ -38,7 +38,6 @@ ohos_shared_library("data") {
     "init:libbegetutil",
     "napi:ace_napi",
     "netmanager_base:net_conn_manager_if"
-
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CellularDataJsApi\"",
