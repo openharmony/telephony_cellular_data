@@ -21,7 +21,6 @@
 #include "apn_item.h"
 #include "cellular_data_constant.h"
 #include "connection_retry_policy.h"
-#include "net_manager_call_back.h"
 
 #ifdef __cplusplus
 extern "C" {
