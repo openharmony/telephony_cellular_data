@@ -47,8 +47,9 @@ void TrafficManagement::UpdatePacketData()
 std::string TrafficManagement::GetIfaceName()
 {
     std::string ifaceName = "";
+    int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId_);
     std::list<int32_t> netIdList;
-    int32_t ret = NetConnClient::GetInstance().GetNetIdByIdentifier(IDENT_PREFIX + std::to_string(slotId_), netIdList);
+    int32_t ret = NetConnClient::GetInstance().GetNetIdByIdentifier(IDENT_PREFIX + std::to_string(simId), netIdList);
     if (ret != NETMANAGER_SUCCESS) {
         TELEPHONY_LOGE("Slot%{public}d: get netIdList by identifier failed, ret = %{public}d", slotId_, ret);
         return ifaceName;

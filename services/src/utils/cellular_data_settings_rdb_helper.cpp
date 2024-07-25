@@ -68,6 +68,7 @@ void CellularDataSettingsRdbHelper::UnRegisterSettingsObserver(
     }
     settingHelper->UnregisterObserver(uri, dataObserver);
     settingHelper->Release();
+    TELEPHONY_LOGE("UnRegisterSettingsObserver success");
 }
 
 void CellularDataSettingsRdbHelper::RegisterSettingsObserver(
@@ -80,6 +81,7 @@ void CellularDataSettingsRdbHelper::RegisterSettingsObserver(
     }
     settingHelper->RegisterObserver(uri, dataObserver);
     settingHelper->Release();
+    TELEPHONY_LOGE("RegisterSettingsObserver success");
 }
 
 void CellularDataSettingsRdbHelper::NotifyChange(const Uri &uri)

@@ -57,6 +57,7 @@ struct NetSupplier {
     uint32_t supplierId = 0;
     uint64_t capability = 0;
     int32_t slotId = 0;
+    int32_t simId = 0;
 };
 enum RegisterType {
     UNKOWN,
@@ -188,7 +189,7 @@ static constexpr const char *DATA_METERED_CONTEXT_ROLES = "default";
 static constexpr const char *IS_CELLULAR_DATA_ENABLE = "isCellularDataEnable";
 static constexpr const char *IS_ROAMING = "isRoaming";
 static constexpr const char *SETTING_SWITCH = "settingSwitch";
-static constexpr const char *IDENT_PREFIX = "slotId";
+static constexpr const char *IDENT_PREFIX = "simId";
 static constexpr const char *DEFAULT_HOSTNAME = "";
 static constexpr const char *DEFAULT_MASK = "";
 static constexpr const char *CELLULAR_DATA_RDB_URI = "datashare:///com.ohos.pdpprofileability";
@@ -216,7 +217,7 @@ static const int32_t DEFAULT_NET_STATISTICS_PERIOD = 3 * 1000;
 static const int32_t DATA_STALL_ALARM_NON_AGGRESSIVE_DELAY_IN_MS_DEFAULT = 1000 * 60 * 10;
 static const int32_t DATA_STALL_ALARM_AGGRESSIVE_DELAY_IN_MS_DEFAULT = 1000 * 10;
 static const int32_t ESTABLISH_DATA_CONNECTION_DELAY = 1 * 1000;
-static const int32_t CONNECTION_DISCONNECTION_TIMEOUT = 120 * 1000;
+static const int32_t CONNECTION_DISCONNECTION_TIMEOUT = 180 * 1000;
 static const int32_t RECOVERY_TRIGGER_PACKET = 10;
 static const int32_t ERROR_APN_ID = -1;
 static const int32_t VALID_IP_SIZE = 2;
