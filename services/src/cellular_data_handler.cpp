@@ -132,7 +132,8 @@ bool CellularDataHandler::RequestNet(const NetRequest &request)
     }
     netRequest->capability = capability;
     netRequest->ident = request.ident;
-    netRequest->netRequestBySpecifier = request.netRequestBySpecifier;
+    request.registerType = netRequest->registerType;
+    request.bearTypes = netRequest->bearTypes;
     AppExecFwk::InnerEvent::Pointer event =
         InnerEvent::Get(CellularDataEventCode::MSG_REQUEST_NETWORK, netRequest, TYPE_REQUEST_NET);
     return SendEvent(event);
@@ -918,7 +919,8 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
     NetRequest request;
     request.ident = netRequest->ident;
     request.capability = netRequest->capability;
-    request.netRequestBySpecifier = netRequest->netRequestBySpecifier;
+    request.registerType = netRequest->registerType;
+    request.bearTypes = netRequest->bearTypes;
     int32_t id = ApnManager::FindApnIdByCapability(request.capability);
     sptr<ApnHolder> apnHolder = apnManager_->FindApnHolderById(id);
     if (apnHolder == nullptr) {
@@ -928,8 +930,7 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
     bool isAllCellularDataAllowed = true;
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     if (TELEPHONY_EXT_WRAPPER.isAllCellularDataAllowed_) {
-        isAllCellularDataAllowed = TELEPHONY_EXT_WRAPPER.isAllCellularDataAllowed_(request.capability,
-            request.netRequestBySpecifier);
+        isAllCellularDataAllowed = TELEPHONY_EXT_WRAPPER.isAllCellularDataAllowed_(request);
     }
 #endif
     if (isAllCellularDataAllowed) {

@@ -20,7 +20,6 @@ config("cellular_data_util_config") {
     "$SUBSYSTEM_DIR/interfaces/innerkits",
     "$SUBSYSTEM_DIR/services/include/apn_manager",
     "$SUBSYSTEM_DIR/services/include/common",
-    "$SUBSYSTEM_DIR/services/include/utils",
     "$TELEPHONY_DATA_DIR/interfaces/innerkits/include",
   ]
 
@@ -66,6 +65,7 @@ ohos_shared_library("tel_cellular_data_api") {
     "ipc:ipc_single",
     "samgr:samgr_proxy",
     "telephony_data:tel_telephony_data",
+    "netmanager_base:net_conn_manager_if"
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CellularDataApi\"",

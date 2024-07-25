@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Telephony {
 int32_t NetManagerCallBack::RequestNetwork(const std::string &ident,
                                            const std::set<NetCap> &netCaps,
-                                           const NetRequestBySpecifier &netRequestBySpecifier)
+                                           const NetManagerStandard::NetRequest &netrequest)
 {
     if (netCaps.empty()) {
         TELEPHONY_LOGI("netCaps is empty[%{public}s]", ident.c_str());
@@ -35,7 +35,10 @@ int32_t NetManagerCallBack::RequestNetwork(const std::string &ident,
         request.capability |= 1L << netCap;
     }
     request.ident = ident;
-    request.netRequestBySpecifier = netRequestBySpecifier;
+    request.registerType = netrequest.registerType;
+    for (const auto &netBearType : netrequest.bearTypes) {
+        request.bearTypes |= 1L << netBearType;
+    }
     int32_t result = DelayedRefSingleton<CellularDataService>::GetInstance().RequestNet(request);
     return result;
 }
