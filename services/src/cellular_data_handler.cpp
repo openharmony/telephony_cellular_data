@@ -950,7 +950,7 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
         } else {
             TELEPHONY_LOGI("release all cellular data");
             apnHolder->ReleaseAllCellularData();
-            
+            return;
         }
     }
     InnerEvent::Pointer innerEvent = InnerEvent::Get(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, id);
