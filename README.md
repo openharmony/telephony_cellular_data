@@ -7,7 +7,9 @@
 -   [Usage Guidelines](#section160mcpsimp)
     -   [Checking the Cellular Data Status](#section192mcpsimp)
     -   [Obtaining the Cellular Data Status](#section213mcpsimp)
-
+    -   [Check if cellular mobile data service is enabled](#section234mcpsimp)
+    -   [Check if cellular data roaming is enabled](#section255mcpsimp)
+    
 -   [Repositories Involved](#section234mcpsimp)
 
 ## Introduction<a name="section117mcpsimp"></a>
@@ -61,10 +63,12 @@ base/telephony/cellular_data/
 
 <a name="table133mcpsimp"></a>
 
-| API                                                          | Description                                 | Required Permission              |
-| ------------------------------------------------------------ | ------------------------------------------- | -------------------------------- |
-| function isCellularDataEnabled(callback: AsyncCallback\<boolean>): void; | Checks whether the cellular data is enabled | ohos.permission.GET_NETWORK_INFO |
-| function getCellularDataState(callback: AsyncCallback\<DataConnectState>): void; | Obtains the cellular data status.           | ohos.permission.GET_NETWORK_INFO |
+| API                                                          | Description                                                  | Required Permission              |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | -------------------------------- |
+| function isCellularDataEnabled(callback: AsyncCallback\<boolean>): void; | Checks whether the cellular data is enabled                  | ohos.permission.GET_NETWORK_INFO |
+| function getCellularDataState(callback: AsyncCallback\<DataConnectState>): void; | Obtains the cellular data status.                            | ohos.permission.GET_NETWORK_INFO |
+| function isCellularDataEnabledSync(): boolean;               | Checks if cellular mobile data service is enabled.           | ohos.permission.GET_NETWORK_INFO |
+| function isCellularDataRoamingEnabledSync(slotId: number): boolean; | Checks if cellular data roaming is enabled（The parameter slotId is the SIM card id, 0 represents card one, and 1 represents card two）. | ohos.permission.GET_NETWORK_INFO |
 
 
 ## Usage Guidelines<a name="section160mcpsimp"></a>
@@ -99,6 +103,45 @@ base/telephony/cellular_data/
     });
     ```
 
+### Check if cellular mobile data service is enabled<a name="section234mcpsimp"></a>
+
+1. You can determine if cellular data services are enabled by calling isCellularDataEnabledSync.
+
+2. This interface is synchronous, and the relevant execution results will be returned from isCellularDataEnabledSync.
+
+   ```
+   import data from "@ohos.telephony.data";
+   
+   try {
+   	// Call the interface [Sync method]
+   	let isEnabled: boolean = data.isCellularDataEnabledSync();
+   	// Call the interface successfully
+       console.log(`isCellularDataEnabledSync success : ${isEnabled}`);
+   } catch (error) {
+   	// Call the interface failed
+       console.log(`isCellularDataEnabledSync failed`);  
+   }    
+   ```
+
+### Check if cellular data roaming is enabled<a name="section255mcpsimp"></a>
+
+1. You can determine if cellular data roaming services are enabled by calling isCellularDataRoamingEnabledSync.
+
+2. This interface is synchronous, and the relevant execution results will be returned from isCellularDataRoamingEnabledSync.
+
+   ```
+   import data from "@ohos.telephony.data";
+   
+   try {
+   	// Call the interface [Sync method]
+   	let isEnabled: boolean = data.isCellularDataRoamingEnabledSync(0);
+   	// Call the interface successfully
+       console.log(`isCellularDataRoamingEnabledSync success : ${isEnabled}`);
+   } catch (error) {
+   	// Call the interface failed
+       console.log(`isCellularDataRoamingEnabledSync failed`);  
+   }     
+   ```
 
 ### Obtaining the Cellular Data Status<a name="section213mcpsimp"></a>
 
