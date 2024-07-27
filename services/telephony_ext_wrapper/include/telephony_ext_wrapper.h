@@ -20,7 +20,7 @@
 #include "singleton.h"
 
 #include "apn_item.h"
-
+#include "net_manager_call_back.h"
 namespace OHOS {
 namespace Telephony {
 class TelephonyExtWrapper final {
@@ -38,7 +38,7 @@ public:
     typedef bool (*IS_CARD_ALLOW_DATA)(int32_t simId, int32_t capability);
     /* add for vsim end */
     typedef void (*SEND_DATA_SWITCH_CHANGE_INFO)(const char*, bool);
-    typedef bool (*IS_ALL_CELLULAR_DATA_ALLOWED)(int32_t, int32_t);
+    typedef bool (*IS_ALL_CELLULAR_DATA_ALLOWED)(int32_t, const NetRequest &);
     typedef bool (*IS_DUAL_CELLULAR_CARD_ALLOWED)();
     DATA_EDN_SELF_CURE dataEndSelfCure_ = nullptr;
     IS_APN_ALLOWED_ACTIVE isApnAllowedActive_ = nullptr;

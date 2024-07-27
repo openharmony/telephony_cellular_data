@@ -34,6 +34,7 @@
 #include "iosfwd"
 #include "iostream"
 #include "net_conn_callback_stub.h"
+#include "net_supplier_callback_base.h"
 #include "net_conn_client.h"
 #include "net_handle.h"
 #include "net_specifier.h"
@@ -1731,11 +1732,11 @@ HWTEST_F(CellularDataTest, RequestNetwork_001, TestSize.Level3)
 {
     std::string ident = "testIdent";
     std::set<NetCap> netCaps;
-    int32_t registerType = 1;
+    NetManagerStandard::NetRequest netrequest;
     if (callback_ == nullptr) {
         callback_ = std::make_unique<NetManagerCallBack>().release();
     }
-    int32_t result = callback_->RequestNetwork(ident, netCaps, registerType);
+    int32_t result = callback_->RequestNetwork(ident, netCaps, netrequest);
     ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
 
@@ -1748,11 +1749,11 @@ HWTEST_F(CellularDataTest, RequestNetwork_002, TestSize.Level3)
 {
     std::string ident = "testIdent";
     std::set<NetCap> netCaps = { NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET };
-    int32_t registerType = 1;
+    NetManagerStandard::NetRequest netrequest;
     if (callback_ == nullptr) {
         callback_ = std::make_unique<NetManagerCallBack>().release();
     }
-    int32_t result = callback_->RequestNetwork(ident, netCaps, registerType);
+    int32_t result = callback_->RequestNetwork(ident, netCaps, netrequest);
     ASSERT_NE(result, CELLULAR_DATA_INVALID_PARAM);
 }
 

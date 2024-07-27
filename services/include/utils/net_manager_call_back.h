@@ -20,12 +20,12 @@
 #include "cellular_data_constant.h"
 namespace OHOS {
 namespace Telephony {
-using namespace NetManagerStandard;
-class NetManagerCallBack : public NetSupplierCallbackBase {
+
+class NetManagerCallBack : public NetManagerStandard::NetSupplierCallbackBase {
 public:
-    int32_t RequestNetwork(const std::string &ident, const std::set<NetCap> &netCaps,
-        const int32_t registerType = REGISTER) override;
-    int32_t ReleaseNetwork(const std::string &ident, const std::set<NetCap> &netCaps) override;
+    int32_t RequestNetwork(const std::string &ident, const std::set<NetManagerStandard::NetCap> &netCaps,
+        const NetManagerStandard::NetRequest &netrequest = {}) override;
+    int32_t ReleaseNetwork(const std::string &ident, const std::set<NetManagerStandard::NetCap> &netCaps) override;
 };
 } // namespace Telephony
 } // namespace OHOS
