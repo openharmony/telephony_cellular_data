@@ -26,7 +26,7 @@
 #include "inactive.h"
 #include "incall_data_state_machine.h"
 #include "tel_event_handler.h"
-#include "telephony_type.h"
+#include "telephony_types.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -762,7 +762,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilAdapterHostDied_001, 
     auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
     disconnecting->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(0);
-    disconnecting->ProcessRilAdapterHostDie(event);
+    disconnecting->ProcessRilAdapterHostDied(event);
     EXPECT_EQ(cellularMachine->IsInactiveState(), false);
 }
 
@@ -928,7 +928,7 @@ HWTEST_F(CellularStateMachineTest, GetIpType_ShouldReturnIPV4V6_002, TestSize.Le
 }
 
 /**
- * @tc.number   GetIpType_ShouldReturnIPV4V6_003
+ * @tc.number   GetIpType_ShouldReturnIPV6_003
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
@@ -946,11 +946,11 @@ HWTEST_F(CellularStateMachineTest, GetIpType_ShouldReturnIPV6_003, TestSize.Leve
 }
 
 /**
- * @tc.number   GetIpType_ShouldReturnIPV4V6_004
+ * @tc.number   GetIpType_ShouldReturnEmpty_004
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(CellularStateMachineTest, GetIpType_ShouldReturnEmptry_004,  TestSize.Level0)
+HWTEST_F(CellularStateMachineTest, GetIpType_ShouldReturnEmpty_004,  TestSize.Level0)
 {
     std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
@@ -981,8 +981,7 @@ HWTEST_F(CellularStateMachineTest, GetIpType_ShouldReturnIPV4V6_005, TestSize.Le
     ASSERT_EQ(result, "");
 }
 
-HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_UpdateNetworkInfo_001, TestSize.Level0)
-{
+HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_UpdateNetworkInfo_001, TestSize.Level0) {
     std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
@@ -995,8 +994,7 @@ HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_UpdateNetworkInfo_00
     ASSERT_EQ(cellularMachine->cause_, 0);
 }
 
-HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_UpdateNetworkInfo_002, TestSize.Level0)
-{
+HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_UpdateNetworkInfo_002, TestSize.Level0) {
     std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
@@ -1010,8 +1008,7 @@ HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_UpdateNetworkInfo_00
     ASSERT_EQ(cellularMachine->cause_, 1);
 }
 
-HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_UpdateNetworkInfo_003, TestSize.Level0)
-{
+HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_UpdateNetworkInfo_003, TestSize.Level0) {
     std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     SetupDataCallResultInfo dataCallInfo;
