@@ -18,6 +18,7 @@
 #include "apn_holder.h"
 #include "apn_manager.h"
 #include "cellular_data_state_machine.h"
+#include "cellular_data_client.h"
 #include "data_connection_manager.h"
 #include "gtest/gtest.h"
 #include "tel_event_handler.h"
@@ -76,7 +77,7 @@ std::shared_ptr<CellularDataStateMachine> StateMachineTest::CreateCellularDataSt
 
 /**
  * @tc.number   FindApnNameByApnId_001
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, FindApnNameByApnId_001, Function | MediumTest | Level1)
@@ -88,7 +89,7 @@ HWTEST_F(ApnManagerTest, FindApnNameByApnId_001, Function | MediumTest | Level1)
 
 /**
  * @tc.number   FindApnNameByApnId_002
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, FindApnNameByApnId_002, Function | MediumTest | Level1)
@@ -100,7 +101,7 @@ HWTEST_F(ApnManagerTest, FindApnNameByApnId_002, Function | MediumTest | Level1)
 
 /**
  * @tc.number   FindApnIdByCapability_001
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, FindApnIdByCapability_001, Function | MediumTest | Level1)
@@ -113,7 +114,7 @@ HWTEST_F(ApnManagerTest, FindApnIdByCapability_001, Function | MediumTest | Leve
 
 /**
  * @tc.number   FindApnIdByCapability_002
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, FindApnIdByCapability_002, Function | MediumTest | Level1)
@@ -126,7 +127,7 @@ HWTEST_F(ApnManagerTest, FindApnIdByCapability_002, Function | MediumTest | Leve
 
 /**
  * @tc.number   FindApnIdByCapability_003
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, FindApnIdByCapability_003, Function | MediumTest | Level1)
@@ -139,7 +140,7 @@ HWTEST_F(ApnManagerTest, FindApnIdByCapability_003, Function | MediumTest | Leve
 
 /**
  * @tc.number   FindApnIdByCapability_004
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, FindApnIdByCapability_004, Function | MediumTest | Level1)
@@ -152,7 +153,7 @@ HWTEST_F(ApnManagerTest, FindApnIdByCapability_004, Function | MediumTest | Leve
 
 /**
  * @tc.number   FindApnIdByCapability_005
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, FindApnIdByCapability_005, Function | MediumTest | Level1)
@@ -165,7 +166,7 @@ HWTEST_F(ApnManagerTest, FindApnIdByCapability_005, Function | MediumTest | Leve
 
 /**
  * @tc.number   FindApnIdByCapability_006
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, FindApnIdByCapability_006, Function | MediumTest | Level1)
@@ -178,7 +179,7 @@ HWTEST_F(ApnManagerTest, FindApnIdByCapability_006, Function | MediumTest | Leve
 
 /**
  * @tc.number   FindApnIdByCapability_007
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, FindApnIdByCapability_007, Function | MediumTest | Level1)
@@ -191,7 +192,7 @@ HWTEST_F(ApnManagerTest, FindApnIdByCapability_007, Function | MediumTest | Leve
 
 /**
  * @tc.number   FindApnIdByCapability_008
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, FindApnIdByCapability_008, Function | MediumTest | Level1)
@@ -204,7 +205,7 @@ HWTEST_F(ApnManagerTest, FindApnIdByCapability_008, Function | MediumTest | Leve
 
 /**
  * @tc.number   FindBestCapability_001
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, FindBestCapability_001, Function | MediumTest | Level1)
@@ -216,7 +217,7 @@ HWTEST_F(ApnManagerTest, FindBestCapability_001, Function | MediumTest | Level1)
 
 /**
  * @tc.number   FindBestCapability_002
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, FindBestCapability_002, Function | MediumTest | Level1)
@@ -228,7 +229,7 @@ HWTEST_F(ApnManagerTest, FindBestCapability_002, Function | MediumTest | Level1)
 
 /**
  * @tc.number   FindBestCapability_003
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, FindBestCapability_003, Function | MediumTest | Level1)
@@ -240,7 +241,7 @@ HWTEST_F(ApnManagerTest, FindBestCapability_003, Function | MediumTest | Level1)
 
 /**
  * @tc.number   FindBestCapability_004
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, FindBestCapability_004, Function | MediumTest | Level1)
@@ -252,7 +253,7 @@ HWTEST_F(ApnManagerTest, FindBestCapability_004, Function | MediumTest | Level1)
 
 /**
  * @tc.number   CreateMvnoApnItems_001
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, CreateMvnoApnItems_001, Function | MediumTest | Level1)
@@ -266,7 +267,7 @@ HWTEST_F(ApnManagerTest, CreateMvnoApnItems_001, Function | MediumTest | Level1)
 
 /**
  * @tc.number   IsPreferredApnUserEdited_001
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, IsPreferredApnUserEdited_001, Function | MediumTest | Level1)
@@ -282,7 +283,7 @@ HWTEST_F(ApnManagerTest, IsPreferredApnUserEdited_001, Function | MediumTest | L
 
 /**
  * @tc.number   IsPreferredApnUserEdited_002
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, IsPreferredApnUserEdited_002, Function | MediumTest | Level1)
@@ -298,7 +299,7 @@ HWTEST_F(ApnManagerTest, IsPreferredApnUserEdited_002, Function | MediumTest | L
 
 /**
  * @tc.number   IsPreferredApnUserEdited_003
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, IsPreferredApnUserEdited_003, Function | MediumTest | Level1)
@@ -314,7 +315,7 @@ HWTEST_F(ApnManagerTest, IsPreferredApnUserEdited_003, Function | MediumTest | L
 
 /**
  * @tc.number   IsDataConnectionNotUsed_001
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, IsDataConnectionNotUsed_001, Function | MediumTest | Level1)
@@ -326,7 +327,7 @@ HWTEST_F(ApnManagerTest, IsDataConnectionNotUsed_001, Function | MediumTest | Le
 
 /**
  * @tc.number   IsDataConnectionNotUsed_002
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, IsDataConnectionNotUsed_002, Function | MediumTest | Level1)
@@ -340,7 +341,7 @@ HWTEST_F(ApnManagerTest, IsDataConnectionNotUsed_002, Function | MediumTest | Le
 
 /**
  * @tc.number   IsDataConnectionNotUsed_003
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, IsDataConnectionNotUsed_003, Function | MediumTest | Level1)
@@ -357,7 +358,7 @@ HWTEST_F(ApnManagerTest, IsDataConnectionNotUsed_003, Function | MediumTest | Le
 
 /**
  * @tc.number   IsDataConnectionNotUsed_004
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, IsDataConnectionNotUsed_004, Function | MediumTest | Level1)
@@ -374,7 +375,7 @@ HWTEST_F(ApnManagerTest, IsDataConnectionNotUsed_004, Function | MediumTest | Le
 
 /**
  * @tc.number   IsDataConnectionNotUsed_005
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, IsDataConnectionNotUsed_005, Function | MediumTest | Level1)
@@ -393,7 +394,7 @@ HWTEST_F(ApnManagerTest, IsDataConnectionNotUsed_005, Function | MediumTest | Le
 
 /**
  * @tc.number   MakeSpecificApnItem_001
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, MakeSpecificApnItem_001, Function | MediumTest | Level1)
@@ -411,7 +412,7 @@ HWTEST_F(ApnManagerTest, MakeSpecificApnItem_001, Function | MediumTest | Level1
 
 /**
  * @tc.number   MakeSpecificApnItem_002
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, MakeSpecificApnItem_002, Function | MediumTest | Level1)
@@ -429,7 +430,7 @@ HWTEST_F(ApnManagerTest, MakeSpecificApnItem_002, Function | MediumTest | Level1
 
 /**
  * @tc.number   MakeSpecificApnItem_003
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, MakeSpecificApnItem_003, Function | MediumTest | Level1)
@@ -447,7 +448,7 @@ HWTEST_F(ApnManagerTest, MakeSpecificApnItem_003, Function | MediumTest | Level1
 
 /**
  * @tc.number   HasAnyConnectedState_001
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, HasAnyConnectedState_001, Function | MediumTest | Level1)
@@ -460,7 +461,7 @@ HWTEST_F(ApnManagerTest, HasAnyConnectedState_001, Function | MediumTest | Level
 
 /**
  * @tc.number   HasAnyConnectedState_002
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, HasAnyConnectedState_002, Function | MediumTest | Level1)
@@ -475,7 +476,7 @@ HWTEST_F(ApnManagerTest, HasAnyConnectedState_002, Function | MediumTest | Level
 
 /**
  * @tc.number   HasAnyConnectedState_003
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, HasAnyConnectedState_003, Function | MediumTest | Level1)
@@ -491,7 +492,7 @@ HWTEST_F(ApnManagerTest, HasAnyConnectedState_003, Function | MediumTest | Level
 
 /**
  * @tc.number   HasAnyConnectedState_004
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, HasAnyConnectedState_004, Function | MediumTest | Level1)
@@ -507,7 +508,7 @@ HWTEST_F(ApnManagerTest, HasAnyConnectedState_004, Function | MediumTest | Level
 
 /**
  * @tc.number   GetRilAttachApn_001
- * @tc.name     test error branch
+ * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(ApnManagerTest, GetRilAttachApn_001, Function | MediumTest | Level1)
@@ -515,6 +516,295 @@ HWTEST_F(ApnManagerTest, GetRilAttachApn_001, Function | MediumTest | Level1)
     std::vector<sptr<ApnItem>> allApnItem;
     apnManager->allApnItem_ = allApnItem;
     ASSERT_EQ(apnManager->GetRilAttachApn(), nullptr);
+}
+
+/**
+ * @tc.number   ReleaseDataConnection_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, ReleaseDataConnection_001, TestSize.Level0)
+{
+    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
+    apnHolder->cellularDataStateMachine_ = nullptr;
+    apnHolder->ReleaseDataConnection();
+    ASSERT_EQ(apnHolder->cellularDataStateMachine_, nullptr);
+}
+
+/**
+ * @tc.number   ReleaseDataConnection_002
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, ReleaseDataConnection_002, TestSize.Level0)
+{
+    std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
+    auto stateMachine = machine->CreateCellularDataStateMachine(0);
+    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
+    apnHolder->SetCellularDataStateMachine(stateMachine);
+    apnHolder->ReleaseDataConnection();
+    ASSERT_EQ(apnHolder->cellularDataStateMachine_, nullptr);
+}
+
+/**
+ * @tc.number   RequestCellularData_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, RequestCellularData_001, TestSize.Level0)
+{
+    NetRequest netRequest;
+    netRequest.capability = 0;
+    netRequest.ident = "ident";
+    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
+    apnHolder->RequestCellularData(netRequest);
+    ASSERT_EQ(apnHolder->dataCallEnabled_, true);
+}
+
+/**
+ * @tc.number   RequestCellularData_002
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, RequestCellularData_002, TestSize.Level0)
+{
+    NetRequest netRequest;
+    netRequest.capability = 0;
+    netRequest.ident = "ident";
+    NetRequest netRequest1;
+    netRequest1.capability = 0;
+    netRequest1.ident = "abc";
+    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
+    apnHolder->netRequests_.push_back(netRequest1);
+    apnHolder->RequestCellularData(netRequest);
+    ASSERT_EQ(apnHolder->dataCallEnabled_, true);
+}
+
+/**
+ * @tc.number   RequestCellularData_003
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, RequestCellularData_003, TestSize.Level0)
+{
+    NetRequest netRequest;
+    netRequest.capability = 0;
+    netRequest.ident = "ident";
+    NetRequest netRequest1;
+    netRequest1.capability = 1;
+    netRequest1.ident = "ident";
+    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
+    apnHolder->netRequests_.push_back(netRequest1);
+    apnHolder->RequestCellularData(netRequest);
+    ASSERT_EQ(apnHolder->dataCallEnabled_, true);
+}
+
+/**
+ * @tc.number   RequestCellularData_004
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, RequestCellularData_004, TestSize.Level0)
+{
+    NetRequest netRequest;
+    netRequest.capability = 1;
+    netRequest.ident = "ident";
+    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
+    apnHolder->netRequests_.push_back(netRequest);
+    int size = apnHolder->netRequests_.size();
+    apnHolder->RequestCellularData(netRequest);
+    ASSERT_EQ(size, apnHolder->netRequests_.size());
+}
+
+/**
+ * @tc.number   IsCompatibleApnItem_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, IsCompatibleApnItem_001, TestSize.Level0)
+{
+    sptr<ApnItem> newApnItem = nullptr;
+    sptr<ApnItem> oldApnItem = nullptr;
+    bool roamingState = false;
+    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
+    bool result = apnHolder->IsCompatibleApnItem(newApnItem, oldApnItem, roamingState);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.number   IsCompatibleApnItem_002
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, IsCompatibleApnItem_002, TestSize.Level0)
+{
+    sptr<ApnItem> newApnItem = new ApnItem();
+    sptr<ApnItem> oldApnItem = new ApnItem();
+    std::strcmp(newApnItem->attr_.roamingProtocol_, "test_protocol");
+    std::strcmp(newApnItem->attr_.roamingProtocol_, "test_protocol");
+    bool roamingState = true;
+    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
+    bool result = apnHolder->IsCompatibleApnItem(newApnItem, oldApnItem, roamingState);
+    ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.number   IsCompatibleApnItem_003
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, IsCompatibleApnItem_003, TestSize.Level0)
+{
+    sptr<ApnItem> newApnItem = new ApnItem();
+    sptr<ApnItem> oldApnItem = new ApnItem();
+    std::strcmp(newApnItem->attr_.roamingProtocol_, "test_protocol");
+    std::strcmp(newApnItem->attr_.roamingProtocol_, "test_protocol");
+    bool roamingState = false;
+    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
+    bool result = apnHolder->IsCompatibleApnItem(newApnItem, oldApnItem, roamingState);
+    ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.number   GetNextRetryApnItem001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, GetNextRetryApnItem001, TestSize.Level0)
+{
+    std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
+    connectionRetryPolicy->matchedApns_.clear();
+    EXPECT_EQ(connectionRetryPolicy->GetNextRetryApnItem(), nullptr);
+}
+
+/**
+ * @tc.number   GetNextRetryApnItem002
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, GetNextRetryApnItem002, TestSize.Level0)
+{
+    std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
+    connectionRetryPolicy->currentApnIndex_ = 10;
+    EXPECT_EQ(connectionRetryPolicy->currentApnIndex_, 10);
+}
+
+/**
+ * @tc.number   GetNextRetryApnItem_003
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, GetNextRetryApnItem_003, TestSize.Level0)
+{
+    std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
+    connectionRetryPolicy->currentApnIndex_ = -1;
+    EXPECT_EQ(connectionRetryPolicy->currentApnIndex_, -1);
+}
+
+/**
+ * @tc.number   GetNextRetryApnItem_004
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, GetNextRetryApnItem_004, TestSize.Level0)
+{
+    std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
+    sptr<ApnItem> defaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
+    defaultApnItem->MarkBadApn(true);
+    connectionRetryPolicy->matchedApns_.push_back(defaultApnItem);
+    connectionRetryPolicy->currentApnIndex_ = 0;
+    EXPECT_EQ(connectionRetryPolicy->currentApnIndex_, 0);
+}
+
+/**
+ * @tc.number   GetNextRetryApnItem_005
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, GetNextRetryApnItem_005, TestSize.Level0)
+{
+    std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
+    sptr<ApnItem> defaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
+    defaultApnItem->MarkBadApn(false);
+    connectionRetryPolicy->matchedApns_.push_back(defaultApnItem);
+    connectionRetryPolicy->tryCount_ = 10;
+    connectionRetryPolicy->maxCount_ = 0;
+    connectionRetryPolicy->currentApnIndex_ = 0;
+    EXPECT_EQ(connectionRetryPolicy->currentApnIndex_, 0);
+}
+
+/**
+ * @tc.number   GetNextRetryApnItem_006
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, GetNextRetryApnItem_006, TestSize.Level0)
+{
+    std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
+    sptr<ApnItem> defaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
+    defaultApnItem->MarkBadApn(false);
+    connectionRetryPolicy->matchedApns_.push_back(defaultApnItem);
+    connectionRetryPolicy->tryCount_ = -1;
+    connectionRetryPolicy->maxCount_ = 0;
+    connectionRetryPolicy->currentApnIndex_ = 0;
+    EXPECT_EQ(connectionRetryPolicy->currentApnIndex_, 0);
+}
+
+/**
+ * @tc.number   GetNextRetryApnItem_007
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, GetNextRetryApnItem_007, TestSize.Level0)
+{
+    std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
+    connectionRetryPolicy->matchedApns_.push_back(nullptr);
+    connectionRetryPolicy->currentApnIndex_ = 0;
+    EXPECT_EQ(connectionRetryPolicy->GetNextRetryApnItem(), nullptr);
+}
+
+/**
+ * @tc.number   EnableCellularDataRoaming_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, EnableCellularDataRoaming_001, TestSize.Level0)
+{
+    int32_t result = CellularDataClient::GetInstance().EnableCellularDataRoaming(0, true);
+    EXPECT_EQ(result, true);
+}
+
+/**
+ * @tc.number   HasInternetCapability_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, HasInternetCapability_001, TestSize.Level0)
+{
+    int32_t result = CellularDataClient::GetInstance().HasInternetCapability(0, 0);
+    EXPECT_EQ(result, false);
+}
+
+/**
+ * @tc.number   HandleApnChanged_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, HandleApnChanged_001, TestSize.Level0)
+{
+    int32_t result = CellularDataClient::GetInstance().HandleApnChanged(0);
+    EXPECT_EQ(result, true);
+}
+
+/**
+ * @tc.number   UpdateDefaultCellularDataSlotId_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, UpdateDefaultCellularDataSlotId_001, TestSize.Level0)
+{
+    int32_t result = CellularDataClient::GetInstance().UpdateDefaultCellularDataSlotId();
+    EXPECT_EQ(result, 0);
 }
 } // namespace Telephony
 } // namespace OHOS
