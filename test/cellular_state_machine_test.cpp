@@ -950,7 +950,7 @@ HWTEST_F(CellularStateMachineTest, GetIpType_ShouldReturnIPV6_003, TestSize.Leve
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(CellularStateMachineTest, GetIpType_ShouldReturnEmpty_004,  TestSize.Level0)
+HWTEST_F(CellularStateMachineTest, GetIpType_ShouldReturnEmpty_004, TestSize.Level0)
 {
     std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
