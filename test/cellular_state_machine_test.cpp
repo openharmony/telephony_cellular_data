@@ -456,7 +456,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessDisconnectDone_001, Function | 
 }
 
 /**
- * @tc.number   Active_ProcessDisconnectDone_001
+ * @tc.number   Active_ProcessDisconnectAllDone_001
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
@@ -650,7 +650,7 @@ HWTEST_F(CellularStateMachineTest, Activating_StateProcess_001, Function | Mediu
     EXPECT_EQ(result, true);
     event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_GET_RIL_BANDWIDTH);
     result = activating->StateProcess(event);
-    EXPECT_EQ(result, false)
+    EXPECT_EQ(result, false);
     event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_CONNECT_TIMEOUT_CHECK);
     result = activating->StateProcess(event);
     EXPECT_EQ(result, true);
