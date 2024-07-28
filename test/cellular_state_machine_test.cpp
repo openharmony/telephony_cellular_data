@@ -45,8 +45,8 @@ void CellularStateMachineTest::TearDown() {}
 
 class IncallDataStateMachineTest : public TelEventHandler {
 public:
-    IncallStateMachineTest() : TelEventHandler("IncallDataStateMachineTest") {}
-    ~IncallStateMachineTest() = default;
+    IncallDataStateMachineTest() : TelEventHandler("IncallDataStateMachineTest") {}
+    ~IncallDataStateMachineTest() = default;
     std::shared_ptr<IncallDataStateMachine> CreateIncallDataStateMachine(int32_t slotId);
 
 public:
@@ -69,15 +69,15 @@ std::shared_ptr<IncallDataStateMachine> IncallDataStateMachineTest::CreateIncall
 
 class CellularMachineTest : public TelEventHandler {
 public:
-    CellularMachineTest() : TelEventHandler("CellularMachineTest") {}
+    CellularMachineTest() : TelEventHandler("CellularDataStateMachineTest") {}
     ~CellularMachineTest() = default;
-    std::shared_ptr<CellularDataStateMachine> CreateCellularDataStateMachine(int32_t slotId);
+    std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect(int32_t slotId);
 
 public:
     std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine_ = nullptr;
 };
 
-std::shared_ptr<CellularDataStateMachine> CellularMachineTest::CreateCellularDataStateMachine(int32_t slotId)
+std::shared_ptr<CellularDataStateMachine> CellularMachineTest::CreateCellularDataConnect(int32_t slotId)
 {
     if (cellularDataStateMachine_ != nullptr) {
         return cellularDataStateMachine_;
@@ -97,11 +97,11 @@ std::shared_ptr<CellularDataStateMachine> CellularMachineTest::CreateCellularDat
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(ApnManagerTest, HasAnyConnectedState_001, Function | MediumTest | Level1)
+HWTEST_F(CellularStateMachineTest, HasAnyConnectedState_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<IncallDataStateMachineTest> incallStateMachineTest = std::make_shared<IncallDataStateMachineTest>();
     std::shared_ptr<IncallDataStateMachine> incallStateMachine =
-        incallStateMachineTest->CreateCellularDataStateMachine(0);
+        incallStateMachineTest->CreateIncallDataStateMachine(0);
     incallStateMachine->apnManager_ = nullptr;
     ASSERT_EQ(incallStateMachine->HasAnyConnectedState(), false);
 }
@@ -111,19 +111,18 @@ HWTEST_F(ApnManagerTest, HasAnyConnectedState_001, Function | MediumTest | Level
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(ApnManagerTest, StateProcess_001, Function | MediumTest | Level1)
+HWTEST_F(CellularStateMachineTest, StateProcess_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<IncallDataStateMachineTest> incallStateMachineTest = std::make_shared<IncallDataStateMachineTest>();
     std::shared_ptr<IncallDataStateMachine> incallStateMachine =
-        incallStateMachineTest->CreateCellularDataStateMachine(0);
-    auto event = AppExecFwk::InnerEvent::Get(MSG_SM_INCALL_DATA_DATA_DISCONNECTED);
+        incallStateMachineTest->CreateIncallDataStateMachine(0);
+    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_DISCONNECTED);
     incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
     incallStateMachine->TransitionTo(incallStateMachine->activatingSecondaryState_);
     incallStateMachine->TransitionTo(incallStateMachine->activatedSecondaryState_);
     incallStateMachine->TransitionTo(incallStateMachine->deactivatingSecondaryState_);
     auto deactivatingSecondaryState =
         static_cast<DeactivatingSecondaryState *>(incallStateMachine->deactivatingSecondaryState_.GetRefPtr());
-    auto event = AppExecFwk::InnerEvent::Get(0);
     bool result = deactivatingSecondaryState->StateProcess(event);
     EXPECT_EQ(result, true);
 }
@@ -133,19 +132,18 @@ HWTEST_F(ApnManagerTest, StateProcess_001, Function | MediumTest | Level1)
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(ApnManagerTest, StateProcess_002, Function | MediumTest | Level1)
+HWTEST_F(CellularStateMachineTest, StateProcess_002, Function | MediumTest | Level1)
 {
     std::shared_ptr<IncallDataStateMachineTest> incallStateMachineTest = std::make_shared<IncallDataStateMachineTest>();
     std::shared_ptr<IncallDataStateMachine> incallStateMachine =
-        incallStateMachineTest->CreateCellularDataStateMachine(0);
-    auto event = AppExecFwk::InnerEvent::Get(MSG_SM_INCALL_DATA_DATA_DISCONNECTED);
+        incallStateMachineTest->CreateIncallDataStateMachine(0);
+    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_DISCONNECTED);
     incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
     incallStateMachine->TransitionTo(incallStateMachine->activatingSecondaryState_);
     incallStateMachine->TransitionTo(incallStateMachine->activatedSecondaryState_);
     incallStateMachine->TransitionTo(incallStateMachine->deactivatingSecondaryState_);
     auto deactivatingSecondaryState =
         static_cast<DeactivatingSecondaryState *>(incallStateMachine->deactivatingSecondaryState_.GetRefPtr());
-    auto event = AppExecFwk::InnerEvent::Get(0);
     bool result = deactivatingSecondaryState->StateProcess(event);
     EXPECT_EQ(result, true);
 }
@@ -155,12 +153,12 @@ HWTEST_F(ApnManagerTest, StateProcess_002, Function | MediumTest | Level1)
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(ApnManagerTest, StateProcess_003, Function | MediumTest | Level1)
+HWTEST_F(CellularStateMachineTest, StateProcess_003, Function | MediumTest | Level1)
 {
     std::shared_ptr<IncallDataStateMachineTest> incallStateMachineTest = std::make_shared<IncallDataStateMachineTest>();
     std::shared_ptr<IncallDataStateMachine> incallStateMachine =
-        incallStateMachineTest->CreateCellularDataStateMachine(0);
-    auto event = AppExecFwk::InnerEvent::Get(MSG_SM_INCALL_DATA_SETTINGS_ON);
+        incallStateMachineTest->CreateIncallDataStateMachine(0);
+    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_SETTINGS_ON);
     incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
     incallStateMachine->TransitionTo(incallStateMachine->activatingSecondaryState_);
     incallStateMachine->TransitionTo(incallStateMachine->activatedSecondaryState_);
@@ -176,16 +174,16 @@ HWTEST_F(ApnManagerTest, StateProcess_003, Function | MediumTest | Level1)
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(ApnManagerTest, ActivatingStateProcess_001, Function | MediumTest | Level1)
+HWTEST_F(CellularStateMachineTest, ActivatingStateProcess_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<IncallDataStateMachineTest> incallStateMachineTest = std::make_shared<IncallDataStateMachineTest>();
     std::shared_ptr<IncallDataStateMachine> incallStateMachine =
-        incallStateMachineTest->CreateCellularDataStateMachine(0);
-    auto event = AppExecFwk::InnerEvent::Get(MSG_SM_INCALL_DATA_DATA_CONNECTED);
+        incallStateMachineTest->CreateIncallDataStateMachine(0);
+    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_CONNECTED);
     incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
     incallStateMachine->TransitionTo(incallStateMachine->activatingSecondaryState_);
     auto activatingSecondaryState =
-        static_cast<DeactivatingSecondaryState *>(incallStateMachine->activatingSecondaryState_.GetRefPtr());
+        static_cast<ActivatingSecondaryState *>(incallStateMachine->activatingSecondaryState_.GetRefPtr());
     bool result = activatingSecondaryState->StateProcess(event);
     EXPECT_EQ(result, true);
 }
@@ -195,35 +193,35 @@ HWTEST_F(ApnManagerTest, ActivatingStateProcess_001, Function | MediumTest | Lev
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(ApnManagerTest, ActivatingStateProcess_002, Function | MediumTest | Level1)
+HWTEST_F(CellularStateMachineTest, ActivatingStateProcess_002, Function | MediumTest | Level1)
 {
     std::shared_ptr<IncallDataStateMachineTest> incallStateMachineTest = std::make_shared<IncallDataStateMachineTest>();
     std::shared_ptr<IncallDataStateMachine> incallStateMachine =
-        incallStateMachineTest->CreateCellularDataStateMachine(0);
+        incallStateMachineTest->CreateIncallDataStateMachine(0);
     auto event = AppExecFwk::InnerEvent::Get(-1);
     incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
     incallStateMachine->TransitionTo(incallStateMachine->activatingSecondaryState_);
     auto activatingSecondaryState =
-        static_cast<DeactivatingSecondaryState *>(incallStateMachine->activatingSecondaryState_.GetRefPtr());
+        static_cast<AactivatingSecondaryState *>(incallStateMachine->activatingSecondaryState_.GetRefPtr());
     bool result = activatingSecondaryState->StateProcess(event);
     EXPECT_EQ(result, false);
 }
 
 /**
- * @tc.number   SecondaryActivatingStateProcess_001
+ * @tc.number   SecondaryActivateStateProcess_001
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(ApnManagerTest, SecondaryActivatingStateProcess_001, Function | MediumTest | Level1)
+HWTEST_F(CellularStateMachineTest, SecondaryActivateStateProcess_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<IncallDataStateMachineTest> incallStateMachineTest = std::make_shared<IncallDataStateMachineTest>();
     std::shared_ptr<IncallDataStateMachine> incallStateMachine =
-        incallStateMachineTest->CreateCellularDataStateMachine(0);
+        incallStateMachineTest->CreateIncallDataStateMachine(0);
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_CONNECTED);
     incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
     incallStateMachine->TransitionTo(incallStateMachine->secondaryActiveState_);
     auto secondaryActiveState =
-        static_cast<DeactivatingSecondaryState *>(incallStateMachine->secondaryActiveState_.GetRefPtr());
+        static_cast<ActivatingSecondaryState *>(incallStateMachine->secondaryActiveState_.GetRefPtr());
     bool result = secondaryActiveState->StateProcess(event);
     EXPECT_EQ(result, false);
 }
@@ -233,10 +231,10 @@ HWTEST_F(ApnManagerTest, SecondaryActivatingStateProcess_001, Function | MediumT
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(ApnManagerTest, InactiveStateBegin_001, Function | MediumTest | Level1)
+HWTEST_F(CellularStateMachineTest, InactiveStateBegin_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
-    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataStateMachine(0);
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
     auto inactive = static_cast<Inactive *>(cellularMachine->inActiveState_.GetRefPtr());
     inactive->deActiveApnTypeId_ = 0;
@@ -249,10 +247,10 @@ HWTEST_F(ApnManagerTest, InactiveStateBegin_001, Function | MediumTest | Level1)
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(ApnManagerTest, InactiveStateProcess_002, Function | MediumTest | Level1)
+HWTEST_F(CellularStateMachineTest, InactiveStateProcess_002, Function | MediumTest | Level1)
 {
     std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
-    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataStateMachine(0);
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
     auto inactive = static_cast<Inactive *>(cellularMachine->inActiveState_.GetRefPtr());
     inactive->stateMachine_ = cellularMachine;
@@ -266,13 +264,13 @@ HWTEST_F(ApnManagerTest, InactiveStateProcess_002, Function | MediumTest | Level
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(ApnManagerTest, InactiveStateProcess_003, Function | MediumTest | Level1)
+HWTEST_F(CellularStateMachineTest, InactiveStateProcess_003, Function | MediumTest | Level1)
 {
     std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
-    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataStateMachine(0);
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
     auto inactive = static_cast<Inactive *>(cellularMachine->inActiveState_.GetRefPtr());
-    inactive->stateMachine_ = cellularMachine;
+    inactive->SetStateMachine(cellularMachine);
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT_ALL);
     bool result = inactive->StateProcess(event);
     EXPECT_EQ(result, true);
@@ -283,10 +281,10 @@ HWTEST_F(ApnManagerTest, InactiveStateProcess_003, Function | MediumTest | Level
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(ApnManagerTest, DefaultStateProcess_001, Function | MediumTest | Level1)
+HWTEST_F(CellularStateMachineTest, DefaultStateProcess_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
-    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataStateMachine(0);
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
     auto mDefault = static_cast<Default *>(cellularMachine->defaultState_.GetRefPtr());
     mDefault->stateMachine_ = cellularMachine;
@@ -301,10 +299,10 @@ HWTEST_F(ApnManagerTest, DefaultStateProcess_001, Function | MediumTest | Level1
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(ApnManagerTest, DefaultProcessDisconnectDone_001, Function | MediumTest | Level1)
+HWTEST_F(CellularStateMachineTest, DefaultProcessDisconnectDone_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
-    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataStateMachine(0);
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
     auto mDefault = static_cast<Default *>(cellularMachine->defaultState_.GetRefPtr());
     mDefault->stateMachine_ = cellularMachine;
@@ -319,13 +317,13 @@ HWTEST_F(ApnManagerTest, DefaultProcessDisconnectDone_001, Function | MediumTest
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(ApnManagerTest, DefaulProcessDataConnectionDrsOrRatChanged_001, Function | MediumTest | Level1)
+HWTEST_F(CellularStateMachineTest, DefaulProcessDataConnectionDrsOrRatChanged_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
-    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataStateMachine(0);
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
     auto mDefault = static_cast<Default *>(cellularMachine->defaultState_.GetRefPtr());
-    cellularMachine->TransitionTo(cellularMachine->activeState);
+    cellularMachine->TransitionTo(cellularMachine->activeState_);
     mDefault->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
     bool result = mDefault->ProcessDataConnectionDrsOrRatChanged(event);
@@ -333,14 +331,14 @@ HWTEST_F(ApnManagerTest, DefaulProcessDataConnectionDrsOrRatChanged_001, Functio
 }
 
 /**
- * @tc.number   DefaulProcessDataConnectionDrsOrRatChanged_002
+ * @tc.number   DefaultProcessDataConnectionDrsOrRatChanged_002
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(ApnManagerTest, DefaulProcessDataConnectionDrsOrRatChanged_002, Function | MediumTest | Level1)
+HWTEST_F(CellularStateMachineTest, DefaultProcessDataConnectionDrsOrRatChanged_002, Function | MediumTest | Level1)
 {
     std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
-    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataStateMachine(0);
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
     auto mDefault = static_cast<Default *>(cellularMachine->defaultState_.GetRefPtr());
     cellularMachine->TransitionTo(cellularMachine->activatingState_);
@@ -355,10 +353,10 @@ HWTEST_F(ApnManagerTest, DefaulProcessDataConnectionDrsOrRatChanged_002, Functio
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(ApnManagerTest, DefaulProcessDataConnectionDrsOrRatChanged_003, Function | MediumTest | Level1)
+HWTEST_F(CellularStateMachineTest, DefaulProcessDataConnectionDrsOrRatChanged_003, Function | MediumTest | Level1)
 {
     std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
-    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataStateMachine(0);
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
     auto mDefault = static_cast<Default *>(cellularMachine->defaultState_.GetRefPtr());
     cellularMachine->TransitionTo(cellularMachine->disconnectingState_);
