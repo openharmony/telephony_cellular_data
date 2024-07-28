@@ -202,17 +202,17 @@ HWTEST_F(CellularStateMachineTest, ActivatingStateProcess_002, Function | Medium
     incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
     incallStateMachine->TransitionTo(incallStateMachine->activatingSecondaryState_);
     auto activatingSecondaryState =
-        static_cast<AactivatingSecondaryState *>(incallStateMachine->activatingSecondaryState_.GetRefPtr());
+        static_cast<ActivatingSecondaryState *>(incallStateMachine->activatingSecondaryState_.GetRefPtr());
     bool result = activatingSecondaryState->StateProcess(event);
     EXPECT_EQ(result, false);
 }
 
 /**
- * @tc.number   SecondaryActivateStateProcess_001
+ * @tc.number   SecondaryActiveStateProcess_001
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(CellularStateMachineTest, SecondaryActivateStateProcess_001, Function | MediumTest | Level1)
+HWTEST_F(CellularStateMachineTest, SecondaryActiveStateProcess_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<IncallDataStateMachineTest> incallStateMachineTest = std::make_shared<IncallDataStateMachineTest>();
     std::shared_ptr<IncallDataStateMachine> incallStateMachine =
@@ -313,11 +313,11 @@ HWTEST_F(CellularStateMachineTest, DefaultProcessDisconnectDone_001, Function | 
 }
 
 /**
- * @tc.number   DefaulProcessDataConnectionDrsOrRatChanged_001
+ * @tc.number   DefaultProcessDataConnectionDrsOrRatChanged_001
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(CellularStateMachineTest, DefaulProcessDataConnectionDrsOrRatChanged_001, Function | MediumTest | Level1)
+HWTEST_F(CellularStateMachineTest, DefaultProcessDataConnectionDrsOrRatChanged_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
@@ -349,11 +349,11 @@ HWTEST_F(CellularStateMachineTest, DefaultProcessDataConnectionDrsOrRatChanged_0
 }
 
 /**
- * @tc.number   DefaulProcessDataConnectionDrsOrRatChanged_003
+ * @tc.number   DefaultProcessDataConnectionDrsOrRatChanged_003
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(CellularStateMachineTest, DefaulProcessDataConnectionDrsOrRatChanged_003, Function | MediumTest | Level1)
+HWTEST_F(CellularStateMachineTest, DefaultProcessDataConnectionDrsOrRatChanged_003, Function | MediumTest | Level1)
 {
     std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);

@@ -607,7 +607,7 @@ HWTEST_F(ApnManagerTest, RequestCellularData_003, TestSize.Level0)
 HWTEST_F(ApnManagerTest, RequestCellularData_004, TestSize.Level0)
 {
     NetRequest netRequest;
-    netRequest.capability = 0;
+    netRequest.capability = 1;
     netRequest.ident = "ident";
     sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
     apnHolder->netRequests_.push_back(netRequest);
@@ -783,6 +783,17 @@ HWTEST_F(ApnManagerTest, HasInternetCapability_001, TestSize.Level0)
 {
     int32_t result = CellularDataClient::GetInstance().HasInternetCapability(0, 0);
     EXPECT_EQ(result, false);
+}
+
+/**
+ * @tc.number   HandleApnChanged_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, HandleApnChanged_001, TestSize.Level0)
+{
+    int32_t result = CellularDataClient::GetInstance().HandleApnChanged(0);
+    EXPECT_EQ(result, true);
 }
 
 /**
