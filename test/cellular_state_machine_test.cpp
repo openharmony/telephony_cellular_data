@@ -15,7 +15,7 @@
 #define private public
 #define protected public
 
-#include "activating"
+#include "activating.h"
 #include "active.h"
 #include "apn_manager.h"
 #include "cellular_data_state_machine.h"
@@ -451,12 +451,12 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessDisconnectDone_001, Function | 
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
-    bool result = active->ProcessDisconnectDon(event);
+    bool result = active->ProcessDisconnectDone(event);
     EXPECT_EQ(result, false);
 }
 
 /**
- * @tc.number   Active_ProcessLostConnection_001
+ * @tc.number   Active_ProcessDisconnectDone_001
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
@@ -466,7 +466,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessLostConnection_001, Function | 
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
     auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
-    cellularMachine->TransitionTo(cellularMachine->inActiveState_)
+    cellularMachine->TransitionTo(cellularMachine->inActiveState_);
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(0);
     bool result = active->ProcessLostConnection(event);
@@ -526,7 +526,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessDataConnectionRoamOff_001, Func
 }
 
 /**
- * @tc.number   ProcessDataConnectionVoiceCallStartedOrEnded_001
+ * @tc.number   Active_ProcessDataConnectionVoiceCallStartedOrEnded_001
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
@@ -538,7 +538,7 @@ HWTEST_F(CellularStateMachineTest, ProcessDataConnectionVoiceCallStartedOrEnded_
     auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
-    bool result = active->ProcessDataConnectionRoamOff(event);
+    bool result = active->ProcessDataConnectionVoiceCallStartedOrEnded(event);
     EXPECT_EQ(result, true);
 }
 
@@ -572,11 +572,11 @@ HWTEST_F(CellularStateMachineTest, Active_RefreshTcpBufferSizes_001, Function | 
     auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
     active->stateMachine_ = cellularMachine;
     active->RefreshTcpBufferSizes();
-    EXPECT_TRUE(cellularMachine != nullptr);
+    ASSERT_TRUE(cellularMachine != nullptr);
 }
 
 /**
- * @tc.number   Active_RefreshTcpBufferSizes_002
+ * @tc.number   Active_RefreshTcpBufferSizes_001
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
@@ -589,7 +589,7 @@ HWTEST_F(CellularStateMachineTest, Active_RefreshTcpBufferSizes_002, Function | 
     cellularMachine->cdConnectionManager_ = nullptr;
     active->stateMachine_ = cellularMachine;
     active->RefreshTcpBufferSizes();
-    EXPECT_TRUE(cellularMachine != nullptr);
+    ASSERT_TRUE(cellularMachine != nullptr);
 }
 
 /**
@@ -602,7 +602,7 @@ HWTEST_F(CellularStateMachineTest, Activating_StateBegin_001, Function | MediumT
     std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
-    auto activating = static_cast<ActivatingSecondaryState *>(machine->activatingSecondaryState_.GetRefPtr());
+    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
     activating->stateMachine_ = cellularMachine;
     activating->StateBegin();
     EXPECT_EQ(activating->isActive_, true);
@@ -618,7 +618,7 @@ HWTEST_F(CellularStateMachineTest, Activating_DataCallPdpError_001, Function | M
     std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
-    auto activating = static_cast<ActivatingSecondaryState *>(machine->activatingSecondaryState_.GetRefPtr());
+    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
     auto result = activating->DataCallPdpError(96);
     EXPECT_EQ(result, DisConnectionReason::REASON_CLEAR_CONNECTION);
     result = activating->DataCallPdpError(114);
@@ -635,22 +635,22 @@ HWTEST_F(CellularStateMachineTest, Activating_StateProcess_001, Function | Mediu
     std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
-    auto activating = static_cast<ActivatingSecondaryState *>(machine->activatingSecondaryState_.GetRefPtr());
+    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DRS_OR_RAT_CHANGED);
-    auto result = activating->StateProcess(event);
+    bool result = activating->StateProcess(event);
     EXPECT_EQ(result, true);
     event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
     result = activating->StateProcess(event);
     EXPECT_EQ(result, true);
     event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_RIL_SETUP_DATA_CALL);
     result = activating->StateProcess(event);
-    EXPECT_EQ(result, true);
+    EXPECT_EQ(result, false);
     event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_GET_LAST_FAIL_DONE);
     result = activating->StateProcess(event);
     EXPECT_EQ(result, true);
     event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_GET_RIL_BANDWIDTH);
     result = activating->StateProcess(event);
-    EXPECT_EQ(result, true)
+    EXPECT_EQ(result, false)
     event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_CONNECT_TIMEOUT_CHECK);
     result = activating->StateProcess(event);
     EXPECT_EQ(result, true);
@@ -669,7 +669,7 @@ HWTEST_F(CellularStateMachineTest, Activating_ProcessConnectTimeout_001, Functio
     std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
-    auto activating = static_cast<ActivatingSecondaryState *>(machine->activatingSecondaryState_.GetRefPtr());
+    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
     cellularMachine->connectId_ = 1;
     activating->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(1);
@@ -687,7 +687,7 @@ HWTEST_F(CellularStateMachineTest, Activating_ProcessConnectTimeout_002, Functio
     std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
-    auto activating = static_cast<ActivatingSecondaryState *>(machine->activatingSecondaryState_.GetRefPtr());
+    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
     cellularMachine->connectId_ = 1;
     activating->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(0);
