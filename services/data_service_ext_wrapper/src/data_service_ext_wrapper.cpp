@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace Telephony {
-
 DataServiceExtWrapper::DataServiceExtWrapper() {}
 DataServiceExtWrapper::~DataServiceExtWrapper()
 {
@@ -33,18 +32,13 @@ DataServiceExtWrapper::~DataServiceExtWrapper()
 void DataServiceExtWrapper::InitDataServiceExtWrapper()
 {
     TELEPHONY_LOGD("DataServiceExtWrapper::InitDataServiceExtWrapper() start");
-    char path[PATH_PARAMETER_SIZE] = {0};
-    char realPath[PATH_MAX] = {0};
-    int retLen = GetParameter(CONFIG_DATA_SERVICE_EXT_PATH, "", path, PATH_PARAMETER_SIZE);
+    char pathName[PATH_PARAMETER_SIZE] = {0};
+    int retLen = GetParameter(CONFIG_DATA_SERVICE_EXT_PATH, "", pathName, PATH_PARAMETER_SIZE);
     if (retLen == 0) {
         TELEPHONY_LOGE("Failed to get vendor library path through system properties.");
         return;
     }
-    if (realpath(path, realPath) == nullptr) {
-        TELEPHONY_LOGE("Path is error, path is %{public}s", path);
-        return;
-    }
-    DataServiceExtWrapperHandle_ = dlopen(realPath, RTLD_NOW);
+    DataServiceExtWrapperHandle_ = dlopen(pathName, RTLD_NOW);
     if (DataServiceExtWrapperHandle_ == nullptr) {
         TELEPHONY_LOGE("DATA_SERVICE_EXT_WRAPPER_PATH was not loaded, error: %{public}s", dlerror());
         return;
