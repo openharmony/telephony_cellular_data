@@ -1,0 +1,429 @@
+/*
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#define private public
+#define protected public
+
+#include "activating.h"
+#include "active.h"
+#include "apn_manager.h"
+#include "cellular_data_state_machine.h"
+#include "data_connection_manager.h"
+#include "default.h"
+#include "disconnecting.h"
+#include "gtest/gtest.h"
+#include "inactive.h"
+#include "incall_data_state_machine.h"
+#include "tel_event_handler.h"
+#include "telephony_types.h"
+
+namespace OHOS {
+namespace Telephony {
+using namespace testing::ext;
+
+class CellularStateMachineTest : public testing::Test {
+public:
+    static void SetUpTestCase();
+    static void TearDownTestCase();
+    void SetUp();
+    void TearDown();
+    std::shared_ptr<CellularDataStateMachine> cellularMachine;
+};
+void CellularStateMachineTest::SetUpTestCase() {}
+
+void CellularStateMachineTest::TearDownTestCase() {}
+
+void CellularStateMachineTest::SetUp() {}
+
+void CellularStateMachineTest::TearDown() {}
+
+class CellularMachineTest : public TelEventHandler {
+public:
+    CellularMachineTest() : TelEventHandler("CellularDataStateMachineTest") {}
+    ~CellularMachineTest() = default;
+    std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect(int32_t slotId);
+
+public:
+    std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine_ = nullptr;
+};
+
+std::shared_ptr<CellularDataStateMachine> CellularMachineTest::CreateCellularDataConnect(int32_t slotId)
+{
+    if (cellularDataStateMachine_ != nullptr) {
+        return cellularDataStateMachine_;
+    }
+    sptr<DataConnectionManager> connectionManager = std::make_unique<DataConnectionManager>(slotId).release();
+    if (connectionManager == nullptr) {
+        return nullptr;
+    }
+    connectionManager->Init();
+    cellularDataStateMachine_ = std::make_shared<CellularDataStateMachine>(
+        connectionManager, std::static_pointer_cast<TelEventHandler>(shared_from_this()));
+    return cellularDataStateMachine_;
+}
+
+/**
+ * @tc.number   Active_ProcessNrStateChanged_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, Active_ProcessNrStateChanged_001, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    active->stateMachine_ = cellularMachine;
+    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
+    bool result = active->ProcessNrStateChanged(event);
+    EXPECT_EQ(result, true);
+}
+
+/**
+ * @tc.number   Active_RefreshTcpBufferSizes_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, Active_RefreshTcpBufferSizes_001, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    active->stateMachine_ = cellularMachine;
+    active->RefreshTcpBufferSizes();
+    ASSERT_TRUE(cellularMachine != nullptr);
+}
+
+/**
+ * @tc.number   Active_RefreshTcpBufferSizes_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, Active_RefreshTcpBufferSizes_002, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    cellularMachine->cdConnectionManager_ = nullptr;
+    active->stateMachine_ = cellularMachine;
+    active->RefreshTcpBufferSizes();
+    ASSERT_TRUE(cellularMachine != nullptr);
+}
+
+/**
+ * @tc.number   Activating_StateBegin_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, Activating_StateBegin_001, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    cellularMachine->TransitionTo(cellularMachine->defaultState_);
+    cellularMachine->TransitionTo(cellularMachine->activatingState_);
+    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    activating->stateMachine_ = cellularMachine;
+    activating->StateBegin();
+    EXPECT_EQ(activating->isActive_, true);
+}
+
+/**
+ * @tc.number   Activating_DataCallPdpError_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, Activating_DataCallPdpError_001, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    cellularMachine->TransitionTo(cellularMachine->defaultState_);
+    cellularMachine->TransitionTo(cellularMachine->activatingState_);
+    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    auto result = activating->DataCallPdpError(96);
+    EXPECT_EQ(result, DisConnectionReason::REASON_CLEAR_CONNECTION);
+    result = activating->DataCallPdpError(114);
+    EXPECT_EQ(result, DisConnectionReason::REASON_CLEAR_CONNECTION);
+}
+
+/**
+ * @tc.number   Activating_StateProcess_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, Activating_StateProcess_001, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    cellularMachine->TransitionTo(cellularMachine->defaultState_);
+    cellularMachine->TransitionTo(cellularMachine->activatingState_);
+    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DRS_OR_RAT_CHANGED);
+    bool result = activating->StateProcess(event);
+    EXPECT_EQ(result, true);
+    event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
+    result = activating->StateProcess(event);
+    EXPECT_EQ(result, true);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_RIL_SETUP_DATA_CALL);
+    result = activating->StateProcess(event);
+    EXPECT_EQ(result, false);
+    event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_GET_LAST_FAIL_DONE);
+    result = activating->StateProcess(event);
+    EXPECT_EQ(result, true);
+    event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_GET_RIL_BANDWIDTH);
+    result = activating->StateProcess(event);
+    EXPECT_EQ(result, false);
+    event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_CONNECT_TIMEOUT_CHECK);
+    result = activating->StateProcess(event);
+    EXPECT_EQ(result, true);
+    event = AppExecFwk::InnerEvent::Get(0);
+    result = activating->StateProcess(event);
+    EXPECT_EQ(result, false);
+}
+
+/**
+ * @tc.number   Activating_ProcessConnectTimeout_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, Activating_ProcessConnectTimeout_001, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    cellularMachine->TransitionTo(cellularMachine->defaultState_);
+    cellularMachine->TransitionTo(cellularMachine->activatingState_);
+    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    cellularMachine->connectId_ = 1;
+    activating->stateMachine_ = cellularMachine;
+    auto event = AppExecFwk::InnerEvent::Get(1);
+    activating->ProcessConnectTimeout(event);
+    EXPECT_EQ(cellularMachine->IsInactiveState(), false);
+}
+
+/**
+ * @tc.number   Activating_ProcessConnectTimeout_002
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, Activating_ProcessConnectTimeout_002, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    cellularMachine->TransitionTo(cellularMachine->defaultState_);
+    cellularMachine->TransitionTo(cellularMachine->activatingState_);
+    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    cellularMachine->connectId_ = 1;
+    activating->stateMachine_ = cellularMachine;
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    activating->ProcessConnectTimeout(event);
+    EXPECT_EQ(cellularMachine->IsInactiveState(), false);
+}
+
+/**
+ * @tc.number   Disconnecting_StateBegin_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, Disconnecting_StateBegin_001, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    cellularMachine->TransitionTo(cellularMachine->defaultState_);
+    cellularMachine->TransitionTo(cellularMachine->activatingState_);
+    cellularMachine->TransitionTo(cellularMachine->inActiveState_);
+    cellularMachine->TransitionTo(cellularMachine->disconnectingState_);
+    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
+    disconnecting->stateMachine_ = cellularMachine;
+    disconnecting->StateBegin();
+    EXPECT_EQ(disconnecting->isActive_, true);
+}
+
+/**
+ * @tc.number   Disconnecting_ProcessConnectTimeout_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessConnectTimeout_001, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    cellularMachine->TransitionTo(cellularMachine->defaultState_);
+    cellularMachine->TransitionTo(cellularMachine->activatingState_);
+    cellularMachine->TransitionTo(cellularMachine->inActiveState_);
+    cellularMachine->TransitionTo(cellularMachine->disconnectingState_);
+    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
+    cellularMachine->connectId_ = 1;
+    disconnecting->stateMachine_ = cellularMachine;
+    auto event = AppExecFwk::InnerEvent::Get(1);
+    disconnecting->ProcessDisconnectTimeout(event);
+    EXPECT_EQ(cellularMachine->IsInactiveState(), false);
+}
+
+/**
+ * @tc.number   Disconnecting_ProcessConnectTimeout_002
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessConnectTimeout_002, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    cellularMachine->TransitionTo(cellularMachine->defaultState_);
+    cellularMachine->TransitionTo(cellularMachine->activatingState_);
+    cellularMachine->TransitionTo(cellularMachine->inActiveState_);
+    cellularMachine->TransitionTo(cellularMachine->disconnectingState_);
+    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
+    cellularMachine->connectId_ = 1;
+    disconnecting->stateMachine_ = cellularMachine;
+    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
+    disconnecting->ProcessDisconnectTimeout(event);
+    EXPECT_EQ(cellularMachine->IsInactiveState(), false);
+}
+
+/**
+ * @tc.number   Disconnecting_ProcessRilAdapterHostDied_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilAdapterHostDied_001, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    cellularMachine->TransitionTo(cellularMachine->defaultState_);
+    cellularMachine->TransitionTo(cellularMachine->activatingState_);
+    cellularMachine->TransitionTo(cellularMachine->inActiveState_);
+    cellularMachine->TransitionTo(cellularMachine->disconnectingState_);
+    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
+    disconnecting->stateMachine_ = cellularMachine;
+    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
+    disconnecting->ProcessRilAdapterHostDied(event);
+    EXPECT_EQ(cellularMachine->IsInactiveState(), false);
+}
+
+/**
+ * @tc.number   Disconnecting_ProcessRilDeactivateDataCall_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilDeactivateDataCall_001, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    cellularMachine->TransitionTo(cellularMachine->defaultState_);
+    cellularMachine->TransitionTo(cellularMachine->activatingState_);
+    cellularMachine->TransitionTo(cellularMachine->inActiveState_);
+    cellularMachine->TransitionTo(cellularMachine->disconnectingState_);
+    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
+    disconnecting->stateMachine_ = cellularMachine;
+    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
+    disconnecting->ProcessRilDeactivateDataCall(event);
+    EXPECT_EQ(cellularMachine->IsInactiveState(), false);
+}
+
+/**
+ * @tc.number   Disconnecting_ProcessRilDeactivateDataCall_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilDeactivateDataCall_002, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    cellularMachine->TransitionTo(cellularMachine->defaultState_);
+    cellularMachine->TransitionTo(cellularMachine->activatingState_);
+    cellularMachine->TransitionTo(cellularMachine->inActiveState_);
+    cellularMachine->TransitionTo(cellularMachine->disconnectingState_);
+    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
+    cellularMachine->stateMachineEventHandler_ = nullptr;
+    disconnecting->stateMachine_ = cellularMachine;
+    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
+    disconnecting->ProcessRilDeactivateDataCall(event);
+    EXPECT_EQ(cellularMachine->IsInactiveState(), false);
+}
+
+/**
+ * @tc.number   Disconnecting_StateProcess_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, Disconnecting_StateProcess_001, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    cellularMachine->TransitionTo(cellularMachine->defaultState_);
+    cellularMachine->TransitionTo(cellularMachine->activatingState_);
+    cellularMachine->TransitionTo(cellularMachine->inActiveState_);
+    cellularMachine->TransitionTo(cellularMachine->disconnectingState_);
+    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_RIL_DEACTIVATE_DATA_CALL);
+    bool result = disconnecting->StateProcess(event);
+    EXPECT_EQ(result, true);
+    event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK);
+    result = disconnecting->StateProcess(event);
+    EXPECT_EQ(result, true);
+    event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_RIL_ADAPTER_HOST_DIED);
+    result = disconnecting->StateProcess(event);
+    EXPECT_EQ(result, true);
+    event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
+    result = disconnecting->StateProcess(event);
+    EXPECT_EQ(result, true);
+    event = AppExecFwk::InnerEvent::Get(0);
+    result = disconnecting->StateProcess(event);
+    EXPECT_EQ(result, false);
+}
+} // namespace Telephony
+} // namespace OHOS
