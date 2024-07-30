@@ -139,7 +139,6 @@ private:
     void CreateApnItem();
     void UpdatePhysicalConnectionState(bool noActiveConnection);
     bool IsVSimSlotId(int32_t slotId);
-    bool GetSmartSwitchState();
     std::shared_ptr<CellularDataStateMachine> CheckForCompatibleDataConnection(sptr<ApnHolder> &apnHolder);
     bool IsGsm();
     bool IsCdma();
