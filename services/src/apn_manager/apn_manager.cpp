@@ -25,8 +25,7 @@
 
 namespace OHOS {
 namespace Telephony {
-const std::map<std::string, int32_t> ApnManager::apnIdApnNameMap_
-{
+const std::map<std::string, int32_t> ApnManager::apnIdApnNameMap_ {
     {DATA_CONTEXT_ROLE_ALL, DATA_CONTEXT_ROLE_ALL_ID},
     {DATA_CONTEXT_ROLE_DEFAULT, DATA_CONTEXT_ROLE_DEFAULT_ID},
     {DATA_CONTEXT_ROLE_MMS, DATA_CONTEXT_ROLE_MMS_ID},
@@ -173,11 +172,11 @@ void ApnManager::AddApnHolder(const std::string &apnType, const int32_t priority
     sortedApnHolders_.emplace_back(apnHolder);
     sort(sortedApnHolders_.begin(), sortedApnHolders_.end(),
         [](const sptr<ApnHolder> &c1, const sptr<ApnHolder> &c2) {
-        if (c1 == nullptr || c2 == nullptr) {
-            return false;
-        }
-        return c2->GetPriority() < c1->GetPriority();
-    });
+            if (c1 == nullptr || c2 == nullptr) {
+                return false;
+            }
+            return c2->GetPriority() < c1->GetPriority();
+        });
     TELEPHONY_LOGI("The Apn holder type:%{public}s, size:%{public}zu", apnType.c_str(), sortedApnHolders_.size());
 }
 
