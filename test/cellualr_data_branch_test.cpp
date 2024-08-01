@@ -32,6 +32,8 @@ namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
 
+static const int32_t SLEEP_TIME = 3;
+
 class CellularStateMachineTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -42,8 +44,9 @@ public:
 };
 void CellularStateMachineTest::SetUpTestCase() {}
 
-void CellularStateMachineTest::TearDownTestCase() {
-    sleep(3);
+void CellularStateMachineTest::TearDownTestCase()
+{
+    sleep(SLEEP_TIME);
 }
 
 void CellularStateMachineTest::SetUp() {}
