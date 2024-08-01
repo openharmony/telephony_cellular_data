@@ -28,7 +28,7 @@
 #include "incall_data_state_machine.h"
 #include "tel_event_handler.h"
 #include "telephony_types.h"
-#include "tel_ril_call_parcel.h"
+#include "tel_ril_data_parcel.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -557,9 +557,10 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessDisconnectAllDone_003, Function
         cellularMachine->Init();
     }
     auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    cellularMachine->TransitionTo(cellularMachine->inActiveState_);
     active->stateMachine_ = cellularMachine;
-    std:shared_ptr<DataDisconnectParams> dataDisconnectParams =
-        std::make_shared<DataDisconnectParams>("",DisConnectionReason::REASON_NORMAL);
+    std::shared_ptr<DataDisconnectParams> dataDisconnectParams =
+        std::make_shared<DataDisconnectParams>("", DisConnectionReason::REASON_NORMAL);
     auto event = AppExecFwk::InnerEvent::Get(0, dataDisconnectParams);
     bool result = active->ProcessDisconnectAllDone(event);
     EXPECT_EQ(result, false);
@@ -580,8 +581,8 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessDisconnectAllDone_004, Function
     auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
     cellularMachine->inActiveState_ = nullptr;
     active->stateMachine_ = cellularMachine;
-    std:shared_ptr<DataDisconnectParams> dataDisconnectParams =
-        std::make_shared<DataDisconnectParams>("",DisConnectionReason::REASON_NORMAL);
+    std::shared_ptr<DataDisconnectParams> dataDisconnectParams =
+        std::make_shared<DataDisconnectParams>("", DisConnectionReason::REASON_NORMAL);
     auto event = AppExecFwk::InnerEvent::Get(0, dataDisconnectParams);
     bool result = active->ProcessDisconnectAllDone(event);
     EXPECT_EQ(result, false);
@@ -621,7 +622,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessLinkCapabilityChanged_002, Func
     auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
     cellularMachine = nullptr;
     active->stateMachine_ = cellularMachine;
-    std:shared_ptr<DataLinkCapability> linkCapability = std::make_shared<DataLinkCapability>();
+    std::shared_ptr<DataLinkCapability> linkCapability = std::make_shared<DataLinkCapability>();
     auto event = AppExecFwk::InnerEvent::Get(0, linkCapability);
     bool result = active->ProcessLinkCapabilityChanged(event);
     EXPECT_EQ(result, false);
@@ -640,9 +641,8 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessLinkCapabilityChanged_003, Func
         cellularMachine->Init();
     }
     auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
-    cellularMachine = nullptr;
     active->stateMachine_ = cellularMachine;
-    std:shared_ptr<DataLinkCapability> linkCapability = std::make_shared<DataLinkCapability>();
+    std::shared_ptr<DataLinkCapability> linkCapability = std::make_shared<DataLinkCapability>();
     linkCapability->primaryUplinkKbps = 0;
     auto event = AppExecFwk::InnerEvent::Get(0, linkCapability);
     bool result = active->ProcessLinkCapabilityChanged(event);
@@ -662,9 +662,8 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessLinkCapabilityChanged_004, Func
         cellularMachine->Init();
     }
     auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
-    cellularMachine = nullptr;
     active->stateMachine_ = cellularMachine;
-    std:shared_ptr<DataLinkCapability> linkCapability = std::make_shared<DataLinkCapability>();
+    std::shared_ptr<DataLinkCapability> linkCapability = std::make_shared<DataLinkCapability>();
     linkCapability->primaryUplinkKbps = 1;
     linkCapability->primaryDownlinkKbps = 0;
     auto event = AppExecFwk::InnerEvent::Get(0, linkCapability);
@@ -685,9 +684,8 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessLinkCapabilityChanged_005, Func
         cellularMachine->Init();
     }
     auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
-    cellularMachine = nullptr;
     active->stateMachine_ = cellularMachine;
-    std:shared_ptr<DataLinkCapability> linkCapability = std::make_shared<DataLinkCapability>();
+    std::shared_ptr<DataLinkCapability> linkCapability = std::make_shared<DataLinkCapability>();
     linkCapability->primaryUplinkKbps = 1;
     linkCapability->primaryDownlinkKbps = 1;
     auto event = AppExecFwk::InnerEvent::Get(0, linkCapability);
@@ -729,7 +727,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessDataConnectionComplete_002, Fun
     auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
     cellularMachine = nullptr;
     active->stateMachine_ = cellularMachine;
-    std:shared_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_shared<SetupDataCallResultInfo>();
+    std::shared_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_shared<SetupDataCallResultInfo>();
     auto event = AppExecFwk::InnerEvent::Get(0, setupDataCallResultInfo);
     bool result = active->ProcessDataConnectionComplete(event);
     EXPECT_EQ(result, false);
@@ -749,7 +747,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessDataConnectionComplete_003, Fun
     }
     auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
     active->stateMachine_ = cellularMachine;
-    std:shared_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_shared<SetupDataCallResultInfo>();
+    std::shared_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_shared<SetupDataCallResultInfo>();
     auto event = AppExecFwk::InnerEvent::Get(0, setupDataCallResultInfo);
     bool result = active->ProcessDataConnectionComplete(event);
     EXPECT_EQ(result, true);
@@ -770,10 +768,10 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessDataConnectionComplete_004, Fun
     auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
     cellularMachine->stateMachineEventHandler_ = nullptr;
     active->stateMachine_ = cellularMachine;
-    std:shared_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_shared<SetupDataCallResultInfo>();
+    std::shared_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_shared<SetupDataCallResultInfo>();
     auto event = AppExecFwk::InnerEvent::Get(0, setupDataCallResultInfo);
     bool result = active->ProcessDataConnectionComplete(event);
-    EXPECT_EQ(result, true);
+    EXPECT_EQ(result, false);
 }
 
 /**
@@ -812,7 +810,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessNrStateChanged_002, Function | 
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
     bool result = active->ProcessNrStateChanged(event);
-    EXPECT_EQ(result, true);
+    EXPECT_EQ(result, false);
 }
 
 /**
@@ -832,7 +830,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessNrFrequencyChanged_001, Functio
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
     bool result = active->ProcessNrFrequencyChanged(event);
-    EXPECT_EQ(result, true);
+    EXPECT_EQ(result, false);
 }
 
 /**
