@@ -17,6 +17,7 @@
 
 #include "cellular_data_client.h"
 #include "cellular_data_constant.h"
+#include "data_access_token.h"
 #include "gtest/gtest.h"
 #include "telephony_errors.h"
 
@@ -141,6 +142,29 @@ HWTEST_F(CellularDataClientTest, IsNeedDoRecovery_001, TestSize.Level0)
     bool needDoRecovery = false;
     CellularDataClient::GetInstance().IsNeedDoRecovery(0, needDoRecovery);
     EXPECT_EQ(needDoRecovery, false);
+}
+
+/**
+ * @tc.number   SetDefaultCellularDataSlotId_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataClientTest, SetDefaultCellularDataSlotId_001, TestSize.Level0)
+{
+    int32_t result = CellularDataClient::GetInstance().SetDefaultCellularDataSlotId(0);
+    EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+}
+
+/**
+ * @tc.number   SetDefaultCellularDataSlotId_002
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataClientTest, SetDefaultCellularDataSlotId_002, TestSize.Level0)
+{
+    DataAccessToken token;
+    int32_t result = CellularDataClient::GetInstance().SetDefaultCellularDataSlotId(0);
+    EXPECT_EQ(result, 0);
 }
 } // namespace Telephony
 } // namespace OHOS
