@@ -83,7 +83,7 @@ HWTEST_F(CellularDataServiceTest, CellularDataService_002, TestSize.Level0)
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->GetCellularDataFlowType());
     ASSERT_EQ("default slotId: -1", service->GetStateMachineCurrentStatusDump());
     service->GetFlowDataInfoDump();
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->.StrategySwitch(DEFAULT_SIM_SLOT_ID, false));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->StrategySwitch(DEFAULT_SIM_SLOT_ID, false));
     ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->HasInternetCapability(DEFAULT_SIM_SLOT_ID, 0));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->ClearAllConnections(DEFAULT_SIM_SLOT_ID, reason));
     ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->ChangeConnectionForDsds(DEFAULT_SIM_SLOT_ID, false));
