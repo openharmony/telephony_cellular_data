@@ -100,12 +100,6 @@ bool ApnHolder::IsDataCallEnabled() const
     return dataCallEnabled_;
 }
 
-bool ApnHolder::IsDataCallConnectable() const
-{
-    return dataCallEnabled_ && ((apnState_ == PROFILE_STATE_IDLE)
-        || (apnState_ == PROFILE_STATE_RETRYING) || (apnState_ == PROFILE_STATE_FAILED));
-}
-
 std::string ApnHolder::GetApnType() const
 {
     return apnType_;
@@ -123,10 +117,10 @@ void ApnHolder::ReleaseDataConnection()
         TELEPHONY_LOGE("ClearConnection fail, object is null");
         return;
     }
+    apnState_ = PROFILE_STATE_DISCONNECTING;
     AppExecFwk::InnerEvent::Pointer event =
         AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT, object);
     cellularDataStateMachine_->SendEvent(event);
-    apnState_ = PROFILE_STATE_IDLE;
     cellularDataStateMachine_ = nullptr;
 }
 

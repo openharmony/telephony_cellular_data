@@ -47,7 +47,6 @@ public:
     void SetApnState(ApnProfileState state);
     ApnProfileState GetApnState() const;
     bool IsDataCallEnabled() const;
-    bool IsDataCallConnectable() const;
     std::string GetApnType() const;
     void ReleaseDataConnection();
     int32_t GetProfileId(const std::string &apnType) const;

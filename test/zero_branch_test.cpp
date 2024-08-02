@@ -1056,7 +1056,6 @@ HWTEST_F(BranchTest, Telephony_ApnHolder_001, Function | MediumTest | Level3)
     apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_FAILED);
     apnHolder->GetApnState();
     apnHolder->IsDataCallEnabled();
-    apnHolder->IsDataCallConnectable();
     apnHolder->GetApnType();
     apnHolder->ReleaseDataConnection();
     apnHolder->cellularDataStateMachine_ = nullptr;
