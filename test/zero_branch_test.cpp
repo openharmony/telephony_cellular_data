@@ -738,6 +738,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataController_001, Function | MediumTest
     ASSERT_FALSE(controller.ClearAllConnections(reason));
     ASSERT_FALSE(controller.ChangeConnectionForDsds(false));
     controller.UnRegisterEvents();
+    ASSERT_FALSE(controller.EstablishAllApnsIfConnectable());
     ASSERT_FALSE(controller.HandleApnChanged());
     ASSERT_FALSE(controller.GetCellularDataFlowType());
 }
@@ -790,6 +791,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataController_002, Function | MediumTest
     controller.HasInternetCapability(0);
     DisConnectionReason reason = DisConnectionReason::REASON_NORMAL;
     ASSERT_TRUE(controller.ClearAllConnections(reason));
+    ASSERT_TRUE(controller.EstablishAllApnsIfConnectable());
     controller.ChangeConnectionForDsds(false);
     ASSERT_FALSE(controller.GetCellularDataFlowType());
     controller.UnRegisterEvents();

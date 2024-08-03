@@ -166,5 +166,17 @@ HWTEST_F(CellularDataClientTest, SetDefaultCellularDataSlotId_002, TestSize.Leve
     int32_t result = CellularDataClient::GetInstance().SetDefaultCellularDataSlotId(0);
     EXPECT_EQ(result, 0);
 }
+
+/**
+ * @tc.number   EstablishAllApnsIfConnectable_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataClientTest, EstablishAllApnsIfConnectable_001, TestSize.Level0)
+{
+    int32_t result = CellularDataClient::GetInstance().EstablishAllApnsIfConnectable(0);
+    EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+}
+
 } // namespace Telephony
 } // namespace OHOS

@@ -83,6 +83,7 @@ public:
     int32_t EnableIntelligenceSwitch(bool enable) override;
     int32_t InitCellularDataController(int32_t slotId) override;
     int32_t GetIntelligenceSwitchState(bool &switchState) override;
+    int32_t EstablishAllApnsIfConnectable(int32_t slotId) override;
 
 private:
     bool Init();
