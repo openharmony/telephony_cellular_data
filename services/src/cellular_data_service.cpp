@@ -333,6 +333,10 @@ void CellularDataService::AddNetSupplier(int32_t slotId, CellularDataNetAgent &n
 
 int32_t CellularDataService::InitCellularDataController(int32_t slotId)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (slotId != CELLULAR_DATA_VSIM_SLOT_ID) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
