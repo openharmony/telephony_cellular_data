@@ -386,7 +386,7 @@ HWTEST_F(CellularStateMachineTest, DefaultProcessDisconnectAllDone_001, Function
     auto mDefault = static_cast<Default *>(cellularMachine->defaultState_.GetRefPtr());
     mDefault->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
-    bool result = mDefault->ProcessDisconnectDone(event);
+    bool result = mDefault->ProcessDisconnectAllDone(event);
     EXPECT_EQ(result, true);
 }
 
@@ -406,8 +406,8 @@ HWTEST_F(CellularStateMachineTest, DefaultProcessDisconnectAllDone_002, Function
     cellularMachine = nullptr;
     mDefault->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
-    bool result = mDefault->ProcessDisconnectDone(event);
-    EXPECT_EQ(result, true);
+    bool result = mDefault->ProcessDisconnectAllDone(event);
+    EXPECT_EQ(result, false);
 }
 
 /**
