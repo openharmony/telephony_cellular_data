@@ -432,7 +432,7 @@ HWTEST_F(CellularStateMachineTest, InactiveStateProcess_001, Function | MediumTe
         cellularMachine->Init();
     }
     auto inactive = static_cast<Inactive *>(cellularMachine->inActiveState_.GetRefPtr());
-    cellularMachine = cellularMachine;
+    inactive->stateMachine_ = cellularMachine;
     sptr<ApnHolder> apnHolder;
     int32_t profileId = 0;
     int32_t radioTechnology = 0;
@@ -482,7 +482,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilAdapterHostDied_002, 
     auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
     cellularMachine->inActiveState_ = nullptr;
     disconnecting->stateMachine_ = cellularMachine;
-    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT);
+    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT, 0);
     disconnecting->ProcessRilAdapterHostDied(event);
     EXPECT_EQ(cellularMachine->IsDisconnectingState(), false);
 }
@@ -577,11 +577,11 @@ HWTEST_F(CellularStateMachineTest, Activating_RilActivatePdpContextDone_004, Fun
 }
 
 /**
- * @tc.number   Activating_RilActivatePdpContextDone_004
+ * @tc.number   Activating_RilActivatePdpContextDone_005
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(CellularStateMachineTest, Activating_RilActivatePdpContextDone_004, Function | MediumTest | Level1)
+HWTEST_F(CellularStateMachineTest, Activating_RilActivatePdpContextDone_005, Function | MediumTest | Level1)
 {
     if (cellularMachine == nullptr) {
         std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
