@@ -212,7 +212,7 @@ HWTEST_F(CellularStateMachineTest, IdleState_StateProcess_002, Function | Medium
 }
 
 /**
- * @tc.number   IdleState_IncallDataStateMachines_001
+ * @tc.number   IdleState_IncallStateMachine_001
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
@@ -227,7 +227,7 @@ HWTEST_F(CellularStateMachineTest, IdleState_IncallStateMachine_001, Function | 
     incallStateMachine = nullptr;
     idleState->stateMachine_ = incallStateMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_DISCONNECTED);
-    auto result = idleState->ProcessCallStarted(event);
+    bool result = idleState->ProcessCallStarted(event);
     ASSERT_EQ(result, NOT_PROCESSED);
     result = idleState->ProcessCallEnded(event);
     ASSERT_EQ(result, NOT_PROCESSED);
