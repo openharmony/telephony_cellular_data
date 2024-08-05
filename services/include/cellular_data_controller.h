@@ -54,6 +54,7 @@ public:
     void IsNeedDoRecovery(bool needDoRecovery) const;
     bool ChangeConnectionForDsds(bool enable) const;
     int32_t GetIntelligenceSwitchState(bool &switchState);
+    bool EstablishAllApnsIfConnectable() const;
 
 private:
     void RegisterEvents();

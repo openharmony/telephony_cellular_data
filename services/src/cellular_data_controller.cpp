@@ -439,5 +439,17 @@ void CellularDataController::IsNeedDoRecovery(bool needDoRecovery) const
     }
     cellularDataHandler_->IsNeedDoRecovery(needDoRecovery);
 }
+
+bool CellularDataController::EstablishAllApnsIfConnectable() const
+{
+    if (cellularDataHandler_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler is null", slotId_);
+        return false;
+    }
+    TELEPHONY_LOGI("EstablishAllApnsIfConnectable slot%{public}d", slotId_);
+    cellularDataHandler_->EstablishAllApnsIfConnectable();
+    return true;
+}
+
 } // namespace Telephony
 } // namespace OHOS

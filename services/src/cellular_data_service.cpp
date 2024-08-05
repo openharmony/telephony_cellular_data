@@ -657,5 +657,34 @@ std::shared_ptr<CellularDataController> CellularDataService::GetCellularDataCont
 
     return item->second;
 }
+
+int32_t CellularDataService::EstablishAllApnsIfConnectable(const int32_t slotId)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+
+    std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
+    if (cellularDataController == nullptr) {
+        TELEPHONY_LOGE("slot%{public}d cellularDataControllers is null", slotId);
+        return CELLULAR_DATA_INVALID_PARAM;
+    }
+
+    bool hasSim = false;
+    CoreManagerInner::GetInstance().HasSimCard(slotId, hasSim);
+    if (!hasSim) {
+        TELEPHONY_LOGE("slot%{public}d has no sim", slotId);
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    if (!CoreManagerInner::GetInstance().IsSimActive(slotId)) {
+        TELEPHONY_LOGE("slot%{public}d sim not active", slotId);
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
+
+    bool result = cellularDataController->EstablishAllApnsIfConnectable();
+    return result ? TELEPHONY_ERR_SUCCESS : TELEPHONY_ERR_FAIL;
+}
+
 } // namespace Telephony
 } // namespace OHOS

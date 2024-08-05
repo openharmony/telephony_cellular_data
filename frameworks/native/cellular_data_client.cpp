@@ -400,5 +400,16 @@ bool CellularDataClient::IsCellularDataSysAbilityExist(sptr<IRemoteObject> &obje
     }
     return true;
 }
+
+int32_t CellularDataClient::EstablishAllApnsIfConnectable(int32_t slotId)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->EstablishAllApnsIfConnectable(slotId);
+}
+
 } // namespace Telephony
 } // namespace OHOS

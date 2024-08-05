@@ -564,5 +564,28 @@ int32_t CellularDataServiceProxy::InitCellularDataController(int32_t slotId)
     int32_t result = replyParcel.ReadInt32();
     return result;
 }
+
+int32_t CellularDataServiceProxy::EstablishAllApnsIfConnectable(int32_t slotId)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor());
+    data.WriteInt32(slotId);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::ESTABLISH_ALL_APNS_IF_CONNECTABLE,
+        data, reply, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("EstablishAllApnsIfConnectable fail! errCode: %{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    return result;
+}
+
 } // namespace Telephony
 } // namespace OHOS

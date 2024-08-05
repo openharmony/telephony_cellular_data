@@ -151,6 +151,8 @@ public:
 
     virtual int32_t InitCellularDataController(int32_t slotId) = 0;
 
+    virtual int32_t EstablishAllApnsIfConnectable(int32_t slotId) = 0;
+
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.telephony.ICellularDataManager");
 };
