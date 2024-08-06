@@ -140,7 +140,7 @@ HWTEST_F(CellularDataServiceTest, DataConnectionMonitor_HandleRecovery_001, Test
     std::shared_ptr<DataConnectionMonitor> dataConnectionMonitor = std::make_shared<DataConnectionMonitor>(0);
     dataConnectionMonitor->dataRecoveryState_ = RecoveryState::STATE_REQUEST_CONTEXT_LIST;
     dataConnectionMonitor->HandleRecovery();
-    ASSERT_EQ(dataConnectionMonitor->dataRecoveryState_, RecoveryState::STATE_REREGISTER_NETWORK);
+    ASSERT_EQ(dataConnectionMonitor->dataRecoveryState_, RecoveryState::STATE_CLEANUP_CONNECTIONS);
     dataConnectionMonitor->dataRecoveryState_ = RecoveryState::STATE_REREGISTER_NETWORK;
     dataConnectionMonitor->HandleRecovery();
     ASSERT_EQ(dataConnectionMonitor->dataRecoveryState_, RecoveryState::STATE_RADIO_STATUS_RESTART);
