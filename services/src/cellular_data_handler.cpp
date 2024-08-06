@@ -1869,10 +1869,11 @@ void CellularDataHandler::HandleDBSettingRoamingChanged(const AppExecFwk::InnerE
         TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ or apnManager_ is null", slotId_);
         return;
     }
-    int64_t value = event->GetParam();
+    int32_t value = event->GetParam();
+    bool isDataRoamingEnabled = (value == static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_ENABLED));
     bool dataRoamingEnabled = false;
     dataSwitchSettings_->QueryUserDataRoamingStatus(dataRoamingEnabled);
-    if (dataRoamingEnabled != value) {
+    if (dataRoamingEnabled != isDataRoamingEnabled) {
         dataSwitchSettings_->SetUserDataRoamingOn(value);
         bool roamingState = false;
         if (CoreManagerInner::GetInstance().GetPsRoamingState(slotId_) > 0) {
