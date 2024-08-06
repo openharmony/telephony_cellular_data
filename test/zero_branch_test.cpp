@@ -471,6 +471,112 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_007, Function | MediumTest | 
 }
 
 /**
+ * @tc.number   Telephony_CellularDataHandler_008
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataHandler_008, Function | MediumTest | Level1)
+{
+    CellularDataController controller{0};
+    controller.Init();
+    ASSERT_FALSE(controller.cellularDataHandler_ == nullptr);
+    NetRequest request { 1, "simId1" };
+    ASSERT_TRUE(controller.cellularDataHandler_->ReleaseNet(request));
+    ASSERT_TRUE(controller.cellularDataHandler_->RequestNet(request));
+    ASSERT_FALSE(controller.cellularDataHandler_->dataSwitchSettings_->IsUserDataRoamingOn());
+    int32_t result = controller.SetCellularDataRoamingEnabled(true);
+    std::cout << "SetCellularDataRoamingEnabled result: " << result << std::endl;
+    ASSERT_NE(result, TELEPHONY_ERR_SUCCESS);
+    ASSERT_FALSE(controller.cellularDataHandler_->dataSwitchSettings_->IsUserDataRoamingOn());
+
+    controller.cellularDataHandler_->dataSwitchSettings_->SetUserDataOn(false);
+    ASSERT_FALSE(controller.cellularDataHandler_->dataSwitchSettings_->IsUserDataOn());
+    controller.cellularDataHandler_->ResetDataFlowType();
+    controller.cellularDataHandler_->dataSwitchSettings_->SetUserDataOn(true);
+    controller.cellularDataHandler_->ResetDataFlowType();
+    ASSERT_TRUE(controller.cellularDataHandler_->dataSwitchSettings_->IsUserDataOn());
+}
+
+/**
+ * @tc.number   Telephony_CellularDataHandler_009
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataHandler_009, Function | MediumTest | Level1)
+{
+    CellularDataController controller{0};
+    controller.Init();
+    ASSERT_FALSE(controller.cellularDataHandler_ == nullptr);
+    NetRequest request { 1, "simId1" };
+
+    std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> stateMachine = machine->CreateCellularDataConnect(0);
+    sptr<ApnHolder> apn = controller.cellularDataHandler_->apnManager_->FindApnHolderById(1);
+    ASSERT_FALSE(apn == nullptr);
+    apn->SetCellularDataStateMachine(stateMachine);
+    DisConnectionReason reason = controller.cellularDataHandler_->GetDisConnectionReason();
+    ASSERT_FALSE(apn->GetCellularDataStateMachine() == nullptr);
+    controller.cellularDataHandler_->ClearConnection(apn, reason);
+    ASSERT_TRUE(apn->GetCellularDataStateMachine() == nullptr);
+
+    ASSERT_EQ(apn->GetApnState(), PROFILE_STATE_DISCONNECTING);
+    apn->SetApnState(PROFILE_STATE_CONNECTED);
+    controller.cellularDataHandler_->ClearAllConnections(reason);
+    apn->SetApnState(PROFILE_STATE_CONNECTING);
+    controller.cellularDataHandler_->ClearAllConnections(reason);
+    ASSERT_EQ(apn->GetApnState(), PROFILE_STATE_CONNECTING);
+}
+
+/**
+ * @tc.number   Telephony_CellularDataHandler_010
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataHandler_010, Function | MediumTest | Level1)
+{
+    CellularDataController controller{0};
+    controller.Init();
+    sptr<ApnHolder> apn = controller.cellularDataHandler_->apnManager_->FindApnHolderById(1);
+    std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> stateMachine = machine->CreateCellularDataConnect(0);
+
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    controller.cellularDataHandler_->RoamingStateOff(event);
+    controller.cellularDataHandler_->PsRadioEmergencyStateOpen(event);
+    apn->SetApnState(PROFILE_STATE_CONNECTED);
+    ASSERT_EQ(controller.cellularDataHandler_->GetCellularDataState(), PROFILE_STATE_CONNECTED);
+    controller.cellularDataHandler_->RoamingStateOff(event);
+    controller.cellularDataHandler_->PsRadioEmergencyStateOpen(event);
+    controller.cellularDataHandler_->PsRadioEmergencyStateClose(event);
+    apn->SetApnState(PROFILE_STATE_IDLE);
+    ASSERT_EQ(controller.cellularDataHandler_->GetCellularDataState(), PROFILE_STATE_IDLE);
+    controller.cellularDataHandler_->PsRadioEmergencyStateOpen(event);
+    controller.cellularDataHandler_->PsRadioEmergencyStateClose(event);
+    apn->SetApnState(PROFILE_STATE_DISCONNECTING);
+    ASSERT_EQ(controller.cellularDataHandler_->GetCellularDataState(), PROFILE_STATE_CONNECTED);
+    controller.cellularDataHandler_->PsRadioEmergencyStateOpen(event);
+    controller.cellularDataHandler_->PsRadioEmergencyStateClose(event);
+
+    sptr<ApnHolder> apn2 = controller.cellularDataHandler_->apnManager_->FindApnHolderById(2);
+    ASSERT_FALSE(apn2 == nullptr);
+    sptr<ApnHolder> apn3 = controller.cellularDataHandler_->apnManager_->FindApnHolderById(3);
+    ASSERT_FALSE(apn3 == nullptr);
+    apn->dataCallEnabled_ = true;
+    apn2->dataCallEnabled_ = true;
+    apn3->dataCallEnabled_ = true;
+    apn->SetApnState(PROFILE_STATE_IDLE);
+    apn2->SetApnState(PROFILE_STATE_IDLE);
+    apn3->SetApnState(PROFILE_STATE_FAILED);
+    apn3->SetCellularDataStateMachine(stateMachine);
+    ASSERT_EQ(controller.cellularDataHandler_->GetCellularDataState(), PROFILE_STATE_IDLE);
+    controller.cellularDataHandler_->PsRadioEmergencyStateClose(event);
+    ASSERT_EQ(apn3->GetApnState(), PROFILE_STATE_IDLE);
+    ASSERT_TRUE(apn3->GetCellularDataStateMachine() == nullptr);
+
+    ASSERT_EQ(controller.cellularDataHandler_->GetCellularDataState("default"), PROFILE_STATE_IDLE);
+}
+
+/**
  * @tc.number   Telephony_CellularDataService_001
  * @tc.name     test error branch
  * @tc.desc     Function test
