@@ -713,7 +713,7 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
     InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT, object);
     if (event == nullptr) {
         if (apnHolder->IsMmsType()) {
-            SetDataPermittedForMms(true);
+            SetDataPermittedForMms(false);
         }
         TELEPHONY_LOGE("event is null");
         return false;
