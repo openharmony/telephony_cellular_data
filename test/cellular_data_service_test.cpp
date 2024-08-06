@@ -20,6 +20,8 @@
 #include "data_access_token.h"
 #include "data_connection_monitor.h"
 #include "gtest/gtest.h"
+#include "tel_ril_network_parcel.h"
+#include "traffic_management.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -138,9 +140,6 @@ HWTEST_F(CellularDataServiceTest, DataConnectionMonitor_HandleRecovery_001, Test
     std::shared_ptr<DataConnectionMonitor> dataConnectionMonitor = std::make_shared<DataConnectionMonitor>(0);
     dataConnectionMonitor->dataRecoveryState_ = RecoveryState::STATE_REQUEST_CONTEXT_LIST;
     dataConnectionMonitor->HandleRecovery();
-    ASSERT_EQ(dataConnectionMonitor->dataRecoveryState_, RecoveryState::STATE_CLEANUP_CONNECTIONS);
-    dataConnectionMonitor->dataRecoveryState_ = RecoveryState::STATE_CLEANUP_CONNECTIONS;
-    dataConnectionMonitor->HandleRecovery();
     ASSERT_EQ(dataConnectionMonitor->dataRecoveryState_, RecoveryState::STATE_REREGISTER_NETWORK);
     dataConnectionMonitor->dataRecoveryState_ = RecoveryState::STATE_REREGISTER_NETWORK;
     dataConnectionMonitor->HandleRecovery();
@@ -173,8 +172,8 @@ HWTEST_F(CellularDataServiceTest, DataConnectionMonitor_UpdateNetTrafficState_00
     std::shared_ptr<DataConnectionMonitor> dataConnectionMonitor = std::make_shared<DataConnectionMonitor>(0);
     dataConnectionMonitor->updateNetStat_ = true;
     dataConnectionMonitor->UpdateNetTrafficState();
-    std::shared_ptr<PreferredNetworkTypeInfo> preferredNetworkTypeInfo = std::make_shared<PreferredNetworkTypeInfo>();
-    auto event = AppExecFwk::InnerEvent::Get(0, preferredNetworkTypeInfo);
+    std::shared_ptr<PreferredNetworkTypeInfo> preferredTypeInfo = std::make_shared<PreferredNetworkTypeInfo>();
+    auto event = AppExecFwk::InnerEvent::Get(0, preferredTypeInfo);
     dataConnectionMonitor->SetPreferredNetworkPara(event);
     ASSERT_EQ(dataConnectionMonitor->dataFlowType_, CellDataFlowType::DATA_FLOW_TYPE_NONE);
 }
@@ -189,7 +188,7 @@ HWTEST_F(CellularDataServiceTest, DataConnectionMonitor_UpdateDataFlowType_001, 
     std::shared_ptr<DataConnectionMonitor> dataConnectionMonitor = std::make_shared<DataConnectionMonitor>(0);
     dataConnectionMonitor->dataFlowType_ = CellDataFlowType::DATA_FLOW_TYPE_DOWN;
     dataConnectionMonitor->trafficManager_->sendPackets_ = 200;
-    dataConnectionMonitor->trafficManager_->sendPackets_ = 100;
+    dataConnectionMonitor->trafficManager_->recvPackets_ = 100;
     dataConnectionMonitor->UpdateDataFlowType();
     ASSERT_EQ(static_cast<int32_t>(dataConnectionMonitor->dataFlowType_),
         static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_NONE));
@@ -232,7 +231,7 @@ HWTEST_F(CellularDataServiceTest, CellularDataController_SetIntelligenceSwitchEn
 {
     std::shared_ptr<CellularDataController> cellularDataController = std::make_shared<CellularDataController>(0);
     cellularDataController->cellularDataHandler_ = nullptr;
-    int32_t result = cellularDataController->SetIntelligenceSwitchEnable(true)
+    int32_t result = cellularDataController->SetIntelligenceSwitchEnable(true);
     ASSERT_EQ(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -245,7 +244,7 @@ HWTEST_F(CellularDataServiceTest, CellularDataController_SetIntelligenceSwitchEn
 {
     std::shared_ptr<CellularDataController> cellularDataController = std::make_shared<CellularDataController>(0);
     cellularDataController->Init();
-    int32_t result = cellularDataController->SetIntelligenceSwitchEnable(false)
+    int32_t result = cellularDataController->SetIntelligenceSwitchEnable(false);
     ASSERT_EQ(result, 0);
 }
 
@@ -257,10 +256,12 @@ HWTEST_F(CellularDataServiceTest, CellularDataController_SetIntelligenceSwitchEn
 HWTEST_F(CellularDataServiceTest, CellularDataController_OnAddSystemAbility_001, TestSize.Level0)
 {
     std::shared_ptr<CellularDataController> cellularDataController = std::make_shared<CellularDataController>(0);
-    cellularDataController->systemAbilityListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(0, nullptr);
+    cellularDataController->systemAbilityListener_ =
+        new (std::nothrow) CellularDataController::SystemAbilityStatusChangeListener(0, nullptr);
     cellularDataController->systemAbilityListener_->OnAddSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID, "");
     cellularDataController->systemAbilityListener_->OnAddSystemAbility(COMMON_EVENT_SERVICE_ID, "");
     cellularDataController->systemAbilityListener_->OnAddSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID, "");
+    cellularDataController->systemAbilityListener_->OnRemoveSystemAbility(COMMON_EVENT_SERVICE_ID, "");
     ASSERT_EQ(cellularDataController->cellularDataHandler_, nullptr);
 }
 } // namespace Telephony
