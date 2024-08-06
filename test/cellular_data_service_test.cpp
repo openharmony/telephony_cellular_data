@@ -18,6 +18,7 @@
 #include "cellular_data_error.h"
 #include "cellular_data_service.h"
 #include "data_access_token.h"
+#include "data_connection_monitor.h"
 #include "gtest/gtest.h"
 
 namespace OHOS {
@@ -95,6 +96,172 @@ HWTEST_F(CellularDataServiceTest, CellularDataService_002, TestSize.Level0)
     ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->GetDataConnIpType(DEFAULT_SIM_SLOT_ID, ipType));
     ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->IsNeedDoRecovery(DEFAULT_SIM_SLOT_ID, true));
     service->OnStop();
+}
+
+/**
+ * @tc.number   DataConnectionMonitor_HandleScreenStateChanged_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, DataConnectionMonitor_HandleScreenStateChanged_001, TestSize.Level0)
+{
+    std::shared_ptr<DataConnectionMonitor> dataConnectionMonitor = std::make_shared<DataConnectionMonitor>(0);
+    dataConnectionMonitor->isScreenOn_ = false;
+    dataConnectionMonitor->HandleScreenStateChanged(true);
+    ASSERT_EQ(dataConnectionMonitor->isScreenOn_, true);
+    dataConnectionMonitor->isScreenOn_ = false;
+    dataConnectionMonitor->HandleScreenStateChanged(false);
+    ASSERT_EQ(dataConnectionMonitor->isScreenOn_, false);
+}
+
+/**
+ * @tc.number   DataConnectionMonitor_OnStallDetectionTimer_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, DataConnectionMonitor_OnStallDetectionTimer_001, TestSize.Level0)
+{
+    std::shared_ptr<DataConnectionMonitor> dataConnectionMonitor = std::make_shared<DataConnectionMonitor>(0);
+    dataConnectionMonitor->noRecvPackets_ = 20;
+    dataConnectionMonitor->stallDetectionEnabled_ = true;
+    dataConnectionMonitor->OnStallDetectionTimer();
+    ASSERT_EQ(dataConnectionMonitor->noRecvPackets_, 0);
+}
+
+/**
+ * @tc.number   DataConnectionMonitor_HandleRecovery_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, DataConnectionMonitor_HandleRecovery_001, TestSize.Level0)
+{
+    std::shared_ptr<DataConnectionMonitor> dataConnectionMonitor = std::make_shared<DataConnectionMonitor>(0);
+    dataConnectionMonitor->dataRecoveryState_ = RecoveryState::STATE_REQUEST_CONTEXT_LIST;
+    dataConnectionMonitor->HandleRecovery();
+    ASSERT_EQ(dataConnectionMonitor->dataRecoveryState_, RecoveryState::STATE_CLEANUP_CONNECTIONS);
+    dataConnectionMonitor->dataRecoveryState_ = RecoveryState::STATE_CLEANUP_CONNECTIONS;
+    dataConnectionMonitor->HandleRecovery();
+    ASSERT_EQ(dataConnectionMonitor->dataRecoveryState_, RecoveryState::STATE_REREGISTER_NETWORK);
+    dataConnectionMonitor->dataRecoveryState_ = RecoveryState::STATE_REREGISTER_NETWORK;
+    dataConnectionMonitor->HandleRecovery();
+    ASSERT_EQ(dataConnectionMonitor->dataRecoveryState_, RecoveryState::STATE_RADIO_STATUS_RESTART);
+    dataConnectionMonitor->dataRecoveryState_ = RecoveryState::STATE_RADIO_STATUS_RESTART;
+    dataConnectionMonitor->HandleRecovery();
+    ASSERT_EQ(dataConnectionMonitor->dataRecoveryState_, RecoveryState::STATE_REQUEST_CONTEXT_LIST);
+}
+
+/**
+ * @tc.number   DataConnectionMonitor_EndNetStatistics_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, DataConnectionMonitor_EndNetStatistics_001, TestSize.Level0)
+{
+    std::shared_ptr<DataConnectionMonitor> dataConnectionMonitor = std::make_shared<DataConnectionMonitor>(0);
+    dataConnectionMonitor->dataFlowType_ = CellDataFlowType::DATA_FLOW_TYPE_DOWN;
+    dataConnectionMonitor->EndNetStatistics();
+    ASSERT_EQ(dataConnectionMonitor->dataFlowType_, CellDataFlowType::DATA_FLOW_TYPE_NONE);
+}
+
+/**
+ * @tc.number   DataConnectionMonitor_UpdateNetTrafficState_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, DataConnectionMonitor_UpdateNetTrafficState_001, TestSize.Level0)
+{
+    std::shared_ptr<DataConnectionMonitor> dataConnectionMonitor = std::make_shared<DataConnectionMonitor>(0);
+    dataConnectionMonitor->updateNetStat_ = true;
+    dataConnectionMonitor->UpdateNetTrafficState();
+    std::shared_ptr<PreferredNetworkTypeInfo> preferredNetworkTypeInfo = std::make_shared<PreferredNetworkTypeInfo>();
+    auto event = AppExecFwk::InnerEvent::Get(0, preferredNetworkTypeInfo);
+    dataConnectionMonitor->SetPreferredNetworkPara(event);
+    ASSERT_EQ(dataConnectionMonitor->dataFlowType_, CellDataFlowType::DATA_FLOW_TYPE_NONE);
+}
+
+/**
+ * @tc.number   DataConnectionMonitor_UpdateDataFlowType_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, DataConnectionMonitor_UpdateDataFlowType_001, TestSize.Level0)
+{
+    std::shared_ptr<DataConnectionMonitor> dataConnectionMonitor = std::make_shared<DataConnectionMonitor>(0);
+    dataConnectionMonitor->dataFlowType_ = CellDataFlowType::DATA_FLOW_TYPE_DOWN;
+    dataConnectionMonitor->trafficManager_->sendPackets_ = 200;
+    dataConnectionMonitor->trafficManager_->sendPackets_ = 100;
+    dataConnectionMonitor->UpdateDataFlowType();
+    ASSERT_EQ(static_cast<int32_t>(dataConnectionMonitor->dataFlowType_),
+        static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_NONE));
+}
+
+/**
+ * @tc.number   DataConnectionMonitor_SetDataFlowType_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, DataConnectionMonitor_SetDataFlowType_001, TestSize.Level0)
+{
+    std::shared_ptr<DataConnectionMonitor> dataConnectionMonitor = std::make_shared<DataConnectionMonitor>(0);
+    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_RUN_MONITOR_TASK);
+    dataConnectionMonitor->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_STALL_DETECTION_EVENT_ID);
+    dataConnectionMonitor->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_DATA_CALL_LIST_CHANGED);
+    dataConnectionMonitor->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_GET_PREFERRED_NETWORK_MODE);
+    dataConnectionMonitor->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE);
+    dataConnectionMonitor->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OFF);
+    dataConnectionMonitor->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_ON);
+    dataConnectionMonitor->ProcessEvent(event);
+    dataConnectionMonitor->dataFlowType_ = CellDataFlowType::DATA_FLOW_TYPE_NONE;
+    dataConnectionMonitor->SetDataFlowType(CellDataFlowType::DATA_FLOW_TYPE_DOWN);
+    ASSERT_EQ(static_cast<int32_t>(dataConnectionMonitor->dataFlowType_),
+        static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_DOWN));
+}
+
+/**
+ * @tc.number   CellularDataController_SetIntelligenceSwitchEnable_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, CellularDataController_SetIntelligenceSwitchEnable_001, TestSize.Level0)
+{
+    std::shared_ptr<CellularDataController> cellularDataController = std::make_shared<CellularDataController>(0);
+    cellularDataController->cellularDataHandler_ = nullptr;
+    int32_t result = cellularDataController->SetIntelligenceSwitchEnable(true)
+    ASSERT_EQ(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+/**
+ * @tc.number   CellularDataController_SetIntelligenceSwitchEnable_002
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, CellularDataController_SetIntelligenceSwitchEnable_002, TestSize.Level0)
+{
+    std::shared_ptr<CellularDataController> cellularDataController = std::make_shared<CellularDataController>(0);
+    cellularDataController->Init();
+    int32_t result = cellularDataController->SetIntelligenceSwitchEnable(false)
+    ASSERT_EQ(result, 0);
+}
+
+/**
+ * @tc.number   CellularDataController_OnAddSystemAbility_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, CellularDataController_OnAddSystemAbility_001, TestSize.Level0)
+{
+    std::shared_ptr<CellularDataController> cellularDataController = std::make_shared<CellularDataController>(0);
+    cellularDataController->systemAbilityListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(0, nullptr);
+    cellularDataController->systemAbilityListener_->OnAddSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID, "");
+    cellularDataController->systemAbilityListener_->OnAddSystemAbility(COMMON_EVENT_SERVICE_ID, "");
+    cellularDataController->systemAbilityListener_->OnAddSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID, "");
+    ASSERT_EQ(cellularDataController->cellularDataHandler_, nullptr);
 }
 } // namespace Telephony
 } // namespace OHOS
