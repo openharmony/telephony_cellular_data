@@ -63,6 +63,7 @@ static const int32_t PING_CHECK_FAIL = 1;
 static const int32_t MAX_TIMES = 60;
 static const int32_t CMD_BUF_SIZE = 10240;
 static const int32_t NET_REGISTER_TIMEOUT_MS = 20000;
+static const int32_t SLEEP_TIME_SECONDS = 3;
 
 class TestCallback : public NetManagerStandard::NetConnCallbackStub {
     int32_t NetAvailable(sptr<NetManagerStandard::NetHandle> &netHandle) override
@@ -178,7 +179,7 @@ void CellularDataTest::TearDownTestCase()
     int32_t enable = CellularDataClient::GetInstance().EnableCellularData(true);
     ASSERT_TRUE(enable == TELEPHONY_ERR_SUCCESS);
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_CONNECTED));
-    sleep(SLEEP_TIME * 3);
+    sleep(SLEEP_TIME_SECONDS);
 }
 
 void CellularDataTest::SetUp() {}
