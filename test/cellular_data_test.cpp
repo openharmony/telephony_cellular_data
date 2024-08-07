@@ -144,7 +144,7 @@ public:
     static int32_t IsNeedDoRecovery(int32_t slotId, bool needDoRecovery);
     static int32_t InitCellularDataController(int32_t slotId);
     static int32_t GetIntelligenceSwitchStateTest(bool &state);
-    CellularDataAgent &netAgent = CellularDataAgent::GetInstance();
+    CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
 };
 
 bool CellularDataTest::HasSimCard(const int32_t slotId)
@@ -178,6 +178,7 @@ void CellularDataTest::TearDownTestCase()
     int32_t enable = CellularDataClient::GetInstance().EnableCellularData(true);
     ASSERT_TRUE(enable == TELEPHONY_ERR_SUCCESS);
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_CONNECTED));
+    sleep(SLEEP_TIME * 3);
 }
 
 void CellularDataTest::SetUp() {}
@@ -208,7 +209,6 @@ void CellularDataTest::SetUpTestCase()
     int32_t enable = CellularDataClient::GetInstance().EnableCellularData(true);
     ASSERT_TRUE(enable == TELEPHONY_ERR_SUCCESS);
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_CONNECTED));
-    sleep(SLEEP_TIME * 3);
 }
 
 void CellularDataTest::WaitTestTimeout(const int32_t status)
