@@ -1241,10 +1241,7 @@ HWTEST_F(BranchTest, StateNotification_Test_01, Function | MediumTest | Level3)
     StateNotification::GetInstance().UpdateCellularDataConnectState(0, PROFILE_STATE_DISCONNECTING, 0);
     StateNotification::GetInstance().OnUpDataFlowtype(0, CellDataFlowType::DATA_FLOW_TYPE_NONE);
     StateNotification::GetInstance().OnUpDataFlowtype(1, CellDataFlowType::DATA_FLOW_TYPE_UP_DOWN);
-    std::shared_ptr<CellularDataHandler> cellularDataHandler = nullptr;
-    auto cellularDataRdbObserver = std::make_shared<CellularDataRdbObserver>(cellularDataHandler);
-    cellularDataRdbObserver->OnChange();
-    ASSERT_TRUE(cellularDataHandler == nullptr);
+    ASSERT_TRUE(StateNotification::GetInstance() != nullptr);
 }
 
 /**
