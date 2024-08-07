@@ -1227,21 +1227,11 @@ HWTEST_F(BranchTest, NetworkSearchCallback_Test_01, Function | MediumTest | Leve
     auto networkSearchCallback = std::make_shared<NetworkSearchCallback>();
     networkSearchCallback->ClearCellularDataConnections(0);
     networkSearchCallback->ClearCellularDataConnections(-1);
-    networkSearchCallback->HasInternetCapability(0, 0);
-    ASSERT_FALSE(networkSearchCallback->HasInternetCapability(-1, -1));
-}
-
-/**
- * @tc.number   StateNotification_Test_01
- * @tc.name    TestDump
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, StateNotification_Test_01, Function | MediumTest | Level3)
-{
+    ASSERT_FALSE(networkSearchCallback->HasInternetCapability(0, 0));
     StateNotification::GetInstance().UpdateCellularDataConnectState(0, PROFILE_STATE_DISCONNECTING, 0);
     StateNotification::GetInstance().OnUpDataFlowtype(0, CellDataFlowType::DATA_FLOW_TYPE_NONE);
     StateNotification::GetInstance().OnUpDataFlowtype(1, CellDataFlowType::DATA_FLOW_TYPE_UP_DOWN);
-    ASSERT_TRUE(StateNotification::GetInstance() != nullptr);
+    ASSERT_FALSE(networkSearchCallback->HasInternetCapability(-1, -1));
 }
 
 /**
