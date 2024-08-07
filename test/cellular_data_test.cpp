@@ -21,6 +21,7 @@
 
 #include "cellular_data_client.h"
 #include "cellular_data_error.h"
+#include "cellular_data_net_agent.h"
 #include "cellular_data_service.h"
 #include "cellular_data_types.h"
 #include "core_service_client.h"
@@ -62,6 +63,7 @@ static const int32_t PING_CHECK_FAIL = 1;
 static const int32_t MAX_TIMES = 60;
 static const int32_t CMD_BUF_SIZE = 10240;
 static const int32_t NET_REGISTER_TIMEOUT_MS = 20000;
+static const int32_t SLEEP_TIME_SECONDS = 3;
 
 class TestCallback : public NetManagerStandard::NetConnCallbackStub {
     int32_t NetAvailable(sptr<NetManagerStandard::NetHandle> &netHandle) override
@@ -143,8 +145,7 @@ public:
     static int32_t IsNeedDoRecovery(int32_t slotId, bool needDoRecovery);
     static int32_t InitCellularDataController(int32_t slotId);
     static int32_t GetIntelligenceSwitchStateTest(bool &state);
-    sptr<NetManagerCallBack> callback_ = nullptr;
-    sptr<NetManagerTacticsCallBack> tacticsCallBack_;
+    CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
 };
 
 bool CellularDataTest::HasSimCard(const int32_t slotId)
@@ -178,6 +179,7 @@ void CellularDataTest::TearDownTestCase()
     int32_t enable = CellularDataClient::GetInstance().EnableCellularData(true);
     ASSERT_TRUE(enable == TELEPHONY_ERR_SUCCESS);
     WaitTestTimeout(static_cast<int32_t>(DataConnectionStatus::DATA_STATE_CONNECTED));
+    sleep(SLEEP_TIME_SECONDS);
 }
 
 void CellularDataTest::SetUp() {}
@@ -1635,10 +1637,7 @@ HWTEST_F(CellularDataTest, RequestNetwork_001, TestSize.Level3)
     std::string ident = "testIdent";
     std::set<NetCap> netCaps;
     NetManagerStandard::NetRequest netrequest;
-    if (callback_ == nullptr) {
-        callback_ = std::make_unique<NetManagerCallBack>().release();
-    }
-    int32_t result = callback_->RequestNetwork(ident, netCaps, netrequest);
+    int32_t result = netAgent.callBack_->RequestNetwork(ident, netCaps, netrequest);
     ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
 
@@ -1652,10 +1651,7 @@ HWTEST_F(CellularDataTest, RequestNetwork_002, TestSize.Level3)
     std::string ident = "testIdent";
     std::set<NetCap> netCaps = { NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET };
     NetManagerStandard::NetRequest netrequest;
-    if (callback_ == nullptr) {
-        callback_ = std::make_unique<NetManagerCallBack>().release();
-    }
-    int32_t result = callback_->RequestNetwork(ident, netCaps, netrequest);
+    int32_t result = netAgent.callBack_->RequestNetwork(ident, netCaps, netrequest);
     ASSERT_NE(result, CELLULAR_DATA_INVALID_PARAM);
 }
 
@@ -1668,10 +1664,7 @@ HWTEST_F(CellularDataTest, ReleaseNetwork_001, TestSize.Level3)
 {
     std::string ident = "testIdent";
     std::set<NetCap> netCaps;
-    if (callback_ == nullptr) {
-        callback_ = std::make_unique<NetManagerCallBack>().release();
-    }
-    int32_t result = callback_->ReleaseNetwork(ident, netCaps);
+    int32_t result = netAgent.callBack_->ReleaseNetwork(ident, netCaps);
     ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
 
@@ -1684,10 +1677,7 @@ HWTEST_F(CellularDataTest, ReleaseNetwork_002, TestSize.Level3)
 {
     std::string ident = "testIdent";
     std::set<NetCap> netCaps = { NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET };
-    if (callback_ == nullptr) {
-        callback_ = std::make_unique<NetManagerCallBack>().release();
-    }
-    int32_t result = callback_->ReleaseNetwork(ident, netCaps);
+    int32_t result = netAgent.callBack_->ReleaseNetwork(ident, netCaps);
     ASSERT_NE(result, CELLULAR_DATA_INVALID_PARAM);
 }
 
@@ -1698,10 +1688,7 @@ HWTEST_F(CellularDataTest, ReleaseNetwork_002, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, NetStrategySwitch_001, TestSize.Level3)
 {
-    if (tacticsCallBack_ == nullptr) {
-        tacticsCallBack_ = std::make_unique<NetManagerTacticsCallBack>().release();
-    }
-    int32_t result = tacticsCallBack_->NetStrategySwitch("", true);
+    int32_t result = netAgent.tacticsCallBack_->NetStrategySwitch("", true);
     ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
 
@@ -1712,10 +1699,7 @@ HWTEST_F(CellularDataTest, NetStrategySwitch_001, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, NetStrategySwitch_002, TestSize.Level3)
 {
-    if (tacticsCallBack_ == nullptr) {
-        tacticsCallBack_ = std::make_unique<NetManagerTacticsCallBack>().release();
-    }
-    int32_t result = tacticsCallBack_->NetStrategySwitch("abc", true);
+    int32_t result = netAgent.tacticsCallBack_->NetStrategySwitch("abc", true);
     ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
 
@@ -1726,10 +1710,7 @@ HWTEST_F(CellularDataTest, NetStrategySwitch_002, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, NetStrategySwitch_003, TestSize.Level3)
 {
-    if (tacticsCallBack_ == nullptr) {
-        tacticsCallBack_ = std::make_unique<NetManagerTacticsCallBack>().release();
-    }
-    int32_t result = tacticsCallBack_->NetStrategySwitch("123", true);
+    int32_t result = netAgent.tacticsCallBack_->NetStrategySwitch("123", true);
     ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
 

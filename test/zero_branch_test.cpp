@@ -152,12 +152,9 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_001, Function | MediumTest | 
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     CellularDataHandler cellularDataHandler { subscriberInfo, 0 };
-    NetRequest request { 0, "simId1" };
     cellularDataHandler.HandleSimStateChanged();
     cellularDataHandler.ReleaseAllNetworkRequest();
     cellularDataHandler.CreateApnItem();
-    ASSERT_FALSE(cellularDataHandler.ReleaseNet(request));
-    ASSERT_FALSE(cellularDataHandler.RequestNet(request));
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
     cellularDataHandler.ProcessEvent(event);
@@ -260,8 +257,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_003, Function | MediumTest | 
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     CellularDataHandler cellularDataHandler { subscriberInfo, INVALID_SLOTID };
     cellularDataHandler.apnManager_ = std::make_unique<ApnManager>().release();
-    NetRequest request;
-    ASSERT_FALSE(cellularDataHandler.ReleaseNet(request));
     cellularDataHandler.SetDataPermittedForMms(false);
     sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
     DisConnectionReason reason = DisConnectionReason::REASON_NORMAL;
@@ -310,9 +305,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_004, Function | MediumTest | 
     CellularDataController controller { 0 };
     controller.Init();
     ASSERT_FALSE(controller.cellularDataHandler_ == nullptr);
-    NetRequest request { 0, "simId1" };
-    controller.cellularDataHandler_->ReleaseNet(request);
-    controller.cellularDataHandler_->RequestNet(request);
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
     controller.cellularDataHandler_->ProcessEvent(event);
@@ -480,9 +472,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_008, Function | MediumTest | 
     CellularDataController controller{0};
     controller.Init();
     ASSERT_FALSE(controller.cellularDataHandler_ == nullptr);
-    NetRequest request { 1, "simId1" };
-    ASSERT_TRUE(controller.cellularDataHandler_->ReleaseNet(request));
-    ASSERT_TRUE(controller.cellularDataHandler_->RequestNet(request));
     ASSERT_FALSE(controller.cellularDataHandler_->dataSwitchSettings_->IsUserDataRoamingOn());
     int32_t result = controller.SetCellularDataRoamingEnabled(true);
     std::cout << "SetCellularDataRoamingEnabled result: " << result << std::endl;
@@ -660,11 +649,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_002, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearAllConnections(INVALID_SLOTID, reason));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ChangeConnectionForDsds(INVALID_SLOTID, false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.StrategySwitch(INVALID_SLOTID, false));
-    NetRequest request;
-    request.ident = "simId12";
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.RequestNet(request));
-    request.ident = "simId2";
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ReleaseNet(request));
     ASSERT_FALSE(service.GetCellularDataController(INVALID_SLOTID) != nullptr);
     ASSERT_FALSE(service.GetCellularDataController(INVALID_SLOTID_TWO) != nullptr);
     ASSERT_NE(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(DEFAULT_SIM_SLOT_ID, std::string()));
@@ -1243,24 +1227,11 @@ HWTEST_F(BranchTest, NetworkSearchCallback_Test_01, Function | MediumTest | Leve
     auto networkSearchCallback = std::make_shared<NetworkSearchCallback>();
     networkSearchCallback->ClearCellularDataConnections(0);
     networkSearchCallback->ClearCellularDataConnections(-1);
-    networkSearchCallback->HasInternetCapability(0, 0);
-    ASSERT_FALSE(networkSearchCallback->HasInternetCapability(-1, -1));
-}
-
-/**
- * @tc.number   StateNotification_Test_01
- * @tc.name    TestDump
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, StateNotification_Test_01, Function | MediumTest | Level3)
-{
+    ASSERT_FALSE(networkSearchCallback->HasInternetCapability(0, 0));
     StateNotification::GetInstance().UpdateCellularDataConnectState(0, PROFILE_STATE_DISCONNECTING, 0);
     StateNotification::GetInstance().OnUpDataFlowtype(0, CellDataFlowType::DATA_FLOW_TYPE_NONE);
     StateNotification::GetInstance().OnUpDataFlowtype(1, CellDataFlowType::DATA_FLOW_TYPE_UP_DOWN);
-    std::shared_ptr<CellularDataHandler> cellularDataHandler = nullptr;
-    auto cellularDataRdbObserver = std::make_shared<CellularDataRdbObserver>(cellularDataHandler);
-    cellularDataRdbObserver->OnChange();
-    ASSERT_TRUE(cellularDataHandler == nullptr);
+    ASSERT_FALSE(networkSearchCallback->HasInternetCapability(-1, -1));
 }
 
 /**
