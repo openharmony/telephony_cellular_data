@@ -232,6 +232,30 @@ HWTEST_F(CellularStateMachineTest, Activating_ProcessConnectTimeout_003, Functio
 }
 
 /**
+ * @tc.number   Activating_CellularDataStateMachine_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, Activating_CellularDataStateMachine_001, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    cellularMachine = nullptr;
+    activating->stateMachine_ = cellularMachine;
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    activating->StateBegin();
+    EXPECT_EQ(activating->isActive_, false);
+    auto result = activating->RilErrorResponse(event);
+    EXPECT_EQ(result, false);
+    result = activating->StateProcess(event);
+    EXPECT_EQ(result, false);
+}
+
+/**
  * @tc.number   Disconnecting_StateBegin_001
  * @tc.name     test function branch
  * @tc.desc     Function test
@@ -690,6 +714,61 @@ HWTEST_F(CellularStateMachineTest, Activating_RilErrorResponse_004, Function | M
     auto event = AppExecFwk::InnerEvent::Get(0, radioResponseInfo);
     bool result = activating->RilErrorResponse(event);
     EXPECT_EQ(result, true);
+}
+
+/**
+ * @tc.number   Activating_RilErrorResponse_005
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, Activating_RilErrorResponse_005, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    cellularMachine = nullptr;
+    activating->stateMachine_ = cellularMachine;
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    bool result = activating->RilErrorResponse(event);
+    EXPECT_EQ(result, false);
+}
+
+/**
+ * @tc.number   Active_CellularDataStateMachine_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, Active_CellularDataStateMachine_001, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    cellularMachine = nullptr;
+    active->stateMachine_ = cellularMachine;
+    active->StateBegin();
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    bool result = active->ProcessDisconnectDone(event);
+    EXPECT_EQ(result, false);
+    result = active->ProcessDisconnectAllDone(event);
+    EXPECT_EQ(result, false);
+    result = active->ProcessLostConnection(event);
+    EXPECT_EQ(result, false);
+    result = active->ProcessLinkCapabilityChanged(event);
+    EXPECT_EQ(result, false);
+    result = active->ProcessDataConnectionRoamOn(event);
+    EXPECT_EQ(result, false);
+    active->RefreshConnectionBandwidths();
+    result = active->ProcessDataConnectionRoamOff(event);
+    EXPECT_EQ(result, false);
+    active->RefreshTcpBufferSizes();
+    result = active->ProcessDataConnectionVoiceCallStartedOrEnded(event);
+    EXPECT_EQ(result, false);
 }
 } // namespace Telephony
 } // namespace OHOS

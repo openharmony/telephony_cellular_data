@@ -532,7 +532,7 @@ HWTEST_F(CellularStateMachineTest, InactiveStateBegin_001, Function | MediumTest
 }
 
 /**
- * @tc.number   InactiveStateBegin_001
+ * @tc.number   InactiveStateProcess_002
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
@@ -551,7 +551,7 @@ HWTEST_F(CellularStateMachineTest, InactiveStateProcess_002, Function | MediumTe
 }
 
 /**
- * @tc.number   InactiveStateBegin_001
+ * @tc.number   InactiveStateProcess_003
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
@@ -567,6 +567,27 @@ HWTEST_F(CellularStateMachineTest, InactiveStateProcess_003, Function | MediumTe
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT_ALL);
     bool result = inactive->StateProcess(event);
     EXPECT_EQ(result, true);
+}
+
+/**
+ * @tc.number   Inactive_CellularDataStateMachine_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, Inactive_CellularDataStateMachine_001, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    auto inactive = static_cast<Inactive *>(cellularMachine->inActiveState_.GetRefPtr());
+    cellularMachine = nullptr;
+    inactive->stateMachine_ = cellularMachine;
+    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT_ALL);
+    bool result = inactive->StateProcess(event);
+    inactive->StateBegin();
+    EXPECT_EQ(result, false);
 }
 
 /**
@@ -1747,6 +1768,57 @@ HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_UpdateNetworkInfoIfI
     cellularMachine->stateMachineEventHandler_ = nullptr;
     cellularMachine->UpdateNetworkInfoIfInActive(dataCallInfo);
     EXPECT_EQ(cellularMachine->stateMachineEventHandler_, nullptr);
+}
+
+/**
+ * @tc.number   CellularDataStateMachine_DoConnect_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_SplitProxyIpAddress_001, TestSize.Level0)
+{
+    std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
+    std::string proxyIpAddress = "";
+    std::string host;
+    uint16_t port;
+    cellularMachine->SplitProxyIpAddress(proxyIpAddress, host, port);
+    ASSERT_EQ(host, "");
+    ASSERT_EQ(port, 0);
+}
+
+/**
+ * @tc.number   CellularDataStateMachine_DoConnect_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_SplitProxyIpAddress_002, TestSize.Level0)
+{
+    std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
+    std::string proxyIpAddress = "192.168.1.1";
+    std::string host;
+    uint16_t port;
+    cellularMachine->SplitProxyIpAddress(proxyIpAddress, host, port);
+    ASSERT_EQ(host, "192.168.1.1");
+    ASSERT_EQ(port, 0);
+}
+
+/**
+ * @tc.number   CellularDataStateMachine_DoConnect_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_SplitProxyIpAddress_003, TestSize.Level0)
+{
+    std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
+    std::string proxyIpAddress = "192.168.1.1:8080";
+    std::string host;
+    uint16_t port;
+    cellularMachine->SplitProxyIpAddress(proxyIpAddress, host, port);
+    ASSERT_EQ(host, "192.168.1.1");
+    ASSERT_EQ(port, 8080);
 }
 } // namespace Telephony
 } // namespace OHOS
