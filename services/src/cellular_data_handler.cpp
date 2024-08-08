@@ -500,7 +500,7 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
         slotId_, attached, simState, isSimAccountLoaded_);
     bool isMmsApn = apnHolder->IsMmsType();
     if (isMmsApn && (simState == SimState::SIM_STATE_READY)) {
-        if (SetDataPermittedForMms(true) && !attached) {
+        if (!attached) {
             return false;
         }
     }
@@ -691,7 +691,10 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
             }
             connectionManager_->AddConnectionStateMachine(cellularDataStateMachine);
         }
-    }    
+    }
+    if (apnHolder->IsMmsType()) {
+        SetDataPermittedForMms(true);
+    }
     cellularDataStateMachine->SetCapability(apnHolder->GetCapability());
     apnHolder->SetCurrentApn(apnItem);
     apnHolder->SetApnState(PROFILE_STATE_CONNECTING);
@@ -709,6 +712,9 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
         slotId_, apnItem->attr_.profileId_, apnHolder->GetApnType().c_str(), radioTech);
     InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT, object);
     if (event == nullptr) {
+        if (apnHolder->IsMmsType()) {
+            SetDataPermittedForMms(false);
+        }
         TELEPHONY_LOGE("event is null");
         return false;
     }
