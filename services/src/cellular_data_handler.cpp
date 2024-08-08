@@ -350,8 +350,14 @@ void CellularDataHandler::RoamingStateOn(const InnerEvent::Pointer &event)
         TELEPHONY_LOGE("Slot%{public}d: device not currently roaming state", slotId_);
         return;
     }
+    bool dataRoamingEnabled = false;
+    int32_t res = IsCellularDataRoamingEnabled(dataRoamingEnabled);
+    if (res != TELEPHONY_ERR_SUCCESS) {
+        dataRoamingEnabled = false;
+    }
     ApnProfileState apnState = apnManager_->GetOverallApnState();
-    if (apnState == ApnProfileState::PROFILE_STATE_CONNECTING || apnState == ApnProfileState::PROFILE_STATE_CONNECTED) {
+    if ((apnState == ApnProfileState::PROFILE_STATE_CONNECTING || apnState == ApnProfileState::PROFILE_STATE_CONNECTED)
+        && !dataRoamingEnabled) {
         ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
     }
     EstablishAllApnsIfConnectable();
@@ -1272,7 +1278,9 @@ void CellularDataHandler::CreateApnItem()
     if (result == 0) {
         apnManager_->CreateAllApnItem();
     }
-    SetRilAttachApn();
+    if (result != 0) {
+        SetRilAttachApn();
+    }
 }
 
 bool CellularDataHandler::HandleApnChanged()
