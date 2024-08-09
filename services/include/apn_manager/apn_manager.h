@@ -51,6 +51,7 @@ public:
     bool ResetApns(int32_t slotId);
     void FetchDunApns(std::vector<sptr<ApnItem>> &matchApnItemList, const int32_t slotId);
     bool IsPreferredApnUserEdited();
+    static int32_t FindApnTypeByApnName(const std::string &apnName);
 
 private:
     void AddApnHolder(const std::string &apnType, const int32_t priority);
@@ -60,6 +61,7 @@ private:
 
 private:
     static const std::map<std::string, int32_t> apnIdApnNameMap_;
+    static const std::map<std::string, ApnTypes> apnNameApnTypeMap_;
     std::vector<sptr<ApnItem>> allApnItem_;
     std::vector<sptr<ApnHolder>> apnHolders_;
     std::map<int32_t, sptr<ApnHolder>> apnIdApnHolderMap_;

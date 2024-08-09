@@ -155,6 +155,24 @@ enum class DisConnectionReason : int32_t {
     REASON_CHANGE_CONNECTION
 };
 
+enum class ApnTypes : int32_t {
+    NONETYPE = 0,
+    DEFAULT = 1,
+    MMS = 2,
+    SUPL = 4,
+    DUN = 8,
+    HIPRI = 16,
+    FOTA = 32,
+    IMS = 64,
+    CBS = 128,
+    IA = 256,
+    EMERGENCY = 512,
+    MCX = 1024,
+    XCAP = 2048,
+    INTERNAL_DEFAULT = 4096,
+    ALL = 8191,
+}
+
 static constexpr const char *DATA_CONTEXT_ROLE_ALL = "*";
 static constexpr const char *DATA_CONTEXT_ROLE_DEFAULT = "default";
 static constexpr const char *DATA_CONTEXT_ROLE_MMS = "mms";

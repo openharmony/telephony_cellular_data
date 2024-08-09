@@ -121,8 +121,10 @@ void CellularDataStateMachine::DoConnect(const DataConnectionParams &connectionP
     activeDataParam.dataProfile.userName = apn->attr_.user_;
     activeDataParam.dataProfile.password = apn->attr_.password_;
     activeDataParam.dataProfile.roamingProtocol = apn->attr_.roamingProtocol_;
-    TELEPHONY_LOGI("Slot%{public}d: Activate PDP context (%{public}d, %{public}s, %{public}s, %{public}s)", slotId,
-        apn->attr_.profileId_, apn->attr_.apn_, apn->attr_.protocol_, apn->attr_.types_);
+    int32_t bitMap = ApnManager::FindApnTypeByApnName(connectionParams.GetApnHolder()->GetApnType());
+    activeDataParam.dataProfile.supportedApnTypesBitmap = bitMap;
+    TELEPHONY_LOGI("Slot%{public}d: Activate PDP context (%{public}d, %{public}s, %{public}s, %{public}s, %{public}d)",
+        slotId, apn->attr_.profileId_, apn->attr_.apn_, apn->attr_.protocol_, apn->attr_.types_, bitMap);
     int32_t result = CoreManagerInner::GetInstance().ActivatePdpContext(slotId, RadioEvent::RADIO_RIL_SETUP_DATA_CALL,
         activeDataParam, stateMachineEventHandler_);
     if (result != TELEPHONY_ERR_SUCCESS) {
