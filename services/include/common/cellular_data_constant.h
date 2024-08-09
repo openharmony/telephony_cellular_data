@@ -171,7 +171,7 @@ enum class ApnTypes : int32_t {
     XCAP = 2048,
     INTERNAL_DEFAULT = 4096,
     ALL = 8191,
-}
+};
 
 static constexpr const char *DATA_CONTEXT_ROLE_ALL = "*";
 static constexpr const char *DATA_CONTEXT_ROLE_DEFAULT = "default";
