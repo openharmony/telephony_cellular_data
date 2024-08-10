@@ -37,6 +37,18 @@ const std::map<std::string, int32_t> ApnManager::apnIdApnNameMap_ {
     {DATA_CONTEXT_ROLE_INTERNAL_DEFAULT, DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID},
     {DATA_CONTEXT_ROLE_XCAP, DATA_CONTEXT_ROLE_XCAP_ID}
 };
+const std::map<std::string, ApnTypes> ApnManager::apnNameApnTypeMap_ {
+    {DATA_CONTEXT_ROLE_ALL, ApnTypes::ALL},
+    {DATA_CONTEXT_ROLE_DEFAULT, ApnTypes::DEFAULT},
+    {DATA_CONTEXT_ROLE_MMS, ApnTypes::MMS},
+    {DATA_CONTEXT_ROLE_SUPL, ApnTypes::SUPL},
+    {DATA_CONTEXT_ROLE_DUN, ApnTypes::DUN},
+    {DATA_CONTEXT_ROLE_IMS, ApnTypes::IMS},
+    {DATA_CONTEXT_ROLE_IA, ApnTypes::IA},
+    {DATA_CONTEXT_ROLE_EMERGENCY, ApnTypes::EMERGENCY},
+    {DATA_CONTEXT_ROLE_XCAP, ApnTypes::XCAP},
+    {DATA_CONTEXT_ROLE_INTERNAL_DEFAULT, ApnTypes::INTERNAL_DEFAULT}
+};
 constexpr const char *CT_MCC_MNC_1 = "46003";
 constexpr const char *CT_MCC_MNC_2 = "46011";
 constexpr const char *GC_ICCID = "8985231";
@@ -98,6 +110,16 @@ std::string ApnManager::FindApnNameByApnId(const int32_t id)
     }
     TELEPHONY_LOGI("apnId %{public}d is not exist!", id);
     return DATA_CONTEXT_ROLE_DEFAULT;
+}
+
+int32_t ApnManager::FindApnTypeByApnName(const std::string &apnName)
+{
+    auto iter = apnNameApnTypeMap_.find(apnName);
+    if (iter != apnNameApnTypeMap_.end()) {
+        return static_cast<uint64_t>(iter->second);
+    }
+    TELEPHONY_LOGI("ApnName %{public}s is not exist!", apnName.c_str());
+    return static_cast<uint64_t>(ApnTypes::NONETYPE);
 }
 
 int32_t ApnManager::FindApnIdByCapability(const uint64_t capability)
