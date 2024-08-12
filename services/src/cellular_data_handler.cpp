@@ -370,11 +370,19 @@ void CellularDataHandler::RoamingStateOff(const InnerEvent::Pointer &event)
         TELEPHONY_LOGE("Slot%{public}d: event or dataSwitchSettings_ or apnManager_ is null", slotId_);
         return;
     }
-    ApnProfileState apnState = apnManager_->GetOverallApnState();
-    if (apnState == ApnProfileState::PROFILE_STATE_CONNECTING || apnState == ApnProfileState::PROFILE_STATE_CONNECTED) {
-        ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
+    bool dataRoamingEnabled = false;
+    int32_t res = IsCellularDataRoamingEnabled(dataRoamingEnabled);
+    if (res != TELEPHONY_ERR_SUCCESS) {
+        dataRoamingEnabled = false;
     }
-    EstablishAllApnsIfConnectable();
+    if (!dataRoamingEnabled) {
+        ApnProfileState apnState = apnManager_->GetOverallApnState();
+        if (apnState == ApnProfileState::PROFILE_STATE_CONNECTING ||
+            apnState == ApnProfileState::PROFILE_STATE_CONNECTED) {
+            ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
+        }
+        EstablishAllApnsIfConnectable();
+    }
 }
 
 void CellularDataHandler::PsRadioEmergencyStateOpen(const InnerEvent::Pointer &event)
