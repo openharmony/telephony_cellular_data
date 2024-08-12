@@ -1241,7 +1241,10 @@ void CellularDataHandler::HandleSimAccountLoaded(const InnerEvent::Pointer &even
         ReleaseAllNetworkRequest();
         ClearAllConnections(DisConnectionReason::REASON_CHANGE_CONNECTION);
         CellularDataNetAgent::GetInstance().UnregisterNetSupplierForSimUpdate(slotId_);
-        CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
+        if (!CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_)) {
+            TELEPHONY_LOGE("Slot%{public}d register supplierid fail", slotId_);
+            isSimAccountLoaded_ = false;
+        }
         if (slotId_ == 0) {
             CellularDataNetAgent::GetInstance().UnregisterPolicyCallback();
             CellularDataNetAgent::GetInstance().RegisterPolicyCallback();
