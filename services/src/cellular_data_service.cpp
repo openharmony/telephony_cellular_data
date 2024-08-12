@@ -610,7 +610,7 @@ int32_t CellularDataService::UnregisterSimAccountCallback()
 
 int32_t CellularDataService::GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr)
 {
-    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
