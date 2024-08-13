@@ -74,6 +74,7 @@ public:
     void RegisterDataSettingObserver();
     void UnRegisterDataSettingObserver();
     int32_t GetIntelligenceSwitchState(bool &switchState);
+    void HandleUpdateNetInfo(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect();
@@ -231,6 +232,8 @@ private:
             [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleFactoryReset(event); } },
         { RadioEvent::RADIO_CLEAN_ALL_DATA_CONNECTIONS,
             [this](const AppExecFwk::InnerEvent::Pointer &event) { OnCleanAllDataConnectionsDone(event); } },
+        { CellularDataEventCode::MSG_DATA_CALL_LIST_CHANGED,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleUpdateNetInfo(event); } },
     };
 };
 } // namespace Telephony

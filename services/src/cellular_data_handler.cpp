@@ -2129,6 +2129,37 @@ std::shared_ptr<CellularDataStateMachine> CellularDataHandler::CheckForCompatibl
     return potentialDc;
 }
 
+void CellularDataHandler::HandleUpdateNetInfo(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("Slot%{public}d: HandleUpdateNetInfo", slotId_);
+    if (event == nullptr || connectionManager_ == nullptr || apnManager_ == nullptr) {
+        TELEPHONY_LOGE("event or connectionManager_ or apnManager_ is null");
+        return;
+    }
+
+    std::shared_ptr<SetupDataCallResultInfo> info = event->GetSharedObject<SetupDataCallResultInfo>();
+    if (info == nullptr) {
+        TELEPHONY_LOGE("info is null");
+        return;
+    }
+
+    sptr<ApnHolder> apnHolder = apnManager_->GetApnHolder(apnManager_->FindApnNameByApnId(info->flag));
+    if (apnHolder == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: flag:%{public}d complete apnHolder is null", slotId_, info->flag);
+        return;
+    }
+    if (apnHolder->GetApnState() != PROFILE_STATE_CONNECTING && apnHolder->GetApnState() != PROFILE_STATE_CONNECTED) {
+        TELEPHONY_LOGE("Slot%{public}d: apnHolder is not connecting or connected", slotId_);
+        return;
+    }
+    std::shared_ptr<CellularDataStateMachine> stateMachine = connectionManager_->GetActiveConnectionByCid(info->cid);
+    if (stateMachine == nullptr) {
+        TELEPHONY_LOGE("stateMachine is null");
+        return;
+    }
+    stateMachine->UpdateNetworkInfo(*info);
+}
+
 bool CellularDataHandler::IsGsm()
 {
     bool isGsm = false;
