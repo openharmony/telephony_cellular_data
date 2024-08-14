@@ -144,6 +144,11 @@ private:
     bool IsGsm();
     bool IsCdma();
     void HandleScreenStateChanged(bool isScreenOn) const;
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    bool IsSimRequestNetOnVSimEnabled(int32_t reqType, bool isMmsType) const;
+#endif
+    void SetNetRequest(NetRequest &request, const std::unique_ptr<NetRequest> &netRequest);
+    void SendEstablishDataConnectionEvent(int32_t id);
 
 private:
     sptr<ApnManager> apnManager_;

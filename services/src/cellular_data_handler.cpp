@@ -889,6 +889,36 @@ void CellularDataHandler::MsgEstablishDataConnection(const InnerEvent::Pointer &
     }
 }
 
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+bool CellularDataHandler::IsSimRequestNetOnVSimEnabled(int32_t reqType, bool isMmsType) const
+{
+    if (reqType == TYPE_REQUEST_NET) {
+        if (slotId_ != CELLULAR_DATA_VSIM_SLOT_ID &&
+            TELEPHONY_EXT_WRAPPER.isVSimEnabled_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_() && !isMmsType) {
+            TELEPHONY_LOGE("Slot%{public}d, VSimEnabled & not mms type", slotId_);
+            return true;
+        }
+    }
+    return false;
+}
+#endif
+
+void CellularDataHandler::SetNetRequest(NetRequest &request, const std::unique_ptr<NetRequest> &netRequest)
+{
+    request.ident = netRequest->ident;
+    request.capability = netRequest->capability;
+    request.registerType = netRequest->registerType;
+    request.bearTypes = netRequest->bearTypes;
+}
+
+void CellularDataHandler::SendEstablishDataConnectionEvent(int32_t id)
+{
+    InnerEvent::Pointer innerEvent = InnerEvent::Get(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, id);
+    if (!SendEvent(innerEvent)) {
+        TELEPHONY_LOGE("Slot%{public}d: send data connection event failed", slotId_);
+    }
+}
+
 void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
 {
     if (apnManager_ == nullptr || event == nullptr) {
@@ -901,16 +931,20 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
         return;
     }
     NetRequest request;
-    request.ident = netRequest->ident;
-    request.capability = netRequest->capability;
-    request.registerType = netRequest->registerType;
-    request.bearTypes = netRequest->bearTypes;
+    SetNetRequest(request, netRequest);
     int32_t id = ApnManager::FindApnIdByCapability(request.capability);
     sptr<ApnHolder> apnHolder = apnManager_->FindApnHolderById(id);
     if (apnHolder == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: apnHolder is null.", slotId_);
         return;
     }
+
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (IsSimRequestNetOnVSimEnabled(event->GetParam(), apnHolder->IsMmsType())) {
+        return;
+    }
+#endif
+
     bool isAllCellularDataAllowed = true;
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     if (TELEPHONY_EXT_WRAPPER.isAllCellularDataAllowed_) {
@@ -936,10 +970,7 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
             apnHolder->ReleaseAllCellularData();
         }
     }
-    InnerEvent::Pointer innerEvent = InnerEvent::Get(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, id);
-    if (!SendEvent(innerEvent)) {
-        TELEPHONY_LOGE("Slot%{public}d: send data connection event failed", slotId_);
-    }
+    SendEstablishDataConnectionEvent(id);
 }
 
 void CellularDataHandler::ProcessEvent(const InnerEvent::Pointer &event)

@@ -16,6 +16,7 @@
 #include "state_notification.h"
 
 #include "core_manager_inner.h"
+#include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_state_registry_client.h"
 
@@ -41,8 +42,15 @@ void StateNotification::OnUpDataFlowtype(int32_t slotId, CellDataFlowType flowTy
     TELEPHONY_LOGI("slotId = %{public}d, flowType = %{public}d", slotId, flowType);
     int32_t defaultSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
     if (flowType != CellDataFlowType::DATA_FLOW_TYPE_NONE && slotId != defaultSlotId) {
-        TELEPHONY_LOGI("defaultSlotId= %{public}d", defaultSlotId);
-        return;
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+        if (slotId != CELLULAR_DATA_VSIM_SLOT_ID ||
+            !TELEPHONY_EXT_WRAPPER.isVSimEnabled_ || !TELEPHONY_EXT_WRAPPER.isVSimEnabled_()) {
+#endif
+            TELEPHONY_LOGI("defaultSlotId = %{public}d", defaultSlotId);
+            return;
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+        }
+#endif
     }
     TelephonyStateRegistryClient::GetInstance().UpdateCellularDataFlow(slotId, static_cast<int32_t>(flowType));
 }
