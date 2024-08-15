@@ -95,6 +95,10 @@ public:
     MOCK_METHOD(int32_t, UpdateSupplierScore, (NetBearType bearerType, bool isBetter, uint32_t &supplierId));
     MOCK_METHOD(int32_t, EnableVnicNetwork, (const sptr<NetLinkInfo> &netLinkInfo, const std::set<int32_t> &uids));
     MOCK_METHOD(int32_t, DisableVnicNetwork, ());
+    MOCK_METHOD(int32_t, EnableDistributedClientNet, (const std::string &virnicAddr, const std::string &iif));
+    MOCK_METHOD(int32_t, EnableDistributedServerNet,
+        (const std::string &iif, const std::string &devIface, const std::string &dstAddr));
+    MOCK_METHOD(int32_t, DisableDistributedNet, (bool isServer));
 };
 
 }  // namespace NetManagerStandard
