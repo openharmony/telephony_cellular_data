@@ -61,6 +61,7 @@ public:
     MOCK_METHOD1(SavePrimarySlotId, int32_t(int32_t));
     MOCK_METHOD2(HasSimCard, int32_t(int32_t, bool &));
     MOCK_METHOD2(GetSimState, int32_t(int32_t, SimState &));
+    MOCK_METHOD2(GetSimIccStatus, int32_t(int32_t, IccSimStatus &));
     MOCK_METHOD2(GetCardType, int32_t(int32_t, CardType &));
     MOCK_METHOD2(SetModemInit, int32_t(int32_t, bool));
     MOCK_METHOD2(SetActiveSim, int32_t(int32_t, int32_t));
