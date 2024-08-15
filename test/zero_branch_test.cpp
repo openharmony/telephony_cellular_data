@@ -568,6 +568,27 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_010, Function | MediumTest | 
 }
 
 /**
+ * @tc.number   Telephony_CellularDataHandler_011
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataHandler_011, Function | MediumTest | Level1)
+{
+    CellularDataController controller { 0 };
+    controller.Init();
+    controller.cellularDataHandler_->SendEstablishDataConnectionEvent(0);
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    int32_t reqType = TYPE_REQUEST_NET;
+    bool isMmsType = false;
+    controller.cellularDataHandler_->IsSimRequestNetOnVSimEnabled(reqType, isMmsType);
+    isMmsType = true;
+    controller.cellularDataHandler_->IsSimRequestNetOnVSimEnabled(reqType, isMmsType);
+    reqType = 0;
+    EXPECT_FALSE(controller.cellularDataHandler_->IsSimRequestNetOnVSimEnabled(reqType, isMmsType));
+#endif
+}
+
+/**
  * @tc.number   Telephony_CellularDataService_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -1233,6 +1254,7 @@ HWTEST_F(BranchTest, NetworkSearchCallback_Test_01, Function | MediumTest | Leve
     StateNotification::GetInstance().UpdateCellularDataConnectState(0, PROFILE_STATE_DISCONNECTING, 0);
     StateNotification::GetInstance().OnUpDataFlowtype(0, CellDataFlowType::DATA_FLOW_TYPE_NONE);
     StateNotification::GetInstance().OnUpDataFlowtype(1, CellDataFlowType::DATA_FLOW_TYPE_UP_DOWN);
+    StateNotification::GetInstance().OnUpDataFlowtype(2, CellDataFlowType::DATA_FLOW_TYPE_UP_DOWN);
     ASSERT_FALSE(networkSearchCallback->HasInternetCapability(-1, -1));
 }
 
