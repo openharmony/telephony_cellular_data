@@ -19,6 +19,7 @@
 #include "active.h"
 #include "apn_manager.h"
 #include "cellular_data_state_machine.h"
+#include "core_manager_inner.h"
 #include "data_connection_manager.h"
 #include "data_connection_params.h"
 #include "data_disconnect_params.h"
@@ -27,6 +28,8 @@
 #include "gtest/gtest.h"
 #include "inactive.h"
 #include "incall_data_state_machine.h"
+#include "mock/mock_sim_manager.h"
+#include "mock/mock_network_search.h"
 #include "tel_event_handler.h"
 #include "telephony_types.h"
 #include "tel_ril_data_parcel.h"
@@ -34,14 +37,32 @@
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
+using ::testing::_;
+using ::testing::AtLeast;
+using ::testing::DoAll;
+using ::testing::Invoke;
+using ::testing::Mock;
+using ::testing::Return;
+using ::testing::SetArgReferee;
 
 class CellularStateMachineTest : public testing::Test {
 public:
+    CellularStateMachineTest() {
+        mockSimManager = new MockSimManager();
+        std::shared_ptr<MockSimManager> mockSimManagerPtr(mockSimManager);
+        CoreManagerInner::GetInstance().simManager_ = mockSimManagerPtr;
+
+        mockNetworkSearchManager = new MockNetworkSearchManager();
+        std::shared_ptr<MockNetworkSearchManager> mockNetworkSearchManagerPtr(mockNetworkSearchManager);
+        CoreManagerInner::GetInstance().networkSearchManager_ = mockNetworkSearchManagerPtr;
+    }
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
     std::shared_ptr<CellularDataStateMachine> cellularMachine;
+    MockSimManager *mockSimManager;
+    MockNetworkSearchManager *mockNetworkSearchManager;
 };
 void CellularStateMachineTest::SetUpTestCase() {}
 
@@ -1736,6 +1757,349 @@ HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_SplitProxyIpAddress_
     cellularMachine->SplitProxyIpAddress(proxyIpAddress, host, port);
     ASSERT_EQ(host, "192.168.1.1");
     ASSERT_EQ(port, 8080);
+}
+
+/**
+ * @tc.number   IncallDataStateMachine_IsSecondaryCanActiveData_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, IncallDataStateMachine_IsSecondaryCanActiveData_001, TestSize.Level0)
+{
+    std::shared_ptr<IncallDataStateMachineTest> incallStateMachineTest = std::make_shared<IncallDataStateMachineTest>();
+    std::shared_ptr<IncallDataStateMachine> incallStateMachine =
+        incallStateMachineTest->CreateIncallDataStateMachine(0);
+    EXPECT_CALL(*mockSimManager, GetDsdsMode(_)).Times(AtLeast(1))
+        .WillOnce([](int32_t &dsdsMode) {
+            dsdsMode = static_cast<int32_t>(DsdsMode::DSDS_MODE_V3);
+            return 0;
+        });
+    auto result = incallStateMachine->IsSecondaryCanActiveData();
+    ASSERT_EQ(result, false);
+}
+
+/**
+ * @tc.number   IncallDataStateMachine_IsSecondaryCanActiveData_002
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, IncallDataStateMachine_IsSecondaryCanActiveData_002, TestSize.Level0)
+{
+    std::shared_ptr<IncallDataStateMachineTest> incallStateMachineTest = std::make_shared<IncallDataStateMachineTest>();
+    std::shared_ptr<IncallDataStateMachine> incallStateMachine =
+        incallStateMachineTest->CreateIncallDataStateMachine(0);
+    EXPECT_CALL(*mockSimManager, GetDsdsMode(_)).Times(AtLeast(1))
+        .WillOnce([](int32_t &dsdsMode) {
+            dsdsMode = static_cast<int32_t>(DsdsMode::DSDS_MODE_V2);
+            return 0;
+        });
+    EXPECT_CALL(*mockSimManager, GetPrimarySlotId(_)).Times(AtLeast(1))
+        .WillOnce([](int32_t &slotId) {
+            slotId = INVALID_SLOT_ID;
+            return 0;
+        });
+    auto result = incallStateMachine->IsSecondaryCanActiveData();
+    ASSERT_EQ(result, false);
+    EXPECT_CALL(*mockSimManager, GetPrimarySlotId(_)).Times(AtLeast(1))
+        .WillOnce([](int32_t &slotId) {
+            slotId = 0;
+            return 0;
+        });
+    result = incallStateMachine->IsSecondaryCanActiveData();
+    ASSERT_EQ(result, false);
+}
+
+/**
+ * @tc.number   IncallDataStateMachine_IsSecondaryCanActiveData_002
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, IncallDataStateMachine_IsSecondaryCanActiveData_003, TestSize.Level0)
+{
+    std::shared_ptr<IncallDataStateMachineTest> incallStateMachineTest = std::make_shared<IncallDataStateMachineTest>();
+    std::shared_ptr<IncallDataStateMachine> incallStateMachine =
+        incallStateMachineTest->CreateIncallDataStateMachine(0);
+    EXPECT_CALL(*mockSimManager, GetDsdsMode(_)).Times(AtLeast(1))
+        .WillOnce([](int32_t &dsdsMode) {
+            dsdsMode = static_cast<int32_t>(DsdsMode::DSDS_MODE_V2);
+            return 0;
+        });
+    EXPECT_CALL(*mockSimManager, GetPrimarySlotId(_)).Times(AtLeast(1))
+        .WillOnce([](int32_t &slotId) {
+            slotId = 1;
+            return 0;
+        });
+    auto result = incallStateMachine->IsSecondaryCanActiveData();
+    ASSERT_EQ(result, false);
+}
+
+/**
+ * @tc.number   IncallDataStateMachine_IsSecondaryCanActiveData_004
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, IncallDataStateMachine_IsSecondaryCanActiveData_004, TestSize.Level0)
+{
+    std::shared_ptr<IncallDataStateMachineTest> incallStateMachineTest = std::make_shared<IncallDataStateMachineTest>();
+    std::shared_ptr<IncallDataStateMachine> incallStateMachine =
+        incallStateMachineTest->CreateIncallDataStateMachine(0);
+    EXPECT_CALL(*mockSimManager, GetDsdsMode(_)).Times(AtLeast(1))
+        .WillOnce([](int32_t &dsdsMode) {
+            dsdsMode = static_cast<int32_t>(DsdsMode::DSDS_MODE_V2);
+            return 0;
+        });
+    EXPECT_CALL(*mockSimManager, GetPrimarySlotId(_)).Times(AtLeast(1))
+        .WillOnce([](int32_t &slotId) {
+            slotId = 1;
+            return 0;
+        });
+    EXPECT_CALL(*mockSimManager, HasSimCard(_, _)).Times(AtLeast(1))
+        .WillOnce([](int32_t slotId, bool &hasSimCard) {
+            hasSimCard = true;
+            return 0;
+        });
+    EXPECT_CALL(*mockNetworkSearchManager, GetImsRegStatus(_, _, _)).Times(AtLeast(2))
+        .WillOnce([](int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) {
+            switch(imsSrvType) {
+                case ImsServiceType::TYPE_VOICE:
+                    info.imsRegState = ImsRegState::IMS_UNREGISTERED;
+                    break;
+                case ImsServiceType::TYPE_VIDEO:
+                    info.imsRegState = ImsRegState::IMS_UNREGISTERED;
+                    break;
+                default:
+                    break;
+            }
+            return 0;
+        });
+    auto result = incallStateMachine->IsSecondaryCanActiveData();
+    ASSERT_EQ(result, false);
+}
+
+/**
+ * @tc.number   IncallDataStateMachine_IsSecondaryCanActiveData_004
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, IncallDataStateMachine_IsSecondaryCanActiveData_005, TestSize.Level0)
+{
+    std::shared_ptr<IncallDataStateMachineTest> incallStateMachineTest = std::make_shared<IncallDataStateMachineTest>();
+    std::shared_ptr<IncallDataStateMachine> incallStateMachine =
+        incallStateMachineTest->CreateIncallDataStateMachine(0);
+    EXPECT_CALL(*mockSimManager, GetDsdsMode(_)).Times(AtLeast(1))
+        .WillOnce([](int32_t &dsdsMode) {
+            dsdsMode = static_cast<int32_t>(DsdsMode::DSDS_MODE_V2);
+            return 0;
+        });
+    EXPECT_CALL(*mockSimManager, GetPrimarySlotId(_)).Times(AtLeast(1))
+        .WillOnce([](int32_t &slotId) {
+            slotId = 1;
+            return 0;
+        });
+    EXPECT_CALL(*mockSimManager, HasSimCard(_, _)).Times(AtLeast(1))
+        .WillOnce([](int32_t slotId, bool &hasSimCard) {
+            hasSimCard = true;
+            return 0;
+        });
+    EXPECT_CALL(*mockNetworkSearchManager, GetImsRegStatus(_, _, _)).Times(AtLeast(2))
+        .WillOnce([](int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) {
+            switch(imsSrvType) {
+                case ImsServiceType::TYPE_VOICE:
+                    info.imsRegState = ImsRegState::IMS_REGISTERED ;
+                    break;
+                case ImsServiceType::TYPE_VIDEO:
+                    info.imsRegState = ImsRegState::IMS_UNREGISTERED;
+                    break;
+                default:
+                    break;
+            }
+            return 0;
+        });
+    auto result = incallStateMachine->IsSecondaryCanActiveData();
+    ASSERT_EQ(result, false);
+}
+
+/**
+ * @tc.number   IncallDataStateMachine_IsSecondaryCanActiveData_004
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, IncallDataStateMachine_IsSecondaryCanActiveData_006, TestSize.Level0)
+{
+    std::shared_ptr<IncallDataStateMachineTest> incallStateMachineTest = std::make_shared<IncallDataStateMachineTest>();
+    std::shared_ptr<IncallDataStateMachine> incallStateMachine =
+        incallStateMachineTest->CreateIncallDataStateMachine(0);
+    EXPECT_CALL(*mockSimManager, GetDsdsMode(_)).Times(AtLeast(1))
+        .WillOnce([](int32_t &dsdsMode) {
+            dsdsMode = static_cast<int32_t>(DsdsMode::DSDS_MODE_V2);
+            return 0;
+        });
+    EXPECT_CALL(*mockSimManager, GetPrimarySlotId(_)).Times(AtLeast(1))
+        .WillOnce([](int32_t &slotId) {
+            slotId = 1;
+            return 0;
+        });
+    EXPECT_CALL(*mockSimManager, HasSimCard(_, _)).Times(AtLeast(1))
+        .WillOnce([](int32_t slotId, bool &hasSimCard) {
+            hasSimCard = true;
+            return 0;
+        });
+    EXPECT_CALL(*mockNetworkSearchManager, GetImsRegStatus(_, _, _)).Times(AtLeast(2))
+        .WillOnce([](int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) {
+            switch(imsSrvType) {
+                case ImsServiceType::TYPE_VOICE:
+                    info.imsRegState = ImsRegState::IMS_REGISTERED ;
+                    break;
+                case ImsServiceType::TYPE_VIDEO:
+                    info.imsRegState = ImsRegState::IMS_REGISTERED;
+                    break;
+                default:
+                    break;
+            }
+            return 0;
+        });
+    incallStateMachine->callState_ = static_cast<int32_t>(TelCallStatus::CALL_STATUS_IDLE);
+    auto result = incallStateMachine->IsSecondaryCanActiveData();
+    ASSERT_EQ(result, false);
+    incallStateMachine->callState_ = static_cast<int32_t>(TelCallStatus::CALL_STATUS_DISCONNECTED);
+    result = incallStateMachine->IsSecondaryCanActiveData();
+    ASSERT_EQ(result, false);
+    incallStateMachine->callState_ = static_cast<int32_t>(TelCallStatus::CALL_STATUS_DIALING);
+    result = incallStateMachine->IsSecondaryCanActiveData();
+    ASSERT_EQ(result, false);
+}
+
+/**
+ * @tc.number   IncallDataStateMachine_IsSecondaryCanActiveData_004
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, IncallDataStateMachine_IsSecondaryCanActiveData_007, TestSize.Level0)
+{
+    std::shared_ptr<IncallDataStateMachineTest> incallStateMachineTest = std::make_shared<IncallDataStateMachineTest>();
+    std::shared_ptr<IncallDataStateMachine> incallStateMachine =
+        incallStateMachineTest->CreateIncallDataStateMachine(0);
+    EXPECT_CALL(*mockSimManager, GetDsdsMode(_)).Times(AtLeast(1))
+        .WillOnce([](int32_t &dsdsMode) {
+            dsdsMode = static_cast<int32_t>(DsdsMode::DSDS_MODE_V2);
+            return 0;
+        });
+    EXPECT_CALL(*mockSimManager, GetPrimarySlotId(_)).Times(AtLeast(1))
+        .WillOnce([](int32_t &slotId) {
+            slotId = 1;
+            return 0;
+        });
+    EXPECT_CALL(*mockSimManager, HasSimCard(_, _)).Times(AtLeast(1))
+        .WillOnce([](int32_t slotId, bool &hasSimCard) {
+            hasSimCard = true;
+            return 0;
+        });
+    EXPECT_CALL(*mockNetworkSearchManager, GetImsRegStatus(_, _, _)).Times(AtLeast(2))
+        .WillOnce([](int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) {
+            switch(imsSrvType) {
+                case ImsServiceType::TYPE_VOICE:
+                    info.imsRegState = ImsRegState::IMS_REGISTERED ;
+                    break;
+                case ImsServiceType::TYPE_VIDEO:
+                    info.imsRegState = ImsRegState::IMS_REGISTERED;
+                    break;
+                default:
+                    break;
+            }
+            return 0;
+        });
+    EXPECT_CALL(*mockNetworkSearchManager, GetPsRadioTech(_, _)).Times(AtLeast(1))
+        .WillOnce([](int32_t slotId, int32_t &psRadioTech) {
+            psRadioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_LTE);
+            return 0;
+        });
+    incallStateMachine->callState_ = static_cast<int32_t>(TelCallStatus::CALL_STATUS_DIALING);
+    auto result = incallStateMachine->IsSecondaryCanActiveData();
+    ASSERT_EQ(result, true);
+}
+
+/**
+ * @tc.number   CellularDataStateMachine_GetMtuSizeFromOpCfg_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_GetMtuSizeFromOpCfg_001, TestSize.Level0)
+{
+    int32_t mtuSize = 0;
+    int32_t slotId = 0;
+    std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
+    EXPECT_CALL(*mockSimManager, GetOperatorConfigs(_, _)).Times(AtLeast(1))
+        .WillOnce([](int32_t slotId, OperatorConfig &poc) {
+            poc.stringValue[KEY_MTU_SIZE_STRING] = "ipv4:1500;ipv6:1400";
+            return 0;
+        });
+    cellularMachine->ipType_ = "ipv4";
+    cellularMachine->GetMtuSizeFromOpCfg(mtuSize, slotId);
+    ASSERT_EQ(mtuSize, 1500);
+}
+
+/**
+ * @tc.number   CellularDataStateMachine_GetMtuSizeFromOpCfg_002
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_GetMtuSizeFromOpCfg_002, TestSize.Level0)
+{
+    int32_t mtuSize = 0;
+    int32_t slotId = 0;
+    std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
+    EXPECT_CALL(*mockSimManager, GetOperatorConfigs(_, _)).Times(AtLeast(1))
+        .WillOnce([](int32_t slotId, OperatorConfig &poc) {
+            poc.stringValue[KEY_MTU_SIZE_STRING] = "ipv4:1500;ipv6:1400";
+            return 0;
+        });
+    cellularMachine->ipType_ = "ipv6";
+    cellularMachine->GetMtuSizeFromOpCfg(mtuSize, slotId);
+    ASSERT_EQ(mtuSize, 1400);
+}
+
+/**
+ * @tc.number   CellularDataStateMachine_GetMtuSizeFromOpCfg_003
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_GetMtuSizeFromOpCfg_003, TestSize.Level0)
+{
+    int32_t mtuSize = 0;
+    int32_t slotId = 0;
+    std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
+    EXPECT_CALL(*mockSimManager, GetOperatorConfigs(_, _)).Times(AtLeast(1))
+        .WillOnce([](int32_t slotId, OperatorConfig &poc) {
+            poc.stringValue[KEY_MTU_SIZE_STRING] = "ipv4:1500;ipv6:1400";
+            return 0;
+        });
+    cellularMachine->ipType_ = "ipv5";
+    cellularMachine->GetMtuSizeFromOpCfg(mtuSize, slotId);
+    ASSERT_EQ(mtuSize, 0);
+}
+
+/**
+ * @tc.number   CellularDataStateMachine_GetMtuSizeFromOpCfg_004
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_GetMtuSizeFromOpCfg_004, TestSize.Level0)
+{
+    int32_t mtuSize = 0;
+    int32_t slotId = 0;
+    std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
+    EXPECT_CALL(*mockSimManager, GetOperatorConfigs(_, _)).Times(AtLeast(1))
+        .WillOnce([](int32_t slotId, OperatorConfig &poc) {
+            poc.stringValue[KEY_MTU_SIZE_STRING] = "ipv4:abc;ipv6:1400";
+            return 0;
+        });
+    cellularMachine->ipType_ = "ipv4";
+    cellularMachine->GetMtuSizeFromOpCfg(mtuSize, slotId);
+    ASSERT_EQ(mtuSize, 0);
 }
 } // namespace Telephony
 } // namespace OHOS

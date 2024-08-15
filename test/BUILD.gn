@@ -101,6 +101,7 @@ ohos_unittest("tel_cellular_state_machine_test") {
   deps = [
     "$SOURCE_DIR:tel_cellular_data",
     "$SOURCE_DIR/frameworks/native:tel_cellular_data_api",
+    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
