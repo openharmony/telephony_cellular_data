@@ -19,7 +19,6 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "cellular_data_handler.h"
-#include "cellular_data_constant.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -179,7 +178,7 @@ HWTEST_F(CellularDataHandlerTest, HandleUpdateNetInfo_006, Function | MediumTest
         cellularDataHandler->apnManager_->FindApnNameByApnId(netInfo->flag));
     EXPECT_NE(apnHolder, nullptr);
     apnHolder->SetApnState(PROFILE_STATE_IDLE);
-    cellularDataHandler->clearConnection(apnHolder, DisConnectionReason::REASON_CLEAR_CONNECTION);
+    cellularDataHandler->ClearConnection(apnHolder, DisConnectionReason::REASON_CLEAR_CONNECTION);
     EXPECT_NE(apnHolder->GetApnState(), PROFILE_STATE_DISCONNECTING);
 }
 } // namespace Telephony
