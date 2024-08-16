@@ -73,12 +73,15 @@ public:
     MOCK_METHOD1(GetNrState, NrState(int32_t slotId));
     MOCK_METHOD4(RegisterImsRegInfoCallback, int32_t(int32_t slotId, ImsServiceType imsSrvType, const int32_t tokenId,
         const sptr<ImsRegInfoCallback> &callback));
-    MOCK_METHOD3(UnregisterImsRegInfoCallback, int32_t(int32_t slotId, ImsServiceType imsSrvType, const int32_t tokenId));
+    MOCK_METHOD3(UnregisterImsRegInfoCallback, int32_t(int32_t slotId, ImsServiceType imsSrvType,
+        const int32_t tokenId));
     MOCK_METHOD2(GetBasebandVersion, int32_t(int32_t slotId, std::string &version));
     MOCK_METHOD1(InitAirplaneMode, void(int32_t slotId));
     MOCK_METHOD1(GetAirplaneMode, int32_t(bool &airplaneMode));
-    MOCK_METHOD3(GetNetworkCapability, int32_t(int32_t slotId, int32_t networkCapabilityType, int32_t &networkCapabilityState));
-    MOCK_METHOD3(SetNetworkCapability, int32_t(int32_t slotId, int32_t networkCapabilityType, int32_t networkCapabilityState));
+    MOCK_METHOD3(GetNetworkCapability, int32_t(int32_t slotId, int32_t networkCapabilityType,
+        int32_t &networkCapabilityState));
+    MOCK_METHOD3(SetNetworkCapability, int32_t(int32_t slotId, int32_t networkCapabilityType,
+        int32_t networkCapabilityState));
     MOCK_METHOD1(UpdateRadioOn, int32_t(int32_t slotId));
     MOCK_METHOD2(GetRrcConnectionState, int32_t(int32_t slotId, int32_t &status));
     MOCK_METHOD1(FactoryReset, int32_t(int32_t slotId));
