@@ -347,7 +347,6 @@ void CellularDataController::SystemAbilityStatusChangeListener::OnAddSystemAbili
             TELEPHONY_LOGI("COMM_NET_CONN_MANAGER_SYS_ABILITY_ID running");
             if (handler_ != nullptr) {
                 handler_->ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
-                CellularDataNetAgent::GetInstance().UnregisterNetSupplier(slotId_);
                 CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
             }
             break;
