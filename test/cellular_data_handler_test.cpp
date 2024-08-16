@@ -158,5 +158,28 @@ HWTEST_F(CellularDataHandlerTest, HandleUpdateNetInfo_005, Function | MediumTest
     auto stateMachine = cellularDataHandler->connectionManager_->GetActiveConnectionByCid(netInfo->cid);
     EXPECT_NE(stateMachine, nullptr);
 }
+
+/**
+ * @tc.number   HandleUpdateNetInfo_006
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, HandleUpdateNetInfo_006, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    cellularDataHandler->Init();
+    auto netInfo = std::make_shared<SetupDataCallResultInfo>();
+    netInfo->flag = DATA_CONTEXT_ROLE_DEFAULT_ID;
+    netInfo->cid = 100;
+    sptr<ApnHolder> apnHolder = cellularDataHandler->apnManager_->GetApnHolder(
+        cellularDataHandler->apnManager_->FindApnNameByApnId(netInfo->flag));
+    EXPECT_NE(apnHolder, nullptr);
+    apnHolder->SetApnState(PROFILE_STATE_IDLE);
+    cellularDataHandler->ClearConnection(apnHolder, DisConnectionReason::REASON_CLEAR_CONNECTION);
+    EXPECT_NE(apnHolder->GetApnState(), PROFILE_STATE_DISCONNECTING);
+}
 } // namespace Telephony
 } // namespace OHOS

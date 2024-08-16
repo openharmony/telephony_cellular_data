@@ -286,6 +286,12 @@ void CellularDataHandler::ClearConnection(const sptr<ApnHolder> &apn, DisConnect
         TELEPHONY_LOGE("Slot%{public}d: ClearConnection fail, object is null", slotId_);
         return;
     }
+    ApnProfileState apnState = apn->GetApnState();
+    if (apnState == ApnProfileState::PROFILE_STATE_IDLE ||
+        apnState == ApnProfileState::PROFILE_STATE_DISCONNECTING) {
+        TELEPHONY_LOGE("Slot%{public}d: apn state has been idle or disconnecting", slotId_);
+        return;
+    }
     apn->SetApnState(PROFILE_STATE_DISCONNECTING);
     apn->SetCellularDataStateMachine(nullptr);
     InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT, object);
