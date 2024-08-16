@@ -1861,7 +1861,7 @@ HWTEST_F(CellularStateMachineTest, IncallDataStateMachine_IsSecondaryCanActiveDa
         });
     EXPECT_CALL(*mockNetworkSearchManager, GetImsRegStatus(_, _, _)).Times(AtLeast(2))
         .WillOnce([](int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) {
-            switch(imsSrvType) {
+            switch (imsSrvType) {
                 case ImsServiceType::TYPE_VOICE:
                     info.imsRegState = ImsRegState::IMS_UNREGISTERED;
                     break;
@@ -1904,7 +1904,7 @@ HWTEST_F(CellularStateMachineTest, IncallDataStateMachine_IsSecondaryCanActiveDa
         });
     EXPECT_CALL(*mockNetworkSearchManager, GetImsRegStatus(_, _, _)).Times(AtLeast(2))
         .WillOnce([](int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) {
-            switch(imsSrvType) {
+            switch (imsSrvType) {
                 case ImsServiceType::TYPE_VOICE:
                     info.imsRegState = ImsRegState::IMS_REGISTERED ;
                     break;
@@ -1947,7 +1947,7 @@ HWTEST_F(CellularStateMachineTest, IncallDataStateMachine_IsSecondaryCanActiveDa
         });
     EXPECT_CALL(*mockNetworkSearchManager, GetImsRegStatus(_, _, _)).Times(AtLeast(2))
         .WillOnce([](int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) {
-            switch(imsSrvType) {
+            switch (imsSrvType) {
                 case ImsServiceType::TYPE_VOICE:
                     info.imsRegState = ImsRegState::IMS_REGISTERED ;
                     break;
