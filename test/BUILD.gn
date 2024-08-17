@@ -21,6 +21,7 @@ ohos_unittest("tel_cellular_data_test") {
 
   sources = [
     "$SOURCE_DIR/test/apn_manager_test.cpp",
+    "$SOURCE_DIR/test/cellular_data_handler_test.cpp",
     "$SOURCE_DIR/test/cellular_data_test.cpp",
     "$SOURCE_DIR/test/data_access_token.cpp",
     "$SOURCE_DIR/test/zero_branch_test.cpp",
@@ -100,6 +101,7 @@ ohos_unittest("tel_cellular_state_machine_test") {
   deps = [
     "$SOURCE_DIR:tel_cellular_data",
     "$SOURCE_DIR/frameworks/native:tel_cellular_data_api",
+    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [

@@ -435,12 +435,13 @@ void CellularDataStateMachine::SetConnectionTcpBuffer(const std::string &tcpBuff
 
 void CellularDataStateMachine::UpdateNetworkInfoIfInActive(SetupDataCallResultInfo &info)
 {
-    if (stateMachineEventHandler_ == nullptr) {
+    if (cellularDataHandler_ == nullptr) {
         TELEPHONY_LOGE("stateMachineEventHandler_ is nullptr");
         return;
     }
     auto netInfo = std::make_shared<SetupDataCallResultInfo>(info);
-    stateMachineEventHandler_->SendEvent(CellularDataEventCode::MSG_DATA_CALL_LIST_CHANGED, netInfo);
+    netInfo->flag = apnId_;
+    cellularDataHandler_->SendEvent(CellularDataEventCode::MSG_DATA_CALL_LIST_CHANGED, netInfo);
 }
 } // namespace Telephony
 } // namespace OHOS

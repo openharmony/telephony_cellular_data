@@ -74,6 +74,7 @@ public:
     void RegisterDataSettingObserver();
     void UnRegisterDataSettingObserver();
     int32_t GetIntelligenceSwitchState(bool &switchState);
+    void HandleUpdateNetInfo(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect();
@@ -143,6 +144,11 @@ private:
     bool IsGsm();
     bool IsCdma();
     void HandleScreenStateChanged(bool isScreenOn) const;
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    bool IsSimRequestNetOnVSimEnabled(int32_t reqType, bool isMmsType) const;
+#endif
+    void SetNetRequest(NetRequest &request, const std::unique_ptr<NetRequest> &netRequest);
+    void SendEstablishDataConnectionEvent(int32_t id);
 
 private:
     sptr<ApnManager> apnManager_;
@@ -231,6 +237,8 @@ private:
             [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleFactoryReset(event); } },
         { RadioEvent::RADIO_CLEAN_ALL_DATA_CONNECTIONS,
             [this](const AppExecFwk::InnerEvent::Pointer &event) { OnCleanAllDataConnectionsDone(event); } },
+        { CellularDataEventCode::MSG_DATA_CALL_LIST_CHANGED,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleUpdateNetInfo(event); } },
     };
 };
 } // namespace Telephony

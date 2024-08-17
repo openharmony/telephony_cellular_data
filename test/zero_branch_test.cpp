@@ -274,6 +274,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_003, Function | MediumTest | 
     cellularDataHandler.AttemptEstablishDataConnection(apnHolder);
     cellularDataHandler.connectionManager_ = nullptr;
     auto event = AppExecFwk::InnerEvent::Get(0);
+    cellularDataHandler.HandleUpdateNetInfo(event);
     cellularDataHandler.ClearConnectionIfRequired();
     event = nullptr;
     cellularDataHandler.MsgEstablishDataConnection(event);
@@ -442,6 +443,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_007, Function | MediumTest | 
     sptr<ApnHolder> apnHolder = controller.cellularDataHandler_->apnManager_->FindApnHolderById(1);
     std::string str = "";
     controller.cellularDataHandler_->CheckForCompatibleDataConnection(apnHolder);
+    controller.cellularDataHandler_->HandleUpdateNetInfo(event);
     controller.cellularDataHandler_->PsRadioEmergencyStateOpen(event);
     controller.cellularDataHandler_->PsRadioEmergencyStateClose(event);
     controller.cellularDataHandler_->IsNeedDoRecovery(true);
@@ -563,6 +565,27 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_010, Function | MediumTest | 
     ASSERT_TRUE(apn3->GetCellularDataStateMachine() == nullptr);
 
     ASSERT_EQ(controller.cellularDataHandler_->GetCellularDataState("default"), PROFILE_STATE_IDLE);
+}
+
+/**
+ * @tc.number   Telephony_CellularDataHandler_011
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataHandler_011, Function | MediumTest | Level1)
+{
+    CellularDataController controller { 0 };
+    controller.Init();
+    controller.cellularDataHandler_->SendEstablishDataConnectionEvent(0);
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    int32_t reqType = TYPE_REQUEST_NET;
+    bool isMmsType = false;
+    controller.cellularDataHandler_->IsSimRequestNetOnVSimEnabled(reqType, isMmsType);
+    isMmsType = true;
+    controller.cellularDataHandler_->IsSimRequestNetOnVSimEnabled(reqType, isMmsType);
+    reqType = 0;
+    EXPECT_FALSE(controller.cellularDataHandler_->IsSimRequestNetOnVSimEnabled(reqType, isMmsType));
+#endif
 }
 
 /**
@@ -1231,6 +1254,7 @@ HWTEST_F(BranchTest, NetworkSearchCallback_Test_01, Function | MediumTest | Leve
     StateNotification::GetInstance().UpdateCellularDataConnectState(0, PROFILE_STATE_DISCONNECTING, 0);
     StateNotification::GetInstance().OnUpDataFlowtype(0, CellDataFlowType::DATA_FLOW_TYPE_NONE);
     StateNotification::GetInstance().OnUpDataFlowtype(1, CellDataFlowType::DATA_FLOW_TYPE_UP_DOWN);
+    StateNotification::GetInstance().OnUpDataFlowtype(2, CellDataFlowType::DATA_FLOW_TYPE_UP_DOWN);
     ASSERT_FALSE(networkSearchCallback->HasInternetCapability(-1, -1));
 }
 
@@ -1382,7 +1406,6 @@ HWTEST_F(BranchTest, Default_Test_01, Function | MediumTest | Level3)
     ASSERT_FALSE(mDefault->ProcessDataConnectionDrsOrRatChanged(event));
     ASSERT_FALSE(mDefault->ProcessDataConnectionRoamOn(event));
     ASSERT_FALSE(mDefault->ProcessDataConnectionRoamOff(event));
-    ASSERT_FALSE(mDefault->ProcessDataCallListChanged(event));
 }
 
 /**

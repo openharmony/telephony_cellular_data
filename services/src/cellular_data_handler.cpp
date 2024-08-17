@@ -286,6 +286,12 @@ void CellularDataHandler::ClearConnection(const sptr<ApnHolder> &apn, DisConnect
         TELEPHONY_LOGE("Slot%{public}d: ClearConnection fail, object is null", slotId_);
         return;
     }
+    ApnProfileState apnState = apn->GetApnState();
+    if (apnState == ApnProfileState::PROFILE_STATE_IDLE ||
+        apnState == ApnProfileState::PROFILE_STATE_DISCONNECTING) {
+        TELEPHONY_LOGE("Slot%{public}d: apn state has been idle or disconnecting", slotId_);
+        return;
+    }
     apn->SetApnState(PROFILE_STATE_DISCONNECTING);
     apn->SetCellularDataStateMachine(nullptr);
     InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT, object);
@@ -897,6 +903,36 @@ void CellularDataHandler::MsgEstablishDataConnection(const InnerEvent::Pointer &
     }
 }
 
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+bool CellularDataHandler::IsSimRequestNetOnVSimEnabled(int32_t reqType, bool isMmsType) const
+{
+    if (reqType == TYPE_REQUEST_NET) {
+        if (slotId_ != CELLULAR_DATA_VSIM_SLOT_ID &&
+            TELEPHONY_EXT_WRAPPER.isVSimEnabled_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_() && !isMmsType) {
+            TELEPHONY_LOGE("Slot%{public}d, VSimEnabled & not mms type", slotId_);
+            return true;
+        }
+    }
+    return false;
+}
+#endif
+
+void CellularDataHandler::SetNetRequest(NetRequest &request, const std::unique_ptr<NetRequest> &netRequest)
+{
+    request.ident = netRequest->ident;
+    request.capability = netRequest->capability;
+    request.registerType = netRequest->registerType;
+    request.bearTypes = netRequest->bearTypes;
+}
+
+void CellularDataHandler::SendEstablishDataConnectionEvent(int32_t id)
+{
+    InnerEvent::Pointer innerEvent = InnerEvent::Get(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, id);
+    if (!SendEvent(innerEvent)) {
+        TELEPHONY_LOGE("Slot%{public}d: send data connection event failed", slotId_);
+    }
+}
+
 void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
 {
     if (apnManager_ == nullptr || event == nullptr) {
@@ -909,16 +945,20 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
         return;
     }
     NetRequest request;
-    request.ident = netRequest->ident;
-    request.capability = netRequest->capability;
-    request.registerType = netRequest->registerType;
-    request.bearTypes = netRequest->bearTypes;
+    SetNetRequest(request, netRequest);
     int32_t id = ApnManager::FindApnIdByCapability(request.capability);
     sptr<ApnHolder> apnHolder = apnManager_->FindApnHolderById(id);
     if (apnHolder == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: apnHolder is null.", slotId_);
         return;
     }
+
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (IsSimRequestNetOnVSimEnabled(event->GetParam(), apnHolder->IsMmsType())) {
+        return;
+    }
+#endif
+
     bool isAllCellularDataAllowed = true;
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     if (TELEPHONY_EXT_WRAPPER.isAllCellularDataAllowed_) {
@@ -944,10 +984,7 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
             apnHolder->ReleaseAllCellularData();
         }
     }
-    InnerEvent::Pointer innerEvent = InnerEvent::Get(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, id);
-    if (!SendEvent(innerEvent)) {
-        TELEPHONY_LOGE("Slot%{public}d: send data connection event failed", slotId_);
-    }
+    SendEstablishDataConnectionEvent(id);
 }
 
 void CellularDataHandler::ProcessEvent(const InnerEvent::Pointer &event)
@@ -1249,7 +1286,10 @@ void CellularDataHandler::HandleSimAccountLoaded(const InnerEvent::Pointer &even
         ReleaseAllNetworkRequest();
         ClearAllConnections(DisConnectionReason::REASON_CHANGE_CONNECTION);
         CellularDataNetAgent::GetInstance().UnregisterNetSupplierForSimUpdate(slotId_);
-        CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
+        if (!CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_)) {
+            TELEPHONY_LOGE("Slot%{public}d register supplierid fail", slotId_);
+            isSimAccountLoaded_ = false;
+        }
         if (slotId_ == 0) {
             CellularDataNetAgent::GetInstance().UnregisterPolicyCallback();
             CellularDataNetAgent::GetInstance().RegisterPolicyCallback();
@@ -2132,6 +2172,37 @@ std::shared_ptr<CellularDataStateMachine> CellularDataHandler::CheckForCompatibl
         }
     }
     return potentialDc;
+}
+
+void CellularDataHandler::HandleUpdateNetInfo(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("Slot%{public}d: HandleUpdateNetInfo", slotId_);
+    if (event == nullptr || connectionManager_ == nullptr || apnManager_ == nullptr) {
+        TELEPHONY_LOGE("event or connectionManager_ or apnManager_ is null");
+        return;
+    }
+
+    std::shared_ptr<SetupDataCallResultInfo> info = event->GetSharedObject<SetupDataCallResultInfo>();
+    if (info == nullptr) {
+        TELEPHONY_LOGE("info is null");
+        return;
+    }
+
+    sptr<ApnHolder> apnHolder = apnManager_->GetApnHolder(apnManager_->FindApnNameByApnId(info->flag));
+    if (apnHolder == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: flag:%{public}d complete apnHolder is null", slotId_, info->flag);
+        return;
+    }
+    if (apnHolder->GetApnState() != PROFILE_STATE_CONNECTING && apnHolder->GetApnState() != PROFILE_STATE_CONNECTED) {
+        TELEPHONY_LOGE("Slot%{public}d: apnHolder is not connecting or connected", slotId_);
+        return;
+    }
+    std::shared_ptr<CellularDataStateMachine> stateMachine = connectionManager_->GetActiveConnectionByCid(info->cid);
+    if (stateMachine == nullptr) {
+        TELEPHONY_LOGE("stateMachine is null");
+        return;
+    }
+    stateMachine->UpdateNetworkInfo(*info);
 }
 
 bool CellularDataHandler::IsGsm()
