@@ -204,7 +204,7 @@ HWTEST_F(CellularDataHandlerTest, HandleRoamingOff_001, Function | MediumTest | 
  * @tc.name     test roaming off
  * @tc.desc     Function test
  */
-HWTEST_F(CellularDataHandlerTest, HandleRoamingOff_001, Function | MediumTest | Level3)
+HWTEST_F(CellularDataHandlerTest, HandleRoamingOff_002, Function | MediumTest | Level3)
 {
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
