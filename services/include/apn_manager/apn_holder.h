@@ -18,22 +18,21 @@
 
 #include <map>
 #include <memory>
+#include <set>
+
 #include "apn_item.h"
 #include "cellular_data_constant.h"
 #include "connection_retry_policy.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-    void ReleaseAllCellularData();
-
-#ifdef __cplusplus
-}
-#endif
+#include "net_supplier_callback_base.h"
 
 namespace OHOS {
 namespace Telephony {
 class CellularDataStateMachine;
+enum class HasSystemUse : int32_t {
+    UNKOWN = -1,
+    NOT_HAS = 0,
+    HAS = 1,
+};
 
 class ApnHolder : public RefBase {
 public:
@@ -63,6 +62,9 @@ public:
     bool IsSameMatchedApns(std::vector<sptr<ApnItem>> newMatchedApns, bool roamingState);
     bool IsSameApnItem(const sptr<ApnItem> &newApnItem, const sptr<ApnItem> &oldApnItem, bool roamingState);
     bool IsCompatibleApnItem(const sptr<ApnItem> &newApnItem, const sptr<ApnItem> &oldApnItem, bool roamingState);
+    void AddUid(int32_t uid);
+    void RemoveUid(int32_t uid);
+    HasSystemUse GetUidStatus() const;
 
 private:
     ApnHolder(ApnHolder &apnHolder) = default;
@@ -79,6 +81,7 @@ private:
     int32_t priority_;
     std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine_;
     std::vector<NetRequest> netRequests_;
+    std::set<int32_t> reqUids_;
 };
 } // namespace Telephony
 } // namespace OHOS

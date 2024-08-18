@@ -57,5 +57,28 @@ int32_t NetManagerCallBack::ReleaseNetwork(const std::string &ident, const std::
     int32_t result = DelayedRefSingleton<CellularDataService>::GetInstance().ReleaseNet(request);
     return result;
 }
+
+int32_t NetManagerCallBack::AddRequest(const NetManagerStandard::NetRequest &netrequest)
+{
+    NetRequest request;
+    request.ident = netrequest.ident;
+    for (const auto &netCap : netrequest.netCaps) {
+        request.capability |= 1L << netCap;
+    }
+    request.uid = netrequest.uid;
+    return DelayedRefSingleton<CellularDataService>::GetInstance().AddUid(request);
+}
+
+int32_t NetManagerCallBack::RemoveRequest(const NetManagerStandard::NetRequest &netrequest)
+{
+    NetRequest request;
+    request.ident = netrequest.ident;
+    for (const auto &netCap : netrequest.netCaps) {
+        request.capability |= 1L << netCap;
+    }
+    request.uid = netrequest.uid;
+    return DelayedRefSingleton<CellularDataService>::GetInstance().RemoveUid(request);
+}
+
 } // namespace Telephony
 } // namespace OHOS

@@ -69,6 +69,7 @@ struct NetRequest {
     std::string ident = "";
     int32_t registerType = UNKOWN;
     uint64_t bearTypes = 0;
+    uint32_t uid = 0;
 };
 
 static const uint32_t DEFAULT_BANDWIDTH = 14;

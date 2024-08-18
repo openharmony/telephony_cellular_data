@@ -20,6 +20,7 @@
 #include <gtest/gtest.h>
 
 #include "cellular_data_client.h"
+#include "cellular_data_controller.h"
 #include "cellular_data_error.h"
 #include "cellular_data_net_agent.h"
 #include "cellular_data_service.h"
@@ -1833,5 +1834,91 @@ HWTEST_F(CellularDataTest, DataMock_Test_01, TestSize.Level3)
     EXPECT_TRUE(true);
 }
 #endif // TEL_TEST_UNSUPPORT
+/**
+ * @tc.number   CellularDataControllerAddUid_Test_01
+ * @tc.name     Test the CellularDataControllerAddUid function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, CellularDataControllerAddUid_Test_01, TestSize.Level3)
+{
+    auto controller = std::make_shared<CellularDataController>(DEFAULT_SIM_SLOT_ID);
+    controller->cellularDataHandler_ = nullptr;
+    NetRequest request;
+    request.uid = 0;
+    ASSERT_FALSE(controller->AddUid(request));
+}
+
+/**
+ * @tc.number   CellularDataControllerAddUid_Test_02
+ * @tc.name     Test the CellularDataControllerAddUid function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, CellularDataControllerAddUid_Test_2, TestSize.Level3)
+{
+    auto controller = std::make_shared<CellularDataController>(DEFAULT_SIM_SLOT_ID);
+    controller->Init();
+    ASSERT_TRUE(controller->cellularDataHandler_ != nullptr);
+    NetRequest request;
+    request.uid = 0;
+    ASSERT_TRUE(controller->AddUid(request));
+    ASSERT_TRUE(controller->AddUid(request));
+    request.uid = 1;
+    ASSERT_TRUE(controller->AddUid(request));
+}
+/**
+ * @tc.number   CellularDataControllerRemoveUid_Test_01
+ * @tc.name     Test the CellularDataControllerRemoveUid function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, CellularDataControllerRemoveUid_Test_1, TestSize.Level3)
+{
+    auto controller = std::make_shared<CellularDataController>(DEFAULT_SIM_SLOT_ID);
+    controller->cellularDataHandler_ = nullptr;
+    NetRequest request;
+    request.uid = 0;
+    ASSERT_FALSE(controller->RemoveUid(request));
+}
+/**
+ * @tc.number   CellularDataControllerRemoveUid_Test_02
+ * @tc.name     Test the CellularDataControllerRemoveUid function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, CellularDataControllerRemoveUid_Test_2, TestSize.Level3)
+{
+    auto controller = std::make_shared<CellularDataController>(DEFAULT_SIM_SLOT_ID);
+    controller->Init();
+    ASSERT_TRUE(controller->cellularDataHandler_ != nullptr);
+    NetRequest request;
+    request.uid = 0;
+    ASSERT_TRUE(controller->RemoveUid(request));
+    ASSERT_TRUE(controller->RemoveUid(request));
+    request.uid = 1;
+    ASSERT_TRUE(controller->RemoveUid(request));
+}
+/**
+ * @tc.number   ControllerReleaseCellularDataConnection_Test_01
+ * @tc.name     Test the Controlle ReleaseCellularDataConnection function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest,ControllerReleaseCellularDataConnection_Test_1, TestSize.Level3)
+{
+    auto controller = std::make_shared<CellularDataController>(DEFAULT_SIM_SLOT_ID);
+    controller->cellularDataHandler_ = nullptr;
+    ASSERT_FALSE(controller->ReleaseCellularDataConnection());
+}
+/**
+ * @tc.number  ControllerReleaseCellularDataConnection_Test_02
+ * @tc.name     Test the Controller ReleaseCellularDataConnection function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest,ControllerReleaseCellularDataConnection_Test_2, TestSize.Level3)
+{
+    auto controller = std::make_shared<CellularDataController>(DEFAULT_SIM_SLOT_ID);
+    controller->Init();
+    ASSERT_TRUE(controller->cellularDataHandler_ != nullptr);
+    NetRequest request;
+    ASSERT_FALSE(controller->ReleaseCellularDataConnection());
+}
+
 } // namespace Telephony
 } // namespace OHOS

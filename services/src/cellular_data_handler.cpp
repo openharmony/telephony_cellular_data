@@ -112,6 +112,51 @@ bool CellularDataHandler::RequestNet(const NetRequest &request)
     return SendEvent(event);
 }
 
+bool CellularDataHandler::AddUid(const NetRequest &request)
+{
+    std::unique_ptr<NetRequest> netRequest = std::make_unique<NetRequest>();
+    if (netRequest == nullptr) {
+        TELEPHONY_LOGE("Netrequest is null");
+        return false;
+    }
+
+    netRequest->capability = ApnManager::FindBestCapability(request.capability);
+    netRequest->ident = request.ident;
+    int32_t id = ApnManager::FindApnIdByCapability(netRequest->capability);
+
+    if (!apnManager_) {
+        TELEPHONY_LOGE("apnManager_ is nullptr")
+        return false;
+    }
+
+    sptr<ApnHolder> apnHolder = apnManager_->FindApnHolderById(id);
+    apnHolder->AddUid(request.uid);
+
+    return true;
+}
+
+bool CellularDataHandler::RemoveUid(const NetRequest &request)
+{
+    std::unique_ptr<NetRequest> netRequest = std::make_unique<NetRequest>();
+    if (netRequest == nullptr) {
+        TELEPHONY_LOGE("Netrequest is null");
+        return false;
+    }
+
+    netRequest->capability = ApnManager::FindBestCapability(request.capability);
+    netRequest->ident = request.ident;
+    int32_t id = ApnManager::FindApnIdByCapability(netRequest->capability);
+
+    if (!apnManager_) {
+        TELEPHONY_LOGE("apnManager_ is nullptr")
+        return false;
+    }
+
+    sptr<ApnHolder> apnHolder = apnManager_->FindApnHolderById(id);
+    apnHolder->RemoveUid(request.uid);
+    return true;
+}
+
 int32_t CellularDataHandler::SetCellularDataEnable(bool userDataOn)
 {
     if (dataSwitchSettings_ == nullptr) {
@@ -954,7 +999,8 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
     bool isAllCellularDataAllowed = true;
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     if (TELEPHONY_EXT_WRAPPER.isAllCellularDataAllowed_) {
-        isAllCellularDataAllowed = TELEPHONY_EXT_WRAPPER.isAllCellularDataAllowed_(request);
+        isAllCellularDataAllowed =
+            TELEPHONY_EXT_WRAPPER.isAllCellularDataAllowed_(request, apnHolder->GetUidStatus());
     }
 #endif
     if (isAllCellularDataAllowed) {
@@ -2209,6 +2255,21 @@ bool CellularDataHandler::IsCdma()
     bool isCdma = false;
     CoreManagerInner::GetInstance().IsCdma(slotId_, isCdma);
     return isCdma;
+}
+
+void CellularDataHandler::ReleaseCellularDataConnection()
+{
+    int32_t id = ApnManager::FindApnIdByCapability(OHOS::NetManagerStandard::NET_CAPABILITY_INTERNET);
+    if (!apnManager_) {
+        TELEPHONY_LOGE("apnManager_ is nullptr")
+        return;
+    } 
+    OHOS::sptr<ApnHolder> apnHolder = apnManager_->FindApnHolderById(id);
+    if (apnHolder->GetUidStatus() == HasSystemUse::HAS) {
+        TELEPHONY_LOGI("system using, can not release");
+        return;
+    }
+    apnHolder->ReleaseDataConnection();
 }
 } // namespace Telephony
 } // namespace OHOS

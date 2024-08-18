@@ -169,6 +169,8 @@ public:
 
     int32_t EstablishAllApnsIfConnectable(int32_t slotId);
 
+    int32_t ReleaseCellularDataConnection(int32_t slotId);
+
 private:
     static inline BrokerDelegator<CellularDataServiceProxy> delegator_;
 };

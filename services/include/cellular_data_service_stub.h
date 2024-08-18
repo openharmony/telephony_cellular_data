@@ -58,6 +58,7 @@ private:
     int32_t OnInitCellularDataController(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetIntelligenceSwitchState(MessageParcel &data, MessageParcel &reply);
     int32_t OnEstablishAllApnsIfConnectable(MessageParcel &data, MessageParcel &reply);
+    int32_t OnReleaseCellularDataConnection(MessageParcel &data, MessageParcel &reply);
     int32_t SetTimer(uint32_t code);
     void CancelTimer(int32_t id);
 
@@ -113,6 +114,8 @@ private:
         { (uint32_t)CellularDataInterfaceCode::ESTABLISH_ALL_APNS_IF_CONNECTABLE,
             [this](MessageParcel &data, MessageParcel &reply) {
                 return OnEstablishAllApnsIfConnectable(data, reply); } },
+        { (uint32_t)CellularDataInterfaceCode::RELEASE_CELLULAR_DATA_CONNECTION,
+            [this](MessageParcel &data, MessageParcel &reply) { return OnReleaseCellularDataConnection(data, reply); }}
     };
     std::map<uint32_t, std::string> collieCodeStringMap_ = {
         { uint32_t(CellularDataInterfaceCode::GET_CELLULAR_DATA_STATE), "GET_CELLULAR_DATA_STATE" },
