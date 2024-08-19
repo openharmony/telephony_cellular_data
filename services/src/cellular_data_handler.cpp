@@ -2263,7 +2263,7 @@ void CellularDataHandler::ReleaseCellularDataConnection()
     if (!apnManager_) {
         TELEPHONY_LOGE("apnManager_ is nullptr");
         return;
-    } 
+    }
     OHOS::sptr<ApnHolder> apnHolder = apnManager_->FindApnHolderById(id);
     if (apnHolder->GetUidStatus() == HasSystemUse::HAS) {
         TELEPHONY_LOGI("system using, can not release");

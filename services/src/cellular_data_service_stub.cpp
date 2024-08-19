@@ -403,7 +403,7 @@ int32_t CellularDataServiceStub::OnEstablishAllApnsIfConnectable(MessageParcel &
 int32_t CellularDataServiceStub::OnReleaseCellularDataConnection(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId;
-    if(!data.ReadInt32(slotId)) {
+    if (!data.ReadInt32(slotId)) {
         TELEPHONY_LOGE("write int32 slotId failed.");
         return TELEPHONY_ERR_READ_DATA_FAIL;
     }

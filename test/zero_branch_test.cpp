@@ -2019,7 +2019,7 @@ HWTEST_F(BranchTest, ServiceAddUid_Test_01, TestSize.Level3)
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.AddUid(request));
     request.ident = "simId1";
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.AddUid(request));
-    service.init();
+    service.Init();
     ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.AddUid(request));
 }
 
@@ -2037,7 +2037,7 @@ HWTEST_F(BranchTest, ServiceRemoveUid_Test_01, TestSize.Level3)
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.RemoveUid(request));
     request.ident = "simId1";
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.RemoveUid(request));
-    service.init();
+    service.Init();
     ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.RemoveUid(request));
 }
 } // namespace Telephony

@@ -1900,7 +1900,7 @@ HWTEST_F(CellularDataTest, CellularDataControllerRemoveUid_Test_2, TestSize.Leve
  * @tc.name     Test the Controlle ReleaseCellularDataConnection function
  * @tc.desc     Function test
  */
-HWTEST_F(CellularDataTest,ControllerReleaseCellularDataConnection_Test_1, TestSize.Level3)
+HWTEST_F(CellularDataTest, ControllerReleaseCellularDataConnection_Test_1, TestSize.Level3)
 {
     auto controller = std::make_shared<CellularDataController>(DEFAULT_SIM_SLOT_ID);
     controller->cellularDataHandler_ = nullptr;
@@ -1911,7 +1911,7 @@ HWTEST_F(CellularDataTest,ControllerReleaseCellularDataConnection_Test_1, TestSi
  * @tc.name     Test the Controller ReleaseCellularDataConnection function
  * @tc.desc     Function test
  */
-HWTEST_F(CellularDataTest,ControllerReleaseCellularDataConnection_Test_2, TestSize.Level3)
+HWTEST_F(CellularDataTest, ControllerReleaseCellularDataConnection_Test_2, TestSize.Level3)
 {
     auto controller = std::make_shared<CellularDataController>(DEFAULT_SIM_SLOT_ID);
     controller->Init();

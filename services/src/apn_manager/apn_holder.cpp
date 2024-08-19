@@ -64,7 +64,7 @@ sptr<ApnItem> ApnHolder::GetCurrentApn() const
 
 void ApnHolder::AddUid(const int32_t uid)
 {
-    if(reqUids_.find(uid) != reqUids_.end()) {
+    if (reqUids_.find(uid) != reqUids_.end()) {
         return;
     }
     reqUids_.insert(uid);
@@ -73,7 +73,7 @@ void ApnHolder::AddUid(const int32_t uid)
 void ApnHolder::RemoveUid(const int32_t uid)
 {
     auto it = reqUids_.find(uid);
-    if(it != reqUids_.end()) {
+    if (it != reqUids_.end()) {
         reqUids_.erase(it);
         return;
     }
@@ -155,7 +155,7 @@ int32_t ApnHolder::GetPriority() const
 
 HasSystemUse ApnHolder::GetUidStatus() const
 {
-     for (auto item : reqUids_) {
+    for (auto item : reqUids_) {
         if (item < SYSTEM_UID) {
             return HasSystemUse::HAS;
         }

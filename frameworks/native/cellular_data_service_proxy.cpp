@@ -596,7 +596,7 @@ int32_t CellularDataServiceProxy::ReleaseCellularDataConnection(int32_t slotId)
         TELEPHONY_LOGE("write interface token failed!");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    if(!dataParcel.WriteInt32(slotId)) {
+    if (!dataParcel.WriteInt32(slotId)) {
         TELEPHONY_LOGE("write slotId failed");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
@@ -605,14 +605,14 @@ int32_t CellularDataServiceProxy::ReleaseCellularDataConnection(int32_t slotId)
         TELEPHONY_LOGE("remote is nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = remote->SendRequest((uint32_t)CellularDataInterfaceCode::RELEASE_CELLULAR_DATA_CONNECTION, dataParcel,
-        replyParcel, option);
+    int32_t error = remote->SendRequest((uint32_t)CellularDataInterfaceCode::RELEASE_CELLULAR_DATA_CONNECTION,
+                                        dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReleaseCellularDataConnection call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result;
-    if(!replyParcel.ReadInt32(result)) {
+    if (!replyParcel.ReadInt32(result)) {
         TELEPHONY_LOGE("read reply result failed");
     }
     return result;
