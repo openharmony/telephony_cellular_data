@@ -181,5 +181,39 @@ HWTEST_F(CellularDataHandlerTest, HandleUpdateNetInfo_006, Function | MediumTest
     cellularDataHandler->ClearConnection(apnHolder, DisConnectionReason::REASON_CLEAR_CONNECTION);
     EXPECT_NE(apnHolder->GetApnState(), PROFILE_STATE_DISCONNECTING);
 }
+
+/**
+ * @tc.number   HandleRoamingOff_001
+ * @tc.name     test roaming off
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, HandleRoamingOff_001, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    cellularDataHandler->Init();
+    cellularDataHandler->SetCellularDataRoamingEnabled(true);
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    cellularDataHandler->RoamingStateOff(event);
+}
+
+/**
+ * @tc.number   HandleRoamingOff_002
+ * @tc.name     test roaming off
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, HandleRoamingOff_002, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    cellularDataHandler->Init();
+    cellularDataHandler->SetCellularDataRoamingEnabled(false);
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    cellularDataHandler->RoamingStateOff(event);
+}
 } // namespace Telephony
 } // namespace OHOS
