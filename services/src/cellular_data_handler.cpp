@@ -33,7 +33,6 @@
 #include "str_convert.h"
 #include "string_ex.h"
 #include "telephony_log_wrapper.h"
-#include "telephony_types.h"
 #include "telephony_ext_wrapper.h"
 #include "telephony_permission.h"
 #include "ipc_skeleton.h"
@@ -67,7 +66,6 @@ void CellularDataHandler::Init()
     }
     connectionManager_->Init();
     apnManager_->InitApnHolders();
-    apnManager_->CreateAllApnItem();
     dataSwitchSettings_->LoadSwitchValue();
     GetConfigurationFor5G();
     SetRilLinkBandwidths();
@@ -255,6 +253,21 @@ void CellularDataHandler::ClearAllConnections(DisConnectionReason reason)
     connectionManager_->EndNetStatistics();
 
     ResetDataFlowType();
+}
+
+void CellularDataHandler::ClearConnectionsOnUpdateApns(const DataProfile &dataProfile, DisConnectionReason reason)
+{
+    bool isDataProfileSame = (dataProfile.profileId == lastDataProfile_.profileId
+        && dataProfile.apn == lastDataProfile_.apn
+        && dataProfile.protocol == lastDataProfile_.protocol
+        && dataProfile.verType == lastDataProfile_.verType
+        && dataProfile.userName == lastDataProfile_.userName
+        && dataProfile.password == lastDataProfile_.password
+        && dataProfile.roamingProtocol == lastDataProfile_.roamingProtocol);
+    if (!isDataProfileSame) {
+        ClearAllConnections(reason);
+        lastDataProfile_ = dataProfile;
+    }
 }
 
 void CellularDataHandler::ResetDataFlowType()
@@ -514,12 +527,12 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
     }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     bool attached = coreInner.GetPsRegState(slotId_) == (int32_t)RegServiceState::REG_STATE_IN_SERVICE;
-    SimState simState = SimState::SIM_STATE_UNKNOWN;
-    coreInner.GetSimState(slotId_, simState);
-    TELEPHONY_LOGD("Slot%{public}d: attached: %{public}d simState: %{public}d isSimAccountLoaded: %{public}d",
-        slotId_, attached, simState, isSimAccountLoaded_);
+    bool isSimStateReadyOrLoaded = IsSimStateReadyOrLoaded();
+    TELEPHONY_LOGD("Slot%{public}d: attached: %{public}d simState: %{public}d isSimAccountLoaded: %{public}d "
+        "isRilApnAttached: %{public}d", slotId_, attached, isSimStateReadyOrLoaded, isSimAccountLoaded_,
+        isRilApnAttached_);
     bool isMmsApn = apnHolder->IsMmsType();
-    if (isMmsApn && (simState == SimState::SIM_STATE_READY)) {
+    if (isMmsApn && isSimStateReadyOrLoaded) {
         if (!attached) {
             return false;
         }
@@ -530,7 +543,7 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
             CellularDataErrorCode::DATA_ERROR_PS_NOT_ATTACH, "It is not emergencyApn and not attached");
         return false;
     }
-    if (!isEmergencyApn && (simState != SimState::SIM_STATE_READY)) {
+    if (!isEmergencyApn && !isSimStateReadyOrLoaded) {
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
             CellularDataErrorCode::DATA_ERROR_SIM_NOT_READY, "It is not emergencyApn and sim not ready");
         return false;
@@ -1049,6 +1062,14 @@ void CellularDataHandler::HandleScreenStateChanged(bool isScreenOn) const
     connectionManager_->HandleScreenStateChanged(isScreenOn);
 }
 
+bool CellularDataHandler::IsSimStateReadyOrLoaded()
+{
+    SimState simState = SimState::SIM_STATE_UNKNOWN;
+    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
+    coreInner.GetSimState(slotId_, simState);
+    return (simState == SimState::SIM_STATE_READY || simState == SimState::SIM_STATE_LOADED);
+}
+
 void CellularDataHandler::HandleSettingSwitchChanged(const InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
@@ -1213,93 +1234,111 @@ void CellularDataHandler::HandleSimStateChanged()
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
     TELEPHONY_LOGI("Slot%{public}d: sim state is :%{public}d", slotId_, simState);
-    if (simState != SimState::SIM_STATE_READY) {
+    if (simState == SimState::SIM_STATE_READY) {
+        std::u16string iccId;
+        CoreManagerInner::GetInstance().GetSimIccId(slotId_, iccId);
+        if (lastIccId_ != u"" && lastIccId_ == iccId) {
+            EstablishAllApnsIfConnectable();
+        }
+    } else if (simState != SimState::SIM_STATE_LOADED) {
         isSimAccountLoaded_ = false;
+        isRilApnAttached_ = false;
         ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
         if (simState == SimState::SIM_STATE_NOT_PRESENT) {
             CellularDataNetAgent::GetInstance().UnregisterNetSupplierForSimUpdate(slotId_);
             ReleaseAllNetworkRequest();
             UnRegisterDataSettingObserver();
         }
-    } else {
-        std::u16string iccId;
-        CoreManagerInner::GetInstance().GetSimIccId(slotId_, iccId);
-        if (lastIccId_ != u"" && lastIccId_ == iccId) {
-            EstablishAllApnsIfConnectable();
-        }
     }
 }
 
-void CellularDataHandler::HandleSimStateOrRecordsChanged(const AppExecFwk::InnerEvent::Pointer &event)
+void CellularDataHandler::HandleRecordsChanged()
+{
+    std::u16string iccId;
+    CoreManagerInner::GetInstance().GetSimIccId(slotId_, iccId);
+    if (iccId == u"") {
+        TELEPHONY_LOGI("iccId nullptr");
+        return;
+    }
+    if (iccId != lastIccId_) {
+        if (dataSwitchSettings_ != nullptr) {
+            dataSwitchSettings_->SetPolicyDataOn(true);
+        }
+        lastIccId_ = iccId;
+    }
+    GetConfigurationFor5G();
+    CreateApnItem();
+    DataProfile dataProfile;
+    SetRilAttachApn(dataProfile);
+    ClearConnectionsOnUpdateApns(dataProfile, DisConnectionReason::REASON_CHANGE_CONNECTION);
+    EstablishAllApnsIfConnectable();
+}
+
+void CellularDataHandler::HandleRadioNvRefreshFinished()
+{
+    if (isRilApnAttached_) {
+        TELEPHONY_LOGI("Apn is alread attached");
+        return;
+    }
+    GetConfigurationFor5G();
+    CreateApnItem();
+    DataProfile dataProfile;
+    SetRilAttachApn(dataProfile);
+    ClearConnectionsOnUpdateApns(dataProfile, DisConnectionReason::REASON_CHANGE_CONNECTION);
+    EstablishAllApnsIfConnectable();
+}
+
+void CellularDataHandler::HandleSimEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
+        return;
+    }
+    auto slotId = event->GetParam();
+    if (slotId != slotId_) {
         return;
     }
     if (dataSwitchSettings_ != nullptr) {
         dataSwitchSettings_->LoadSwitchValue();
     }
-    switch (event->GetInnerEventId()) {
-        case RadioEvent::RADIO_SIM_STATE_CHANGE: {
+    auto eventId = event->GetInnerEventId();
+    TELEPHONY_LOGI("Slot%{public}d, event:%{public}d", slotId_, eventId);
+    switch (eventId) {
+        case RadioEvent::RADIO_SIM_STATE_CHANGE:
             HandleSimStateChanged();
             break;
-        }
-        case RadioEvent::RADIO_SIM_RECORDS_LOADED: {
-            std::u16string iccId;
-            CoreManagerInner::GetInstance().GetSimIccId(slotId_, iccId);
-            SimState simState = SimState::SIM_STATE_UNKNOWN;
-            CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
-            if (simState != SimState::SIM_STATE_READY || iccId == u"") {
-                TELEPHONY_LOGI("sim state error or iccId nullptr");
-                break;
-            }
-            if (iccId != lastIccId_) {
-                if (dataSwitchSettings_ != nullptr) {
-                    dataSwitchSettings_->SetPolicyDataOn(true);
-                }
-                lastIccId_ = iccId;
-            } else if (lastIccId_ == iccId) {
-                TELEPHONY_LOGI("Slot%{public}d: sim state changed, but iccId not changed.", slotId_);
-                // the sim card status has changed to ready, so try to connect
-                EstablishAllApnsIfConnectable();
-            }
+        case RadioEvent::RADIO_SIM_RECORDS_LOADED:
+            HandleRecordsChanged();
             break;
-        }
+        case RadioEvent::RADIO_NV_REFRESH_FINISHED:
+            HandleRadioNvRefreshFinished();
+            break;
+        case RadioEvent::RADIO_SIM_ACCOUNT_LOADED:
+            HandleSimAccountLoaded();
+            break;
         default:
             break;
     }
 }
 
-void CellularDataHandler::HandleSimAccountLoaded(const InnerEvent::Pointer &event)
+void CellularDataHandler::HandleSimAccountLoaded()
 {
-    if (event == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: event is null", slotId_);
-        return;
-    }
-    TELEPHONY_LOGI("Slot%{public}d", slotId_);
     if (isSimAccountLoaded_) {
         TELEPHONY_LOGE("Slot%{public}d has already loaded", slotId_);
         return;
     }
-    auto slotId = event->GetParam();
-    if (slotId == slotId_) {
-        isSimAccountLoaded_ = true;
-        ReleaseAllNetworkRequest();
-        ClearAllConnections(DisConnectionReason::REASON_CHANGE_CONNECTION);
-        CellularDataNetAgent::GetInstance().UnregisterNetSupplierForSimUpdate(slotId_);
-        if (!CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_)) {
-            TELEPHONY_LOGE("Slot%{public}d register supplierid fail", slotId_);
-            isSimAccountLoaded_ = false;
-        }
-        if (slotId_ == 0) {
-            CellularDataNetAgent::GetInstance().UnregisterPolicyCallback();
-            CellularDataNetAgent::GetInstance().RegisterPolicyCallback();
-        }
-        RegisterDataSettingObserver();
-        if (dataSwitchSettings_ != nullptr) {
-            dataSwitchSettings_->LoadSwitchValue();
-        }
-        GetConfigurationFor5G();
-        CreateApnItem();
+    isSimAccountLoaded_ = true;
+    CellularDataNetAgent::GetInstance().UnregisterNetSupplierForSimUpdate(slotId_);
+    if (!CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_)) {
+        TELEPHONY_LOGE("Slot%{public}d register supplierid fail", slotId_);
+        isSimAccountLoaded_ = false;
+    }
+    if (slotId_ == 0) {
+        CellularDataNetAgent::GetInstance().UnregisterPolicyCallback();
+        CellularDataNetAgent::GetInstance().RegisterPolicyCallback();
+    }
+    RegisterDataSettingObserver();
+    if (dataSwitchSettings_ != nullptr) {
+        dataSwitchSettings_->LoadSwitchValue();
     }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
@@ -1322,12 +1361,6 @@ void CellularDataHandler::CreateApnItem()
         if (result != 0) {
             break;
         }
-    }
-    if (result == 0) {
-        apnManager_->CreateAllApnItem();
-    }
-    if (result != 0) {
-        SetRilAttachApn();
     }
 }
 
@@ -1356,10 +1389,9 @@ void CellularDataHandler::HandleApnChanged(const InnerEvent::Pointer &event)
         return;
     }
     CreateApnItem();
-    ApnProfileState apnState = apnManager_->GetOverallApnState();
-    if (apnState == ApnProfileState::PROFILE_STATE_CONNECTING || apnState == ApnProfileState::PROFILE_STATE_CONNECTED) {
-        ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
-    }
+    DataProfile dataProfile;
+    SetRilAttachApn(dataProfile);
+    ClearConnectionsOnUpdateApns(dataProfile, DisConnectionReason::REASON_RETRY_CONNECTION);
     for (const sptr<ApnHolder> &apnHolder : apnManager_->GetAllApnHolder()) {
         if (apnHolder == nullptr) {
             continue;
@@ -1599,41 +1631,31 @@ bool CellularDataHandler::GetEsmFlagFromOpCfg()
     return (esmFlagFromOpCfg != 0);
 }
 
-void CellularDataHandler::SetInitApnWithNullDp()
+void CellularDataHandler::SetRilAttachApn(DataProfile &dataProfile)
 {
-    DataProfile dataProfile;
-    dataProfile.profileId = 0;
-    dataProfile.apn = "";
-    dataProfile.protocol = "";
-    dataProfile.verType = 0;
-    dataProfile.userName = "";
-    dataProfile.password = "";
-    dataProfile.roamingProtocol = "";
-    CoreManagerInner::GetInstance().SetInitApnInfo(
-        slotId_, CellularDataEventCode::MSG_SET_RIL_ATTACH_APN, dataProfile, shared_from_this());
-    return;
-}
-
-void CellularDataHandler::SetRilAttachApn()
-{
-    sptr<ApnItem> attachApn = apnManager_->GetRilAttachApn();
-    if (attachApn == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: attachApn is null", slotId_);
-        return;
-    }
     if (!GetEsmFlagFromOpCfg()) {
-        SetInitApnWithNullDp();
-        return;
+        dataProfile.profileId = 0;
+        dataProfile.apn = "";
+        dataProfile.protocol = "";
+        dataProfile.verType = 0;
+        dataProfile.userName = "";
+        dataProfile.password = "";
+        dataProfile.roamingProtocol = "";
+    } else {
+        sptr<ApnItem> attachApn = apnManager_->GetRilAttachApn();
+        if (attachApn == nullptr) {
+            TELEPHONY_LOGE("Slot%{public}d: attachApn is null", slotId_);
+            return;
+        }
+        dataProfile.profileId = attachApn->attr_.profileId_;
+        dataProfile.apn = attachApn->attr_.apn_;
+        dataProfile.protocol = attachApn->attr_.protocol_;
+        dataProfile.verType = attachApn->attr_.authType_;
+        dataProfile.userName = attachApn->attr_.user_;
+        dataProfile.password = attachApn->attr_.password_;
+        dataProfile.roamingProtocol = attachApn->attr_.roamingProtocol_;
     }
-    DataProfile dataProfile;
-    dataProfile.profileId = attachApn->attr_.profileId_;
-    dataProfile.apn = attachApn->attr_.apn_;
-    dataProfile.protocol = attachApn->attr_.protocol_;
-    dataProfile.verType = attachApn->attr_.authType_;
-    dataProfile.userName = attachApn->attr_.user_;
-    dataProfile.password = attachApn->attr_.password_;
-    dataProfile.roamingProtocol = attachApn->attr_.roamingProtocol_;
-    TELEPHONY_LOGI("DataProfile profileId = %{public}d", dataProfile.profileId);
+    TELEPHONY_LOGI("Slot%{public}d: DataProfile profileId = %{public}d", slotId_, dataProfile.profileId);
     CoreManagerInner::GetInstance().SetInitApnInfo(
         slotId_, CellularDataEventCode::MSG_SET_RIL_ATTACH_APN, dataProfile, shared_from_this());
 }
@@ -1652,6 +1674,8 @@ void CellularDataHandler::SetRilAttachApnResponse(const AppExecFwk::InnerEvent::
     if (rilInfo->errorNo != 0) {
         TELEPHONY_LOGE("Slot%{public}d: SetRilAttachApn error", slotId_);
     }
+    isRilApnAttached_ = (rilInfo->errorNo == 0);
+    TELEPHONY_LOGI("Slot%{public}d: isRilApnAttached_ = %{public}d", slotId_, isRilApnAttached_);
 }
 
 bool CellularDataHandler::HasAnyHigherPriorityConnection(const sptr<ApnHolder> &apnHolder)

@@ -215,5 +215,147 @@ HWTEST_F(CellularDataHandlerTest, HandleRoamingOff_002, Function | MediumTest | 
     auto event = AppExecFwk::InnerEvent::Get(0);
     cellularDataHandler->RoamingStateOff(event);
 }
+
+/**
+ * @tc.number   HandleSimEvent_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, HandleSimEvent_001, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    cellularDataHandler->Init();
+    AppExecFwk::InnerEvent::Pointer nullEvent(nullptr, nullptr);
+    cellularDataHandler->HandleSimEvent(nullEvent);
+    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_DATA_CALL_LIST_CHANGED, 0);
+    cellularDataHandler->HandleSimEvent(event);
+    EXPECT_NE(cellularDataHandler->connectionManager_, nullptr);
+    EXPECT_NE(cellularDataHandler->apnManager_, nullptr);
+}
+
+/**
+ * @tc.number   HandleSimEvent_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, HandleSimEvent_002, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    cellularDataHandler->Init();
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE, 1);
+    cellularDataHandler->HandleSimEvent(event);
+    EXPECT_NE(cellularDataHandler->slotId_, event->GetParam());
+}
+
+/**
+ * @tc.number   HandleSimEvent_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, HandleSimEvent_003, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    cellularDataHandler->Init();
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE, 0);
+    cellularDataHandler->HandleSimEvent(event);
+    EXPECT_EQ(event->GetInnerEventId(), RadioEvent::RADIO_SIM_STATE_CHANGE);
+}
+
+/**
+ * @tc.number   HandleSimEvent_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, HandleSimEvent_004, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    cellularDataHandler->Init();
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_RECORDS_LOADED, 0);
+    cellularDataHandler->HandleSimEvent(event);
+    EXPECT_EQ(event->GetInnerEventId(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
+}
+
+/**
+ * @tc.number   HandleSimEvent_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, HandleSimEvent_005, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    cellularDataHandler->Init();
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_NV_REFRESH_FINISHED, 0);
+    cellularDataHandler->HandleSimEvent(event);
+    EXPECT_EQ(event->GetInnerEventId(), RadioEvent::RADIO_NV_REFRESH_FINISHED);
+}
+
+/**
+ * @tc.number   HandleSimEvent_006
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, HandleSimEvent_006, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    cellularDataHandler->Init();
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_ACCOUNT_LOADED, 0);
+    cellularDataHandler->HandleSimEvent(event);
+    EXPECT_EQ(event->GetInnerEventId(), RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
+}
+
+/**
+ * @tc.number   ClearConnectionsOnUpdateApns_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, ClearConnectionsOnUpdateApns_001, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    cellularDataHandler->Init();
+    DataProfile dataProfile;
+    cellularDataHandler->ClearConnectionsOnUpdateApns(dataProfile, DisConnectionReason::REASON_RETRY_CONNECTION);
+    EXPECT_NE(cellularDataHandler->connectionManager_, nullptr);
+    EXPECT_NE(cellularDataHandler->apnManager_, nullptr);
+}
+
+/**
+ * @tc.number   ClearConnectionsOnUpdateApns_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, ClearConnectionsOnUpdateApns_002, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    cellularDataHandler->Init();
+    DataProfile dataProfile;
+    dataProfile.profileId = 1;
+    cellularDataHandler->ClearConnectionsOnUpdateApns(dataProfile, DisConnectionReason::REASON_RETRY_CONNECTION);
+    EXPECT_NE(cellularDataHandler->connectionManager_, nullptr);
+    EXPECT_NE(cellularDataHandler->apnManager_, nullptr);
+}
 } // namespace Telephony
 } // namespace OHOS

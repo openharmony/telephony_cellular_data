@@ -34,7 +34,6 @@ public:
     sptr<ApnHolder> GetApnHolder(const std::string &apnType) const;
     std::vector<sptr<ApnHolder>> GetAllApnHolder() const;
     std::vector<sptr<ApnHolder>> GetSortApnHolder() const;
-    void CreateAllApnItem();
     std::vector<sptr<ApnItem>> FilterMatchedApns(const std::string &requestApnType, const int32_t slotId);
     void InitApnHolders();
     sptr<ApnHolder> FindApnHolderById(const int32_t id) const;

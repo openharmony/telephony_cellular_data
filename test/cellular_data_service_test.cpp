@@ -26,7 +26,6 @@
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
-const int32_t DEFAULT_SIM_SLOT_ID = 0;
 
 class CellularDataServiceTest : public testing::Test {
 public:

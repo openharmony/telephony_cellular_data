@@ -227,48 +227,6 @@ std::vector<sptr<ApnHolder>> ApnManager::GetSortApnHolder() const
     return sortedApnHolders_;
 }
 
-void ApnManager::CreateAllApnItem()
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    allApnItem_.clear();
-    sptr<ApnItem> defaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
-    if (defaultApnItem != nullptr) {
-        allApnItem_.push_back(defaultApnItem);
-    }
-    sptr<ApnItem> mmsApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_MMS);
-    if (mmsApnItem != nullptr) {
-        allApnItem_.push_back(mmsApnItem);
-    }
-    sptr<ApnItem> suplApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_SUPL);
-    if (suplApnItem != nullptr) {
-        allApnItem_.push_back(suplApnItem);
-    }
-    sptr<ApnItem> dunApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DUN);
-    if (dunApnItem != nullptr) {
-        allApnItem_.push_back(dunApnItem);
-    }
-    sptr<ApnItem> imsApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_IMS);
-    if (imsApnItem != nullptr) {
-        allApnItem_.push_back(imsApnItem);
-    }
-    sptr<ApnItem> iaApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_IA);
-    if (iaApnItem != nullptr) {
-        allApnItem_.push_back(iaApnItem);
-    }
-    sptr<ApnItem> emergencyApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_EMERGENCY);
-    if (emergencyApnItem != nullptr) {
-        allApnItem_.push_back(emergencyApnItem);
-    }
-    auto internalDefaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_INTERNAL_DEFAULT);
-    if (internalDefaultApnItem != nullptr) {
-        allApnItem_.push_back(internalDefaultApnItem);
-    }
-    auto xcapApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_XCAP);
-    if (xcapApnItem != nullptr) {
-        allApnItem_.push_back(xcapApnItem);
-    }
-}
-
 int32_t ApnManager::CreateAllApnItemByDatabase(int32_t slotId)
 {
     int32_t count = 0;
