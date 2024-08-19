@@ -125,7 +125,7 @@ bool CellularDataHandler::AddUid(const NetRequest &request)
     int32_t id = ApnManager::FindApnIdByCapability(netRequest->capability);
 
     if (!apnManager_) {
-        TELEPHONY_LOGE("apnManager_ is nullptr")
+        TELEPHONY_LOGE("apnManager_ is nullptr");
         return false;
     }
 
@@ -148,7 +148,7 @@ bool CellularDataHandler::RemoveUid(const NetRequest &request)
     int32_t id = ApnManager::FindApnIdByCapability(netRequest->capability);
 
     if (!apnManager_) {
-        TELEPHONY_LOGE("apnManager_ is nullptr")
+        TELEPHONY_LOGE("apnManager_ is nullptr");
         return false;
     }
 
@@ -2261,7 +2261,7 @@ void CellularDataHandler::ReleaseCellularDataConnection()
 {
     int32_t id = ApnManager::FindApnIdByCapability(OHOS::NetManagerStandard::NET_CAPABILITY_INTERNET);
     if (!apnManager_) {
-        TELEPHONY_LOGE("apnManager_ is nullptr")
+        TELEPHONY_LOGE("apnManager_ is nullptr");
         return;
     } 
     OHOS::sptr<ApnHolder> apnHolder = apnManager_->FindApnHolderById(id);

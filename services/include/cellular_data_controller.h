@@ -57,10 +57,11 @@ public:
     bool EstablishAllApnsIfConnectable() const;
     bool AddUid(const NetRequest &request);
     bool RemoveUid(const NetRequest &request);
+    bool ReleaseCellularDataConnection() const;
+
 private:
     void RegisterEvents();
     void UnRegisterEvents();
-    bool ReleaseCellularDataConnection() const;
 
 private:
     std::shared_ptr<CellularDataHandler> cellularDataHandler_;
