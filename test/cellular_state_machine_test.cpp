@@ -2102,5 +2102,43 @@ HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_GetMtuSizeFromOpCfg_
     cellularMachine->GetMtuSizeFromOpCfg(mtuSize, slotId);
     ASSERT_EQ(mtuSize, 0);
 }
+
+/**
+ * @tc.number   CellularDataStateMachine_GetNetScoreBySlotId_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_GetNetScoreBySlotId_001, TestSize.Level0)
+{
+    int32_t score;
+    int32_t slotId = 0;
+    std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
+    EXPECT_CALL(*mockSimManager, GetDefaultCellularDataSlotId()).Times(AtLeast(1))
+        .WillOnce([]() {
+            return 0;
+        });
+    score = cellularMachine->GetNetScoreBySlotId(slotId);
+    ASSERT_EQ(score, DEFAULT_INTERNET_CONNECTION_SCORE);
+}
+
+/**
+ * @tc.number   CellularDataStateMachine_GetNetScoreBySlotId_002
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_GetNetScoreBySlotId_002, TestSize.Level0)
+{
+    int32_t score;
+    int32_t slotId = 0;
+    std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
+    EXPECT_CALL(*mockSimManager, GetDefaultCellularDataSlotId()).Times(AtLeast(1))
+        .WillOnce([]() {
+            return 1;
+        });
+    score = cellularMachine->GetNetScoreBySlotId(slotId);
+    ASSERT_EQ(score, OTHER_CONNECTION_SCORE);
+}
 } // namespace Telephony
 } // namespace OHOS

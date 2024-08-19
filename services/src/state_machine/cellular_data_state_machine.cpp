@@ -301,6 +301,16 @@ void CellularDataStateMachine::UpdateHttpProxy(const std::string &proxyIpAddress
     netLinkInfo_->httpProxy_ = httpProxy;
 }
 
+int32_t CellularDataStateMachine::GetNetScoreBySlotId(int32_t slotId)
+{
+    int32_t score = DEFAULT_INTERNET_CONNECTION_SCORE;
+    int32_t defaultSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
+    if (slotId != defaultSlotId) {
+        score = OTHER_CONNECTION_SCORE;
+    }
+    return score;
+}
+
 void CellularDataStateMachine::UpdateNetworkInfo(const SetupDataCallResultInfo &dataCallInfo)
 {
     std::lock_guard<std::mutex> guard(mtx_);
@@ -337,6 +347,7 @@ void CellularDataStateMachine::UpdateNetworkInfo(const SetupDataCallResultInfo &
     netSupplierInfo_->isRoaming_ = roamingState;
     netSupplierInfo_->linkUpBandwidthKbps_ = upBandwidth_;
     netSupplierInfo_->linkDownBandwidthKbps_ = downBandwidth_;
+    netSupplierInfo_->score_ = GetNetScoreBySlotId(slotId);
     cause_ = dataCallInfo.reason;
     CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
     int32_t supplierId = netAgent.GetSupplierId(slotId, capability_);
@@ -354,6 +365,7 @@ void CellularDataStateMachine::UpdateNetworkInfo()
     netLinkInfo_->tcpBufferSizes_ = tcpBuffer_;
     netSupplierInfo_->linkUpBandwidthKbps_ = upBandwidth_;
     netSupplierInfo_->linkDownBandwidthKbps_ = downBandwidth_;
+    netSupplierInfo_->score_ = GetNetScoreBySlotId(slotId);
     int32_t supplierId = netAgent.GetSupplierId(slotId, capability_);
     netAgent.UpdateNetSupplierInfo(supplierId, netSupplierInfo_);
     if (netSupplierInfo_->isAvailable_) {
