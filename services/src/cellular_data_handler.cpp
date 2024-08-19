@@ -114,15 +114,7 @@ bool CellularDataHandler::RequestNet(const NetRequest &request)
 
 bool CellularDataHandler::AddUid(const NetRequest &request)
 {
-    std::unique_ptr<NetRequest> netRequest = std::make_unique<NetRequest>();
-    if (netRequest == nullptr) {
-        TELEPHONY_LOGE("Netrequest is null");
-        return false;
-    }
-
-    netRequest->capability = ApnManager::FindBestCapability(request.capability);
-    netRequest->ident = request.ident;
-    int32_t id = ApnManager::FindApnIdByCapability(netRequest->capability);
+    int32_t id = ApnManager::FindApnIdByCapability(ApnManager::FindBestCapability(request.capability));
 
     if (!apnManager_) {
         TELEPHONY_LOGE("apnManager_ is nullptr");
@@ -137,15 +129,7 @@ bool CellularDataHandler::AddUid(const NetRequest &request)
 
 bool CellularDataHandler::RemoveUid(const NetRequest &request)
 {
-    std::unique_ptr<NetRequest> netRequest = std::make_unique<NetRequest>();
-    if (netRequest == nullptr) {
-        TELEPHONY_LOGE("Netrequest is null");
-        return false;
-    }
-
-    netRequest->capability = ApnManager::FindBestCapability(request.capability);
-    netRequest->ident = request.ident;
-    int32_t id = ApnManager::FindApnIdByCapability(netRequest->capability);
+    int32_t id = ApnManager::FindApnIdByCapability(ApnManager::FindBestCapability(request.capability));
 
     if (!apnManager_) {
         TELEPHONY_LOGE("apnManager_ is nullptr");

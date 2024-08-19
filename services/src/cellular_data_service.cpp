@@ -365,11 +365,6 @@ int32_t CellularDataService::ReleaseNet(const NetRequest &request)
 
 int32_t CellularDataService::RemoveUid(const NetRequest &request)
 {
-    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
-        TELEPHONY_LOGE("Permission denied!");
-        return TELEPHONY_ERR_PERMISSION_ERR;
-    }
-
     std::string requestIdent = request.ident.substr(strlen(IDENT_PREFIX));
     if (!IsValidDecValue(requestIdent)) {
         return CELLULAR_DATA_INVALID_PARAM;
@@ -386,11 +381,6 @@ int32_t CellularDataService::RemoveUid(const NetRequest &request)
 
 int32_t CellularDataService::AddUid(const NetRequest &request)
 {
-    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
-        TELEPHONY_LOGE("Permission denied!");
-        return TELEPHONY_ERR_PERMISSION_ERR;
-    }
-
     std::string requestIdent = request.ident.substr(strlen(IDENT_PREFIX));
     if (!IsValidDecValue(requestIdent)) {
         return CELLULAR_DATA_INVALID_PARAM;

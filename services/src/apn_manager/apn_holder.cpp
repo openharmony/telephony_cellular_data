@@ -62,7 +62,7 @@ sptr<ApnItem> ApnHolder::GetCurrentApn() const
     return apnItem_;
 }
 
-void ApnHolder::AddUid(const int32_t uid)
+void ApnHolder::AddUid(uint32_t uid)
 {
     if (reqUids_.find(uid) != reqUids_.end()) {
         return;
@@ -70,7 +70,7 @@ void ApnHolder::AddUid(const int32_t uid)
     reqUids_.insert(uid);
 }
 
-void ApnHolder::RemoveUid(const int32_t uid)
+void ApnHolder::RemoveUid(uint32_t uid)
 {
     auto it = reqUids_.find(uid);
     if (it != reqUids_.end()) {

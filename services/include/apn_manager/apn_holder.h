@@ -62,8 +62,8 @@ public:
     bool IsSameMatchedApns(std::vector<sptr<ApnItem>> newMatchedApns, bool roamingState);
     bool IsSameApnItem(const sptr<ApnItem> &newApnItem, const sptr<ApnItem> &oldApnItem, bool roamingState);
     bool IsCompatibleApnItem(const sptr<ApnItem> &newApnItem, const sptr<ApnItem> &oldApnItem, bool roamingState);
-    void AddUid(int32_t uid);
-    void RemoveUid(int32_t uid);
+    void AddUid(uint32_t uid);
+    void RemoveUid(uint32_t uid);
     HasSystemUse GetUidStatus() const;
 
 private:
@@ -81,7 +81,7 @@ private:
     int32_t priority_;
     std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine_;
     std::vector<NetRequest> netRequests_;
-    std::set<int32_t> reqUids_;
+    std::set<uint32_t> reqUids_;
 };
 } // namespace Telephony
 } // namespace OHOS
