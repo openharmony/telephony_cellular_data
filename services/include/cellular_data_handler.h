@@ -46,6 +46,8 @@ public:
     void Init();
     bool ReleaseNet(const NetRequest &request);
     bool RequestNet(const NetRequest &request);
+    bool AddUid(const NetRequest &request);
+    bool RemoveUid(const NetRequest &request);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
     int32_t SetCellularDataEnable(bool userDataEnabled);
@@ -77,6 +79,7 @@ public:
     void UnRegisterDataSettingObserver();
     int32_t GetIntelligenceSwitchState(bool &switchState);
     void HandleUpdateNetInfo(const AppExecFwk::InnerEvent::Pointer &event);
+    void ReleaseCellularDataConnection();
 
 private:
     std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect();

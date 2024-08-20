@@ -71,6 +71,8 @@ public:
     int32_t StrategySwitch(int32_t slotId, bool enable);
     int32_t RequestNet(const NetRequest &request);
     int32_t ReleaseNet(const NetRequest &request);
+    int32_t AddUid(const NetRequest &request);
+    int32_t RemoveUid(const NetRequest &request);
     int32_t GetServiceRunningState();
     int64_t GetSpendTime();
     int32_t GetApnState(int32_t slotId, const std::string &apnType) override;
@@ -84,6 +86,7 @@ public:
     int32_t InitCellularDataController(int32_t slotId) override;
     int32_t GetIntelligenceSwitchState(bool &switchState) override;
     int32_t EstablishAllApnsIfConnectable(int32_t slotId) override;
+    int32_t ReleaseCellularDataConnection(int32_t slotId) override;
 
 private:
     bool Init();

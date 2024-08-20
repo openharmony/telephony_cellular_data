@@ -400,5 +400,20 @@ int32_t CellularDataServiceStub::OnEstablishAllApnsIfConnectable(MessageParcel &
     return result;
 }
 
+int32_t CellularDataServiceStub::OnReleaseCellularDataConnection(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId;
+    if (!data.ReadInt32(slotId)) {
+        TELEPHONY_LOGE("write int32 slotId failed.");
+        return TELEPHONY_ERR_READ_DATA_FAIL;
+    }
+    int32_t result = ReleaseCellularDataConnection(slotId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("write int32 reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
 } // namespace Telephony
 } // namespace OHOS

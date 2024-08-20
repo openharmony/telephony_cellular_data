@@ -21,27 +21,9 @@
 #include "apn_manager.h"
 namespace OHOS {
 namespace Telephony {
-#ifdef __cplusplus
-extern "C" {
-#endif
-void ReleaseAllCellularDataForInternet()
-{
-    using namespace OHOS::Telephony;
-    OHOS::sptr<ApnManager> apnManager = std::make_unique<ApnManager>().release();
-    if (!apnManager) {
-        TELEPHONY_LOGE("Get Apn manager failed");
-        return;
-    }
-    apnManager->InitApnHolders();
-    int32_t id = ApnManager::FindApnIdByCapability(OHOS::NetManagerStandard::NET_CAPABILITY_INTERNET);
-    OHOS::sptr<ApnHolder> apnHolder = apnManager->FindApnHolderById(id);
-    apnHolder->ReleaseAllCellularData();
-    TELEPHONY_LOGI("Release all cellular data");
+namespace {
+    constexpr int32_t SYSTEM_UID = 1e4;
 }
-#ifdef __cplusplus
-}
-#endif
-
 const std::map<std::string, int32_t> ApnHolder::apnTypeDataProfileMap_ {
     {DATA_CONTEXT_ROLE_DEFAULT, DATA_PROFILE_DEFAULT},
     {DATA_CONTEXT_ROLE_MMS, DATA_PROFILE_MMS},
@@ -78,6 +60,23 @@ void ApnHolder::SetCurrentApn(sptr<ApnItem> &apnItem)
 sptr<ApnItem> ApnHolder::GetCurrentApn() const
 {
     return apnItem_;
+}
+
+void ApnHolder::AddUid(uint32_t uid)
+{
+    if (reqUids_.find(uid) != reqUids_.end()) {
+        return;
+    }
+    reqUids_.insert(uid);
+}
+
+void ApnHolder::RemoveUid(uint32_t uid)
+{
+    auto it = reqUids_.find(uid);
+    if (it != reqUids_.end()) {
+        reqUids_.erase(it);
+        return;
+    }
 }
 
 void ApnHolder::SetApnState(ApnProfileState state)
@@ -152,6 +151,16 @@ uint64_t ApnHolder::GetCapability() const
 int32_t ApnHolder::GetPriority() const
 {
     return priority_;
+}
+
+HasSystemUse ApnHolder::GetUidStatus() const
+{
+    for (auto item : reqUids_) {
+        if (item < SYSTEM_UID) {
+            return HasSystemUse::HAS;
+        }
+    }
+    return HasSystemUse::NOT_HAS;
 }
 
 void ApnHolder::RequestCellularData(const NetRequest &netRequest)
