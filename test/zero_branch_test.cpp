@@ -506,10 +506,18 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_009, Function | MediumTest | 
     apn->SetCellularDataStateMachine(stateMachine);
     DisConnectionReason reason = controller.cellularDataHandler_->GetDisConnectionReason();
     ASSERT_FALSE(apn->GetCellularDataStateMachine() == nullptr);
+    ASSERT_EQ(apn->GetApnState(), PROFILE_STATE_IDLE);
+    controller.cellularDataHandler_->ClearConnection(apn, reason);
+    ASSERT_FALSE(apn->GetCellularDataStateMachine() == nullptr);
+    apn->SetApnState(PROFILE_STATE_DISCONNECTING);
+    controller.cellularDataHandler_->ClearConnection(apn, reason);
+    ASSERT_FALSE(apn->GetCellularDataStateMachine() == nullptr);
+    
+    apn->SetApnState(PROFILE_STATE_CONNECTED);
     controller.cellularDataHandler_->ClearConnection(apn, reason);
     ASSERT_TRUE(apn->GetCellularDataStateMachine() == nullptr);
-
     ASSERT_EQ(apn->GetApnState(), PROFILE_STATE_DISCONNECTING);
+
     apn->SetApnState(PROFILE_STATE_CONNECTED);
     controller.cellularDataHandler_->ClearAllConnections(reason);
     apn->SetApnState(PROFILE_STATE_CONNECTING);
@@ -560,7 +568,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_010, Function | MediumTest | 
     apn3->SetCellularDataStateMachine(stateMachine);
     ASSERT_EQ(controller.cellularDataHandler_->GetCellularDataState(), PROFILE_STATE_IDLE);
     controller.cellularDataHandler_->PsRadioEmergencyStateClose(event);
-    ASSERT_EQ(apn3->GetApnState(), PROFILE_STATE_IDLE);
+    ASSERT_EQ(apn3->GetApnState(), PROFILE_STATE_DISCONNECTING);
     ASSERT_TRUE(apn3->GetCellularDataStateMachine() == nullptr);
 
     ASSERT_EQ(controller.cellularDataHandler_->GetCellularDataState("default"), PROFILE_STATE_IDLE);
