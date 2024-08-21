@@ -179,6 +179,7 @@ private:
     bool defaultDataRoamingEnable_ = false;
     bool isSimAccountLoaded_ = false;
     bool isRilApnAttached_ = false;
+    std::mutex mtx_;
     std::vector<std::string> upLinkThresholds_;
     std::vector<std::string> downLinkThresholds_;
     sptr<CellularDataSettingObserver> settingObserver_;
