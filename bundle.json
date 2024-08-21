@@ -62,7 +62,8 @@
                 ],
                 "service_group": [
                     "//base/telephony/cellular_data:tel_cellular_data",
-                    "//base/telephony/cellular_data/sa_profile:cellular_data_sa_profile"
+                    "//base/telephony/cellular_data/sa_profile:cellular_data_sa_profile",
+                    "//base/telephony/cellular_data/frameworks/cj:cj_cellular_data_ffi"
                 ]
             },
             "inner_kits": [
