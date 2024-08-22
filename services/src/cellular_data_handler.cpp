@@ -1926,6 +1926,7 @@ void CellularDataHandler::HandleRadioNrFrequencyChanged(const AppExecFwk::InnerE
 
 void CellularDataHandler::GetDefaultUpLinkThresholdsConfig()
 {
+    std::lock_guard<std::mutex> guard(mtx_);
     upLinkThresholds_.clear();
     char upLinkConfig[UP_DOWN_LINK_SIZE] = { 0 };
     GetParameter(CONFIG_UPLINK_THRESHOLDS, CAPACITY_THRESHOLDS_FOR_UPLINK, upLinkConfig, UP_DOWN_LINK_SIZE);
@@ -1935,6 +1936,7 @@ void CellularDataHandler::GetDefaultUpLinkThresholdsConfig()
 
 void CellularDataHandler::GetDefaultDownLinkThresholdsConfig()
 {
+    std::lock_guard<std::mutex> guard(mtx_);
     downLinkThresholds_.clear();
     char downLinkConfig[UP_DOWN_LINK_SIZE] = { 0 };
     GetParameter(CONFIG_DOWNLINK_THRESHOLDS, CAPACITY_THRESHOLDS_FOR_DOWNLINK, downLinkConfig, UP_DOWN_LINK_SIZE);
@@ -1944,6 +1946,7 @@ void CellularDataHandler::GetDefaultDownLinkThresholdsConfig()
 
 void CellularDataHandler::SetRilLinkBandwidths()
 {
+    std::lock_guard<std::mutex> guard(mtx_);
     LinkBandwidthRule linkBandwidth;
     CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, linkBandwidth.rat);
     linkBandwidth.delayMs = DELAY_SET_RIL_BANDWIDTH_MS;
