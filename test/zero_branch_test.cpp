@@ -64,7 +64,6 @@ const int32_t INVALID_SLOTID = -1;
 const int32_t INVALID_SLOTID_TWO = 5;
 const int32_t INVALID_CID = -1;
 const int32_t INVALID_FD = -1;
-const int32_t DEFAULT_SIM_SLOT_ID = 0;
 const int32_t SLEEP_TIME_SECONDS = 3;
 const std::string ADDRESS = "127.0.0.1";
 const std::string FLAG = ".";
@@ -222,8 +221,8 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | 
     cellularDataHandler.HandleCallChanged(0);
     cellularDataHandler.HandleImsCallChanged(0);
     cellularDataHandler.HandleVoiceCallChanged(0);
-    cellularDataHandler.HandleSimStateOrRecordsChanged(event);
-    cellularDataHandler.HandleSimAccountLoaded(event);
+    cellularDataHandler.HandleSimEvent(event);
+    cellularDataHandler.HandleSimAccountLoaded();
     cellularDataHandler.HandleRadioStateChanged(event);
     cellularDataHandler.HandleDsdsModeChanged(event);
     cellularDataHandler.SetRilAttachApnResponse(event);
@@ -372,8 +371,8 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_005, Function | MediumTest | 
     controller.cellularDataHandler_->HandleCallChanged(0);
     controller.cellularDataHandler_->HandleImsCallChanged(0);
     controller.cellularDataHandler_->HandleVoiceCallChanged(0);
-    controller.cellularDataHandler_->HandleSimStateOrRecordsChanged(event);
-    controller.cellularDataHandler_->HandleSimAccountLoaded(event);
+    controller.cellularDataHandler_->HandleSimEvent(event);
+    controller.cellularDataHandler_->HandleSimAccountLoaded();
     controller.cellularDataHandler_->HandleRadioStateChanged(event);
     controller.cellularDataHandler_->HandleDsdsModeChanged(event);
     controller.cellularDataHandler_->SetRilAttachApnResponse(event);
@@ -507,10 +506,18 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_009, Function | MediumTest | 
     apn->SetCellularDataStateMachine(stateMachine);
     DisConnectionReason reason = controller.cellularDataHandler_->GetDisConnectionReason();
     ASSERT_FALSE(apn->GetCellularDataStateMachine() == nullptr);
+    ASSERT_EQ(apn->GetApnState(), PROFILE_STATE_IDLE);
+    controller.cellularDataHandler_->ClearConnection(apn, reason);
+    ASSERT_FALSE(apn->GetCellularDataStateMachine() == nullptr);
+    apn->SetApnState(PROFILE_STATE_DISCONNECTING);
+    controller.cellularDataHandler_->ClearConnection(apn, reason);
+    ASSERT_FALSE(apn->GetCellularDataStateMachine() == nullptr);
+    
+    apn->SetApnState(PROFILE_STATE_CONNECTED);
     controller.cellularDataHandler_->ClearConnection(apn, reason);
     ASSERT_TRUE(apn->GetCellularDataStateMachine() == nullptr);
-
     ASSERT_EQ(apn->GetApnState(), PROFILE_STATE_DISCONNECTING);
+
     apn->SetApnState(PROFILE_STATE_CONNECTED);
     controller.cellularDataHandler_->ClearAllConnections(reason);
     apn->SetApnState(PROFILE_STATE_CONNECTING);
@@ -561,7 +568,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_010, Function | MediumTest | 
     apn3->SetCellularDataStateMachine(stateMachine);
     ASSERT_EQ(controller.cellularDataHandler_->GetCellularDataState(), PROFILE_STATE_IDLE);
     controller.cellularDataHandler_->PsRadioEmergencyStateClose(event);
-    ASSERT_EQ(apn3->GetApnState(), PROFILE_STATE_IDLE);
+    ASSERT_EQ(apn3->GetApnState(), PROFILE_STATE_DISCONNECTING);
     ASSERT_TRUE(apn3->GetCellularDataStateMachine() == nullptr);
 
     ASSERT_EQ(controller.cellularDataHandler_->GetCellularDataState("default"), PROFILE_STATE_IDLE);
@@ -1416,7 +1423,6 @@ HWTEST_F(BranchTest, Default_Test_01, Function | MediumTest | Level3)
 HWTEST_F(BranchTest, ApnManager_Test_01, Function | MediumTest | Level3)
 {
     auto apnManager = std::make_shared<ApnManager>();
-    apnManager->CreateAllApnItem();
     EXPECT_GE(apnManager->CreateAllApnItemByDatabase(0), 0);
     EXPECT_EQ(apnManager->CreateAllApnItemByDatabase(0), 0);
     apnManager->ResetApns(0);

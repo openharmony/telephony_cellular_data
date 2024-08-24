@@ -25,6 +25,7 @@
 #include "cellular_data_setting_observer.h"
 #include "cellular_data_rdb_observer.h"
 #include "cellular_data_roaming_observer.h"
+#include "cellular_data_settings_rdb_helper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -63,7 +64,14 @@ HWTEST_F(CellularDataObserverTest, CellularDataIncallObserver_01, Function | Med
     cellularDataIncallObserver->OnChange();
     ASSERT_TRUE(cellularDataHandler == nullptr);
 
-    // cellularDataHandler is not nullptr
+    // GetValue success, cellularDataHandler is nullptr
+    std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
+    Uri uri(CELLULAR_DATA_SETTING_DATA_INCALL_URI);
+    ASSERT_TRUE(settingHelper->PutValue(uri, CELLULAR_DATA_COLUMN_INCALL, 1) == TELEPHONY_ERR_SUCCESS);
+    cellularDataIncallObserver->OnChange();
+    ASSERT_TRUE(cellularDataHandler == nullptr);
+
+    // GetValue success, cellularDataHandler is not nullptr
     cellularDataHandler = CellularDataObserverTest::createCellularDataHandler();
     cellularDataIncallObserver = std::make_shared<CellularDataIncallObserver>(cellularDataHandler);
     cellularDataIncallObserver->OnChange();
@@ -101,7 +109,20 @@ HWTEST_F(CellularDataObserverTest, CellularDataRoamingObserver_03, Function | Me
     cellularDataRoamingObserver->OnChange();
     ASSERT_TRUE(cellularDataHandler == nullptr);
 
-    // get sim id success, cellularDataHandler is not nullptr
+    // get sim id success, GetValue failed
+    EXPECT_CALL(*mockSimManager, GetSimId(_)).WillOnce(Return(1));
+    cellularDataRoamingObserver->OnChange();
+    ASSERT_TRUE(cellularDataHandler == nullptr);
+
+    // get sim id success, GetValue success, cellularDataHandler is nullptr
+    EXPECT_CALL(*mockSimManager, GetSimId(_)).WillOnce(Return(1));
+    std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
+    Uri uri(std::string(CELLULAR_DATA_SETTING_DATA_ROAMING_URI) + std::to_string(1));
+    ASSERT_TRUE(settingHelper->PutValue(uri, CELLULAR_DATA_COLUMN_ROAMING, 1) == TELEPHONY_ERR_SUCCESS);
+    cellularDataRoamingObserver->OnChange();
+    ASSERT_TRUE(cellularDataHandler == nullptr);
+
+    // get sim id success, GetValue success, cellularDataHandler is nullptr
     EXPECT_CALL(*mockSimManager, GetSimId(_)).WillOnce(Return(1));
     cellularDataHandler = CellularDataObserverTest::createCellularDataHandler();
     cellularDataRoamingObserver = std::make_shared<CellularDataRoamingObserver>(cellularDataHandler, 0);
@@ -118,7 +139,14 @@ HWTEST_F(CellularDataObserverTest, CellularDataSettingObserver_04, Function | Me
     cellularDataSettingObserver->OnChange();
     ASSERT_TRUE(cellularDataHandler == nullptr);
 
-    // cellularDataHandler is not nullptr
+    // GetValue success, cellularDataHandler is nullptr
+    std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
+    Uri uri(CELLULAR_DATA_SETTING_DATA_ENABLE_URI);
+    ASSERT_TRUE(settingHelper->PutValue(uri, CELLULAR_DATA_COLUMN_ENABLE, 1) == TELEPHONY_ERR_SUCCESS);
+    cellularDataSettingObserver->OnChange();
+    ASSERT_TRUE(cellularDataHandler == nullptr);
+
+    // GetValue success, cellularDataHandler is not nullptr
     cellularDataHandler = CellularDataObserverTest::createCellularDataHandler();
     cellularDataSettingObserver = std::make_shared<CellularDataSettingObserver>(cellularDataHandler);
     cellularDataSettingObserver->OnChange();

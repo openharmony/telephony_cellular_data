@@ -29,7 +29,6 @@ namespace Telephony {
 using namespace testing::ext;
 using ::testing::_;
 using ::testing::DoAll;
-using ::testing::Invoke;
 using ::testing::Mock;
 using ::testing::Return;
 using ::testing::SetArgReferee;
@@ -74,11 +73,15 @@ public:
 
 HWTEST_F(TrafficManagementTest, TrafficManagementTest_001, Function | MediumTest | Level1)
 {
+    EXPECT_CALL(*mockSimManager, GetSimId(_)).WillOnce(Return(1));
+    EXPECT_CALL(*mockNetConnService, GetNetIdByIdentifier(_, _)).WillOnce(Return(1));
+    trafficManagement->UpdatePacketData();
+
+    EXPECT_CALL(*mockSimManager, GetSimId(_)).WillOnce(Return(1));
+    EXPECT_CALL(*mockNetConnService, GetNetIdByIdentifier(_, _)).WillOnce(Return(1));
     std::string ifaceName = trafficManagement->GetIfaceName();
     std::cout << "TrafficManagementTest_001 interface name:" << ifaceName << std::endl;
     ASSERT_TRUE(ifaceName.empty());
-
-    trafficManagement->UpdatePacketData();
 }
 
 HWTEST_F(TrafficManagementTest, TrafficManagementTest_002, Function | MediumTest | Level1)
@@ -94,15 +97,10 @@ HWTEST_F(TrafficManagementTest, TrafficManagementTest_002, Function | MediumTest
 
 HWTEST_F(TrafficManagementTest, TrafficManagementTest_003, Function | MediumTest | Level1)
 {
-    // get sim id failed
-    EXPECT_CALL(*mockSimManager, GetSimId(_)).WillOnce(Return(1));
-    std::string ifaceName = trafficManagement->GetIfaceName();
-    ASSERT_EQ(ifaceName, "");
-
     // get net id failed
     EXPECT_CALL(*mockSimManager, GetSimId(_)).WillOnce(Return(0));
     EXPECT_CALL(*mockNetConnService, GetNetIdByIdentifier(_, _)).WillOnce(Return(1));
-    ifaceName = trafficManagement->GetIfaceName();
+    std::string ifaceName = trafficManagement->GetIfaceName();
     ASSERT_EQ(ifaceName, "");
 
     // get all nets failed

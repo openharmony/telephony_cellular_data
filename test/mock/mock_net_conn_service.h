@@ -99,6 +99,7 @@ public:
     MOCK_METHOD(int32_t, EnableDistributedServerNet,
         (const std::string &iif, const std::string &devIface, const std::string &dstAddr));
     MOCK_METHOD(int32_t, DisableDistributedNet, (bool isServer));
+    MOCK_METHOD(int32_t, CloseSocketsUid, (int32_t netId, uint32_t uid));
 };
 
 }  // namespace NetManagerStandard

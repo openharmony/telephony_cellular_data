@@ -36,6 +36,7 @@
 #include "tel_event_handler.h"
 #include "tel_profile_util.h"
 #include "tel_ril_data_parcel.h"
+#include "telephony_types.h"
 namespace OHOS {
 namespace Telephony {
 class CellularDataHandler : public TelEventHandler, public EventFwk::CommonEventSubscriber {
@@ -59,6 +60,7 @@ public:
     void ClearConnection(const sptr<ApnHolder> &apnHolder, DisConnectionReason reason);
     void EstablishAllApnsIfConnectable();
     void ClearAllConnections(DisConnectionReason reason);
+    void ClearConnectionsOnUpdateApns(const DataProfile &dataProfile, DisConnectionReason reason);
     bool ChangeConnectionForDsds(bool enable);
     int32_t GetSlotId() const;
     bool HandleApnChanged();
@@ -71,7 +73,7 @@ public:
     void GetDataConnApnAttr(ApnItem::Attribute &apnAttr) const;
     std::string GetDataConnIpType() const;
     int32_t GetDataRecoveryState();
-    void SetRilAttachApn();
+    void SetRilAttachApn(DataProfile &dataProfile);
     void IsNeedDoRecovery(bool needDoRecovery) const;
     void RegisterDataSettingObserver();
     void UnRegisterDataSettingObserver();
@@ -102,9 +104,11 @@ private:
     void HandleVoiceCallChanged(int32_t state);
     void HandleDefaultDataSubscriptionChanged();
     void HandleSimStateChanged();
+    void HandleRecordsChanged();
+    void HandleRadioNvRefreshFinished();
     void HandleDsdsModeChanged(const AppExecFwk::InnerEvent::Pointer &event);
-    void HandleSimStateOrRecordsChanged(const AppExecFwk::InnerEvent::Pointer &event);
-    void HandleSimAccountLoaded(const AppExecFwk::InnerEvent::Pointer &event);
+    void HandleSimEvent(const AppExecFwk::InnerEvent::Pointer &event);
+    void HandleSimAccountLoaded();
     void HandleRadioStateChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void PsDataRatChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void SetRilAttachApnResponse(const AppExecFwk::InnerEvent::Pointer &event);
@@ -134,7 +138,6 @@ private:
     void ClearConnectionIfRequired();
     void ReleaseAllNetworkRequest();
     bool GetEsmFlagFromOpCfg();
-    void SetInitApnWithNullDp();
     void GetSinglePdpEnabledFromOpCfg();
     bool IsSingleConnectionEnabled(int32_t radioTech);
     void OnRilAdapterHostDied(const AppExecFwk::InnerEvent::Pointer &event);
@@ -152,6 +155,7 @@ private:
 #endif
     void SetNetRequest(NetRequest &request, const std::unique_ptr<NetRequest> &netRequest);
     void SendEstablishDataConnectionEvent(int32_t id);
+    bool IsSimStateReadyOrLoaded();
 
 private:
     sptr<ApnManager> apnManager_;
@@ -174,6 +178,8 @@ private:
     bool multipleConnectionsEnabled_ = false;
     bool defaultDataRoamingEnable_ = false;
     bool isSimAccountLoaded_ = false;
+    bool isRilApnAttached_ = false;
+    std::mutex mtx_;
     std::vector<std::string> upLinkThresholds_;
     std::vector<std::string> downLinkThresholds_;
     sptr<CellularDataSettingObserver> settingObserver_;
@@ -181,6 +187,7 @@ private:
     sptr<CellularDataIncallObserver> incallObserver_;
     sptr<CellularDataRdbObserver> cellularDataRdbObserver_;
     std::shared_ptr<IncallDataStateMachine> incallDataStateMachine_;
+    DataProfile lastDataProfile_;
 
     using Fun = std::function<void(const AppExecFwk::InnerEvent::Pointer &event)>;
     std::map<uint32_t, Fun> eventIdMap_ {
@@ -211,11 +218,11 @@ private:
         { RadioEvent::RADIO_DSDS_MODE_CHANGED,
             [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleDsdsModeChanged(event); } },
         { RadioEvent::RADIO_SIM_STATE_CHANGE,
-            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleSimStateOrRecordsChanged(event); } },
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleSimEvent(event); } },
         { RadioEvent::RADIO_SIM_RECORDS_LOADED,
-            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleSimStateOrRecordsChanged(event); } },
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleSimEvent(event); } },
         { RadioEvent::RADIO_SIM_ACCOUNT_LOADED,
-            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleSimAccountLoaded(event); } },
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleSimEvent(event); } },
         { RadioEvent::RADIO_PS_RAT_CHANGED,
             [this](const AppExecFwk::InnerEvent::Pointer &event) { PsDataRatChanged(event); } },
         { CellularDataEventCode::MSG_APN_CHANGED,
@@ -242,6 +249,8 @@ private:
             [this](const AppExecFwk::InnerEvent::Pointer &event) { OnCleanAllDataConnectionsDone(event); } },
         { CellularDataEventCode::MSG_DATA_CALL_LIST_CHANGED,
             [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleUpdateNetInfo(event); } },
+        { RadioEvent::RADIO_NV_REFRESH_FINISHED,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleSimEvent(event); } },
     };
 };
 } // namespace Telephony

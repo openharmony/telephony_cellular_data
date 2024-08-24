@@ -29,12 +29,26 @@ using namespace testing::ext;
 using ::testing::_;
 using ::testing::DoAll;
 using ::testing::Return;
+using ::testing::AtLeast;
 using ::testing::SetArgReferee;
 
 class CellularDataDumpHelperTest : public testing::Test {
 public:
-    CellularDataDumpHelperTest() = default;
+    CellularDataDumpHelperTest()
+    {
+        mockCoreService = new MockCoreService();
+        sptr<ICoreService> mockCoreServicePtr(mockCoreService);
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().proxy_ = mockCoreServicePtr;
+    }
     ~CellularDataDumpHelperTest() = default;
+    static void TearDownTestCase()
+    {
+        if (DelayedRefSingleton<CoreServiceClient>::GetInstance().proxy_ != nullptr) {
+            DelayedRefSingleton<CoreServiceClient>::GetInstance().proxy_ = nullptr;
+            std::cout << "CellularDataDumpHelperTest set proxy_ nullptr" << std::endl;
+        }
+    }
+    MockCoreService *mockCoreService;
 };
 
 HWTEST_F(CellularDataDumpHelperTest, CellularDataDumpHelper_01, Function | MediumTest | Level1)
@@ -53,6 +67,9 @@ HWTEST_F(CellularDataDumpHelperTest, CellularDataDumpHelper_02, Function | Mediu
     CellularDataDumpHelper help;
     std::vector<std::string> args = {"cellular_data", "help"};
     std::string result = "";
+    EXPECT_CALL(*mockCoreService, HasSimCard(_, _))
+        .Times(AtLeast(0))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(false), Return(0)));
     help.Dump(args, result);
     std::cout << "CellularDataDumpHelper_02 result: " << result << std::endl;
     ASSERT_FALSE(result.find("Ohos cellular data service") == std::string::npos);
@@ -64,6 +81,9 @@ HWTEST_F(CellularDataDumpHelperTest, CellularDataDumpHelper_03, Function | Mediu
     CellularDataDumpHelper help;
     std::vector<std::string> args = {"cellular_data_1", "--help"};
     std::string result = "";
+    EXPECT_CALL(*mockCoreService, HasSimCard(_, _))
+        .Times(AtLeast(0))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(false), Return(0)));
     help.Dump(args, result);
     std::cout << "CellularDataDumpHelper_03 result: " << result << std::endl;
     ASSERT_FALSE(result.find("Ohos cellular data service") == std::string::npos);
@@ -72,10 +92,6 @@ HWTEST_F(CellularDataDumpHelperTest, CellularDataDumpHelper_03, Function | Mediu
 
 HWTEST_F(CellularDataDumpHelperTest, CellularDataDumpHelper_04, Function | MediumTest | Level1)
 {
-    MockCoreService *mockCoreService = new MockCoreService();
-    sptr<ICoreService> mockCoreServicePtr(mockCoreService);
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().proxy_ = mockCoreServicePtr;
-
     maxSlotCount_ = 2;
     EXPECT_CALL(*mockCoreService, HasSimCard(0, _)).WillOnce(DoAll(SetArgReferee<1>(true), Return(0)));
     EXPECT_CALL(*mockCoreService, HasSimCard(1, _)).WillOnce(DoAll(SetArgReferee<1>(false), Return(0)));
@@ -86,12 +102,7 @@ HWTEST_F(CellularDataDumpHelperTest, CellularDataDumpHelper_04, Function | Mediu
     std::cout << "CellularDataDumpHelper_04 result: " << result << std::endl;
     ASSERT_FALSE(result.find("Ohos cellular data service") == std::string::npos);
     ASSERT_FALSE(result.find("CellularDataRoamingEnabled") == std::string::npos);
-
     maxSlotCount_ = 0;
-    if (DelayedRefSingleton<CoreServiceClient>::GetInstance().proxy_ != nullptr) {
-        DelayedRefSingleton<CoreServiceClient>::GetInstance().proxy_ = nullptr;
-        std::cout << "CellularDataDumpHelperTest set proxy_ nullptr" << std::endl;
-    }
 }
 
 }  // namespace Telephony

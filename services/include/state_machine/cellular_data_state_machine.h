@@ -33,6 +33,8 @@ namespace Telephony {
 static const uint16_t DEFAULT_PORT = 0;
 static const size_t HOST_SIZE = 1;
 static const size_t HOST_PORT_SIZE = 2;
+static const int32_t DEFAULT_INTERNET_CONNECTION_SCORE = 60;
+static const int32_t OTHER_CONNECTION_SCORE = 55;
 
 class DataConnectionManager;
 class CellularDataStateMachine : public StateMachine,
@@ -90,6 +92,7 @@ private:
     void GetMtuSizeFromOpCfg(int32_t &mtuSize, int32_t slotId);
     std::string GetIpType(std::vector<AddressInfo> ipInfoArray);
     bool HasMatchedIpTypeAddrs(uint8_t ipType, uint8_t ipInfoArraySize, std::vector<AddressInfo> ipInfoArray);
+    int32_t GetNetScoreBySlotId(int32_t slotId);
 
 private:
     friend class Active;
