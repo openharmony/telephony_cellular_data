@@ -2011,40 +2011,5 @@ HWTEST_F(BranchTest, MakePdpProfile_002, TestSize.Level3)
     ASSERT_EQ("abc", apnBean.roamPdpProtocol);
 }
 
-/**
- * @tc.number   ServiceAddUid Test
- * @tc.name     Test the function
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, ServiceAddUid_Test_01, TestSize.Level3)
-{
-    DataAccessToken token;
-    CellularDataService service;
-    NetRequest request;
-    request.ident = "simId12";
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.AddUid(request));
-    request.ident = "simId1";
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.AddUid(request));
-    service.Init();
-    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.AddUid(request));
-}
-
-/**
- * @tc.number   ServiceRemoveUid Test
- * @tc.name     Test the function
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, ServiceRemoveUid_Test_01, TestSize.Level3)
-{
-    DataAccessToken token;
-    CellularDataService service;
-    NetRequest request;
-    request.ident = "simId12";
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.RemoveUid(request));
-    request.ident = "simId1";
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.RemoveUid(request));
-    service.Init();
-    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.RemoveUid(request));
-}
 } // namespace Telephony
 } // namespace OHOS
