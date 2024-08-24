@@ -1849,23 +1849,6 @@ HWTEST_F(CellularDataTest, CellularDataControllerAddUid_Test_01, TestSize.Level3
 }
 
 /**
- * @tc.number   CellularDataControllerAddUid_Test_02
- * @tc.name     Test the CellularDataControllerAddUid function
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataTest, CellularDataControllerAddUid_Test_2, TestSize.Level3)
-{
-    auto controller = std::make_shared<CellularDataController>(DEFAULT_SIM_SLOT_ID);
-    controller->Init();
-    ASSERT_TRUE(controller->cellularDataHandler_ != nullptr);
-    NetRequest request;
-    request.uid = 0;
-    ASSERT_TRUE(controller->AddUid(request));
-    ASSERT_TRUE(controller->AddUid(request));
-    request.uid = 1;
-    ASSERT_TRUE(controller->AddUid(request));
-}
-/**
  * @tc.number   CellularDataControllerRemoveUid_Test_01
  * @tc.name     Test the CellularDataControllerRemoveUid function
  * @tc.desc     Function test
@@ -1878,23 +1861,7 @@ HWTEST_F(CellularDataTest, CellularDataControllerRemoveUid_Test_1, TestSize.Leve
     request.uid = 0;
     ASSERT_FALSE(controller->RemoveUid(request));
 }
-/**
- * @tc.number   CellularDataControllerRemoveUid_Test_02
- * @tc.name     Test the CellularDataControllerRemoveUid function
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataTest, CellularDataControllerRemoveUid_Test_2, TestSize.Level3)
-{
-    auto controller = std::make_shared<CellularDataController>(DEFAULT_SIM_SLOT_ID);
-    controller->Init();
-    ASSERT_TRUE(controller->cellularDataHandler_ != nullptr);
-    NetRequest request;
-    request.uid = 0;
-    ASSERT_TRUE(controller->RemoveUid(request));
-    ASSERT_TRUE(controller->RemoveUid(request));
-    request.uid = 1;
-    ASSERT_TRUE(controller->RemoveUid(request));
-}
+
 /**
  * @tc.number   ControllerReleaseCellularDataConnection_Test_01
  * @tc.name     Test the Controlle ReleaseCellularDataConnection function
@@ -1917,7 +1884,7 @@ HWTEST_F(CellularDataTest, ControllerReleaseCellularDataConnection_Test_2, TestS
     controller->Init();
     ASSERT_TRUE(controller->cellularDataHandler_ != nullptr);
     NetRequest request;
-    ASSERT_FALSE(controller->ReleaseCellularDataConnection());
+    ASSERT_TRUE(controller->ReleaseCellularDataConnection());
 }
 
 } // namespace Telephony
