@@ -606,6 +606,10 @@ int32_t CellularDataService::UnregisterSimAccountCallback()
 
 int32_t CellularDataService::GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
     if (cellularDataController == nullptr) {
         TELEPHONY_LOGE("cellularDataControllers is null, slotId=%{public}d", slotId);
