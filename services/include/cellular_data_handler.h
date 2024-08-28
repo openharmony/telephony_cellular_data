@@ -156,6 +156,7 @@ private:
     void SetNetRequest(NetRequest &request, const std::unique_ptr<NetRequest> &netRequest);
     void SendEstablishDataConnectionEvent(int32_t id);
     bool IsSimStateReadyOrLoaded();
+    void UpdateCellularDataConnectState(const std::string &apnType);
 
 private:
     sptr<ApnManager> apnManager_;
