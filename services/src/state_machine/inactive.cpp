@@ -34,21 +34,21 @@ void Inactive::StateBegin()
     isActive_ = true;
     if (deActiveApnTypeId_ != ERROR_APN_ID) {
         // set net manager connection false
-        CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
-        int32_t supplierId = netAgent.GetSupplierId(stateMachine->GetSlotId(), stateMachine->GetCapability());
         if (stateMachine->netSupplierInfo_ != nullptr) {
             stateMachine->netSupplierInfo_->isAvailable_ = false;
-            netAgent.UpdateNetSupplierInfo(supplierId, stateMachine->netSupplierInfo_);
         }
         // send MSG_DISCONNECT_DATA_COMPLETE to CellularDataHandler
-        std::string apnType = ApnManager::FindApnNameByApnId(deActiveApnTypeId_);
-        std::unique_ptr<DataDisconnectParams> object = std::make_unique<DataDisconnectParams>(apnType, reason_);
-        if (object == nullptr) {
+        auto netInfo = std::make_shared<SetupDataCallResultInfo>();
+        if (netInfo == nullptr) {
             TELEPHONY_LOGE("Create data disconnect params failed");
             return;
         }
+        netInfo->cid = stateMachine->cid_;
+        netInfo->flag = deActiveApnTypeId_;
+        netInfo->reason = static_cast<int32_t>(reason_);
+        netInfo->active = 0;
         AppExecFwk::InnerEvent::Pointer event =
-            AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_DISCONNECT_DATA_COMPLETE, object);
+            AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_DISCONNECT_DATA_COMPLETE, netInfo);
         if (event == nullptr) {
             TELEPHONY_LOGE("Create event failed");
             return;
@@ -60,9 +60,6 @@ void Inactive::StateBegin()
         reason_ = DisConnectionReason::REASON_RETRY_CONNECTION;
     }
     stateMachine->SetCurrentState(sptr<State>(this));
-    if (stateMachine->cdConnectionManager_ != nullptr) {
-        stateMachine->cdConnectionManager_->RemoveActiveConnectionByCid(stateMachine->GetCid());
-    }
 }
 
 void Inactive::StateEnd()
