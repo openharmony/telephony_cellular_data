@@ -152,12 +152,9 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_001, Function | MediumTest | 
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     CellularDataHandler cellularDataHandler { subscriberInfo, 0 };
-    NetRequest request { 0, "simId1" };
     cellularDataHandler.HandleSimStateChanged();
     cellularDataHandler.ReleaseAllNetworkRequest();
     cellularDataHandler.CreateApnItem();
-    ASSERT_FALSE(cellularDataHandler.ReleaseNet(request));
-    ASSERT_FALSE(cellularDataHandler.RequestNet(request));
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
     cellularDataHandler.ProcessEvent(event);

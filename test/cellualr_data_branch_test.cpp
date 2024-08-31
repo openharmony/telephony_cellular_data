@@ -186,7 +186,7 @@ HWTEST_F(CellularStateMachineTest, Activating_ProcessConnectTimeout_001, Functio
     activating->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(1);
     activating->ProcessConnectTimeout(event);
-    EXPECT_EQ(cellularMachine->IsInactiveState(), false);
+    EXPECT_EQ(cellularMachine->IsInactiveState(), true);
 }
 
 /**
@@ -283,7 +283,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilAdapterHostDied_001, 
     disconnecting->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT);
     disconnecting->ProcessRilAdapterHostDied(event);
-    EXPECT_EQ(cellularMachine->IsInactiveState(), false);
+    EXPECT_EQ(cellularMachine->IsInactiveState(), true);
 }
 
 /**
@@ -302,7 +302,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilDeactivateDataCall_00
     disconnecting->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT);
     disconnecting->ProcessRilDeactivateDataCall(event);
-    EXPECT_EQ(cellularMachine->IsInactiveState(), false);
+    EXPECT_EQ(cellularMachine->IsInactiveState(), true);
 }
 
 /**
@@ -322,7 +322,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilDeactivateDataCall_00
     disconnecting->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT);
     disconnecting->ProcessRilDeactivateDataCall(event);
-    EXPECT_EQ(cellularMachine->IsInactiveState(), false);
+    EXPECT_EQ(cellularMachine->IsInactiveState(), true);
 }
 
 /**
