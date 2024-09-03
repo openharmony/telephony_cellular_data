@@ -395,10 +395,11 @@ void DataConnectionManager::UpdateBandWidthsUseLte()
 
 void DataConnectionManager::GetDefaultTcpBufferConfig()
 {
-    tcpBufferConfigMap_.clear();
     char tcpBufferConfig[MAX_BUFFER_SIZE] = {0};
     GetParameter(CONFIG_TCP_BUFFER, DEFAULT_TCP_BUFFER_CONFIG, tcpBufferConfig, MAX_BUFFER_SIZE);
     std::vector<std::string> tcpBufferVec = CellularDataUtils::Split(tcpBufferConfig, ";");
+    std::lock_guard<std::mutex> lock(tcpBufferConfigMutex_);
+    tcpBufferConfigMap_.clear();
     for (std::string tcpBuffer : tcpBufferVec) {
         std::vector<std::string> str = CellularDataUtils::Split(tcpBuffer, ":");
         tcpBufferConfigMap_.emplace(str.front(), str.back());
@@ -445,6 +446,7 @@ std::string DataConnectionManager::GetTcpBufferByRadioTech(const int32_t radioTe
         (nrState == NrState::NR_NSA_STATE_DUAL_CONNECTED || nrState == NrState::NR_NSA_STATE_CONNECTED_DETECT)) {
         radioTechName = "NR";
     }
+    std::lock_guard<std::mutex> lock(tcpBufferConfigMutex_);
     std::map<std::string, std::string>::iterator iter = tcpBufferConfigMap_.find(radioTechName);
     if (iter != tcpBufferConfigMap_.end()) {
         tcpBuffer = iter->second;

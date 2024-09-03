@@ -67,6 +67,7 @@ private:
     std::map<int32_t, std::shared_ptr<CellularDataStateMachine>> cidActiveConnectionMap_;
     std::mutex stateMachineMutex_;
     std::mutex activeConnectionMutex_;
+    std::mutex tcpBufferConfigMutex_;
     sptr<State> ccmDefaultState_;
     const int32_t slotId_;
     std::map<std::string, LinkBandwidthInfo> bandwidthConfigMap_;
