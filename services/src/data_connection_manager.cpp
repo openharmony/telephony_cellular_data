@@ -353,6 +353,7 @@ void DataConnectionManager::GetDefaultBandWidthsConfig()
     if (linkBandwidthVec.empty()) {
         linkBandwidthVec = CellularDataUtils::Split(DEFAULT_BANDWIDTH_CONFIG, ";");
     }
+    std::lock_guard<std::mutex> lock(bandwidthConfigMutex_);
     bandwidthConfigMap_.clear();
     for (std::string temp : linkBandwidthVec) {
         std::vector<std::string> linkBandwidths = CellularDataUtils::Split(temp, ":");
@@ -426,6 +427,7 @@ LinkBandwidthInfo DataConnectionManager::GetBandwidthsByRadioTech(const int32_t 
         radioTechName = "NR_SA";
     }
     TELEPHONY_LOGI("Slot%{public}d: accessRadioName is %{private}s", slotId_, radioTechName.c_str());
+    std::lock_guard<std::mutex> lock(bandwidthConfigMutex_);
     std::map<std::string, LinkBandwidthInfo>::iterator iter = bandwidthConfigMap_.find(radioTechName);
     if (iter != bandwidthConfigMap_.end()) {
         linkBandwidthInfo = iter->second;
