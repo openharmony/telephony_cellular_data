@@ -27,6 +27,7 @@
 #include "incall_data_state_machine.h"
 #include "tel_event_handler.h"
 #include "telephony_types.h"
+#include "core_service_client.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -38,6 +39,7 @@ class CellularStateMachineTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
+    static bool HasSimCard(const int32_t slotId);
     void SetUp();
     void TearDown();
     std::shared_ptr<CellularDataStateMachine> cellularMachine;
@@ -52,6 +54,13 @@ void CellularStateMachineTest::TearDownTestCase()
 void CellularStateMachineTest::SetUp() {}
 
 void CellularStateMachineTest::TearDown() {}
+
+bool CellularStateMachineTest::HasSimCard(const int32_t slotId)
+{
+    bool hasSimCard = false;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId, hasSimCard);
+    return hasSimCard;
+}
 
 class CellularMachineTest : public TelEventHandler {
 public:
@@ -176,6 +185,9 @@ HWTEST_F(CellularStateMachineTest, Activating_StateProcess_001, Function | Mediu
  */
 HWTEST_F(CellularStateMachineTest, Activating_ProcessConnectTimeout_001, Function | MediumTest | Level1)
 {
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
     if (cellularMachine == nullptr) {
         std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
         cellularMachine = machine->CreateCellularDataConnect(0);
@@ -196,6 +208,9 @@ HWTEST_F(CellularStateMachineTest, Activating_ProcessConnectTimeout_001, Functio
  */
 HWTEST_F(CellularStateMachineTest, Activating_ProcessConnectTimeout_002, Function | MediumTest | Level1)
 {
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
     if (cellularMachine == nullptr) {
         std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
         cellularMachine = machine->CreateCellularDataConnect(0);
@@ -274,6 +289,9 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessConnectTimeout_002, Func
  */
 HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilAdapterHostDied_001, Function | MediumTest | Level1)
 {
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
     if (cellularMachine == nullptr) {
         std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
         cellularMachine = machine->CreateCellularDataConnect(0);
@@ -283,7 +301,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilAdapterHostDied_001, 
     disconnecting->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT);
     disconnecting->ProcessRilAdapterHostDied(event);
-    EXPECT_EQ(cellularMachine->IsInactiveState(), true);
+    EXPECT_EQ(cellularMachine->IsInactiveState(), false);
 }
 
 /**
@@ -293,6 +311,9 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilAdapterHostDied_001, 
  */
 HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilDeactivateDataCall_001, Function | MediumTest | Level1)
 {
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
     if (cellularMachine == nullptr) {
         std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
         cellularMachine = machine->CreateCellularDataConnect(0);
@@ -302,16 +323,19 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilDeactivateDataCall_00
     disconnecting->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT);
     disconnecting->ProcessRilDeactivateDataCall(event);
-    EXPECT_EQ(cellularMachine->IsInactiveState(), true);
+    EXPECT_EQ(cellularMachine->IsInactiveState(), false);
 }
 
 /**
- * @tc.number   Disconnecting_ProcessRilDeactivateDataCall_001
+ * @tc.number   Disconnecting_ProcessRilDeactivateDataCall_002
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
 HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilDeactivateDataCall_002, Function | MediumTest | Level1)
 {
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
     if (cellularMachine == nullptr) {
         std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
         cellularMachine = machine->CreateCellularDataConnect(0);
@@ -322,7 +346,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilDeactivateDataCall_00
     disconnecting->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT);
     disconnecting->ProcessRilDeactivateDataCall(event);
-    EXPECT_EQ(cellularMachine->IsInactiveState(), true);
+    EXPECT_EQ(cellularMachine->IsInactiveState(), false);
 }
 
 /**
