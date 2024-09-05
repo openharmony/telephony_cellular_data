@@ -1656,7 +1656,7 @@ HWTEST_F(CellularDataTest, RequestNetwork_002, TestSize.Level3)
         callback_ = std::make_unique<NetManagerCallBack>().release();
     }
     int32_t result = callback_->RequestNetwork(ident, netCaps, netrequest);
-    ASSERT_NE(result, CELLULAR_DATA_INVALID_PARAM);
+    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
 
 /**
@@ -1688,7 +1688,7 @@ HWTEST_F(CellularDataTest, ReleaseNetwork_002, TestSize.Level3)
         callback_ = std::make_unique<NetManagerCallBack>().release();
     }
     int32_t result = callback_->ReleaseNetwork(ident, netCaps);
-    ASSERT_NE(result, CELLULAR_DATA_INVALID_PARAM);
+    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
 
 /**
