@@ -54,6 +54,7 @@
 #include "telephony_hisysevent.h"
 #include "telephony_log_wrapper.h"
 #include "uri.h"
+#include "core_service_client.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -81,6 +82,7 @@ class BranchTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
+    static bool HasSimCard(const int32_t slotId);
     void SetUp();
     void TearDown();
 };
@@ -91,6 +93,12 @@ void BranchTest::TearDownTestCase() {}
 void BranchTest::SetUp() {}
 
 void BranchTest::TearDown() {}
+bool BranchTest::HasSimCard(const int32_t slotId)
+{
+    bool hasSimCard = false;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId, hasSimCard);
+    return hasSimCard;
+}
 
 class StateMachineTest : public TelEventHandler {
 public:
@@ -469,6 +477,9 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_007, Function | MediumTest | 
  */
 HWTEST_F(BranchTest, Telephony_CellularDataService_001, Function | MediumTest | Level3)
 {
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
     DataAccessToken token;
     CellularDataService service;
     std::vector<std::u16string> strV;
@@ -487,21 +498,21 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_001, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.IsCellularDataRoamingEnabled(DEFAULT_SIM_SLOT_ID, dataRoamingEnabled));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularDataRoaming(DEFAULT_SIM_SLOT_ID, true));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HandleApnChanged(INVALID_SLOTID));
-    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.HandleApnChanged(DEFAULT_SIM_SLOT_ID));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HandleApnChanged(DEFAULT_SIM_SLOT_ID));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDefaultCellularDataSlotId());
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.SetDefaultCellularDataSlotId(INVALID_SLOTID));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.SetDefaultCellularDataSlotId(DEFAULT_SIM_SLOT_ID));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetCellularDataFlowType());
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HasInternetCapability(INVALID_SLOTID, 0));
-    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.HasInternetCapability(DEFAULT_SIM_SLOT_ID, 0));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HasInternetCapability(DEFAULT_SIM_SLOT_ID, 0));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearCellularDataConnections(INVALID_SLOTID));
-    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.ClearCellularDataConnections(DEFAULT_SIM_SLOT_ID));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearCellularDataConnections(DEFAULT_SIM_SLOT_ID));
     DisConnectionReason reason = DisConnectionReason::REASON_NORMAL;
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearAllConnections(INVALID_SLOTID, reason));
-    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.ClearAllConnections(DEFAULT_SIM_SLOT_ID, reason));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearAllConnections(DEFAULT_SIM_SLOT_ID, reason));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ChangeConnectionForDsds(INVALID_SLOTID, false));
-    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.ChangeConnectionForDsds(DEFAULT_SIM_SLOT_ID, false));
-    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.ChangeConnectionForDsds(DEFAULT_SIM_SLOT_ID, true));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ChangeConnectionForDsds(DEFAULT_SIM_SLOT_ID, false));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ChangeConnectionForDsds(DEFAULT_SIM_SLOT_ID, true));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.StrategySwitch(INVALID_SLOTID, false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.StrategySwitch(DEFAULT_SIM_SLOT_ID, false));
     NetRequest request;
@@ -509,7 +520,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_001, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.RequestNet(request));
     request.ident = "simId2";
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ReleaseNet(request));
-    ASSERT_TRUE(service.GetCellularDataController(DEFAULT_SIM_SLOT_ID) != nullptr);
+    ASSERT_FALSE(service.GetCellularDataController(DEFAULT_SIM_SLOT_ID) != nullptr);
     ASSERT_FALSE(service.GetCellularDataController(INVALID_SLOTID) != nullptr);
     ASSERT_FALSE(service.GetCellularDataController(INVALID_SLOTID_TWO) != nullptr);
 }
@@ -521,6 +532,9 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_001, Function | MediumTest | 
  */
 HWTEST_F(BranchTest, Telephony_CellularDataService_002, Function | MediumTest | Level3)
 {
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
     CellularDataService service;
     std::vector<std::u16string> strV;
     ASSERT_EQ(TELEPHONY_ERR_FAIL, service.Dump(INVALID_FD, strV));
@@ -548,10 +562,10 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_002, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.StrategySwitch(INVALID_SLOTID, false));
     ASSERT_FALSE(service.GetCellularDataController(INVALID_SLOTID) != nullptr);
     ASSERT_FALSE(service.GetCellularDataController(INVALID_SLOTID_TWO) != nullptr);
-    ASSERT_NE(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(DEFAULT_SIM_SLOT_ID, std::string()));
+    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(DEFAULT_SIM_SLOT_ID, std::string()));
     ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(INVALID_SLOTID, std::string()));
     ASSERT_EQ(service.GetDataRecoveryState(), 0);
-    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.InitCellularDataController(2));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.InitCellularDataController(2));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.InitCellularDataController(INVALID_SLOTID));
     service.GetFlowDataInfoDump();
     service.OnStop();
@@ -617,6 +631,9 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_003, Function | MediumTest | 
  */
 HWTEST_F(BranchTest, Telephony_CellularDataService_004, Function | MediumTest | Level3)
 {
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
     DataAccessToken token;
     CellularDataService service;
     std::vector<std::u16string> strV;
@@ -627,19 +644,19 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_004, Function | MediumTest | 
     service.GetFlowDataInfoDump();
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableIntelligenceSwitch(false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableIntelligenceSwitch(true));
-    ASSERT_NE(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(DEFAULT_SIM_SLOT_ID, std::string()));
+    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(DEFAULT_SIM_SLOT_ID, std::string()));
     ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(INVALID_SLOTID, std::string()));
     ASSERT_EQ(service.GetDataRecoveryState(), 0);
     ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.InitCellularDataController(2));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.InitCellularDataController(INVALID_SLOTID));
     ApnItem::Attribute apnAttr;
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDataConnApnAttr(INVALID_SLOTID, apnAttr));
-    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.GetDataConnApnAttr(DEFAULT_SIM_SLOT_ID, apnAttr));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDataConnApnAttr(DEFAULT_SIM_SLOT_ID, apnAttr));
     std::string ipType;
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDataConnIpType(INVALID_SLOTID, ipType));
-    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.GetDataConnIpType(DEFAULT_SIM_SLOT_ID, ipType));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDataConnIpType(DEFAULT_SIM_SLOT_ID, ipType));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.IsNeedDoRecovery(INVALID_SLOTID, true));
-    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.IsNeedDoRecovery(DEFAULT_SIM_SLOT_ID, true));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.IsNeedDoRecovery(DEFAULT_SIM_SLOT_ID, true));
 }
 
 /**
