@@ -23,6 +23,7 @@ namespace OHOS {
 namespace Telephony {
 namespace {
     constexpr int32_t SYSTEM_UID = 1e4;
+    std::shared_mutex reqUidsMutex_;
 }
 const std::map<std::string, int32_t> ApnHolder::apnTypeDataProfileMap_ {
     {DATA_CONTEXT_ROLE_DEFAULT, DATA_PROFILE_DEFAULT},
@@ -64,6 +65,7 @@ sptr<ApnItem> ApnHolder::GetCurrentApn() const
 
 void ApnHolder::AddUid(uint32_t uid)
 {
+    std::unique_lock<std::shared_mutex> lock(reqUidsMutex_);
     if (reqUids_.find(uid) != reqUids_.end()) {
         return;
     }
@@ -72,6 +74,7 @@ void ApnHolder::AddUid(uint32_t uid)
 
 void ApnHolder::RemoveUid(uint32_t uid)
 {
+    std::unique_lock<std::shared_mutex> lock(reqUidsMutex_);
     auto it = reqUids_.find(uid);
     if (it != reqUids_.end()) {
         reqUids_.erase(it);
@@ -155,6 +158,7 @@ int32_t ApnHolder::GetPriority() const
 
 HasSystemUse ApnHolder::GetUidStatus() const
 {
+    std::unique_lock<std::shared_mutex> lock(reqUidsMutex_);
     for (auto item : reqUids_) {
         if (item < SYSTEM_UID) {
             return HasSystemUse::HAS;
