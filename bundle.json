@@ -55,6 +55,7 @@
         "build": {
             "group_type": {
                 "base_group": [
+                    "//base/telephony/cellular_data/interfaces/kits/c/telephony_data:telephony_data"
                 ],
                 "fwk_group": [
                     "//base/telephony/cellular_data/frameworks/js:data",
