@@ -777,5 +777,99 @@ HWTEST_F(CellularDataHandlerTest, ChangeConnectionForDsdsTest001, Function | Med
     cellularDataHandler->ChangeConnectionForDsds(true);
     EXPECT_TRUE(cellularDataHandler->dataSwitchSettings_->internalDataOn_);
 }
+
+/**
+ * @tc.number   GetDataConnApnAttrTest001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, GetDataConnApnAttrTest001, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 1);
+    cellularDataHandler->Init();
+    sptr<ApnHolder> apnHolder1 = std::make_unique<ApnHolder>("default", static_cast<int32_t>(0)).release();
+    apnHolder1->apnItem_ = nullptr;
+    apnHolder1->dataCallEnabled_ = true;
+    cellularDataHandler->apnManager_->apnHolders_.push_back(apnHolder1);
+    sptr<ApnHolder> apnHolder2 = std::make_unique<ApnHolder>("default", static_cast<int32_t>(0)).release();
+    sptr<ApnItem> apnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
+    apnItem->attr_.isEdited_ = true;
+    apnHolder2->apnItem_ = apnItem;
+    apnHolder2->dataCallEnabled_ = true;
+    cellularDataHandler->apnManager_->apnHolders_.push_back(apnHolder2);
+    ApnItem::Attribute apnAttr;
+    apnAttr.isEdited_ = false;
+    cellularDataHandler->GetDataConnApnAttr(apnAttr);
+    EXPECT_TRUE(apnAttr.isEdited_);
+}
+
+/**
+ * @tc.number   GetDataConnIpTypeTest001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, GetDataConnIpTypeTest001, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 1);
+    cellularDataHandler->Init();
+    sptr<ApnHolder> apnHolder1 = std::make_unique<ApnHolder>("default", static_cast<int32_t>(0)).release();
+    apnHolder1->cellularDataStateMachine_ = nullptr;
+    apnHolder1->dataCallEnabled_ = true;
+    cellularDataHandler->apnManager_->apnHolders_.push_back(apnHolder1);
+    sptr<ApnHolder> apnHolder2 = std::make_unique<ApnHolder>("default", static_cast<int32_t>(0)).release();
+    sptr<DataConnectionManager> connectionManager = std::make_unique<DataConnectionManager>(0).release();
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = std::make_shared<CellularDataStateMachine>(
+        connectionManager, nullptr);
+    cellularMachine->ipType_ = "IPV4";
+    apnHolder2->cellularDataStateMachine_ = cellularMachine;
+    apnHolder2->dataCallEnabled_ = true;
+    cellularDataHandler->apnManager_->apnHolders_.push_back(apnHolder2);
+    cellularDataHandler->GetDataConnIpType();
+    EXPECT_EQ(cellularDataHandler->GetDataConnIpType(), "IPV4");
+}
+
+/**
+ * @tc.number   CheckForCompatibleDataConnectionTest001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, CheckForCompatibleDataConnectionTest001, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 1);
+    sptr<ApnHolder> apnHolder = std::make_unique<ApnHolder>("default", static_cast<int32_t>(0)).release();
+    apnHolder->apnType_ = DATA_CONTEXT_ROLE_DUN;
+    EXPECT_EQ(cellularDataHandler->CheckForCompatibleDataConnection(apnHolder), nullptr);
+    cellularDataHandler->Init();
+    EXPECT_EQ(cellularDataHandler->CheckForCompatibleDataConnection(apnHolder), nullptr);
+}
+
+/**
+ * @tc.number   ReleaseCellularDataConnectionTest001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, ReleaseCellularDataConnectionTest001, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    cellularDataHandler->Init();
+    std::set<uint32_t> reqUids = {1};
+    sptr<ApnHolder> apnHolder = std::make_unique<ApnHolder>("default", static_cast<int32_t>(0)).release();
+    apnHolder->reqUids_ = reqUids;
+    cellularDataHandler->apnManager_->apnIdApnHolderMap_[1] = apnHolder;
+    cellularDataHandler->ReleaseCellularDataConnection();
+    EXPECT_NE(cellularDataHandler->apnManager_->apnIdApnHolderMap_[1]->apnState_, 3);
+}
 } // namespace Telephony
 } // namespace OHOS
