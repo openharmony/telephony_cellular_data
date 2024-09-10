@@ -105,7 +105,6 @@ private:
     void HandleDefaultDataSubscriptionChanged();
     void HandleSimStateChanged();
     void HandleRecordsChanged();
-    void HandleRadioNvRefreshFinished();
     void HandleDsdsModeChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleSimEvent(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleSimAccountLoaded();

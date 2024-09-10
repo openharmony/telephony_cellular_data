@@ -552,12 +552,6 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
     TELEPHONY_LOGD("Slot%{public}d: attached: %{public}d simState: %{public}d isSimAccountLoaded: %{public}d "
         "isRilApnAttached: %{public}d", slotId_, attached, isSimStateReadyOrLoaded, isSimAccountLoaded_,
         isRilApnAttached_);
-    bool isMmsApn = apnHolder->IsMmsType();
-    if (isMmsApn && isSimStateReadyOrLoaded) {
-        if (!attached) {
-            return false;
-        }
-    }
     bool isEmergencyApn = apnHolder->IsEmergencyType();
     if (!isEmergencyApn && !attached) {
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
@@ -746,9 +740,6 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
             connectionManager_->AddConnectionStateMachine(cellularDataStateMachine);
         }
     }
-    if (apnHolder->IsMmsType()) {
-        SetDataPermittedForMms(true);
-    }
     cellularDataStateMachine->SetCapability(apnHolder->GetCapability());
     apnHolder->SetCurrentApn(apnItem);
     apnHolder->SetApnState(PROFILE_STATE_CONNECTING);
@@ -762,9 +753,6 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
         slotId_, apnItem->attr_.profileId_, apnHolder->GetApnType().c_str(), radioTech);
     InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT, object);
     if (event == nullptr) {
-        if (apnHolder->IsMmsType()) {
-            SetDataPermittedForMms(false);
-        }
         TELEPHONY_LOGE("event is null");
         return false;
     }
@@ -865,9 +853,6 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
             incallDataStateMachine_->SendEvent(incallEvent);
         }
     }
-    if (apnHolder->IsMmsType()) {
-        SetDataPermittedForMms(false);
-    }
     if (reason == DisConnectionReason::REASON_CHANGE_CONNECTION) {
         HandleSortConnection();
     }
@@ -913,6 +898,9 @@ void CellularDataHandler::MsgEstablishDataConnection(const InnerEvent::Pointer &
     }
     TELEPHONY_LOGD("Slot%{public}d: APN holder type:%{public}s call:%{public}d", slotId_,
         apnHolder->GetApnType().c_str(), apnHolder->IsDataCallEnabled());
+    if (apnHolder->IsMmsType()) {
+        SetDataPermittedForMms(apnHolder->IsDataCallEnabled());
+    }
     if (apnHolder->IsDataCallEnabled()) {
         AttemptEstablishDataConnection(apnHolder);
     } else {
@@ -1295,20 +1283,6 @@ void CellularDataHandler::HandleRecordsChanged()
     EstablishAllApnsIfConnectable();
 }
 
-void CellularDataHandler::HandleRadioNvRefreshFinished()
-{
-    if (isRilApnAttached_) {
-        TELEPHONY_LOGI("Apn is alread attached");
-        return;
-    }
-    GetConfigurationFor5G();
-    CreateApnItem();
-    DataProfile dataProfile;
-    SetRilAttachApn(dataProfile);
-    ClearConnectionsOnUpdateApns(dataProfile, DisConnectionReason::REASON_CHANGE_CONNECTION);
-    EstablishAllApnsIfConnectable();
-}
-
 void CellularDataHandler::HandleSimEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
@@ -1330,9 +1304,11 @@ void CellularDataHandler::HandleSimEvent(const AppExecFwk::InnerEvent::Pointer &
         case RadioEvent::RADIO_SIM_RECORDS_LOADED:
             HandleRecordsChanged();
             break;
-        case RadioEvent::RADIO_NV_REFRESH_FINISHED:
-            HandleRadioNvRefreshFinished();
+        case RadioEvent::RADIO_NV_REFRESH_FINISHED: {
+            DataProfile dataProfile;
+            SetRilAttachApn(dataProfile);
             break;
+        }
         case RadioEvent::RADIO_SIM_ACCOUNT_LOADED:
             HandleSimAccountLoaded();
             break;
