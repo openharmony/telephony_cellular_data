@@ -157,7 +157,6 @@ public:
     MOCK_METHOD(int32_t, FactoryReset, (int32_t slotId), (override));
     MOCK_METHOD(int32_t, GetNrSsbIdInfo, (int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation),
         (override));
-    MOCK_METHOD(int32_t, InitExtraModule, (int32_t slotId), (override));
     MOCK_METHOD(bool, IsAllowedInsertApn, (std::string & value), (override));
     MOCK_METHOD(int32_t, GetTargetOpkey, (int32_t slotId, std::u16string &opkey), (override));
     MOCK_METHOD(int32_t, GetOpkeyVersion, (std::string & versionInfo), (override));
