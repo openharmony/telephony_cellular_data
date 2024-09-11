@@ -263,5 +263,33 @@ HWTEST_F(CellularDataServiceTest, CellularDataController_OnAddSystemAbility_001,
     cellularDataController->systemAbilityListener_->OnRemoveSystemAbility(COMMON_EVENT_SERVICE_ID, "");
     ASSERT_EQ(cellularDataController->cellularDataHandler_, nullptr);
 }
+
+/**
+ * @tc.number   RemoveOrAddUidTest001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, RemoveOrAddUidTest001, TestSize.Level0)
+{
+    NetRequest request;
+    request.ident = "simId123456789123";
+    EXPECT_EQ(service->AddUid(request), CELLULAR_DATA_INVALID_PARAM);
+    EXPECT_EQ(service->RemoveUid(request), CELLULAR_DATA_INVALID_PARAM);
+    request.ident = "simId12";
+    EXPECT_EQ(service->AddUid(request), CELLULAR_DATA_INVALID_PARAM);
+    EXPECT_EQ(service->RemoveUid(request), CELLULAR_DATA_INVALID_PARAM);
+}
+
+/**
+ * @tc.number   EstablishAllApnsIfConnectableTest001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, EstablishAllApnsIfConnectableTest001, TestSize.Level0)
+{
+    int32_t slotId = -1;
+    EXPECT_EQ(service->EstablishAllApnsIfConnectable(slotId), TELEPHONY_ERR_PERMISSION_ERR);
+    EXPECT_EQ(service->ReleaseCellularDataConnection(slotId), TELEPHONY_ERR_PERMISSION_ERR);
+}
 } // namespace Telephony
 } // namespace OHOS
