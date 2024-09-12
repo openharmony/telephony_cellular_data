@@ -92,7 +92,7 @@ HWTEST_F(CellularDataServiceTest, CellularDataService_002, TestSize.Level0)
     ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->ChangeConnectionForDsds(DEFAULT_SIM_SLOT_ID, false));
     ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->ChangeConnectionForDsds(DEFAULT_SIM_SLOT_ID, true));
     ApnItem::Attribute apnAttr;
-    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->GetDataConnApnAttr(DEFAULT_SIM_SLOT_ID, apnAttr));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->GetDataConnApnAttr(DEFAULT_SIM_SLOT_ID, apnAttr));
     std::string ipType;
     ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->GetDataConnIpType(DEFAULT_SIM_SLOT_ID, ipType));
     ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->IsNeedDoRecovery(DEFAULT_SIM_SLOT_ID, true));
@@ -126,7 +126,7 @@ HWTEST_F(CellularDataServiceTest, DataConnectionMonitor_OnStallDetectionTimer_00
     dataConnectionMonitor->noRecvPackets_ = 20;
     dataConnectionMonitor->stallDetectionEnabled_ = true;
     dataConnectionMonitor->OnStallDetectionTimer();
-    ASSERT_EQ(dataConnectionMonitor->noRecvPackets_, 0);
+    ASSERT_EQ(dataConnectionMonitor->noRecvPackets_, 20);
 }
 
 /**

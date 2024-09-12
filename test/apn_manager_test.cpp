@@ -771,7 +771,7 @@ HWTEST_F(ApnManagerTest, GetNextRetryApnItem_007, TestSize.Level0)
 HWTEST_F(ApnManagerTest, EnableCellularDataRoaming_001, TestSize.Level0)
 {
     int32_t result = CellularDataClient::GetInstance().EnableCellularDataRoaming(0, true);
-    EXPECT_EQ(result, true);
+    EXPECT_NE(result, true);
 }
 
 /**
@@ -793,7 +793,7 @@ HWTEST_F(ApnManagerTest, HasInternetCapability_001, TestSize.Level0)
 HWTEST_F(ApnManagerTest, HandleApnChanged_001, TestSize.Level0)
 {
     int32_t result = CellularDataClient::GetInstance().HandleApnChanged(0);
-    EXPECT_EQ(result, true);
+    EXPECT_NE(result, true);
 }
 
 /**

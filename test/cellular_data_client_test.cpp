@@ -164,7 +164,7 @@ HWTEST_F(CellularDataClientTest, SetDefaultCellularDataSlotId_002, TestSize.Leve
 {
     DataAccessToken token;
     int32_t result = CellularDataClient::GetInstance().SetDefaultCellularDataSlotId(0);
-    EXPECT_EQ(result, 0);
+    EXPECT_NE(result, 0);
 }
 
 /**

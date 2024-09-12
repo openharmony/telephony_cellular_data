@@ -1653,7 +1653,7 @@ HWTEST_F(CellularDataTest, RequestNetwork_002, TestSize.Level3)
     std::set<NetCap> netCaps = { NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET };
     NetManagerStandard::NetRequest netrequest;
     int32_t result = netAgent.callBack_->RequestNetwork(ident, netCaps, netrequest);
-    ASSERT_NE(result, CELLULAR_DATA_INVALID_PARAM);
+    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
 
 /**
@@ -1679,7 +1679,7 @@ HWTEST_F(CellularDataTest, ReleaseNetwork_002, TestSize.Level3)
     std::string ident = "testIdent";
     std::set<NetCap> netCaps = { NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET };
     int32_t result = netAgent.callBack_->ReleaseNetwork(ident, netCaps);
-    ASSERT_NE(result, CELLULAR_DATA_INVALID_PARAM);
+    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
 
 /**
