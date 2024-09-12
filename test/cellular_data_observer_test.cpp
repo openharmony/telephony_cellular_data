@@ -118,7 +118,8 @@ HWTEST_F(CellularDataObserverTest, CellularDataRoamingObserver_03, Function | Me
     EXPECT_CALL(*mockSimManager, GetSimId(_)).WillOnce(Return(1));
     std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
     Uri uri(std::string(CELLULAR_DATA_SETTING_DATA_ROAMING_URI) + std::to_string(1));
-    ASSERT_TRUE(settingHelper->PutValue(uri, CELLULAR_DATA_COLUMN_ROAMING, 1) == TELEPHONY_ERR_SUCCESS);
+    std::string col = std::string(CELLULAR_DATA_COLUMN_ROAMING) + std::to_string(1);
+    ASSERT_TRUE(settingHelper->PutValue(uri, col, 1) == TELEPHONY_ERR_SUCCESS);
     cellularDataRoamingObserver->OnChange();
     ASSERT_TRUE(cellularDataHandler == nullptr);
 
