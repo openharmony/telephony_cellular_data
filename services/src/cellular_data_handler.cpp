@@ -425,6 +425,11 @@ bool CellularDataHandler::SetDataPermittedForMms(bool dataPermittedForMms)
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     SetDataPermitted(defSlotId, !dataPermittedForMms);
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (TELEPHONY_EXT_WRAPPER.isVSimEnabled_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_()) {
+        SetDataPermitted(CELLULAR_DATA_VSIM_SLOT_ID, !dataPermittedForMms);
+    }
+#endif
     SetDataPermitted(slotId_, dataPermittedForMms);
     DelayedRefSingleton<CellularDataService>::GetInstance().ChangeConnectionForDsds(defSlotId, !dataPermittedForMms);
     return true;
