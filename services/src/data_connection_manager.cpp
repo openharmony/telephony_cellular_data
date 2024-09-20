@@ -210,10 +210,10 @@ void CcmDefaultState::RadioDataCallListChanged(const AppExecFwk::InnerEvent::Poi
         TELEPHONY_LOGE("setupDataCallResultInfo is null");
         return;
     }
-    UpdateNetworkInfo(event);
     std::vector<std::shared_ptr<CellularDataStateMachine>> retryDataConnection;
     std::map<int32_t, std::shared_ptr<CellularDataStateMachine>> idActiveConnectionMap =
         connectManager_.GetActiveConnection();
+    UpdateNetworkInfo(event);
     for (const std::pair<const int32_t, std::shared_ptr<CellularDataStateMachine>>& it : idActiveConnectionMap) {
         bool isPush = true;
         if (it.second == nullptr) {
