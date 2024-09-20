@@ -1458,6 +1458,35 @@ HWTEST_F(BranchTest, ApnManager_Test_01, Function | MediumTest | Level3)
 }
 
 /**
+ * @tc.number   IsMvnoDataMatched_Test_01
+ * @tc.name     Test IsMvnoDataMatched
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, IsMvnoDataMatched_Test_01, Function | MediumTest | Level3)
+{
+    auto helper = CellularDataRdbHelper::GetInstance();
+    PdpProfile apnBean;
+    ASSERT_EQ(apnBean.mvnoMatchData, "");
+    ASSERT_EQ(apnBean.mvnoType, "");
+    ASSERT_FALSE(helper->IsMvnoDataMatched("", apnBean));
+
+    apnBean.mvnoType = MvnoType::ICCID;
+    apnBean.mvnoMatchData = "";
+    ASSERT_FALSE(helper->IsMvnoDataMatched("test", apnBean));
+
+    apnBean.mvnoType = MvnoType::SPN;
+    apnBean.mvnoMatchData = "\\";
+    ASSERT_FALSE(helper->IsMvnoDataMatched("test", apnBean));
+
+    apnBean.mvnoType = MvnoType::IMSI;
+    apnBean.mvnoMatchData = "";
+    ASSERT_FALSE(helper->IsMvnoDataMatched("test", apnBean));
+
+    apnBean.mvnoType = MvnoType::GID1;
+    ASSERT_TRUE(helper->IsMvnoDataMatched("test", apnBean));
+}
+
+/**
  * @tc.number   IdleState_Test_01
  * @tc.name     test error branch
  * @tc.desc     Function test

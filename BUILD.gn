@@ -15,6 +15,11 @@ import("../core_service/telephony_core_service.gni")
 
 TELEPHONY_EXT_WRAPPER_ROOT = "services/telephony_ext_wrapper"
 DATA_SERVICE_EXT_WRAPPER_ROOT = "services/data_service_ext_wrapper"
+
+config("tel_cellular_data_config") {
+  configs = [ "//build/config/compiler:exceptions" ]
+}
+
 ohos_shared_library("tel_cellular_data") {
   sanitize = {
     cfi = true
@@ -126,6 +131,8 @@ ohos_shared_library("tel_cellular_data") {
     "-O2",
     "-D_FORTIFY_SOURCE=2",
   ]
+
+  configs = [ ":tel_cellular_data_config" ]
 
   defines += telephony_extra_defines
 
