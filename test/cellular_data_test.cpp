@@ -146,6 +146,9 @@ public:
     static int32_t IsNeedDoRecovery(int32_t slotId, bool needDoRecovery);
     static int32_t InitCellularDataController(int32_t slotId);
     static int32_t GetIntelligenceSwitchStateTest(bool &state);
+    static int32_t GetCellularDataSupplierId(int32_t slotId, uint64_t capability, uint32_t &supplierId);
+    static int32_t CorrectNetSupplierNoAvailable(int32_t slotid);
+    static int32_t GetSupplierRegisterState(uint32_t supplierId, int32_t &regState);
     CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
 };
 
@@ -361,6 +364,21 @@ int32_t CellularDataTest::IsNeedDoRecovery(int32_t slotId, bool needDoRecovery)
 int32_t CellularDataTest::InitCellularDataController(int32_t slotId)
 {
     return CellularDataClient::GetInstance().InitCellularDataController(slotId);
+}
+
+int32_t CellularDataTest::GetCellularDataSupplierId(int32_t slotId, uint64_t capability, uint32_t &supplierId)
+{
+    return CellularDataClient::GetInstance().GetCellularDataSupplierId(slotId, capability, supplierId);
+}
+
+int32_t CellularDataTest::CorrectNetSupplierNoAvailable(int32_t slotId)
+{
+    return CellularDataClient::GetInstance().CorrectNetSupplierNoAvailable(slotId);
+}
+
+int32_t CellularDataTest::GetSupplierRegisterState(uint32_t supplierId, int32_t &regState)
+{
+    return CellularDataClient::GetInstance().GetSupplierRegisterState(supplierId, regState);
 }
 #ifndef TEL_TEST_UNSUPPORT
 /**
@@ -1148,6 +1166,71 @@ HWTEST_F(CellularDataTest, IsNeedDoRecovery_Test_02, TestSize.Level3)
     bool needDoRecovery = true;
     int32_t result = CellularDataTest::IsNeedDoRecovery(DEFAULT_SIM_SLOT_ID, needDoRecovery);
     ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   GetCellularDataSupplierId_Test_01
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, GetCellularDataSupplierId_Test_01, TestSize.Level3)
+{
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+    DataAccessToken token;
+    uint32_t supplierId = 0;
+    uint64_t capabilityInvalid = NetCap::NET_CAPABILITY_END;
+    int32_t result = CellularDataTest::GetCellularDataSupplierId(DEFAULT_SIM_SLOT_ID, capabilityInvalid, supplierId);
+    ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
+
+    result =
+        CellularDataTest::GetCellularDataSupplierId(DEFAULT_SIM_SLOT_ID, NetCap::NET_CAPABILITY_INTERNET, supplierId);
+    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   CorrectNetSupplierNoAvailable_Test_01
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, CorrectNetSupplierNoAvailable_Test_01, TestSize.Level3)
+{
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+    DataAccessToken token;
+    int32_t result = CellularDataTest::CorrectNetSupplierNoAvailable(DEFAULT_SIM_SLOT_ID);
+    int32_t apnState = CellularDataTest::GetApnState(DEFAULT_SIM_SLOT_ID, "default");
+    if (apnState == ApnProfileState::PROFILE_STATE_CONNECTED) {
+        ASSERT_TRUE(result == TELEPHONY_ERR_FAIL);
+    } else {
+        ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
+    }
+}
+
+/**
+ * @tc.number   GetSupplierRegisterState_Test_01
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, GetSupplierRegisterState_Test_01, TestSize.Level3)
+{
+    DataAccessToken token;
+    int32_t regState = -1;
+    uint32_t supplierId = 1;
+    int32_t result = CellularDataTest::GetSupplierRegisterState(supplierId, regState);
+    ASSERT_TRUE(result == TELEPHONY_ERR_FAIL);
+
+    if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
+        return;
+    }
+    int32_t getSupplierIdRet =
+        CellularDataTest::GetCellularDataSupplierId(DEFAULT_SIM_SLOT_ID, NetCap::NET_CAPABILITY_INTERNET, supplierId);
+    if (getSupplierIdRet == TELEPHONY_ERR_SUCCESS) {
+        result = CellularDataTest::GetSupplierRegisterState(supplierId, regState);
+        ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
+    }
 }
 
 /**

@@ -218,6 +218,33 @@ public:
      */
     int32_t ReleaseCellularDataConnection(int32_t slotId);
 
+    /**
+     * @brief Get cellular data supplierId.
+     *
+     * @param slotId Card slot identification.
+     * @param capability Net capability.
+     * @param supplierId Cellular supplier id.
+     * @return 0 get success, others get fail.
+     */
+    int32_t GetCellularDataSupplierId(int32_t slotId, uint64_t capability, uint32_t &supplierId);
+
+    /**
+     * @brief Correct net supplier available is false.
+     *
+     * @param slotId Card slot identification.
+     * @return 0 set success, others set fail.
+     */
+    int32_t CorrectNetSupplierNoAvailable(int32_t slotId);
+
+    /**
+     * @brief Get supplier register state.
+     *
+     * @param supplierId Cellular supplier id.
+     * @param regState Supplier register state.
+     * @return 0 set success, others set fail.
+     */
+    int32_t GetSupplierRegisterState(uint32_t supplierId, int32_t &regState);
+
 private:
     class CellularDataDeathRecipient : public IRemoteObject::DeathRecipient {
     public:

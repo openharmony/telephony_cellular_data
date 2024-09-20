@@ -96,6 +96,14 @@ HWTEST_F(CellularDataServiceTest, CellularDataService_002, TestSize.Level0)
     std::string ipType;
     ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->GetDataConnIpType(DEFAULT_SIM_SLOT_ID, ipType));
     ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->IsNeedDoRecovery(DEFAULT_SIM_SLOT_ID, true));
+    uint32_t supplierId = 0;
+    ASSERT_EQ(TELEPHONY_ERR_SUCCESS,
+        service->GetCellularDataSupplierId(DEFAULT_SIM_SLOT_ID, NetCap::NET_CAPABILITY_INTERNET, supplierId));
+    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM,
+        service->GetCellularDataSupplierId(DEFAULT_SIM_SLOT_ID, NetCap::NET_CAPABILITY_END, supplierId));
+    service->CorrectNetSupplierNoAvailable(DEFAULT_SIM_SLOT_ID);
+    int32_t regState = -1;
+    service->GetSupplierRegisterState(supplierId, regState);
     service->OnStop();
 }
 

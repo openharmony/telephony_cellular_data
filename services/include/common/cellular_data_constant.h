@@ -58,6 +58,7 @@ struct NetSupplier {
     uint64_t capability = 0;
     int32_t slotId = 0;
     int32_t simId = 0;
+    int32_t regState = -1;
 };
 enum RegisterType {
     UNKOWN,
@@ -296,6 +297,7 @@ static constexpr const char *CELLULAR_DATA_COLUMN_VALUE = "VALUE";
 static const int32_t INVALID_SIM_ID = 0;
 static const int32_t INVALID_SLOT_ID = -1;
 static const int32_t CELLULAR_DATA_VSIM_SLOT_ID = 2;
+static const int32_t SUPPLIER_INVALID_REG_STATE = -1;
 } // namespace Telephony
 } // namespace OHOS
 #endif // CELLULAR_DATA_CONSTANT_H

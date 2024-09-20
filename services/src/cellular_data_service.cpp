@@ -15,6 +15,8 @@
 
 #include "cellular_data_service.h"
 
+#include <cinttypes>
+
 #include "cellular_data_dump_helper.h"
 #include "cellular_data_error.h"
 #include "cellular_data_hisysevent.h"
@@ -327,6 +329,7 @@ void CellularDataService::AddNetSupplier(int32_t slotId, CellularDataNetAgent &n
         netSupplier.slotId = slotId;
         netSupplier.simId = INVALID_SIM_ID;
         netSupplier.capability = capability;
+        netSupplier.regState = SUPPLIER_INVALID_REG_STATE;
         netAgent.AddNetSupplier(netSupplier);
     }
 }
@@ -747,6 +750,51 @@ int32_t CellularDataService::ReleaseCellularDataConnection(int32_t slotId)
     }
 
     return cellularDataController->ReleaseCellularDataConnection() ? TELEPHONY_ERR_SUCCESS : TELEPHONY_ERR_FAIL;
+}
+
+int32_t CellularDataService::GetCellularDataSupplierId(int32_t slotId, uint64_t capability, uint32_t &supplierId)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (capability < NetCap::NET_CAPABILITY_MMS || capability > NetCap::NET_CAPABILITY_INTERNAL_DEFAULT) {
+        TELEPHONY_LOGE("Invalid capability = (%{public}" PRIu64 ")", capability);
+        return CELLULAR_DATA_INVALID_PARAM;
+    }
+    supplierId = CellularDataNetAgent::GetInstance().GetSupplierId(slotId, capability);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t CellularDataService::CorrectNetSupplierNoAvailable(int32_t slotId)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
+    if (cellularDataController == nullptr) {
+        TELEPHONY_LOGE("cellularDataControllers is null, slotId=%{public}d", slotId);
+        return CELLULAR_DATA_INVALID_PARAM;
+    }
+    int32_t apnState = static_cast<int32_t>(cellularDataController->GetCellularDataState(DATA_CONTEXT_ROLE_DEFAULT));
+    if (apnState == ApnProfileState::PROFILE_STATE_CONNECTED) {
+        TELEPHONY_LOGE("Default apn state is connected, do not set available false");
+        return TELEPHONY_ERR_FAIL;
+    }
+    TELEPHONY_LOGI("correct default supplier available is false, apn state = %{public}d", apnState);
+    bool result = CellularDataNetAgent::GetInstance().UpdateNetSupplierAvailable(slotId, false);
+    return result ? TELEPHONY_ERR_SUCCESS : TELEPHONY_ERR_FAIL;
+}
+
+int32_t CellularDataService::GetSupplierRegisterState(uint32_t supplierId, int32_t &regState)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    bool result = CellularDataNetAgent::GetInstance().GetSupplierRegState(supplierId, regState);
+    return result ? TELEPHONY_ERR_SUCCESS : TELEPHONY_ERR_FAIL;
 }
 } // namespace Telephony
 } // namespace OHOS

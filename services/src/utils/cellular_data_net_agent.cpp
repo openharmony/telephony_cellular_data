@@ -70,7 +70,7 @@ bool CellularDataNetAgent::RegisterNetSupplier(const int32_t slotId)
             sptr<NetSupplierInfo> netSupplierInfo = new (std::nothrow) NetSupplierInfo();
             if (netSupplierInfo != nullptr) {
                 netSupplierInfo->isAvailable_ = false;
-                int32_t updateResult = netManager.UpdateNetSupplierInfo(netSupplier.supplierId, netSupplierInfo);
+                int32_t updateResult = UpdateNetSupplierInfo(netSupplier.supplierId, netSupplierInfo);
                 TELEPHONY_LOGI("Update network result:%{public}d", updateResult);
             }
             int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
@@ -150,13 +150,19 @@ void CellularDataNetAgent::UnregisterPolicyCallback()
     TELEPHONY_LOGI("Unregister NetPolicy Callback is :%{public}d", registerResult);
 }
 
-void CellularDataNetAgent::UpdateNetSupplierInfo(
-    int32_t supplierId, sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
+int32_t CellularDataNetAgent::UpdateNetSupplierInfo(
+    uint32_t supplierId, sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
 {
     int32_t result = NetConnClient::GetInstance().UpdateNetSupplierInfo(supplierId, netSupplierInfo);
     if (result != NETMANAGER_SUCCESS) {
         TELEPHONY_LOGE("Update network fail, result:%{public}d", result);
     }
+    for (NetSupplier &netSupplier : netSuppliers_) {
+        if (netSupplier.supplierId == supplierId) {
+            netSupplier.regState = result;
+        }
+    }
+    return result;
 }
 
 void CellularDataNetAgent::UpdateNetLinkInfo(int32_t supplierId, sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo)
@@ -191,6 +197,41 @@ void CellularDataNetAgent::RegisterSlotType(int32_t supplierId, int32_t radioTec
 {
     int32_t result = NetConnClient::GetInstance().RegisterSlotType(supplierId, radioTech);
     TELEPHONY_LOGI("result:%{public}d", result);
+}
+
+bool CellularDataNetAgent::UpdateNetSupplierAvailable(int32_t slotId, bool isAvailable)
+{
+    int32_t defaultSupplierId = 0;
+    for (const NetSupplier &netSupplier : netSuppliers_) {
+        if (netSupplier.slotId == slotId && netSupplier.capability == NetCap::NET_CAPABILITY_INTERNET) {
+            defaultSupplierId = netSupplier.supplierId;
+            break;
+        }
+    }
+    sptr<NetSupplierInfo> netSupplierInfo = new (std::nothrow) NetSupplierInfo();
+    if (netSupplierInfo != nullptr && defaultSupplierId != 0) {
+        netSupplierInfo->isAvailable_ = isAvailable;
+        int32_t result = UpdateNetSupplierInfo(defaultSupplierId, netSupplierInfo);
+        if (result == NETMANAGER_SUCCESS) {
+            TELEPHONY_LOGI("UpdateNetSupplierAvailable success");
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CellularDataNetAgent::GetSupplierRegState(uint32_t supplierId, int32_t &regState)
+{
+    auto it = std::find_if(netSuppliers_.begin(), netSuppliers_.end(), [supplierId](const auto &netSupplier) {
+        return netSupplier.supplierId == supplierId;
+    });
+    if (it != netSuppliers_.end()) {
+        regState = it->regState;
+        return true;
+    } else {
+        TELEPHONY_LOGE("not find the supplier, supplierId = %{public}d", supplierId);
+        return false;
+    }
 }
 } // namespace Telephony
 } // namespace OHOS
