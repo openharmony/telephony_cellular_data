@@ -626,8 +626,7 @@ HWTEST_F(ApnManagerTest, IsCompatibleApnItem_001, TestSize.Level0)
     sptr<ApnItem> newApnItem = nullptr;
     sptr<ApnItem> oldApnItem = nullptr;
     bool roamingState = false;
-    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
-    bool result = apnHolder->IsCompatibleApnItem(newApnItem, oldApnItem, roamingState);
+    bool result = ApnHolder::IsCompatibleApnItem(newApnItem, oldApnItem, roamingState);
     ASSERT_FALSE(result);
 }
 
@@ -643,8 +642,7 @@ HWTEST_F(ApnManagerTest, IsCompatibleApnItem_002, TestSize.Level0)
     std::strcmp(newApnItem->attr_.roamingProtocol_, "test_protocol");
     std::strcmp(newApnItem->attr_.roamingProtocol_, "test_protocol");
     bool roamingState = true;
-    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
-    bool result = apnHolder->IsCompatibleApnItem(newApnItem, oldApnItem, roamingState);
+    bool result = ApnHolder::IsCompatibleApnItem(newApnItem, oldApnItem, roamingState);
     ASSERT_TRUE(result);
 }
 
@@ -660,8 +658,7 @@ HWTEST_F(ApnManagerTest, IsCompatibleApnItem_003, TestSize.Level0)
     std::strcmp(newApnItem->attr_.roamingProtocol_, "test_protocol");
     std::strcmp(newApnItem->attr_.roamingProtocol_, "test_protocol");
     bool roamingState = false;
-    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
-    bool result = apnHolder->IsCompatibleApnItem(newApnItem, oldApnItem, roamingState);
+    bool result = ApnHolder::IsCompatibleApnItem(newApnItem, oldApnItem, roamingState);
     ASSERT_TRUE(result);
 }
 

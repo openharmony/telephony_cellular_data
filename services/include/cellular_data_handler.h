@@ -60,7 +60,7 @@ public:
     void ClearConnection(const sptr<ApnHolder> &apnHolder, DisConnectionReason reason);
     void EstablishAllApnsIfConnectable();
     void ClearAllConnections(DisConnectionReason reason);
-    void ClearConnectionsOnUpdateApns(const DataProfile &dataProfile, DisConnectionReason reason);
+    void ClearConnectionsOnUpdateApns(DisConnectionReason reason);
     bool ChangeConnectionForDsds(bool enable);
     int32_t GetSlotId() const;
     bool HandleApnChanged();
@@ -73,7 +73,7 @@ public:
     void GetDataConnApnAttr(ApnItem::Attribute &apnAttr) const;
     std::string GetDataConnIpType() const;
     int32_t GetDataRecoveryState();
-    void SetRilAttachApn(DataProfile &dataProfile);
+    void SetRilAttachApn();
     void IsNeedDoRecovery(bool needDoRecovery) const;
     void RegisterDataSettingObserver();
     void UnRegisterDataSettingObserver();
@@ -187,7 +187,7 @@ private:
     sptr<CellularDataIncallObserver> incallObserver_;
     sptr<CellularDataRdbObserver> cellularDataRdbObserver_;
     std::shared_ptr<IncallDataStateMachine> incallDataStateMachine_;
-    DataProfile lastDataProfile_;
+    sptr<ApnItem> lastApnItem_ = nullptr;
 
     using Fun = std::function<void(const AppExecFwk::InnerEvent::Pointer &event)>;
     std::map<uint32_t, Fun> eventIdMap_ {

@@ -1230,15 +1230,14 @@ HWTEST_F(BranchTest, Telephony_ApnHolder_002, Function | MediumTest | Level3)
  */
 HWTEST_F(BranchTest, Telephony_ApnHolder_003, Function | MediumTest | Level3)
 {
-    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
     sptr<ApnItem> newApnItem;
     sptr<ApnItem> oldApnItem;
-    ASSERT_FALSE(apnHolder->IsSameApnItem(newApnItem, oldApnItem, true));
+    ASSERT_FALSE(ApnHolder::IsSameApnItem(newApnItem, oldApnItem, true));
     oldApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
-    ASSERT_FALSE(apnHolder->IsSameApnItem(newApnItem, oldApnItem, true));
+    ASSERT_FALSE(ApnHolder::IsSameApnItem(newApnItem, oldApnItem, true));
     newApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
     oldApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
-    ASSERT_TRUE(apnHolder->IsSameApnItem(newApnItem, oldApnItem, false));
+    ASSERT_TRUE(ApnHolder::IsSameApnItem(newApnItem, oldApnItem, false));
     oldApnItem->CanDealWithType(DATA_CONTEXT_ROLE_DEFAULT);
     oldApnItem->GetApnTypes();
     PdpProfile apnBean;

@@ -332,11 +332,8 @@ HWTEST_F(CellularDataHandlerTest, ClearConnectionsOnUpdateApns_001, Function | M
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
-    cellularDataHandler->Init();
-    DataProfile dataProfile;
-    cellularDataHandler->ClearConnectionsOnUpdateApns(dataProfile, DisConnectionReason::REASON_RETRY_CONNECTION);
-    EXPECT_NE(cellularDataHandler->connectionManager_, nullptr);
-    EXPECT_NE(cellularDataHandler->apnManager_, nullptr);
+    cellularDataHandler->ClearConnectionsOnUpdateApns(DisConnectionReason::REASON_RETRY_CONNECTION);
+    EXPECT_EQ(cellularDataHandler->apnManager_, nullptr);
 }
 
 /**
@@ -351,9 +348,7 @@ HWTEST_F(CellularDataHandlerTest, ClearConnectionsOnUpdateApns_002, Function | M
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
     cellularDataHandler->Init();
-    DataProfile dataProfile;
-    dataProfile.profileId = 1;
-    cellularDataHandler->ClearConnectionsOnUpdateApns(dataProfile, DisConnectionReason::REASON_RETRY_CONNECTION);
+    cellularDataHandler->ClearConnectionsOnUpdateApns(DisConnectionReason::REASON_RETRY_CONNECTION);
     EXPECT_NE(cellularDataHandler->connectionManager_, nullptr);
     EXPECT_NE(cellularDataHandler->apnManager_, nullptr);
 }
@@ -641,11 +636,10 @@ HWTEST_F(CellularDataHandlerTest, SetRilAttachApnTest001, Function | MediumTest 
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 1);
     cellularDataHandler->Init();
+    EXPECT_NE(cellularDataHandler->apnManager_, nullptr);
     sptr<ApnItem> attachApn = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
     cellularDataHandler->apnManager_->allApnItem_.push_back(attachApn);
-    DataProfile dataProfile;
-    cellularDataHandler->SetRilAttachApn(dataProfile);
-    EXPECT_EQ(dataProfile.profileId, attachApn->attr_.profileId_);
+    cellularDataHandler->SetRilAttachApn();
 }
 
 /**
