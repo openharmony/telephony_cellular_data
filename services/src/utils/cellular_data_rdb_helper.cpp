@@ -263,7 +263,7 @@ bool CellularDataRdbHelper::IsMvnoDataMatched(const std::string &mvnoDataFromSim
         try {
             return std::regex_match(mvnoDataFromSim, std::regex(apnBean.mvnoMatchData));
         } catch (std::regex_error &e) {
-            TELEPHONY_LOGE("regex data: %{public}s, error: %{public}s", apnBean.mvnoMatchData.c_str(), e.what());
+            TELEPHONY_LOGE("regex error");
             return false;
         }
     }
