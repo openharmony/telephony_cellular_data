@@ -188,5 +188,40 @@ HWTEST_F(CellularDataClientTest, ReleaseCellularDataConnection_001, TestSize.Lev
     int32_t result = CellularDataClient::GetInstance().ReleaseCellularDataConnection(0);
     EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
 }
+
+/**
+ * @tc.number   GetCellularDataSupplierId_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataClientTest, GetCellularDataSupplierId_001, TestSize.Level0)
+{
+    uint32_t supplierId = 0;
+    int32_t result = CellularDataClient::GetInstance().GetCellularDataSupplierId(0, 0, supplierId);
+    EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+}
+
+/**
+ * @tc.number   CorrectNetSupplierNoAvailable_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataClientTest, CorrectNetSupplierNoAvailable_001, TestSize.Level0)
+{
+    int32_t result = CellularDataClient::GetInstance().CorrectNetSupplierNoAvailable(0);
+    EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+}
+
+/**
+ * @tc.number   GetSupplierRegisterState_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataClientTest, GetSupplierRegisterState_001, TestSize.Level0)
+{
+    int32_t regState = 0;
+    int32_t result = CellularDataClient::GetInstance().GetSupplierRegisterState(0, regState);
+    EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+}
 } // namespace Telephony
 } // namespace OHOS

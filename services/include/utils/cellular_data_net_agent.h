@@ -71,7 +71,7 @@ public:
      * @param supplierId network unique identity id returned after network registration
      * @param netSupplierInfo network data information
      */
-    void UpdateNetSupplierInfo(int32_t supplierId, sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo);
+    int32_t UpdateNetSupplierInfo(uint32_t supplierId, sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo);
 
     /**
      * Update link information
@@ -103,6 +103,10 @@ public:
     int32_t GetSupplierId(const int32_t slotId, uint64_t capability) const;
 
     void RegisterSlotType(int32_t supplierId, int32_t radioTech);
+
+    bool UpdateNetSupplierAvailable(int32_t slotId, bool isAvailable);
+
+    bool GetSupplierRegState(uint32_t supplierId, int32_t &regState);
 
 private:
     std::vector<NetSupplier> netSuppliers_;

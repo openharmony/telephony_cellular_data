@@ -59,6 +59,9 @@ private:
     int32_t OnGetIntelligenceSwitchState(MessageParcel &data, MessageParcel &reply);
     int32_t OnEstablishAllApnsIfConnectable(MessageParcel &data, MessageParcel &reply);
     int32_t OnReleaseCellularDataConnection(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetCellularDataSupplierId(MessageParcel &data, MessageParcel &reply);
+    int32_t OnCorrectNetSupplierNoAvailable(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetSupplierRegisterState(MessageParcel &data, MessageParcel &reply);
     int32_t SetTimer(uint32_t code);
     void CancelTimer(int32_t id);
 
@@ -115,7 +118,14 @@ private:
             [this](MessageParcel &data, MessageParcel &reply) {
                 return OnEstablishAllApnsIfConnectable(data, reply); } },
         { (uint32_t)CellularDataInterfaceCode::RELEASE_CELLULAR_DATA_CONNECTION,
-            [this](MessageParcel &data, MessageParcel &reply) { return OnReleaseCellularDataConnection(data, reply); }}
+            [this](MessageParcel &data, MessageParcel &reply) { return OnReleaseCellularDataConnection(data, reply); }},
+        { (uint32_t)CellularDataInterfaceCode::GET_CELLULAR_DATA_SUPPLIERID,
+            [this](MessageParcel &data, MessageParcel &reply) { return OnGetCellularDataSupplierId(data, reply); } },
+        { (uint32_t)CellularDataInterfaceCode::CORRECT_NET_SUPPLIER_NO_AVAILABLE,
+            [this](MessageParcel &data, MessageParcel &reply) {
+                return OnCorrectNetSupplierNoAvailable(data, reply); } },
+        { (uint32_t)CellularDataInterfaceCode::GET_SUPPLIER_REGISTER_STATE,
+            [this](MessageParcel &data, MessageParcel &reply) { return OnGetSupplierRegisterState(data, reply); } }
     };
     std::map<uint32_t, std::string> collieCodeStringMap_ = {
         { uint32_t(CellularDataInterfaceCode::GET_CELLULAR_DATA_STATE), "GET_CELLULAR_DATA_STATE" },

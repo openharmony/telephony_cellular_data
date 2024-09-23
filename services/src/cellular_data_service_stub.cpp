@@ -415,5 +415,48 @@ int32_t CellularDataServiceStub::OnReleaseCellularDataConnection(MessageParcel &
     return result;
 }
 
+int32_t CellularDataServiceStub::OnGetCellularDataSupplierId(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    uint64_t capability = data.ReadUint64();
+    uint32_t supplierId = 0;
+    int32_t result = GetCellularDataSupplierId(slotId, capability, supplierId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("write int32 reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteUint32(supplierId)) {
+        TELEPHONY_LOGE("write uint32 reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CellularDataServiceStub::OnCorrectNetSupplierNoAvailable(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t result = CorrectNetSupplierNoAvailable(slotId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("write int32 reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CellularDataServiceStub::OnGetSupplierRegisterState(MessageParcel &data, MessageParcel &reply)
+{
+    uint32_t supplierId = data.ReadUint32();
+    int32_t regState = -1;
+    int32_t result = GetSupplierRegisterState(supplierId, regState);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("write int32 reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteInt32(regState)) {
+        TELEPHONY_LOGE("write int32 reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
 } // namespace Telephony
 } // namespace OHOS

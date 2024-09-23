@@ -420,5 +420,35 @@ int32_t CellularDataClient::ReleaseCellularDataConnection(int32_t slotId)
     }
     return proxy->ReleaseCellularDataConnection(slotId);
 }
+
+int32_t CellularDataClient::GetCellularDataSupplierId(int32_t slotId, uint64_t capability, uint32_t &supplierId)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetCellularDataSupplierId(slotId, capability, supplierId);
+}
+
+int32_t CellularDataClient::CorrectNetSupplierNoAvailable(int32_t slotId)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->CorrectNetSupplierNoAvailable(slotId);
+}
+
+int32_t CellularDataClient::GetSupplierRegisterState(uint32_t supplierId, int32_t &regState)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetSupplierRegisterState(supplierId, regState);
+}
 } // namespace Telephony
 } // namespace OHOS
