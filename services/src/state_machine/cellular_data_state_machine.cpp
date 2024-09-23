@@ -28,6 +28,7 @@
 #include "disconnecting.h"
 #include "inactive.h"
 #include "radio_event.h"
+#include "telephony_common_utils.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -288,7 +289,9 @@ void CellularDataStateMachine::SplitProxyIpAddress(const std::string &proxyIpAdd
     }
     if (address.size() == HOST_PORT_SIZE) {
         host = address[0];
-        port = static_cast<uint16_t>(std::stoi(address[1]));
+        if (!address[1].empty() && IsValidDecValue(address[1])) {
+            port = static_cast<uint16_t>(std::stoi(address[1]));
+        }
     }
 }
 
