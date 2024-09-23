@@ -123,7 +123,6 @@ void ApnHolder::ReleaseDataConnection()
     AppExecFwk::InnerEvent::Pointer event =
         AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT, object);
     cellularDataStateMachine_->SendEvent(event);
-    cellularDataStateMachine_ = nullptr;
 }
 
 int32_t ApnHolder::GetProfileId(const std::string &apnType) const

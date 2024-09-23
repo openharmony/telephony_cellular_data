@@ -60,8 +60,9 @@ public:
     bool IsMmsType() const;
     void InitialApnRetryCount();
     bool IsSameMatchedApns(std::vector<sptr<ApnItem>> newMatchedApns, bool roamingState);
-    bool IsSameApnItem(const sptr<ApnItem> &newApnItem, const sptr<ApnItem> &oldApnItem, bool roamingState);
-    bool IsCompatibleApnItem(const sptr<ApnItem> &newApnItem, const sptr<ApnItem> &oldApnItem, bool roamingState);
+    static bool IsSameApnItem(const sptr<ApnItem> &newApnItem, const sptr<ApnItem> &oldApnItem, bool roamingState);
+    static bool IsCompatibleApnItem(const sptr<ApnItem> &newApnItem, const sptr<ApnItem> &oldApnItem,
+        bool roamingState);
     void AddUid(uint32_t uid);
     void RemoveUid(uint32_t uid);
     HasSystemUse GetUidStatus() const;
