@@ -294,6 +294,9 @@ void CellularDataHandler::ClearConnectionsOnUpdateApns(DisConnectionReason reaso
         if (lastApnItem_ == nullptr) {
             lastApnItem_ = new ApnItem();
         }
+        if (apnItem == nullptr) {
+            return;
+        }
         *lastApnItem_ = *apnItem;
     }
 }
