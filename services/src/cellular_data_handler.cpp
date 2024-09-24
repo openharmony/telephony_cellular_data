@@ -49,6 +49,7 @@ CellularDataHandler::CellularDataHandler(const EventFwk::CommonEventSubscribeInf
 
 void CellularDataHandler::Init()
 {
+    lastApnItem_ = new ApnItem();
     apnManager_ = std::make_unique<ApnManager>().release();
     dataSwitchSettings_ = std::make_unique<DataSwitchSettings>(slotId_);
     connectionManager_ = std::make_unique<DataConnectionManager>(slotId_).release();
@@ -69,7 +70,6 @@ void CellularDataHandler::Init()
     dataSwitchSettings_->LoadSwitchValue();
     GetConfigurationFor5G();
     SetRilLinkBandwidths();
-    lastApnItem_ = new ApnItem();
 }
 
 CellularDataHandler::~CellularDataHandler()
@@ -291,6 +291,9 @@ void CellularDataHandler::ClearConnectionsOnUpdateApns(DisConnectionReason reaso
     auto apnItem = apnManager_->GetRilAttachApn();
     if (!ApnHolder::IsCompatibleApnItem(lastApnItem_, apnItem, isRoaming)) {
         ClearAllConnections(reason);
+        if (lastApnItem_ == nullptr) {
+            lastApnItem_ = new ApnItem();
+        }
         *lastApnItem_ = *apnItem;
     }
 }
