@@ -92,7 +92,7 @@ public:
     MOCK_METHOD(int32_t, IsPreferCellularUrl, (const std::string &url, bool &preferCellular));
     MOCK_METHOD(int32_t, RegisterPreAirplaneCallback, (const sptr<IPreAirplaneCallback> callback));
     MOCK_METHOD(int32_t, UnregisterPreAirplaneCallback, (const sptr<IPreAirplaneCallback> callback));
-    MOCK_METHOD(int32_t, UpdateSupplierScore, (NetBearType bearerType, bool isBetter, uint32_t &supplierId));
+    MOCK_METHOD(int32_t, UpdateSupplierScore, (NetBearType bearerType, uint32_t detectionStatus, uint32_t &supplierId));
     MOCK_METHOD(int32_t, EnableVnicNetwork, (const sptr<NetLinkInfo> &netLinkInfo, const std::set<int32_t> &uids));
     MOCK_METHOD(int32_t, DisableVnicNetwork, ());
     MOCK_METHOD(int32_t, EnableDistributedClientNet, (const std::string &virnicAddr, const std::string &iif));
