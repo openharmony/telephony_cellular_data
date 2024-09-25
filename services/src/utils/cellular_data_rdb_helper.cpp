@@ -257,14 +257,15 @@ bool CellularDataRdbHelper::IsMvnoDataMatched(const std::string &mvnoDataFromSim
     if (mvnoDataFromSim.empty()) {
         return false;
     }
-    if (apnBean.mvnoType.compare(MvnoType::ICCID) == 0) {
-        return std::regex_match(mvnoDataFromSim, std::regex(apnBean.mvnoMatchData));
-    }
-    if (apnBean.mvnoType.compare(MvnoType::SPN) == 0) {
-        return std::regex_match(mvnoDataFromSim, std::regex(apnBean.mvnoMatchData));
-    }
-    if (apnBean.mvnoType.compare(MvnoType::IMSI) == 0) {
-        return std::regex_match(mvnoDataFromSim, std::regex(apnBean.mvnoMatchData));
+    if (apnBean.mvnoType.compare(MvnoType::ICCID) == 0 ||
+        apnBean.mvnoType.compare(MvnoType::SPN) == 0 ||
+        apnBean.mvnoType.compare(MvnoType::IMSI) == 0) {
+        try {
+            return std::regex_match(mvnoDataFromSim, std::regex(apnBean.mvnoMatchData));
+        } catch (std::regex_error &e) {
+            TELEPHONY_LOGE("regex error");
+            return false;
+        }
     }
     if (apnBean.mvnoType.compare(MvnoType::GID1) == 0) {
         return mvnoDataFromSim.compare(0, apnBean.mvnoMatchData.size(), apnBean.mvnoMatchData) == 0;
