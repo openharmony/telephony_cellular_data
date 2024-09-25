@@ -803,5 +803,6 @@ HWTEST_F(ApnManagerTest, UpdateDefaultCellularDataSlotId_001, TestSize.Level0)
     int32_t result = CellularDataClient::GetInstance().UpdateDefaultCellularDataSlotId();
     EXPECT_EQ(result, 0);
 }
+
 } // namespace Telephony
 } // namespace OHOS
