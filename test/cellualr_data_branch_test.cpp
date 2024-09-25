@@ -770,5 +770,6 @@ HWTEST_F(CellularStateMachineTest, Active_CellularDataStateMachine_001, Function
     result = active->ProcessDataConnectionVoiceCallStartedOrEnded(event);
     EXPECT_EQ(result, false);
 }
+
 } // namespace Telephony
 } // namespace OHOS

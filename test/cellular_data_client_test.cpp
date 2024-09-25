@@ -223,5 +223,6 @@ HWTEST_F(CellularDataClientTest, GetSupplierRegisterState_001, TestSize.Level0)
     int32_t result = CellularDataClient::GetInstance().GetSupplierRegisterState(0, regState);
     EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
 }
+
 } // namespace Telephony
 } // namespace OHOS

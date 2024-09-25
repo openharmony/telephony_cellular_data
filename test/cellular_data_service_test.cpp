@@ -299,5 +299,6 @@ HWTEST_F(CellularDataServiceTest, EstablishAllApnsIfConnectableTest001, TestSize
     EXPECT_EQ(service->EstablishAllApnsIfConnectable(slotId), TELEPHONY_ERR_PERMISSION_ERR);
     EXPECT_EQ(service->ReleaseCellularDataConnection(slotId), TELEPHONY_ERR_PERMISSION_ERR);
 }
+
 } // namespace Telephony
 } // namespace OHOS
