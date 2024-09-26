@@ -992,8 +992,7 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
         if (event->GetParam() == TYPE_REQUEST_NET) {
             apnHolder->RequestCellularData(request);
         } else {
-            apnHolder->ReleaseCellularData(request);
-            if (apnHolder->IsDataCallEnabled()) {
+            if (!apnHolder->ReleaseCellularData(request)) {
                 return;
             }
         }
