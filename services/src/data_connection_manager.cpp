@@ -210,36 +210,29 @@ void CcmDefaultState::RadioDataCallListChanged(const AppExecFwk::InnerEvent::Poi
         TELEPHONY_LOGE("setupDataCallResultInfo is null");
         return;
     }
-    std::vector<std::shared_ptr<CellularDataStateMachine>> retryDataConnection;
     std::map<int32_t, std::shared_ptr<CellularDataStateMachine>> idActiveConnectionMap =
         connectManager_.GetActiveConnection();
     UpdateNetworkInfo(event);
     for (const std::pair<const int32_t, std::shared_ptr<CellularDataStateMachine>>& it : idActiveConnectionMap) {
-        bool isPush = true;
         if (it.second == nullptr) {
             TELEPHONY_LOGI("The activation item is null(%{public}d)", it.first);
             continue;
         }
         int32_t cid = it.second->GetCid();
         for (size_t i = 0; i < infos->dcList.size(); ++i) {
-            if (infos->dcList[i].cid == cid && infos->dcList[i].active > 0) {
-                isPush = false;
+            if (infos->dcList[i].cid == cid && infos->dcList[i].active <= 0) {
+                auto object = std::make_shared<SetupDataCallResultInfo>();
+                object->cid = cid;
+                object->reason = infos->dcList[i].reason;
+                object->retryTime = infos->dcList[i].retryTime;
+                object->retryScene = static_cast<int32_t>(RetryScene::RETRY_SCENE_MODEM_DEACTIVATE);
+                TELEPHONY_LOGI("add to retry (modem dend): cid=%{public}d, cause=%{public}d", cid, object->reason);
+                AppExecFwk::InnerEvent::Pointer event =
+                    AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_LOST_CONNECTION, object);
+                it.second->SendEvent(event);
                 break;
             }
         }
-        if (isPush) {
-            TELEPHONY_LOGI("cid:%{public}d add to retry", it.first);
-            retryDataConnection.push_back(it.second);
-        }
-    }
-    for (std::shared_ptr<CellularDataStateMachine> &it : retryDataConnection) {
-        if (it == nullptr) {
-            TELEPHONY_LOGI(" retryDataConnection is null");
-            continue;
-        }
-        AppExecFwk::InnerEvent::Pointer event =
-            AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_LOST_CONNECTION);
-        it->SendEvent(event);
     }
 }
 

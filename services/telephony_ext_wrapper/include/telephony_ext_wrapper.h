@@ -45,6 +45,7 @@ public:
     typedef bool (*IS_ALL_CELLULAR_DATA_ALLOWED)(
         const NetRequest &, const HasSystemUse hasSystemUse);
     typedef bool (*IS_DUAL_CELLULAR_CARD_ALLOWED)();
+    typedef void (*DATA_END_RETRY_STRATEGY)(int64_t&, int32_t&, int64_t&, int32_t&);
     DATA_EDN_SELF_CURE dataEndSelfCure_ = nullptr;
     IS_APN_ALLOWED_ACTIVE isApnAllowedActive_ = nullptr;
     GET_VSIM_SLOT_ID getVSimSlotId_ = nullptr;
@@ -54,6 +55,7 @@ public:
     SEND_DATA_SWITCH_CHANGE_INFO sendDataSwitchChangeInfo_ = nullptr;
     IS_ALL_CELLULAR_DATA_ALLOWED isAllCellularDataAllowed_ = nullptr;
     IS_DUAL_CELLULAR_CARD_ALLOWED isDualCellularCardAllowed_ = nullptr;
+    DATA_END_RETRY_STRATEGY dataEndRetryStrategy_ = nullptr;
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
     void* telephonyVSimWrapperHandle_ = nullptr;
@@ -65,6 +67,7 @@ private:
     void InitSendDataSwitchChangeInfo();
     void InitIsAllCellularDataAllowed();
     void InitIsDualCellularCardAllowed();
+    void InitDataEndRetryStrategy();
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()

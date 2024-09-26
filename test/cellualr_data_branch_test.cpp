@@ -115,25 +115,6 @@ HWTEST_F(CellularStateMachineTest, Activating_StateBegin_001, Function | MediumT
 }
 
 /**
- * @tc.number   Activating_DataCallPdpError_001
- * @tc.name     test function branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularStateMachineTest, Activating_DataCallPdpError_001, Function | MediumTest | Level1)
-{
-    if (cellularMachine == nullptr) {
-        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
-        cellularMachine = machine->CreateCellularDataConnect(0);
-        cellularMachine->Init();
-    }
-    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
-    auto result = activating->DataCallPdpError(96);
-    EXPECT_EQ(result, DisConnectionReason::REASON_CLEAR_CONNECTION);
-    result = activating->DataCallPdpError(114);
-    EXPECT_EQ(result, DisConnectionReason::REASON_CLEAR_CONNECTION);
-}
-
-/**
  * @tc.number   Activating_StateProcess_001
  * @tc.name     test function branch
  * @tc.desc     Function test
@@ -770,6 +751,5 @@ HWTEST_F(CellularStateMachineTest, Active_CellularDataStateMachine_001, Function
     result = active->ProcessDataConnectionVoiceCallStartedOrEnded(event);
     EXPECT_EQ(result, false);
 }
-
 } // namespace Telephony
 } // namespace OHOS

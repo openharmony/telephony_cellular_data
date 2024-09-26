@@ -48,9 +48,9 @@ void ApnHolder::SetAllMatchedApns(std::vector<sptr<ApnItem>> &matchedApns)
     retryPolicy_.SetMatchedApns(matchedApns);
 }
 
-int64_t ApnHolder::GetRetryDelay() const
+int64_t ApnHolder::GetRetryDelay(int32_t cause, int32_t suggestTime, RetryScene scene)
 {
-    return retryPolicy_.GetNextRetryDelay();
+    return retryPolicy_.GetNextRetryDelay(apnType_, cause, suggestTime, scene);
 }
 
 void ApnHolder::SetCurrentApn(sptr<ApnItem> &apnItem)
@@ -293,6 +293,13 @@ bool ApnHolder::IsCompatibleApnItem(const sptr<ApnItem> &newApnItem, const sptr<
         std::strcmp(newApnItem->attr_.password_, oldApnItem->attr_.password_) == 0 &&
         std::strcmp(newApnItem->attr_.proxyIpAddress_, oldApnItem->attr_.proxyIpAddress_) == 0 &&
         std::strcmp(newApnItem->attr_.mmsIpAddress_, oldApnItem->attr_.mmsIpAddress_) == 0;
+}
+
+void ApnHolder::MarkCurrentApnBad()
+{
+    if (apnItem_ != nullptr) {
+        apnItem_->MarkBadApn(true);
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

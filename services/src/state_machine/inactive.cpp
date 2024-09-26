@@ -45,8 +45,12 @@ void Inactive::StateBegin()
         }
         netInfo->cid = stateMachine->cid_;
         netInfo->flag = deActiveApnTypeId_;
-        netInfo->reason = static_cast<int32_t>(reason_);
         netInfo->active = 0;
+        if (resultInfo_ != nullptr) {
+            netInfo->reason = resultInfo_->reason;
+            netInfo->retryTime = resultInfo_->retryTime;
+            netInfo->retryScene = resultInfo_->retryScene;
+        }
         AppExecFwk::InnerEvent::Pointer event =
             AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_DISCONNECT_DATA_COMPLETE, netInfo);
         if (event == nullptr) {
@@ -57,7 +61,7 @@ void Inactive::StateBegin()
             stateMachine->cellularDataHandler_->SendEvent(event);
         }
         deActiveApnTypeId_ = ERROR_APN_ID;
-        reason_ = DisConnectionReason::REASON_RETRY_CONNECTION;
+        resultInfo_ = nullptr;
     }
     stateMachine->SetCurrentState(sptr<State>(this));
 }
@@ -115,9 +119,21 @@ void Inactive::SetDeActiveApnTypeId(int32_t deActiveApnTypeId)
     deActiveApnTypeId_ = deActiveApnTypeId;
 }
 
-void Inactive::SetReason(DisConnectionReason reason)
+void Inactive::SetDataCallResultInfo(std::shared_ptr<SetupDataCallResultInfo> resultInfo)
 {
-    reason_ = reason;
+    resultInfo_ = resultInfo;
+}
+
+void Inactive::SetDataCallResultInfoToRetry()
+{
+    resultInfo_ = std::make_shared<SetupDataCallResultInfo>();
+    resultInfo_->reason = static_cast<int32_t>(PdpErrorReason::PDP_ERR_RETRY);
+}
+
+void Inactive::SetDataCallResultInfoToClear()
+{
+    resultInfo_ = std::make_shared<SetupDataCallResultInfo>();
+    resultInfo_->reason = static_cast<int32_t>(PdpErrorReason::PDP_ERR_UNKNOWN_TO_CLEAR_CONNECTION);
 }
 } // namespace Telephony
 } // namespace OHOS

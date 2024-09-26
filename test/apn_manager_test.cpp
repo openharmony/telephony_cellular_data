@@ -672,6 +672,14 @@ HWTEST_F(ApnManagerTest, GetNextRetryApnItem001, TestSize.Level0)
     std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
     connectionRetryPolicy->matchedApns_.clear();
     EXPECT_EQ(connectionRetryPolicy->GetNextRetryApnItem(), nullptr);
+
+    sptr<ApnItem> defaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
+    defaultApnItem->MarkBadApn(true);
+    connectionRetryPolicy->matchedApns_.push_back(defaultApnItem);
+    connectionRetryPolicy->currentApnIndex_ = 0;
+    EXPECT_EQ(connectionRetryPolicy->GetNextRetryApnItem(), nullptr);
+    defaultApnItem->MarkBadApn(false);
+    EXPECT_NE(connectionRetryPolicy->GetNextRetryApnItem(), nullptr);
 }
 
 /**
@@ -755,9 +763,177 @@ HWTEST_F(ApnManagerTest, GetNextRetryApnItem_006, TestSize.Level0)
 HWTEST_F(ApnManagerTest, GetNextRetryApnItem_007, TestSize.Level0)
 {
     std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
-    connectionRetryPolicy->matchedApns_.push_back(nullptr);
+    connectionRetryPolicy->matchedApns_.clear();
     connectionRetryPolicy->currentApnIndex_ = 0;
     EXPECT_EQ(connectionRetryPolicy->GetNextRetryApnItem(), nullptr);
+}
+
+/**
+ * @tc.number   OnPropChanged_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, OnPropChanged_001, TestSize.Level0)
+{
+    std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
+    connectionRetryPolicy->OnPropChanged(nullptr, nullptr, nullptr);
+    EXPECT_EQ(connectionRetryPolicy->isPropOn_, true);
+    connectionRetryPolicy->OnPropChanged("persist.telephony.retrystrategy.allow", nullptr, nullptr);
+    EXPECT_EQ(connectionRetryPolicy->isPropOn_, true);
+    connectionRetryPolicy->OnPropChanged("persist.telephony.retrystrategy.allow", "true", nullptr);
+    EXPECT_EQ(connectionRetryPolicy->isPropOn_, true);
+    connectionRetryPolicy->OnPropChanged("fakeKey", nullptr, nullptr);
+    EXPECT_EQ(connectionRetryPolicy->isPropOn_, true);
+    connectionRetryPolicy->OnPropChanged("fakeKey", "true", nullptr);
+    EXPECT_EQ(connectionRetryPolicy->isPropOn_, true);
+}
+
+/**
+ * @tc.number   IsAllBadApn_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, IsAllBadApn_001, TestSize.Level0)
+{
+    std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
+    connectionRetryPolicy->matchedApns_.clear();
+    EXPECT_TRUE(connectionRetryPolicy->IsAllBadApn());
+    sptr<ApnItem> defaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
+    defaultApnItem->MarkBadApn(false);
+    connectionRetryPolicy->matchedApns_.push_back(defaultApnItem);
+    EXPECT_FALSE(connectionRetryPolicy->IsAllBadApn());
+    defaultApnItem->MarkBadApn(true);
+    EXPECT_TRUE(connectionRetryPolicy->IsAllBadApn());
+}
+
+/**
+ * @tc.number   GetNextRetryDelay_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, GetNextRetryDelay_001, TestSize.Level0)
+{
+    std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
+    connectionRetryPolicy->matchedApns_.clear();
+    auto delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_DEFAULT, 0, 0,
+        RetryScene::RETRY_SCENE_OTHERS);
+    EXPECT_GE(delay, 0);
+    sptr<ApnItem> defaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
+    defaultApnItem->MarkBadApn(true);
+    connectionRetryPolicy->matchedApns_.push_back(defaultApnItem);
+    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_DEFAULT, 0, 0, RetryScene::RETRY_SCENE_OTHERS);
+    EXPECT_GE(delay, 0);
+}
+
+/**
+ * @tc.number   GetNextRetryDelay_002
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, GetNextRetryDelay_002, TestSize.Level0)
+{
+    std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
+    connectionRetryPolicy->matchedApns_.clear();
+    sptr<ApnItem> defaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
+    defaultApnItem->MarkBadApn(false);
+    connectionRetryPolicy->matchedApns_.push_back(defaultApnItem);
+    auto delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_DEFAULT, 0, 0,
+        RetryScene::RETRY_SCENE_OTHERS);
+    EXPECT_GE(delay, 0);
+    connectionRetryPolicy->isPropOn_ = false;
+    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_DEFAULT, 0, 0, RetryScene::RETRY_SCENE_OTHERS);
+    EXPECT_GE(delay, 0);
+    connectionRetryPolicy->isPropOn_ = true;
+    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_DEFAULT, 0, 0, RetryScene::RETRY_SCENE_OTHERS);
+    EXPECT_GE(delay, 0);
+    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_MMS, 0, 0, RetryScene::RETRY_SCENE_OTHERS);
+    EXPECT_GE(delay, 0);
+}
+
+/**
+ * @tc.number   SetMatchedApns_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, SetMatchedApns_001, TestSize.Level0)
+{
+    std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
+    std::vector<sptr<ApnItem>> matchedApns = {};
+    connectionRetryPolicy->SetMatchedApns(matchedApns);
+    EXPECT_EQ(connectionRetryPolicy->GetMatchedApns().size(), 0);
+}
+
+/**
+ * @tc.number   GetRandomDelay_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, GetRandomDelay_001, TestSize.Level0)
+{
+    std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
+    EXPECT_GE(connectionRetryPolicy->GetRandomDelay(), 0);
+    EXPECT_LE(connectionRetryPolicy->GetRandomDelay(), 2000);
+}
+
+/**
+ * @tc.number   ConvertPdpErrorToDisconnReason_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, ConvertPdpErrorToDisconnReason_001, TestSize.Level0)
+{
+    std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
+    auto res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
+        PdpErrorReason::PDP_ERR_OPERATOR_DETERMINED_BARRING);
+    EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
+    res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
+        PdpErrorReason::PDP_ERR_MISSING_OR_UNKNOWN_APN);
+    EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
+    res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
+        PdpErrorReason::PDP_ERR_UNKNOWN_PDP_ADDR_OR_TYPE);
+    EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
+    res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
+        PdpErrorReason::PDP_ERR_USER_VERIFICATION);
+    EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
+    res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
+        PdpErrorReason::PDP_ERR_ACTIVATION_REJECTED_GGSN);
+    EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
+    res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
+        PdpErrorReason::PDP_ERR_SERVICE_OPTION_NOT_SUPPORTED);
+    EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
+    res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
+        PdpErrorReason::PDP_ERR_REQUESTED_SERVICE_OPTION_NOT_SUBSCRIBED);
+    EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
+    res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
+        PdpErrorReason::PDP_ERR_NSAPI_ALREADY_USED);
+    EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
+    res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
+        PdpErrorReason::PDP_ERR_IPV4_ONLY_ALLOWED);
+    EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
+    res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
+        PdpErrorReason::PDP_ERR_IPV6_ONLY_ALLOWED);
+    EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
+    res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
+        PdpErrorReason::PDP_ERR_PROTOCOL_ERRORS);
+    EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
+    res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
+        PdpErrorReason::PDP_ERR_UNKNOWN_TO_CLEAR_CONNECTION);
+    EXPECT_EQ(res, DisConnectionReason::REASON_CLEAR_CONNECTION);
+    res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
+        PdpErrorReason::PDP_ERR_RETRY);
+    EXPECT_EQ(res, DisConnectionReason::REASON_RETRY_CONNECTION);
+}
+
+/**
+ * @tc.number   InitialRetryCountValue_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, InitialRetryCountValue_001, TestSize.Level0)
+{
+    std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
+    connectionRetryPolicy->InitialRetryCountValue();
+    EXPECT_EQ(connectionRetryPolicy->tryCount_, 0);
 }
 
 /**
@@ -803,6 +979,5 @@ HWTEST_F(ApnManagerTest, UpdateDefaultCellularDataSlotId_001, TestSize.Level0)
     int32_t result = CellularDataClient::GetInstance().UpdateDefaultCellularDataSlotId();
     EXPECT_EQ(result, 0);
 }
-
 } // namespace Telephony
 } // namespace OHOS

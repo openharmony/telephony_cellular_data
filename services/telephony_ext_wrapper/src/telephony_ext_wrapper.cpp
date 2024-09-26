@@ -58,6 +58,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCellularData()
     InitSendDataSwitchChangeInfo();
     InitIsAllCellularDataAllowed();
     InitIsDualCellularCardAllowed();
+    InitDataEndRetryStrategy();
 }
 
 void TelephonyExtWrapper::InitDataEndSelfCure()
@@ -134,6 +135,18 @@ void TelephonyExtWrapper::InitIsDualCellularCardAllowed()
         return;
     }
     TELEPHONY_LOGD("telephony ext wrapper init IsDualCellularCardAllowed success");
+}
+
+void TelephonyExtWrapper::InitDataEndRetryStrategy()
+{
+    dataEndRetryStrategy_ =
+        (DATA_END_RETRY_STRATEGY)dlsym(telephonyExtWrapperHandle_, "DataEndRetryStrategy");
+    if (dataEndRetryStrategy_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol DataEndRetryStrategy failed,\
+            error: %{public}s", dlerror());
+        return;
+    }
+    TELEPHONY_LOGD("telephony ext wrapper init DataEndRetryStrategy success");
 }
 
 } // namespace Telephony

@@ -21,22 +21,30 @@
 #include <vector>
 
 #include "apn_item.h"
+#include "cellular_data_constant.h"
 
 namespace OHOS {
 namespace Telephony {
 class ConnectionRetryPolicy {
 public:
     ConnectionRetryPolicy();
-    ~ConnectionRetryPolicy();
+    ~ConnectionRetryPolicy() = default;
     sptr<ApnItem> GetNextRetryApnItem() const;
     void SetMatchedApns(std::vector<sptr<ApnItem>> &apns);
     void ClearRetryApns();
     void MarkBadApn(ApnItem &apn);
-    int64_t GetNextRetryDelay() const;
+    int64_t GetNextRetryDelay(std::string apnType, int32_t cause, int64_t suggestTime, RetryScene scene);
     void InitialRetryCountValue();
     std::vector<sptr<ApnItem>> GetMatchedApns() const;
+    static void OnPropChanged(const char *key, const char *value, void *context);
+    static DisConnectionReason ConvertPdpErrorToDisconnReason(int32_t reason);
+    bool IsAllBadApn() const;
 
 private:
+    int64_t GetRandomDelay();
+
+private:
+    inline static bool isPropOn_ = false;
     std::vector<sptr<ApnItem>> matchedApns_;
     mutable int32_t tryCount_ = 0;
     int32_t maxCount_ = 5;

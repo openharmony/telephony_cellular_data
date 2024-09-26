@@ -596,6 +596,60 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_011, Function | MediumTest | 
 }
 
 /**
+ * @tc.number   Telephony_CellularDataHandler_012
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataHandler_012, Function | MediumTest | Level1)
+{
+    CellularDataController controller { 0 };
+    controller.Init();
+    sptr<ApnHolder> apnHolder = controller.cellularDataHandler_->apnManager_->FindApnHolderById(1);
+    sptr<ApnItem> apnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
+    apnHolder->SetCurrentApn(apnItem);
+    auto handler = controller.cellularDataHandler_;
+    handler->RetryOrClearConnection(nullptr, DisConnectionReason::REASON_CLEAR_CONNECTION, nullptr);
+    ASSERT_FALSE(handler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_SETUP_DATACALL));
+    handler->RetryOrClearConnection(apnHolder, DisConnectionReason::REASON_CLEAR_CONNECTION, nullptr);
+    ASSERT_FALSE(handler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_SETUP_DATACALL));
+    auto resultInfo = std::make_shared<SetupDataCallResultInfo>();
+    handler->RetryOrClearConnection(apnHolder, DisConnectionReason::REASON_CLEAR_CONNECTION, resultInfo);
+    ASSERT_FALSE(handler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_SETUP_DATACALL));
+    handler->RetryOrClearConnection(apnHolder, DisConnectionReason::REASON_RETRY_CONNECTION, resultInfo);
+    ASSERT_TRUE(handler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_SETUP_DATACALL));
+    handler->RetryOrClearConnection(apnHolder, DisConnectionReason::REASON_PERMANENT_REJECT, resultInfo);
+    ASSERT_TRUE(handler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_SETUP_DATACALL));
+}
+
+/**
+ * @tc.number   Telephony_CellularDataHandler_013
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataHandler_013, Function | MediumTest | Level1)
+{
+    CellularDataController controller { 0 };
+    controller.Init();
+    sptr<ApnHolder> apnHolder = controller.cellularDataHandler_->apnManager_->FindApnHolderById(1);
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    controller.cellularDataHandler_->RetryToSetupDatacall(event);
+    ASSERT_FALSE(controller.cellularDataHandler_->HasInnerEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION));
+    auto event2 = AppExecFwk::InnerEvent::Get(-1);
+    controller.cellularDataHandler_->RetryToSetupDatacall(event2);
+    ASSERT_FALSE(controller.cellularDataHandler_->HasInnerEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION));
+    apnHolder->SetApnState(PROFILE_STATE_IDLE);
+    auto event3 = AppExecFwk::InnerEvent::Get(1);
+    controller.cellularDataHandler_->RetryToSetupDatacall(event3);
+    ASSERT_FALSE(controller.cellularDataHandler_->HasInnerEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION));
+    apnHolder->SetApnState(PROFILE_STATE_RETRYING);
+    auto event4 = AppExecFwk::InnerEvent::Get(1);
+    controller.cellularDataHandler_->RetryToSetupDatacall(event4);
+    ASSERT_EQ(apnHolder->GetApnState(), PROFILE_STATE_RETRYING);
+    controller.cellularDataHandler_->RemoveAllEvents();
+    sleep(SLEEP_TIME_SECONDS);
+}
+
+/**
  * @tc.number   Telephony_CellularDataService_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -1170,7 +1224,8 @@ HWTEST_F(BranchTest, Telephony_ApnHolder_001, Function | MediumTest | Level3)
     apnHolder->GetNextRetryApn();
     std::vector<sptr<ApnItem>> matchedApns;
     apnHolder->SetAllMatchedApns(matchedApns);
-    apnHolder->GetRetryDelay();
+    apnHolder->GetRetryDelay(0, 0, RetryScene::RETRY_SCENE_OTHERS);
+    apnHolder->MarkCurrentApnBad();
     sptr<ApnItem> apnItem;
     apnHolder->SetCurrentApn(apnItem);
     apnHolder->GetCurrentApn();
@@ -1316,29 +1371,6 @@ HWTEST_F(BranchTest, Activating_Test_02, Function | MediumTest | Level3)
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
     activating->ProcessConnectTimeout(event);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_RETRY);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_UNKNOWN);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_SHORTAGE_RESOURCES);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_ACTIVATION_REJECTED_UNSPECIFIED);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_SERVICE_OPTION_TEMPORARILY_OUT_OF_ORDER);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_APN_NOT_SUPPORTED_IN_CURRENT_RAT_PLMN);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_APN_RESTRICTION_VALUE_INCOMPATIBLE);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_MULT_ACCESSES_PDN_NOT_ALLOWED);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_OPERATOR_DETERMINED_BARRING);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_MISSING_OR_UNKNOWN_APN);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_UNKNOWN_PDP_ADDR_OR_TYPE);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_USER_VERIFICATION);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_ACTIVATION_REJECTED_GGSN);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_SERVICE_OPTION_NOT_SUPPORTED);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_REQUESTED_SERVICE_OPTION_NOT_SUBSCRIBED);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_NSAPI_ALREADY_USED);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_IPV4_ONLY_ALLOWED);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_IPV6_ONLY_ALLOWED);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_IPV4V6_ONLY_ALLOWED);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_NON_IP_ONLY_ALLOWED);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_MAX_NUM_OF_PDP_CONTEXTS);
-    activating->DataCallPdpError(PdpErrorReason::PDP_ERR_PROTOCOL_ERRORS);
-    activating->DataCallPdpError(-1);
     ASSERT_FALSE(activating->RilActivatePdpContextDone(event));
     ASSERT_FALSE(activating->RilErrorResponse(event));
     ASSERT_FALSE(activating->StateProcess(event));
@@ -1362,7 +1394,6 @@ HWTEST_F(BranchTest, Inactive_Test_01, Function | MediumTest | Level3)
     inactive->StateBegin();
     inactive->StateEnd();
     inactive->SetDeActiveApnTypeId(0);
-    inactive->SetReason(DisConnectionReason::REASON_NORMAL);
     ASSERT_FALSE(inactive->StateProcess(event));
 }
 
