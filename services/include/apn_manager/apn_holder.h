@@ -54,7 +54,7 @@ public:
     uint64_t GetCapability() const;
     int32_t GetPriority() const;
     void RequestCellularData(const NetRequest &netRequest);
-    void ReleaseCellularData(const NetRequest &netRequest);
+    bool ReleaseCellularData(const NetRequest &netRequest);
     void ReleaseAllCellularData();
     bool IsEmergencyType() const;
     bool IsMmsType() const;

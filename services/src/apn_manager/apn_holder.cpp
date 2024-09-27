@@ -178,17 +178,18 @@ void ApnHolder::RequestCellularData(const NetRequest &netRequest)
     dataCallEnabled_ = true;
 }
 
-void ApnHolder::ReleaseCellularData(const NetRequest &netRequest)
+bool ApnHolder::ReleaseCellularData(const NetRequest &netRequest)
 {
     for (std::vector<NetRequest>::const_iterator it = netRequests_.begin(); it != netRequests_.end(); it++) {
         if ((netRequest.capability == it->capability) && (netRequest.ident == it->ident)) {
             netRequests_.erase(it);
             if (netRequests_.empty()) {
                 dataCallEnabled_ = false;
+                return true;
             }
-            return;
         }
     }
+    return false;
 }
 
 void ApnHolder::ReleaseAllCellularData()
