@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -762,7 +762,7 @@ int32_t CellularDataService::GetCellularDataSupplierId(int32_t slotId, uint64_t 
         TELEPHONY_LOGE("Invalid capability = (%{public}" PRIu64 ")", capability);
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    supplierId = CellularDataNetAgent::GetInstance().GetSupplierId(slotId, capability);
+    supplierId = static_cast<uint32_t>(CellularDataNetAgent::GetInstance().GetSupplierId(slotId, capability));
     return TELEPHONY_ERR_SUCCESS;
 }
 
