@@ -35,12 +35,14 @@ public:
     virtual bool StateProcess(const AppExecFwk::InnerEvent::Pointer &event);
     void SetStateMachine(const std::weak_ptr<CellularDataStateMachine> &stateMachine);
     void SetDeActiveApnTypeId(int32_t deActiveApnTypeId);
-    void SetReason(DisConnectionReason reason);
+    void SetDataCallResultInfo(std::shared_ptr<SetupDataCallResultInfo> resultInfo);
+    void SetDataCallResultInfoToRetry();
+    void SetDataCallResultInfoToClear();
 
 private:
     std::weak_ptr<CellularDataStateMachine> stateMachine_;
     int32_t deActiveApnTypeId_ = ERROR_APN_ID;
-    DisConnectionReason reason_ = DisConnectionReason::REASON_RETRY_CONNECTION;
+    std::shared_ptr<SetupDataCallResultInfo> resultInfo_;
 };
 } // namespace Telephony
 } // namespace OHOS

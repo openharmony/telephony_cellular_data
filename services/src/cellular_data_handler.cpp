@@ -36,6 +36,7 @@
 #include "telephony_ext_wrapper.h"
 #include "telephony_permission.h"
 #include "ipc_skeleton.h"
+#include "connection_retry_policy.h"
 namespace OHOS {
 namespace Telephony {
 using namespace AppExecFwk;
@@ -332,8 +333,9 @@ void CellularDataHandler::ClearConnection(const sptr<ApnHolder> &apn, DisConnect
     }
     ApnProfileState apnState = apn->GetApnState();
     if (apnState == ApnProfileState::PROFILE_STATE_IDLE ||
-        apnState == ApnProfileState::PROFILE_STATE_DISCONNECTING) {
-        TELEPHONY_LOGE("Slot%{public}d: apn state has been idle or disconnecting", slotId_);
+        apnState == ApnProfileState::PROFILE_STATE_DISCONNECTING ||
+        apnState == ApnProfileState::PROFILE_STATE_RETRYING) {
+        TELEPHONY_LOGE("Slot%{public}d: apn state has been idle, disconnecting, or retrying", slotId_);
         return;
     }
     apn->SetApnState(PROFILE_STATE_DISCONNECTING);
@@ -640,10 +642,13 @@ bool CellularDataHandler::CheckApnState(sptr<ApnHolder> &apnHolder)
         SendEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, id, ESTABLISH_DATA_CONNECTION_DELAY);
         return false;
     }
+    if (apnHolder->GetApnState() == PROFILE_STATE_RETRYING) {
+        TELEPHONY_LOGI("during retry, check state fail");
+        return false;
+    }
     if (apnHolder->GetApnState() == PROFILE_STATE_FAILED) {
         apnHolder->SetApnState(PROFILE_STATE_IDLE);
     }
-
     if (apnHolder->GetApnState() != PROFILE_STATE_IDLE) {
         TELEPHONY_LOGD("Slot%{public}d: APN holder is not idle, apn state is %{public}d",
             slotId_, apnHolder->GetApnState());
@@ -840,7 +845,7 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
         TELEPHONY_LOGE("Slot%{public}d: apnHolder is null, apnId is %{public}d", slotId_, apnId);
         return;
     }
-    DisConnectionReason reason = static_cast<DisConnectionReason>(netInfo->reason);
+    DisConnectionReason reason = ConnectionRetryPolicy::ConvertPdpErrorToDisconnReason(netInfo->reason);
     apnHolder->SetApnState(PROFILE_STATE_IDLE);
     auto stateMachine = apnHolder->GetCellularDataStateMachine();
     if (stateMachine == nullptr) {
@@ -852,8 +857,8 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
     apnHolder->SetCellularDataStateMachine(nullptr);
     UpdateCellularDataConnectState(apnHolder->GetApnType());
     UpdatePhysicalConnectionState(connectionManager_->isNoActiveConnection());
-    if (apnHolder->IsDataCallEnabled() && reason == DisConnectionReason::REASON_RETRY_CONNECTION) {
-        SendEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, apnId, apnHolder->GetRetryDelay());
+    if (apnHolder->IsDataCallEnabled()) {
+        RetryOrClearConnection(apnHolder, reason, netInfo);
     }
     if (!apnManager_->HasAnyConnectedState()) {
         connectionManager_->StopStallDetectionTimer();
@@ -866,6 +871,41 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
     if (reason == DisConnectionReason::REASON_CHANGE_CONNECTION) {
         HandleSortConnection();
     }
+}
+
+void CellularDataHandler::RetryOrClearConnection(const sptr<ApnHolder> &apnHolder, DisConnectionReason reason,
+    const std::shared_ptr<SetupDataCallResultInfo> &netInfo)
+{
+    if (apnHolder == nullptr || netInfo == nullptr) {
+        return;
+    }
+    if (reason == DisConnectionReason::REASON_CLEAR_CONNECTION) {
+        TELEPHONY_LOGI("clear connection");
+        ClearConnection(apnHolder, reason);
+    } else if (reason == DisConnectionReason::REASON_PERMANENT_REJECT) {
+        TELEPHONY_LOGI("permannent reject, mark bad and clear connection");
+        apnHolder->MarkCurrentApnBad();
+        ClearConnection(apnHolder, DisConnectionReason::REASON_CLEAR_CONNECTION);
+    } else if (reason == DisConnectionReason::REASON_RETRY_CONNECTION) {
+        apnHolder->SetApnState(PROFILE_STATE_RETRYING);
+        RetryScene scene = static_cast<RetryScene>(netInfo->retryScene);
+        int64_t delayTime = apnHolder->GetRetryDelay(netInfo->reason, netInfo->retryTime, scene);
+        TELEPHONY_LOGI("cid=%{public}d, cause=%{public}d, suggest=%{public}d, delay=%{public}lld, scene=%{public}d",
+            netInfo->cid, netInfo->reason, netInfo->retryTime, static_cast<long long>(delayTime), netInfo->retryScene);
+        SendEvent(CellularDataEventCode::MSG_RETRY_TO_SETUP_DATACALL, netInfo->flag, delayTime);
+    }
+}
+
+void CellularDataHandler::RetryToSetupDatacall(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    int32_t apnId = event->GetParam();
+    auto apnHolder = apnManager_->FindApnHolderById(apnId);
+    if (apnHolder == nullptr || apnHolder->GetApnState() != PROFILE_STATE_RETRYING) {
+        return;
+    }
+    TELEPHONY_LOGI("apnId=%{public}d, state=%{public}d", apnId, apnHolder->GetApnState());
+    apnHolder->SetApnState(PROFILE_STATE_IDLE);
+    SendEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, apnId, 0);
 }
 
 void CellularDataHandler::UpdatePhysicalConnectionState(bool noActiveConnection)
@@ -1395,6 +1435,11 @@ void CellularDataHandler::HandleApnChanged(const InnerEvent::Pointer &event)
             continue;
         }
         int32_t id = apnManager_->FindApnIdByApnName(apnHolder->GetApnType());
+        if (apnHolder->GetApnState() == PROFILE_STATE_RETRYING) {
+            apnHolder->InitialApnRetryCount();
+            apnHolder->SetApnState(PROFILE_STATE_IDLE);
+            RemoveEvent(CellularDataEventCode::MSG_RETRY_TO_SETUP_DATACALL);
+        }
         SendEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, id, ESTABLISH_DATA_CONNECTION_DELAY);
     }
 }

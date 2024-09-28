@@ -154,7 +154,8 @@ enum class DisConnectionReason : int32_t {
     REASON_GSM_AND_CALLING_ONLY,
     REASON_RETRY_CONNECTION,
     REASON_CLEAR_CONNECTION,
-    REASON_CHANGE_CONNECTION
+    REASON_CHANGE_CONNECTION,
+    REASON_PERMANENT_REJECT
 };
 
 enum class ApnTypes : int32_t {
@@ -173,6 +174,12 @@ enum class ApnTypes : int32_t {
     XCAP = 2048,
     INTERNAL_DEFAULT = 4096,
     ALL = 8191,
+};
+
+enum class RetryScene : int32_t {
+    RETRY_SCENE_SETUP_DATA = 0,
+    RETRY_SCENE_MODEM_DEACTIVATE = 1,
+    RETRY_SCENE_OTHERS = 2,
 };
 
 static constexpr const char *DATA_CONTEXT_ROLE_ALL = "*";

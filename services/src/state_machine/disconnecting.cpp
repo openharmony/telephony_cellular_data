@@ -62,8 +62,8 @@ void Disconnecting::ProcessDisconnectTimeout(const AppExecFwk::InnerEvent::Point
         TELEPHONY_LOGE("inActive is null");
         return;
     }
+    inActive->SetDataCallResultInfoToRetry();
     inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
-    inActive->SetReason(DisConnectionReason::REASON_RETRY_CONNECTION);
     stateMachine->TransitionTo(stateMachine->inActiveState_);
     TELEPHONY_LOGI("ProcessDisconnectTimeout");
 }
@@ -80,8 +80,8 @@ void Disconnecting::ProcessRilAdapterHostDied(const AppExecFwk::InnerEvent::Poin
         TELEPHONY_LOGE("inActive is null");
         return;
     }
+    inActive->SetDataCallResultInfoToRetry();
     inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
-    inActive->SetReason(DisConnectionReason::REASON_RETRY_CONNECTION);
     stateMachine->TransitionTo(stateMachine->inActiveState_);
     TELEPHONY_LOGI("ProcessRilAdapterHostDied");
 }

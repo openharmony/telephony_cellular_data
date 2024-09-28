@@ -91,7 +91,11 @@ bool Active::ProcessDisconnectDone(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGE("inActive is null");
         return false;
     }
-    inActive->SetReason(reason);
+    if (reason == DisConnectionReason::REASON_RETRY_CONNECTION) {
+        inActive->SetDataCallResultInfoToRetry();
+    } else {
+        inActive->SetDataCallResultInfoToClear();
+    }
     stateMachine->FreeConnection(*object);
     stateMachine->TransitionTo(stateMachine->disconnectingState_);
     return PROCESSED;
@@ -120,7 +124,11 @@ bool Active::ProcessDisconnectAllDone(const AppExecFwk::InnerEvent::Pointer &eve
         TELEPHONY_LOGE("inActive is null");
         return false;
     }
-    inActive->SetReason(reason);
+    if (reason == DisConnectionReason::REASON_RETRY_CONNECTION) {
+        inActive->SetDataCallResultInfoToRetry();
+    } else {
+        inActive->SetDataCallResultInfoToClear();
+    }
     stateMachine->FreeConnection(*object);
     stateMachine->TransitionTo(stateMachine->disconnectingState_);
     return PROCESSED;
@@ -129,6 +137,15 @@ bool Active::ProcessDisconnectAllDone(const AppExecFwk::InnerEvent::Pointer &eve
 bool Active::ProcessLostConnection(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("Active::EVENT_LOST_CONNECTION");
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is null");
+        return false;
+    }
+    auto resultInfo = event->GetSharedObject<SetupDataCallResultInfo>();
+    if (resultInfo == nullptr) {
+        TELEPHONY_LOGE("resultInfo null");
+        return false;
+    }
     CellularDataHiSysEvent::WriteDataDeactiveBehaviorEvent(INVALID_PARAMETER, DataDisconnectCause::LOST_CONNECTION);
     std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
     if (stateMachine == nullptr) {
@@ -141,7 +158,7 @@ bool Active::ProcessLostConnection(const AppExecFwk::InnerEvent::Pointer &event)
         return false;
     }
     inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
-    inActive->SetReason(DisConnectionReason::REASON_RETRY_CONNECTION);
+    inActive->SetDataCallResultInfo(resultInfo);
 
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     if (TELEPHONY_EXT_WRAPPER.dataEndSelfCure_) {

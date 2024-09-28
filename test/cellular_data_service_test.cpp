@@ -265,10 +265,15 @@ HWTEST_F(CellularDataServiceTest, CellularDataController_OnAddSystemAbility_001,
     std::shared_ptr<CellularDataController> cellularDataController = std::make_shared<CellularDataController>(0);
     cellularDataController->systemAbilityListener_ =
         new (std::nothrow) CellularDataController::SystemAbilityStatusChangeListener(0, nullptr);
-    cellularDataController->systemAbilityListener_->OnAddSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID, "");
-    cellularDataController->systemAbilityListener_->OnAddSystemAbility(COMMON_EVENT_SERVICE_ID, "");
-    cellularDataController->systemAbilityListener_->OnAddSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID, "");
-    cellularDataController->systemAbilityListener_->OnRemoveSystemAbility(COMMON_EVENT_SERVICE_ID, "");
+    if (cellularDataController->systemAbilityListener_ != nullptr) {
+        cellularDataController->systemAbilityListener_->OnRemoveSystemAbility(
+            COMM_NET_CONN_MANAGER_SYS_ABILITY_ID, "");
+        cellularDataController->systemAbilityListener_->OnRemoveSystemAbility(
+            COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID, "");
+        cellularDataController->systemAbilityListener_->OnRemoveSystemAbility(
+            DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID, "");
+        cellularDataController->systemAbilityListener_->OnRemoveSystemAbility(-1, "");
+    }
     ASSERT_EQ(cellularDataController->cellularDataHandler_, nullptr);
 }
 

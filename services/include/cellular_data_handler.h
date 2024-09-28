@@ -156,6 +156,9 @@ private:
     void SendEstablishDataConnectionEvent(int32_t id);
     bool IsSimStateReadyOrLoaded();
     void UpdateCellularDataConnectState(const std::string &apnType);
+    void RetryToSetupDatacall(const AppExecFwk::InnerEvent::Pointer &event);
+    void RetryOrClearConnection(const sptr<ApnHolder> &apnHolder, DisConnectionReason reason,
+        const std::shared_ptr<SetupDataCallResultInfo> &netInfo);
 
 private:
     sptr<ApnManager> apnManager_;
@@ -251,6 +254,8 @@ private:
             [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleUpdateNetInfo(event); } },
         { RadioEvent::RADIO_NV_REFRESH_FINISHED,
             [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleSimEvent(event); } },
+        { CellularDataEventCode::MSG_RETRY_TO_SETUP_DATACALL,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { RetryToSetupDatacall(event); } },
     };
 };
 } // namespace Telephony

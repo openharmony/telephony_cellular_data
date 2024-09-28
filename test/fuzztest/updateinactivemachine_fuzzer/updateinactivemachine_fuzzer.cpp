@@ -61,7 +61,6 @@ void UpdateInActiveMachineFuzz(const uint8_t *data, size_t size)
 
     InnerEvent::Pointer event = InnerEvent::Get(intValue, object);
     inactive->SetDeActiveApnTypeId(intValue);
-    inactive->SetReason(DisConnectionReason::REASON_NORMAL);
     inactive->StateProcess(event);
 
     activating->StateProcess(event);

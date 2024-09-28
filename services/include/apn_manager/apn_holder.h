@@ -40,7 +40,7 @@ public:
     ~ApnHolder();
     sptr<ApnItem> GetNextRetryApn() const;
     void SetAllMatchedApns(std::vector<sptr<ApnItem>> &matchedApns);
-    int64_t GetRetryDelay() const;
+    int64_t GetRetryDelay(int32_t cause, int32_t suggestTime, RetryScene scene);
     void SetCurrentApn(sptr<ApnItem> &apnItem);
     sptr<ApnItem> GetCurrentApn() const;
     void SetApnState(ApnProfileState state);
@@ -66,6 +66,7 @@ public:
     void AddUid(uint32_t uid);
     void RemoveUid(uint32_t uid);
     HasSystemUse GetUidStatus() const;
+    void MarkCurrentApnBad();
 
 private:
     ApnHolder(ApnHolder &apnHolder) = default;

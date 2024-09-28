@@ -550,7 +550,11 @@ HWTEST_F(CellularStateMachineTest, InactiveStateBegin_001, Function | MediumTest
     auto inactive = static_cast<Inactive *>(cellularMachine->inActiveState_.GetRefPtr());
     inactive->deActiveApnTypeId_ = 0;
     inactive->SetStateMachine(cellularMachine);
-    EXPECT_EQ(inactive->reason_, DisConnectionReason::REASON_RETRY_CONNECTION);
+    inactive->SetDataCallResultInfoToRetry();
+    EXPECT_EQ(inactive->resultInfo_->reason, static_cast<int32_t>(PdpErrorReason::PDP_ERR_RETRY));
+    inactive->SetDataCallResultInfoToClear();
+    EXPECT_EQ(inactive->resultInfo_->reason,
+        static_cast<int32_t>(PdpErrorReason::PDP_ERR_UNKNOWN_TO_CLEAR_CONNECTION));
 }
 
 /**
