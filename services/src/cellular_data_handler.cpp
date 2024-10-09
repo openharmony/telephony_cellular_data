@@ -804,6 +804,7 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
             stateMachine->UpdateHttpProxy(proxyIpAddress);
             stateMachine->UpdateNetworkInfo(*resultInfo);
         } else {
+            apnHolder->SetApnState(PROFILE_STATE_IDLE);
             TELEPHONY_LOGE(
                 "Slot%{public}d:update network info stateMachine(%{public}d) is null", slotId_, resultInfo->flag);
         }
@@ -846,14 +847,15 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
         return;
     }
     DisConnectionReason reason = ConnectionRetryPolicy::ConvertPdpErrorToDisconnReason(netInfo->reason);
-    apnHolder->SetApnState(PROFILE_STATE_IDLE);
     auto stateMachine = apnHolder->GetCellularDataStateMachine();
     if (stateMachine == nullptr) {
+        apnHolder->SetApnState(PROFILE_STATE_IDLE);
         TELEPHONY_LOGE("stateMachine is null");
         return;
     }
     stateMachine->UpdateNetworkInfo(*netInfo);
     connectionManager_->RemoveActiveConnectionByCid(stateMachine->GetCid());
+    apnHolder->SetApnState(PROFILE_STATE_IDLE);
     apnHolder->SetCellularDataStateMachine(nullptr);
     UpdateCellularDataConnectState(apnHolder->GetApnType());
     UpdatePhysicalConnectionState(connectionManager_->isNoActiveConnection());
