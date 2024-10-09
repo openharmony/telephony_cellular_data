@@ -182,7 +182,7 @@ bool ApnHolder::ReleaseCellularData(const NetRequest &netRequest)
 {
     for (std::vector<NetRequest>::const_iterator it = netRequests_.begin(); it != netRequests_.end(); it++) {
         if ((netRequest.capability == it->capability) && (netRequest.ident == it->ident)) {
-            netRequests_.erase(it);
+            it = netRequests_.erase(it);
             if (netRequests_.empty()) {
                 dataCallEnabled_ = false;
                 return true;

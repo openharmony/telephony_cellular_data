@@ -72,7 +72,7 @@ void DataConnectionManager::RemoveConnectionStateMachine(const std::shared_ptr<C
     for (std::vector<std::shared_ptr<CellularDataStateMachine>>::const_iterator iter =
         stateMachines_.begin(); iter != stateMachines_.end(); iter++) {
         if (*iter.base() == stateMachine) {
-            stateMachines_.erase(iter);
+            iter = stateMachines_.erase(iter);
             break;
         }
     }
