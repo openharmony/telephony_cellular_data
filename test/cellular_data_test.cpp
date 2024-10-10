@@ -50,6 +50,8 @@
 #include "unistd.h"
 #include "apn_item.h"
 #include "cellular_data_constant.h"
+#include "common_event_manager.h"
+#include "common_event_support.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1964,6 +1966,36 @@ HWTEST_F(CellularDataTest, ControllerReleaseCellularDataConnection_Test_2, TestS
     ASSERT_TRUE(controller->cellularDataHandler_ != nullptr);
     NetRequest request;
     ASSERT_TRUE(controller->ReleaseCellularDataConnection());
+}
+
+/**
+ * @tc.number  ControllerUpdateNetworkInfo_Test_01
+ * @tc.name     Test the Controller UpdateNetworkInfo function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, ControllerUpdateNetworkInfo_Test_01, TestSize.Level3)
+{
+    auto controller = std::make_shared<CellularDataController>(DEFAULT_SIM_SLOT_ID);
+    ASSERT_TRUE(controller->cellularDataHandler_ == nullptr);
+    ASSERT_FALSE(controller->UpdateNetworkInfo());
+}
+
+/**
+ * @tc.number  ControllerUpdateNetworkInfo_Test_02
+ * @tc.name     Test the Controller UpdateNetworkInfo function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, ControllerUpdateNetworkInfo_Test_02, TestSize.Level3)
+{
+    auto controller = std::make_shared<CellularDataController>(DEFAULT_SIM_SLOT_ID);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    cellularDataHandler->Init();
+    controller->cellularDataHandler_ = cellularDataHandler;
+    ASSERT_TRUE(controller->cellularDataHandler_ != nullptr);
+    ASSERT_TRUE(controller->UpdateNetworkInfo());
 }
 
 } // namespace Telephony

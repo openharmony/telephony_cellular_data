@@ -2306,5 +2306,19 @@ void CellularDataHandler::ReleaseCellularDataConnection()
     }
     apnHolder->ReleaseDataConnection();
 }
+
+bool CellularDataHandler::UpdateNetworkInfo()
+{
+    if (connectionManager_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: connectionManager_ is null", slotId_);
+        return false;
+    }
+    auto stateMachines = connectionManager_->GetAllConnectionMachine();
+    for (const std::shared_ptr<CellularDataStateMachine> &cellularDataStateMachine : stateMachines) {
+        auto eventCode = InnerEvent::Get(CellularDataEventCode::MSG_SM_UPDATE_NETWORK_INFO);
+        cellularDataStateMachine->SendEvent(eventCode);
+    }
+    return true;
+}
 } // namespace Telephony
 } // namespace OHOS

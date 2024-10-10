@@ -127,5 +127,16 @@ bool Default::ProcessDataConnectionRoamOff(const AppExecFwk::InnerEvent::Pointer
     TELEPHONY_LOGI("Default::EVENT_DATA_CONNECTION_ROAM_OFF");
     return false;
 }
+
+bool Default::ProcessUpdateNetworkInfo(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::shared_ptr<CellularDataStateMachine> shareStateMachine = stateMachine_.lock();
+    if (shareStateMachine == nullptr) {
+        TELEPHONY_LOGE("shareStateMachine is null");
+        return false;
+    }
+    shareStateMachine->UpdateNetworkInfo();
+    return true;
+}
 } // namespace Telephony
 } // namespace OHOS

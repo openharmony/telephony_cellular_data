@@ -865,5 +865,36 @@ HWTEST_F(CellularDataHandlerTest, ReleaseCellularDataConnectionTest001, Function
     cellularDataHandler->ReleaseCellularDataConnection();
     EXPECT_NE(cellularDataHandler->apnManager_->apnIdApnHolderMap_[1]->apnState_, 3);
 }
+
+/**
+ * @tc.number   UpdateNetworkInfo_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, UpdateNetworkInfo_001, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    EXPECT_EQ(cellularDataHandler->connectionManager_, nullptr);
+    EXPECT_FALSE(cellularDataHandler->UpdateNetworkInfo());
+}
+
+/**
+ * @tc.number   UpdateNetworkInfo_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, UpdateNetworkInfo_002, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    cellularDataHandler->Init();
+    EXPECT_NE(cellularDataHandler->connectionManager_, nullptr);
+    EXPECT_TRUE(cellularDataHandler->UpdateNetworkInfo());
+}
 } // namespace Telephony
 } // namespace OHOS

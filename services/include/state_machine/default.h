@@ -42,6 +42,7 @@ private:
     bool ProcessDataConnectionDrsOrRatChanged(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessDataConnectionRoamOn(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessDataConnectionRoamOff(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessUpdateNetworkInfo(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     using Fun = std::function<bool(const AppExecFwk::InnerEvent::Pointer &data)>;
@@ -59,6 +60,8 @@ private:
             [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessDataConnectionRoamOn(data); } },
         { CellularDataEventCode::MSG_SM_DATA_ROAM_OFF,
             [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessDataConnectionRoamOff(data); } },
+        { CellularDataEventCode::MSG_SM_UPDATE_NETWORK_INFO,
+            [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessUpdateNetworkInfo(data); }},
     };
     std::weak_ptr<CellularDataStateMachine> stateMachine_;
 };

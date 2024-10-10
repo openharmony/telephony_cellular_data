@@ -58,6 +58,7 @@ public:
     bool AddUid(const NetRequest &request);
     bool RemoveUid(const NetRequest &request);
     bool ReleaseCellularDataConnection() const;
+    bool UpdateNetworkInfo();
 
 private:
     void RegisterEvents();

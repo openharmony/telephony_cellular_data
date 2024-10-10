@@ -366,9 +366,10 @@ void CellularDataController::SystemAbilityStatusChangeListener::OnAddSystemAbili
     switch (systemAbilityId) {
         case COMM_NET_CONN_MANAGER_SYS_ABILITY_ID:
             TELEPHONY_LOGI("COMM_NET_CONN_MANAGER_SYS_ABILITY_ID running");
+            CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
             if (handler_ != nullptr) {
-                handler_->ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
-                CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
+                bool ret = handler_->UpdateNetworkInfo();
+                TELEPHONY_LOGI("UpdateNetworkInfo result = %{public}d", ret);
             }
             break;
         case COMM_NET_POLICY_MANAGER_SYS_ABILITY_ID:
@@ -480,6 +481,15 @@ bool CellularDataController::ReleaseCellularDataConnection() const
     TELEPHONY_LOGI("ReleaseCellularDataConnection slot%{public}d", slotId_);
     cellularDataHandler_->ReleaseCellularDataConnection();
     return true;
+}
+
+bool CellularDataController::UpdateNetworkInfo()
+{
+    if (cellularDataHandler_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler is null", slotId_);
+        return false;
+    }
+    return cellularDataHandler_->UpdateNetworkInfo();
 }
 
 } // namespace Telephony
