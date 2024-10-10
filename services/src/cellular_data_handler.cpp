@@ -821,7 +821,7 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
             incallDataStateMachine_->SendEvent(incallEvent);
         }
         UpdateCellularDataConnectState(apnHolder->GetApnType());
-		UpdateApnInfo(apnHolder->GetCurrentApn()->attr_.profileId_);
+        UpdateApnInfo(apnHolder->GetCurrentApn()->attr_.profileId_);
     }
 }
 
