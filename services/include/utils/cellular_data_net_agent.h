@@ -104,8 +104,6 @@ public:
 
     void RegisterSlotType(int32_t supplierId, int32_t radioTech);
 
-    bool UpdateNetSupplierAvailable(int32_t slotId, bool isAvailable);
-
     bool GetSupplierRegState(uint32_t supplierId, int32_t &regState);
 
 private:

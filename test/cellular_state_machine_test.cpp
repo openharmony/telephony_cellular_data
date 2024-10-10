@@ -2144,5 +2144,28 @@ HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_GetNetScoreBySlotId_
     score = cellularMachine->GetNetScoreBySlotId(slotId);
     ASSERT_EQ(score, OTHER_CONNECTION_SCORE);
 }
+
+/**
+ * @tc.number   Default_ProcessUpdateNetworkInfo_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, Default_ProcessUpdateNetworkInfo_001, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+        EXPECT_CALL(*mockSimManager, GetDefaultCellularDataSlotId()).Times(AtLeast(1))
+        .WillOnce([]() {
+            return 0;
+        });
+    }
+    auto defaultState = static_cast<Default *>(cellularMachine->defaultState_.GetRefPtr());
+    defaultState->stateMachine_ = cellularMachine;
+    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_UPDATE_NETWORK_INFO);
+    bool result = defaultState->ProcessUpdateNetworkInfo(event);
+    EXPECT_EQ(result, true);
+}
 } // namespace Telephony
 } // namespace OHOS

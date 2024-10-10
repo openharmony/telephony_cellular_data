@@ -80,6 +80,7 @@ public:
     int32_t GetIntelligenceSwitchState(bool &switchState);
     void HandleUpdateNetInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void ReleaseCellularDataConnection();
+    bool UpdateNetworkInfo();
 
 private:
     std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect();

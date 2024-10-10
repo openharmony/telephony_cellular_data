@@ -783,7 +783,7 @@ int32_t CellularDataService::CorrectNetSupplierNoAvailable(int32_t slotId)
         return TELEPHONY_ERR_FAIL;
     }
     TELEPHONY_LOGI("correct default supplier available is false, apn state = %{public}d", apnState);
-    bool result = CellularDataNetAgent::GetInstance().UpdateNetSupplierAvailable(slotId, false);
+    bool result = cellularDataController->UpdateNetworkInfo();
     return result ? TELEPHONY_ERR_SUCCESS : TELEPHONY_ERR_FAIL;
 }
 
