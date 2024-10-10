@@ -160,6 +160,10 @@ private:
     void RetryToSetupDatacall(const AppExecFwk::InnerEvent::Pointer &event);
     void RetryOrClearConnection(const sptr<ApnHolder> &apnHolder, DisConnectionReason reason,
         const std::shared_ptr<SetupDataCallResultInfo> &netInfo);
+    std::shared_ptr<DataShare::DataShareHelper> CreatorDataShareHelper();
+    bool GetCurrentDataShareApnInfo(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,
+        const int32_t simId, int32_t &profileIdValue);
+    void UpdateApnInfo(const int32_t profileId);
 
 private:
     sptr<ApnManager> apnManager_;
