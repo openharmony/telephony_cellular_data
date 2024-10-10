@@ -895,7 +895,7 @@ void CellularDataHandler::UpdateApnInfo(const int32_t profileId)
         Uri uri(CELLULAR_DATA_RDB_PREFER);
         int32_t result = dataShareHelper->Update(uri, predicates, values);
         if (result < TELEPHONY_ERR_SUCCESS) {
-            TELEPHONY_LOGE("UpdateApnInfo fail!");
+            TELEPHONY_LOGE("UpdateApnInfo fail! result:%{public}d", result);
         }
     }
     dataShareHelper->Release();
