@@ -260,7 +260,7 @@ static napi_value IsCellularDataEnabledSync(napi_env env, napi_callback_info inf
     } else {
         return value;
     }
-    NAPI_CALL(env, napi_create_int32(env, isEnabled, &value));
+    NAPI_CALL(env, napi_get_boolean(env, isEnabled, &value));
     return value;
 }
 
