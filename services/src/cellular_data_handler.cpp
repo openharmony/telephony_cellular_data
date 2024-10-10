@@ -869,24 +869,23 @@ bool CellularDataHandler::GetCurrentDataShareApnInfo(std::shared_ptr<DataShare::
 
 void CellularDataHandler::UpdateApnInfo(const int32_t profileId)
 {
-    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreatorDataShareHelper();
-    if (dataShareHelper == nullptr) {
-        TELEPHONY_LOGE("dataShareHelper is nullptr.");
-        return;
-    }
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId_);
     if (simId <= INVALID_SIM_ID) {
         TELEPHONY_LOGE("Slot%{public}d: failed due to invalid sim id %{public}d", slotId_, simId);
         return;
     }
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreatorDataShareHelper();
+    if (dataShareHelper == nullptr) {
+        TELEPHONY_LOGE("dataShareHelper is nullptr.");
+        return;
+    }
     int32_t profileIdValue = 0;
     if (!GetCurrentDataShareApnInfo(dataShareHelper, simId, profileIdValue)) {
         TELEPHONY_LOGE("GetCurrentDataShareApnInfo fail.");
+        dataShareHelper->Release();
         return;
     }
-    if (profileIdValue == profileId) {
-        return;
-    } else {
+    if (profileIdValue != profileId) {
         DataShare::DataSharePredicates predicates;
         DataShare::DataShareValuesBucket values;
         double profileIdAsDouble = static_cast<double>(profileId);
