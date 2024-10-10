@@ -894,7 +894,9 @@ void CellularDataHandler::UpdateApnInfo(const int32_t profileId)
         values.Put(PdpProfileData::SIM_ID, simIdAsDouble);
         Uri uri(CELLULAR_DATA_RDB_PREFER);
         int32_t result = dataShareHelper->Update(uri, predicates, values);
-        TELEPHONY_LOGI("profile_id:%{public}d, simId:%{public}d, result:%{public}d", profileId, simId, result);
+        if (result < TELEPHONY_ERR_SUCCESS) {
+            TELEPHONY_LOGE("UpdateApnInfo fail!");
+        }
     }
     dataShareHelper->Release();
 }
