@@ -855,11 +855,11 @@ bool CellularDataHandler::GetCurrentDataShareApnInfo(std::shared_ptr<DataShare::
     int count = 0;
     resultSet->GetRowCount(count);
     if (count <= 0) {
-        TELEPHONY_LOGI("GetRowCount fail.");
+        TELEPHONY_LOGI("GetRowCount is NULL.");
         resultSet->Close();
         return false;
     }
-    int32_t columnIndex = 0;
+    int columnIndex = 0;
     resultSet->GoToFirstRow();
     resultSet->GetColumnIndex(PdpProfileData::PROFILE_ID, columnIndex);
     resultSet->GetInt(columnIndex, profileIdValue);
