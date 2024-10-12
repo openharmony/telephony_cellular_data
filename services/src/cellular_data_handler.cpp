@@ -852,17 +852,17 @@ bool CellularDataHandler::GetCurrentDataShareApnInfo(std::shared_ptr<DataShare::
         TELEPHONY_LOGI("Query CurrentDataShareApnInfo resultSet is nullptr.");
         return false;
     }
-
-    int32_t operationResult = resultSet->GoToFirstRow();
-    while (operationResult == TELEPHONY_SUCCESS) {
-        int32_t columnIndex = 0;
-        resultSet->GetColumnIndex(PdpProfileData::PROFILE_ID, columnIndex);
-        operationResult = resultSet->GetInt(columnIndex, profileIdValue);
-        if (operationResult == TELEPHONY_SUCCESS) {
-            break;
-        }
-        operationResult = resultSet->GoToNextRow();
+    int count = 0;
+    resultSet->GetRowCount(count);
+    if (count <= 0) {
+        TELEPHONY_LOGI("GetRowCount fail.");
+        resultSet->Close();
+        return false;
     }
+    int32_t columnIndex = 0;
+    resultSet->GoToFirstRow();
+    resultSet->GetColumnIndex(PdpProfileData::PROFILE_ID, columnIndex);
+    resultSet->GetInt(columnIndex, profileIdValue);
     resultSet->Close();
     return true;
 }
