@@ -1380,6 +1380,7 @@ void CellularDataHandler::HandleSimAccountLoaded()
     }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
+    CreateApnItem();
     if (defSlotId == slotId_) {
         EstablishAllApnsIfConnectable();
     } else {
