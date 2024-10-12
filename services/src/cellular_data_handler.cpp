@@ -73,10 +73,7 @@ void CellularDataHandler::Init()
     SetRilLinkBandwidths();
 }
 
-CellularDataHandler::~CellularDataHandler()
-{
-    UnRegisterDataSettingObserver();
-}
+CellularDataHandler::~CellularDataHandler() {}
 
 bool CellularDataHandler::ReleaseNet(const NetRequest &request)
 {
