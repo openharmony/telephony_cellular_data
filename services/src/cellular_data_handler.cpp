@@ -828,11 +828,11 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
 std::shared_ptr<DataShare::DataShareHelper> CellularDataHandler::CreatorDataShareHelper()
 {
     sptr<ISystemAbilityManager> saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    sptr<IRemoteObject> remoteObj = saManager->GetSystemAbility(TELEPHONY_CELLULAR_DATA_SYS_ABILITY_ID);
     if (saManager == nullptr) {
         TELEPHONY_LOGE("saManager is nullptr.");
         return nullptr;
     }
+    sptr<IRemoteObject> remoteObj = saManager->GetSystemAbility(TELEPHONY_CELLULAR_DATA_SYS_ABILITY_ID);
     if (remoteObj == nullptr) {
         TELEPHONY_LOGE("remoteObj is nullptr.");
         return nullptr;
