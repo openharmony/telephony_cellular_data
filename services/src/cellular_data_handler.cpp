@@ -44,6 +44,8 @@ using namespace OHOS::EventFwk;
 using namespace NetManagerStandard;
 static const int32_t ESM_FLAG_INVALID = -1;
 const std::string DEFAULT_DATA_ROAMING = "persist.telephony.defaultdataroaming";
+static constexpr int32_t NUMBER_MINUS_ONE = -1;
+static constexpr char TELEPHONY_EXT_DOMAIN_NAME[] = "TELEPHONY_EXT";
 CellularDataHandler::CellularDataHandler(const EventFwk::CommonEventSubscribeInfo &sp, int32_t slotId)
     : TelEventHandler("CellularDataHandler"), CommonEventSubscriber(sp), slotId_(slotId)
 {}
@@ -1060,6 +1062,7 @@ void CellularDataHandler::SetNetRequest(NetRequest &request, const std::unique_p
     request.capability = netRequest->capability;
     request.registerType = netRequest->registerType;
     request.bearTypes = netRequest->bearTypes;
+    request.uid = netRequest->uid;
 }
 
 void CellularDataHandler::SendEstablishDataConnectionEvent(int32_t id)
@@ -1103,6 +1106,7 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
             TELEPHONY_EXT_WRAPPER.isAllCellularDataAllowed_(request, apnHolder->GetUidStatus());
     }
 #endif
+    WriteEventCellularRequest(request);
     if (isAllCellularDataAllowed) {
         TELEPHONY_LOGD("allow cellular data");
         if (event->GetParam() == TYPE_REQUEST_NET) {
@@ -1122,6 +1126,25 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
         }
     }
     SendEstablishDataConnectionEvent(id);
+}
+
+void CellularDataHandler::WriteEventCellularRequest(NetRequest request)
+{
+    HiSysEventWrite(TELEPHONY_EXT_DOMAIN_NAME,
+        "CELLULAR_REQUEST",
+        HiviewDFX::HiSysEvent::BEHAVIOR,
+        "CALL_UID",
+        static_cast<int32_t>(request.uid),
+        "CALL_PID",
+        NUMBER_MINUS_ONE,
+        "NAME",
+        request.ident,
+        "REQUEST_ID",
+        NUMBER_MINUS_ONE,
+        "TYPE",
+        request.registerType,
+        "STATE",
+        NUMBER_MINUS_ONE);
 }
 
 void CellularDataHandler::ProcessEvent(const InnerEvent::Pointer &event)
