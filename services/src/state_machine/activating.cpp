@@ -21,6 +21,7 @@
 #include "inactive.h"
 #include "radio_event.h"
 #include "telephony_log_wrapper.h"
+#include "apn_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -157,6 +158,9 @@ void Activating::ProcessConnectTimeout(const AppExecFwk::InnerEvent::Pointer &ev
     inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
     inActive->SetDataCallResultInfoToRetry();
     stateMachine->TransitionTo(stateMachine->inActiveState_);
+    std::string apnType = ApnManager::FindApnNameByApnId(stateMachine->apnId_);
+    CellularDataHiSysEvent::WriteDataActivateFaultEvent(stateMachine->GetSlotId(), SWITCH_ON,
+        CellularDataErrorCode::DATA_ERROR_DATA_ACTIVATE_TIME_OUT, apnType + " activate time out.");
     TELEPHONY_LOGI("ProcessConnectTimeout");
 }
 

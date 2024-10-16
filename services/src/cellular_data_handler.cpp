@@ -336,6 +336,8 @@ void CellularDataHandler::ClearConnection(const sptr<ApnHolder> &apn, DisConnect
         return;
     }
     apn->SetApnState(PROFILE_STATE_DISCONNECTING);
+    CellularDataHiSysEvent::WriteDataConnectStateBehaviorEvent(slotId_, apn->GetApnType(),
+        apn->GetCapability(), static_cast<int32_t>(PROFILE_STATE_DISCONNECTING));
     InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT, object);
     stateMachine->SendEvent(event);
 }
@@ -759,6 +761,8 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
     cellularDataStateMachine->SetCapability(apnHolder->GetCapability());
     apnHolder->SetCurrentApn(apnItem);
     apnHolder->SetApnState(PROFILE_STATE_CONNECTING);
+    CellularDataHiSysEvent::WriteDataConnectStateBehaviorEvent(slotId_, apnHolder->GetApnType(),
+        apnHolder->GetCapability(), static_cast<int32_t>(PROFILE_STATE_CONNECTING));
     apnHolder->SetCellularDataStateMachine(cellularDataStateMachine);
     bool roamingState = CoreManagerInner::GetInstance().GetPsRoamingState(slotId_) > 0;
     bool userDataRoaming = dataSwitchSettings_->IsUserDataRoamingOn();
@@ -790,6 +794,8 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
             return;
         }
         apnHolder->SetApnState(PROFILE_STATE_CONNECTED);
+        CellularDataHiSysEvent::WriteDataConnectStateBehaviorEvent(slotId_, apnHolder->GetApnType(),
+            apnHolder->GetCapability(), static_cast<int32_t>(PROFILE_STATE_CONNECTED));
         apnHolder->InitialApnRetryCount();
         std::shared_ptr<CellularDataStateMachine> stateMachine = apnHolder->GetCellularDataStateMachine();
         if (stateMachine != nullptr) {
@@ -930,6 +936,8 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
     stateMachine->UpdateNetworkInfo(*netInfo);
     connectionManager_->RemoveActiveConnectionByCid(stateMachine->GetCid());
     apnHolder->SetApnState(PROFILE_STATE_IDLE);
+    CellularDataHiSysEvent::WriteDataConnectStateBehaviorEvent(slotId_, apnHolder->GetApnType(),
+        apnHolder->GetCapability(), static_cast<int32_t>(PROFILE_STATE_IDLE));
     apnHolder->SetCellularDataStateMachine(nullptr);
     UpdateCellularDataConnectState(apnHolder->GetApnType());
     UpdatePhysicalConnectionState(connectionManager_->isNoActiveConnection());

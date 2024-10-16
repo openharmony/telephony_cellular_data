@@ -36,8 +36,10 @@ enum class DataDisconnectCause {
 
 class CellularDataHiSysEvent : public TelephonyHiSysEvent {
 public:
-    static void WriteDataDeactiveBehaviorEvent(const int32_t slotId, const DataDisconnectCause type);
-    static void WriteDataConnectStateBehaviorEvent(const int32_t state);
+    static void WriteDataDeactiveBehaviorEvent(const int32_t slotId, const DataDisconnectCause type,
+        const std::string &apnType = "default");
+    static void WriteDataConnectStateBehaviorEvent(const int32_t slotId, const std::string &apnType,
+        const uint64_t capability, const int32_t state);
     static void WriteRoamingConnectStateBehaviorEvent(const int32_t state);
     static void WriteDataActivateFaultEvent(const int32_t slotId, const int32_t switchState,
         const CellularDataErrorCode errorType, const std::string &errorMsg);

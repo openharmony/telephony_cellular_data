@@ -21,6 +21,7 @@
 #include "inactive.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_ext_wrapper.h"
+#include "apn_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -146,12 +147,13 @@ bool Active::ProcessLostConnection(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGE("resultInfo null");
         return false;
     }
-    CellularDataHiSysEvent::WriteDataDeactiveBehaviorEvent(INVALID_PARAMETER, DataDisconnectCause::LOST_CONNECTION);
     std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
     if (stateMachine == nullptr) {
         TELEPHONY_LOGE("stateMachine is null");
         return false;
     }
+    CellularDataHiSysEvent::WriteDataDeactiveBehaviorEvent(stateMachine.GetSlotId(),
+        DataDisconnectCause::LOST_CONNECTION, ApnManager::FindApnNameByApnId(stateMachine->apnId_));
     Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
     if (inActive == nullptr) {
         TELEPHONY_LOGE("inActive is null");
