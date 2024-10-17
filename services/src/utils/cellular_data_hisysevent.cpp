@@ -64,7 +64,7 @@ void CellularDataHiSysEvent::WriteRoamingConnectStateBehaviorEvent(const int32_t
 }
 
 void CellularDataHiSysEvent::WriteCellularRequestBehaviorEvent(
-    const uint32_t uid, const std::string name, const uint64_t type, const int32_t state);
+    const uint32_t uid, const std::string name, const uint64_t type, const int32_t state)
 {
     HiWriteBehaviorEvent(CELLULAR_REQUEST_EVENT, CALL_UID_KEY, static_cast<int32_t>(uid),
         CALL_PID_KEY, NUMBER_MINUS_ONE, NAME_KEY, name, REQUEST_ID_KEY, NUMBER_MINUS_ONE,

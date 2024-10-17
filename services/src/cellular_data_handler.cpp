@@ -1128,7 +1128,7 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
 
 void CellularDataHandler::WriteEventCellularRequest(NetRequest request, int32_t state)
 {
-    if (reqeust.capability == NetCap::NET_CAPABILITY_INTERNET &&
+    if (request.capability == NetCap::NET_CAPABILITY_INTERNET &&
         (request.bearTypes & (1ULL << NetBearType::BEARER_CELLULAR)) != 0) {
         CellularDataHiSysEvent::WriteCellularRequestBehaviorEvent(
             request.uid, request.ident, request.registerType, state);
