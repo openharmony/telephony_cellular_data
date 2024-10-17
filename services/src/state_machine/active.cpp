@@ -152,7 +152,7 @@ bool Active::ProcessLostConnection(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGE("stateMachine is null");
         return false;
     }
-    CellularDataHiSysEvent::WriteDataDeactiveBehaviorEvent(stateMachine.GetSlotId(),
+    CellularDataHiSysEvent::WriteDataDeactiveBehaviorEvent(stateMachine->GetSlotId(),
         DataDisconnectCause::LOST_CONNECTION, ApnManager::FindApnNameByApnId(stateMachine->apnId_));
     Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
     if (inActive == nullptr) {

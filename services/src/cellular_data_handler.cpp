@@ -936,9 +936,9 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
     stateMachine->UpdateNetworkInfo(*netInfo);
     connectionManager_->RemoveActiveConnectionByCid(stateMachine->GetCid());
     apnHolder->SetApnState(PROFILE_STATE_IDLE);
+    apnHolder->SetCellularDataStateMachine(nullptr);
     CellularDataHiSysEvent::WriteDataConnectStateBehaviorEvent(slotId_, apnHolder->GetApnType(),
         apnHolder->GetCapability(), static_cast<int32_t>(PROFILE_STATE_IDLE));
-    apnHolder->SetCellularDataStateMachine(nullptr);
     UpdateCellularDataConnectState(apnHolder->GetApnType());
     UpdatePhysicalConnectionState(connectionManager_->isNoActiveConnection());
     if (apnHolder->IsDataCallEnabled()) {
