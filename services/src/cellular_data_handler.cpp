@@ -1126,13 +1126,15 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
     SendEstablishDataConnectionEvent(id);
 }
 
-void CellularDataHandler::WriteEventCellularRequest(NetRequest request, int32_t state)
+bool CellularDataHandler::WriteEventCellularRequest(NetRequest request, int32_t state)
 {
     if (request.capability == NetCap::NET_CAPABILITY_INTERNET &&
         (request.bearTypes & (1ULL << NetBearType::BEARER_CELLULAR)) != 0) {
         CellularDataHiSysEvent::WriteCellularRequestBehaviorEvent(
             request.uid, request.ident, request.registerType, state);
+            return true;
     }
+    return false;
 }
 
 void CellularDataHandler::ProcessEvent(const InnerEvent::Pointer &event)
