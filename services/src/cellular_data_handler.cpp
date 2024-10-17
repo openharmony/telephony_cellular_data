@@ -1060,6 +1060,7 @@ void CellularDataHandler::SetNetRequest(NetRequest &request, const std::unique_p
     request.capability = netRequest->capability;
     request.registerType = netRequest->registerType;
     request.bearTypes = netRequest->bearTypes;
+    request.uid = netRequest->uid;
 }
 
 void CellularDataHandler::SendEstablishDataConnectionEvent(int32_t id)
@@ -1103,6 +1104,7 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
             TELEPHONY_EXT_WRAPPER.isAllCellularDataAllowed_(request, apnHolder->GetUidStatus());
     }
 #endif
+    WriteEventCellularRequest(request, event->GetParam());
     if (isAllCellularDataAllowed) {
         TELEPHONY_LOGD("allow cellular data");
         if (event->GetParam() == TYPE_REQUEST_NET) {
@@ -1122,6 +1124,17 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
         }
     }
     SendEstablishDataConnectionEvent(id);
+}
+
+bool CellularDataHandler::WriteEventCellularRequest(NetRequest request, int32_t state)
+{
+    if (request.capability == NetCap::NET_CAPABILITY_INTERNET &&
+        (request.bearTypes & (1ULL << NetBearType::BEARER_CELLULAR)) != 0) {
+        CellularDataHiSysEvent::WriteCellularRequestBehaviorEvent(
+            request.uid, request.ident, request.registerType, state);
+            return true;
+    }
+    return false;
 }
 
 void CellularDataHandler::ProcessEvent(const InnerEvent::Pointer &event)
