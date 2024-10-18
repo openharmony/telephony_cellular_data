@@ -352,11 +352,11 @@ int32_t CellularDataService::InitCellularDataController(int32_t slotId)
 
 int32_t CellularDataService::ReleaseNet(const NetRequest &request)
 {
-    size_t identLen = strlen(IDENT_PREFIX);
-    if (request.ident.length() < identLen) {
+    size_t identPreLen = strlen(IDENT_PREFIX);
+    if (request.ident.length() < identPreLen) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    std::string requestIdent = request.ident.substr(identLen);
+    std::string requestIdent = request.ident.substr(identPreLen);
     if (!IsValidDecValue(requestIdent)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
@@ -372,11 +372,11 @@ int32_t CellularDataService::ReleaseNet(const NetRequest &request)
 
 int32_t CellularDataService::RemoveUid(const NetRequest &request)
 {
-    size_t identLen = strlen(IDENT_PREFIX);
-    if (request.ident.length() < identLen) {
+    size_t identPreLen = strlen(IDENT_PREFIX);
+    if (request.ident.length() < identPreLen) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    std::string requestIdent = request.ident.substr(identLen);
+    std::string requestIdent = request.ident.substr(identPreLen);
     if (!IsValidDecValue(requestIdent)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
@@ -392,11 +392,11 @@ int32_t CellularDataService::RemoveUid(const NetRequest &request)
 
 int32_t CellularDataService::AddUid(const NetRequest &request)
 {
-    size_t identLen = strlen(IDENT_PREFIX);
-    if (request.ident.length() < identLen) {
+    size_t identPreLen = strlen(IDENT_PREFIX);
+    if (request.ident.length() < identPreLen) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    std::string requestIdent = request.ident.substr(identLen);
+    std::string requestIdent = request.ident.substr(identPreLen);
     if (!IsValidDecValue(requestIdent)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
@@ -412,11 +412,11 @@ int32_t CellularDataService::AddUid(const NetRequest &request)
 
 int32_t CellularDataService::RequestNet(const NetRequest &request)
 {
-    size_t identLen = strlen(IDENT_PREFIX);
-    if (request.ident.length() < identLen) {
+    size_t identPreLen = strlen(IDENT_PREFIX);
+    if (request.ident.length() < identPreLen) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    std::string requestIdent = request.ident.substr(identLen);
+    std::string requestIdent = request.ident.substr(identPreLen);
     if (!IsValidDecValue(requestIdent)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
