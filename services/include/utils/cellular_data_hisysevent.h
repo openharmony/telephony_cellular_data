@@ -41,6 +41,8 @@ public:
     static void WriteDataConnectStateBehaviorEvent(const int32_t slotId, const std::string &apnType,
         const uint64_t capability, const int32_t state);
     static void WriteRoamingConnectStateBehaviorEvent(const int32_t state);
+    static void WriteCellularRequestBehaviorEvent(
+        const uint32_t uid, const std::string name, const uint64_t type, const int32_t state);
     static void WriteDataActivateFaultEvent(const int32_t slotId, const int32_t switchState,
         const CellularDataErrorCode errorType, const std::string &errorMsg);
     void SetCellularDataActivateStartTime();

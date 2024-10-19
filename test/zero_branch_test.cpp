@@ -2070,5 +2070,30 @@ HWTEST_F(BranchTest, MakePdpProfile_002, TestSize.Level3)
     ASSERT_EQ("abc", apnBean.roamPdpProtocol);
 }
 
+/**
+ * @tc.number   WriteEventCellularRequest_Test_01
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, WriteEventCellularRequest_Test_01, TestSize.Level3)
+{
+    CellularDataUtils::ParseNormalIpAddr(ADDRESS);
+    CellularDataUtils::ParseRoute(ADDRESS);
+    CellularDataUtils::GetPrefixLen(ADDRESS, FLAG);
+    auto cellularDataHiSysEvent = DelayedSingleton<CellularDataHiSysEvent>::GetInstance();
+    cellularDataHiSysEvent->WriteCellularRequestBehaviorEvent(1, "abc", 1, 1);
+    CellularDataController controller { 0 };
+    controller.Init();
+    NetRequest request;
+    int32_t state = 0;
+    ASSERT_FALSE(controller.cellularDataHandler_->WriteEventCellularRequest(request, state));
+    request.capability = NetCap::NET_CAPABILITY_INTERNET;
+    ASSERT_FALSE(controller.cellularDataHandler_->WriteEventCellularRequest(request, state));
+    request.bearTypes |= (1ULL << NetBearType::BEARER_CELLULAR);
+    ASSERT_TRUE(controller.cellularDataHandler_->WriteEventCellularRequest(request, state));
+    request.capability = NetCap::NET_CAPABILITY_END;
+    ASSERT_FALSE(controller.cellularDataHandler_->WriteEventCellularRequest(request, state));
+}
+
 } // namespace Telephony
 } // namespace OHOS

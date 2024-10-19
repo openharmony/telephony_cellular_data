@@ -28,6 +28,7 @@ static constexpr const char *DATA_CONNECTION_STATE_EVENT = "DATA_CONNECTION_STAT
 static constexpr const char *ROAMING_DATA_CONNECTION_STATE_EVENT = "ROAMING_DATA_CONNECTION_STATE";
 static constexpr const char *DATA_ACTIVATE_FAILED_EVENT = "DATA_ACTIVATE_FAILED";
 static constexpr const char *DATA_DEACTIVED_EVENT = "DATA_DEACTIVED";
+static constexpr const char *CELLULAR_REQUEST_EVENT = "CELLULAR_REQUEST";
 
 // KEY
 static constexpr const char *MODULE_NAME_KEY = "MODULE";
@@ -42,9 +43,14 @@ static constexpr const char *ERROR_TYPE_KEY = "ERROR_TYPE";
 static constexpr const char *ERROR_MSG_KEY = "ERROR_MSG";
 static constexpr const char *TYPE_KEY = "TYPE";
 static constexpr const char *APN_TYPE_KEY = "APN_TYPE";
+static constexpr const char *CALL_UID_KEY = "CALL_UID";
+static constexpr const char *CALL_PID_KEY = "CALL_PID";
+static constexpr const char *NAME_KEY = "NAME";
+static constexpr const char *REQUEST_ID_KEY = "REQUEST_ID";
 
 // VALUE
 static constexpr const char *CELLULAR_DATA_MODULE = "CELLULAR_DATA";
+static constexpr int32_t NUMBER_MINUS_ONE = -1;
 
 void CellularDataHiSysEvent::WriteDataDeactiveBehaviorEvent(const int32_t slotId, const DataDisconnectCause type,
     const std::string &apnType)
@@ -67,6 +73,14 @@ void CellularDataHiSysEvent::WriteDataConnectStateBehaviorEvent(const int32_t sl
 void CellularDataHiSysEvent::WriteRoamingConnectStateBehaviorEvent(const int32_t state)
 {
     HiWriteBehaviorEvent(ROAMING_DATA_CONNECTION_STATE_EVENT, STATE_KEY, state);
+}
+
+void CellularDataHiSysEvent::WriteCellularRequestBehaviorEvent(
+    const uint32_t uid, const std::string name, const uint64_t type, const int32_t state)
+{
+    HiWriteBehaviorEvent(CELLULAR_REQUEST_EVENT, CALL_UID_KEY, static_cast<int32_t>(uid),
+        CALL_PID_KEY, NUMBER_MINUS_ONE, NAME_KEY, name, REQUEST_ID_KEY, NUMBER_MINUS_ONE,
+        TYPE_KEY, static_cast<int32_t>(type), STATE_KEY, state);
 }
 
 void CellularDataHiSysEvent::WriteDataActivateFaultEvent(
