@@ -18,6 +18,8 @@
 #include "chrono"
 #include "string"
 #include "type_traits"
+#include "apn_manager.h"
+#include "cellular_data_net_agent.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -31,6 +33,7 @@ static constexpr const char *CELLULAR_REQUEST_EVENT = "CELLULAR_REQUEST";
 // KEY
 static constexpr const char *MODULE_NAME_KEY = "MODULE";
 static constexpr const char *SLOT_ID_KEY = "SLOT_ID";
+static constexpr const char *SUPPLIER_ID_KEY = "SUPPLIER_ID";
 static constexpr const char *STATE_KEY = "STATE";
 static constexpr const char *DATA_SWITCH_KEY = "DATA_SWITCH";
 static constexpr const char *UPLINK_DATA_KEY = "UPLINK_DATA";
@@ -39,6 +42,7 @@ static constexpr const char *DATASTATE_KEY = "DATASTATE";
 static constexpr const char *ERROR_TYPE_KEY = "ERROR_TYPE";
 static constexpr const char *ERROR_MSG_KEY = "ERROR_MSG";
 static constexpr const char *TYPE_KEY = "TYPE";
+static constexpr const char *APN_TYPE_KEY = "APN_TYPE";
 static constexpr const char *CALL_UID_KEY = "CALL_UID";
 static constexpr const char *CALL_PID_KEY = "CALL_PID";
 static constexpr const char *NAME_KEY = "NAME";
@@ -48,14 +52,22 @@ static constexpr const char *REQUEST_ID_KEY = "REQUEST_ID";
 static constexpr const char *CELLULAR_DATA_MODULE = "CELLULAR_DATA";
 static constexpr int32_t NUMBER_MINUS_ONE = -1;
 
-void CellularDataHiSysEvent::WriteDataDeactiveBehaviorEvent(const int32_t slotId, const DataDisconnectCause type)
+void CellularDataHiSysEvent::WriteDataDeactiveBehaviorEvent(const int32_t slotId, const DataDisconnectCause type,
+    const std::string &apnType)
 {
-    HiWriteBehaviorEvent(DATA_DEACTIVED_EVENT, SLOT_ID_KEY, slotId, TYPE_KEY, static_cast<int32_t>(type));
+    int32_t bitMap = ApnManager::FindApnTypeByApnName(apnType);
+    HiWriteBehaviorEvent(DATA_DEACTIVED_EVENT, SLOT_ID_KEY, slotId, APN_TYPE_KEY, bitMap,
+        TYPE_KEY, static_cast<int32_t>(type));
 }
 
-void CellularDataHiSysEvent::WriteDataConnectStateBehaviorEvent(const int32_t state)
+void CellularDataHiSysEvent::WriteDataConnectStateBehaviorEvent(const int32_t slotId, const std::string &apnType,
+    const uint64_t capability, const int32_t state)
 {
-    HiWriteBehaviorEvent(DATA_CONNECTION_STATE_EVENT, STATE_KEY, state);
+    int32_t bitMap = ApnManager::FindApnTypeByApnName(apnType);
+    CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
+    int32_t supplierId = netAgent.GetSupplierId(slotId, capability);
+    HiWriteBehaviorEvent(DATA_CONNECTION_STATE_EVENT, SLOT_ID_KEY, slotId, APN_TYPE_KEY, bitMap,
+        SUPPLIER_ID_KEY, supplierId, STATE_KEY, state);
 }
 
 void CellularDataHiSysEvent::WriteRoamingConnectStateBehaviorEvent(const int32_t state)
