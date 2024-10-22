@@ -21,25 +21,41 @@
 #include "telephony_log_wrapper.h"
 #include "cellular_data_utils.h"
 #include "telephony_ext_wrapper.h"
+#include "telephony_common_utils.h"
 
 namespace OHOS {
 namespace Telephony {
-static const char* PROP_RETRY_STRATEGY_ALLOW = "persist.telephony.retrystrategy.allow";
-static const char* DEFAULT_RETRY_STRATEGY_ALLOW = "false";
-static constexpr int32_t SYSPARA_SIZE = 8;
-static constexpr int64_t DEFAULT_DELAY_FOR_INTERNAL_DEFAULT_APN = 30 * 1000;
-static constexpr int64_t DEFAULT_DELAY_DATA_SETUP_FAIL = 3000;
-static constexpr int64_t DEFAULT_DELAY_MODEM_DEACTIVATE_FAIL = 1000;
-static constexpr int64_t DEFAULT_DELAY_FOR_OTHER_APN = 2 * 1000;
-static constexpr int32_t MIN_RANDOM_DELAY = 0;
-static constexpr int32_t MAX_RANDOM_DELAY = 2000;
+namespace {
+    const char* PROP_RETRY_STRATEGY_ALLOW = "persist.telephony.retrystrategy.allow";
+    const char* PROP_SETUP_FAIL_DELAY = "persist.telephony.setupfail.delay";
+    const char* PROP_MODEM_DEND_DELAY = "persist.telephony.modemdend.delay";
+    const char* DEFAULT_RETRY_STRATEGY_ALLOW = "false";
+    const char* DEFAULT_PROP_DELAY = "3000";
+    constexpr int32_t SYSPARA_SIZE = 8;
+    constexpr int32_t MIN_RANDOM_DELAY = 0;
+    constexpr int32_t MAX_RANDOM_DELAY = 2000;
+    constexpr int64_t DEFAULT_DELAY_FOR_INTERNAL_DEFAULT_APN = 30 * 1000;
+    constexpr int64_t DEFAULT_DELAY_FOR_OTHER_APN = 2 * 1000;
+}
 
 ConnectionRetryPolicy::ConnectionRetryPolicy()
 {
     char retryStrategyAllow[SYSPARA_SIZE] = { 0 };
     GetParameter(PROP_RETRY_STRATEGY_ALLOW, DEFAULT_RETRY_STRATEGY_ALLOW, retryStrategyAllow, SYSPARA_SIZE);
     isPropOn_ = (strcmp(retryStrategyAllow, "true") == 0);
+    char setupFailDelay[SYSPARA_SIZE] = { 0 };
+    GetParameter(PROP_SETUP_FAIL_DELAY, DEFAULT_PROP_DELAY, setupFailDelay, SYSPARA_SIZE);
+    if (IsValidDecValue(setupFailDelay)) {
+        defaultSetupFailDelay_ = std::stoi(setupFailDelay);
+    }
+    char modemDendDelay[SYSPARA_SIZE] = { 0 };
+    GetParameter(PROP_MODEM_DEND_DELAY, DEFAULT_PROP_DELAY, modemDendDelay, SYSPARA_SIZE);
+    if (IsValidDecValue(modemDendDelay)) {
+        defaultModemDendDelay_ = std::stoi(modemDendDelay);
+    }
     WatchParameter(PROP_RETRY_STRATEGY_ALLOW, OnPropChanged, this);
+    WatchParameter(PROP_SETUP_FAIL_DELAY, OnPropChanged, this);
+    WatchParameter(PROP_MODEM_DEND_DELAY, OnPropChanged, this);
 }
 
 sptr<ApnItem> ConnectionRetryPolicy::GetNextRetryApnItem() const
@@ -80,20 +96,20 @@ void ConnectionRetryPolicy::MarkBadApn(ApnItem &apn)
 }
 
 int64_t ConnectionRetryPolicy::GetNextRetryDelay(std::string apnType, int32_t cause, int64_t suggestTime,
-    RetryScene scene)
+    RetryScene scene, int32_t slotId)
 {
     int64_t retryDelay = GetRandomDelay();
     if (apnType == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
         retryDelay += DEFAULT_DELAY_FOR_INTERNAL_DEFAULT_APN;
     } else if (apnType == DATA_CONTEXT_ROLE_DEFAULT) {
         if (scene == RetryScene::RETRY_SCENE_MODEM_DEACTIVATE) {
-            retryDelay += DEFAULT_DELAY_MODEM_DEACTIVATE_FAIL;
+            retryDelay += defaultModemDendDelay_;
         } else {
-            retryDelay += DEFAULT_DELAY_DATA_SETUP_FAIL;
+            retryDelay += defaultSetupFailDelay_;
         }
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
         if (isPropOn_ && TELEPHONY_EXT_WRAPPER.dataEndRetryStrategy_) {
-            TELEPHONY_EXT_WRAPPER.dataEndRetryStrategy_(retryDelay, cause, suggestTime, maxCount_);
+            TELEPHONY_EXT_WRAPPER.dataEndRetryStrategy_(retryDelay, cause, suggestTime, maxCount_, slotId);
         }
 #endif
     } else {
@@ -116,13 +132,18 @@ std::vector<sptr<ApnItem>> ConnectionRetryPolicy::GetMatchedApns() const
 
 void ConnectionRetryPolicy::OnPropChanged(const char *key, const char *value, void *context)
 {
-    if ((key == nullptr) || (value == nullptr) || (strcmp(key, PROP_RETRY_STRATEGY_ALLOW) != 0)) {
+    if ((key == nullptr) || (value == nullptr)) {
         return;
     }
-    char retryStrategyAllow[SYSPARA_SIZE] = { 0 };
-    GetParameter(PROP_RETRY_STRATEGY_ALLOW, DEFAULT_RETRY_STRATEGY_ALLOW, retryStrategyAllow, SYSPARA_SIZE);
-    isPropOn_ = (strcmp(retryStrategyAllow, "true") == 0);
-    TELEPHONY_LOGI("prop changes to %{public}s", retryStrategyAllow);
+    if (strcmp(key, PROP_RETRY_STRATEGY_ALLOW) == 0) {
+        isPropOn_ = (strcmp(value, "true") == 0);
+    } else if ((strcmp(key, PROP_SETUP_FAIL_DELAY) == 0) && IsValidDecValue(value)) {
+        defaultSetupFailDelay_ = std::stoi(value);
+    } else if ((strcmp(key, PROP_MODEM_DEND_DELAY) == 0) && IsValidDecValue(value)) {
+        defaultModemDendDelay_ = std::stoi(value);
+    }
+    TELEPHONY_LOGI("prop changes: allow=%{public}d, delay=%{public}d,%{public}d", isPropOn_, defaultSetupFailDelay_,
+        defaultModemDendDelay_);
 }
 
 DisConnectionReason ConnectionRetryPolicy::ConvertPdpErrorToDisconnReason(int32_t reason)
@@ -133,19 +154,20 @@ DisConnectionReason ConnectionRetryPolicy::ConvertPdpErrorToDisconnReason(int32_
         case PdpErrorReason::PDP_ERR_UNKNOWN_PDP_ADDR_OR_TYPE:
         case PdpErrorReason::PDP_ERR_USER_VERIFICATION:
         case PdpErrorReason::PDP_ERR_ACTIVATION_REJECTED_GGSN:
-        case PdpErrorReason::PDP_ERR_SERVICE_OPTION_NOT_SUPPORTED:
-        case PdpErrorReason::PDP_ERR_REQUESTED_SERVICE_OPTION_NOT_SUBSCRIBED:
-        case PdpErrorReason::PDP_ERR_NSAPI_ALREADY_USED:
         case PdpErrorReason::PDP_ERR_IPV4_ONLY_ALLOWED:
         case PdpErrorReason::PDP_ERR_IPV6_ONLY_ALLOWED:
-        case PdpErrorReason::PDP_ERR_PROTOCOL_ERRORS:
             return DisConnectionReason::REASON_PERMANENT_REJECT;
         case PdpErrorReason::PDP_ERR_UNKNOWN_TO_CLEAR_CONNECTION:
             return DisConnectionReason::REASON_CLEAR_CONNECTION;
+        case PdpErrorReason::PDP_ERR_PROTOCOL_ERRORS:
+        case PdpErrorReason::PDP_ERR_SERVICE_OPTION_NOT_SUPPORTED:
+        case PdpErrorReason::PDP_ERR_REQUESTED_SERVICE_OPTION_NOT_SUBSCRIBED:
+        case PdpErrorReason::PDP_ERR_NSAPI_ALREADY_USED:
+            TELEPHONY_LOGI("retry for DS cause=%{public}d", reason);
+            return DisConnectionReason::REASON_RETRY_CONNECTION;
         default:
-            break;
+            return DisConnectionReason::REASON_RETRY_CONNECTION;
     }
-    return DisConnectionReason::REASON_RETRY_CONNECTION;
 }
 
 bool ConnectionRetryPolicy::IsAllBadApn() const

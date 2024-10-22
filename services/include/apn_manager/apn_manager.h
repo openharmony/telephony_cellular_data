@@ -51,6 +51,7 @@ public:
     void FetchDunApns(std::vector<sptr<ApnItem>> &matchApnItemList, const int32_t slotId);
     bool IsPreferredApnUserEdited();
     static int32_t FindApnTypeByApnName(const std::string &apnName);
+    void ClearAllApnBad();
 
 private:
     void AddApnHolder(const std::string &apnType, const int32_t priority);

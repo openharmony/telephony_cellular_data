@@ -70,6 +70,7 @@ bool Activating::RilActivatePdpContextDone(const AppExecFwk::InnerEvent::Pointer
         TELEPHONY_LOGE("Inactive is null");
         return false;
     }
+    stateMachine->SetCid(resultInfo->cid);
     if (resultInfo->reason != 0 || resultInfo->active == 0) {
         resultInfo->retryScene = static_cast<int32_t>(RetryScene::RETRY_SCENE_SETUP_DATA);
         inActive->SetDataCallResultInfo(resultInfo);
@@ -77,7 +78,6 @@ bool Activating::RilActivatePdpContextDone(const AppExecFwk::InnerEvent::Pointer
         stateMachine->TransitionTo(stateMachine->inActiveState_);
         return true;
     }
-    stateMachine->SetCid(resultInfo->cid);
     if (stateMachine->cdConnectionManager_ != nullptr) {
         stateMachine->cdConnectionManager_->AddActiveConnectionByCid(stateMachine_.lock());
     } else {

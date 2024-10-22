@@ -25,6 +25,10 @@
 
 namespace OHOS {
 namespace Telephony {
+namespace {
+    constexpr int32_t DEFAULT_DELAY_FOR_SETUP_FAIL = 3000;
+    constexpr int32_t DEFAULT_DELAY_FOR_MODEM_DEND = 1000;
+}
 class ConnectionRetryPolicy {
 public:
     ConnectionRetryPolicy();
@@ -33,7 +37,8 @@ public:
     void SetMatchedApns(std::vector<sptr<ApnItem>> &apns);
     void ClearRetryApns();
     void MarkBadApn(ApnItem &apn);
-    int64_t GetNextRetryDelay(std::string apnType, int32_t cause, int64_t suggestTime, RetryScene scene);
+    int64_t GetNextRetryDelay(std::string apnType, int32_t cause, int64_t suggestTime, RetryScene scene,
+        int32_t slotId);
     void InitialRetryCountValue();
     std::vector<sptr<ApnItem>> GetMatchedApns() const;
     static void OnPropChanged(const char *key, const char *value, void *context);
@@ -46,6 +51,8 @@ private:
 private:
     inline static bool isPropOn_ = false;
     std::vector<sptr<ApnItem>> matchedApns_;
+    inline static int32_t defaultSetupFailDelay_ = DEFAULT_DELAY_FOR_SETUP_FAIL;
+    inline static int32_t defaultModemDendDelay_ = DEFAULT_DELAY_FOR_MODEM_DEND;
     mutable int32_t tryCount_ = 0;
     int32_t maxCount_ = 5;
     mutable int32_t currentApnIndex_ = 0;
