@@ -40,18 +40,6 @@ void StateNotification::UpdateCellularDataConnectState(int32_t slotId, ApnProfil
 void StateNotification::OnUpDataFlowtype(int32_t slotId, CellDataFlowType flowType)
 {
     TELEPHONY_LOGI("slotId = %{public}d, flowType = %{public}d", slotId, flowType);
-    int32_t defaultSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
-    if (flowType != CellDataFlowType::DATA_FLOW_TYPE_NONE && slotId != defaultSlotId) {
-#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
-        if ((!TELEPHONY_EXT_WRAPPER.isDualCellularCardAllowed_) && (slotId != CELLULAR_DATA_VSIM_SLOT_ID ||
-            !TELEPHONY_EXT_WRAPPER.isVSimEnabled_ || !TELEPHONY_EXT_WRAPPER.isVSimEnabled_())) {
-#endif
-            TELEPHONY_LOGI("defaultSlotId = %{public}d", defaultSlotId);
-            return;
-#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
-        }
-#endif
-    }
     TelephonyStateRegistryClient::GetInstance().UpdateCellularDataFlow(slotId, static_cast<int32_t>(flowType));
 }
 } // namespace Telephony
