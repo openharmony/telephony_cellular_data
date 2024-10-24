@@ -1224,11 +1224,13 @@ HWTEST_F(BranchTest, Telephony_ApnHolder_001, Function | MediumTest | Level3)
     apnHolder->GetNextRetryApn();
     std::vector<sptr<ApnItem>> matchedApns;
     apnHolder->SetAllMatchedApns(matchedApns);
-    apnHolder->GetRetryDelay(0, 0, RetryScene::RETRY_SCENE_OTHERS);
+    apnHolder->GetRetryDelay(0, 0, RetryScene::RETRY_SCENE_OTHERS, 0);
     apnHolder->MarkCurrentApnBad();
-    sptr<ApnItem> apnItem;
+    sptr<ApnItem> apnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
     apnHolder->SetCurrentApn(apnItem);
     apnHolder->GetCurrentApn();
+    apnHolder->ClearCurrentApnBad();
+    EXPECT_FALSE(apnItem->IsBadApn());
     apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_IDLE);
     apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_FAILED);
     apnHolder->GetApnState();
@@ -1460,6 +1462,7 @@ HWTEST_F(BranchTest, ApnManager_Test_01, Function | MediumTest | Level3)
     apnManager->GetCTOperator(0, operatorNumeric);
     EXPECT_EQ(operatorNumeric, "46011");
     apnManager->GetApnHolder(DATA_CONTEXT_ROLE_DEFAULT);
+    apnManager->ClearAllApnBad();
     apnManager->FindApnNameByApnId(1);
     std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);

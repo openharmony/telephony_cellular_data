@@ -48,9 +48,9 @@ void ApnHolder::SetAllMatchedApns(std::vector<sptr<ApnItem>> &matchedApns)
     retryPolicy_.SetMatchedApns(matchedApns);
 }
 
-int64_t ApnHolder::GetRetryDelay(int32_t cause, int32_t suggestTime, RetryScene scene)
+int64_t ApnHolder::GetRetryDelay(int32_t cause, int32_t suggestTime, RetryScene scene, int32_t slotId)
 {
-    return retryPolicy_.GetNextRetryDelay(apnType_, cause, suggestTime, scene);
+    return retryPolicy_.GetNextRetryDelay(apnType_, cause, suggestTime, scene, slotId);
 }
 
 void ApnHolder::SetCurrentApn(sptr<ApnItem> &apnItem)
@@ -302,6 +302,13 @@ void ApnHolder::MarkCurrentApnBad()
 {
     if (apnItem_ != nullptr) {
         apnItem_->MarkBadApn(true);
+    }
+}
+
+void ApnHolder::ClearCurrentApnBad()
+{
+    if (apnItem_ != nullptr) {
+        apnItem_->MarkBadApn(false);
     }
 }
 } // namespace Telephony

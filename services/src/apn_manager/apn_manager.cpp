@@ -546,5 +546,14 @@ bool ApnManager::IsPreferredApnUserEdited()
     }
     return isUserEdited;
 }
+
+void ApnManager::ClearAllApnBad()
+{
+    for (const sptr<ApnHolder> &apnHolder : apnHolders_) {
+        if (apnHolder != nullptr) {
+            apnHolder->ClearCurrentApnBad();
+        }
+    }
+}
 }  // namespace Telephony
 }  // namespace OHOS
