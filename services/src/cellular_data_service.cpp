@@ -346,6 +346,7 @@ int32_t CellularDataService::InitCellularDataController(int32_t slotId)
     CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
     std::vector<uint64_t> netCapabilities;
     netCapabilities.push_back(NetCap::NET_CAPABILITY_INTERNET);
+    netCapabilities.push_back(NetCap::NET_CAPABILITY_INTERNAL_DEFAULT);
     AddNetSupplier(slotId, netAgent, netCapabilities);
     return TELEPHONY_ERR_SUCCESS;
 }
