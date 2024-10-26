@@ -531,6 +531,11 @@ bool CellularDataHandler::CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder)
     }
 
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (slotId_ != CELLULAR_DATA_VSIM_SLOT_ID && !apnHolder->IsMmsType() &&
+        TELEPHONY_EXT_WRAPPER.isVSimEnabled_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_()) {
+        TELEPHONY_LOGE("slot%{public}d, VSimEnabled & not mms type, ret false", slotId_);
+        return false;
+    }
     if (TELEPHONY_EXT_WRAPPER.isDualCellularCardAllowed_) {
         if (TELEPHONY_EXT_WRAPPER.isDualCellularCardAllowed_()) {
             return true;
