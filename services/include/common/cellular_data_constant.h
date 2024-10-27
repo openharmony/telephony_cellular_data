@@ -305,7 +305,6 @@ static const int32_t INVALID_SIM_ID = 0;
 static const int32_t INVALID_SLOT_ID = -1;
 static const int32_t CELLULAR_DATA_VSIM_SLOT_ID = 2;
 static const int32_t SUPPLIER_INVALID_REG_STATE = -1;
-static const int32_t INVALID_DELAY_NO_RETRY = -1;
 } // namespace Telephony
 } // namespace OHOS
 #endif // CELLULAR_DATA_CONSTANT_H

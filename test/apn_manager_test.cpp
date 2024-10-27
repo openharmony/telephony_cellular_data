@@ -786,14 +786,6 @@ HWTEST_F(ApnManagerTest, OnPropChanged_001, TestSize.Level0)
     EXPECT_EQ(connectionRetryPolicy->isPropOn_, true);
     connectionRetryPolicy->OnPropChanged("fakeKey", "true", nullptr);
     EXPECT_EQ(connectionRetryPolicy->isPropOn_, true);
-    connectionRetryPolicy->OnPropChanged("persist.telephony.setupfail.delay", "3000", nullptr);
-    EXPECT_EQ(connectionRetryPolicy->defaultSetupFailDelay_, 3000);
-    connectionRetryPolicy->OnPropChanged("persist.telephony.modemdend.delay", "1000", nullptr);
-    EXPECT_EQ(connectionRetryPolicy->defaultModemDendDelay_, 1000);
-    connectionRetryPolicy->OnPropChanged("persist.telephony.setupfail.delay", "0x3000", nullptr);
-    EXPECT_EQ(connectionRetryPolicy->defaultSetupFailDelay_, 3000);
-    connectionRetryPolicy->OnPropChanged("persist.telephony.modemdend.delay", "0x1000", nullptr);
-    EXPECT_EQ(connectionRetryPolicy->defaultModemDendDelay_, 1000);
 }
 
 /**
@@ -824,13 +816,12 @@ HWTEST_F(ApnManagerTest, GetNextRetryDelay_001, TestSize.Level0)
     std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
     connectionRetryPolicy->matchedApns_.clear();
     auto delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_DEFAULT, 0, 0,
-        RetryScene::RETRY_SCENE_OTHERS, 0);
+        RetryScene::RETRY_SCENE_OTHERS);
     EXPECT_GE(delay, 0);
     sptr<ApnItem> defaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
     defaultApnItem->MarkBadApn(true);
     connectionRetryPolicy->matchedApns_.push_back(defaultApnItem);
-    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_DEFAULT, 0, 0, RetryScene::RETRY_SCENE_OTHERS,
-        0);
+    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_DEFAULT, 0, 0, RetryScene::RETRY_SCENE_OTHERS);
     EXPECT_GE(delay, 0);
 }
 
@@ -847,17 +838,15 @@ HWTEST_F(ApnManagerTest, GetNextRetryDelay_002, TestSize.Level0)
     defaultApnItem->MarkBadApn(false);
     connectionRetryPolicy->matchedApns_.push_back(defaultApnItem);
     auto delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_DEFAULT, 0, 0,
-        RetryScene::RETRY_SCENE_OTHERS, 0);
+        RetryScene::RETRY_SCENE_OTHERS);
     EXPECT_GE(delay, 0);
     connectionRetryPolicy->isPropOn_ = false;
-    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_DEFAULT, 0, 0, RetryScene::RETRY_SCENE_OTHERS,
-        0);
+    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_DEFAULT, 0, 0, RetryScene::RETRY_SCENE_OTHERS);
     EXPECT_GE(delay, 0);
     connectionRetryPolicy->isPropOn_ = true;
-    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_DEFAULT, 0, 0, RetryScene::RETRY_SCENE_OTHERS,
-        0);
+    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_DEFAULT, 0, 0, RetryScene::RETRY_SCENE_OTHERS);
     EXPECT_GE(delay, 0);
-    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_MMS, 0, 0, RetryScene::RETRY_SCENE_OTHERS, 0);
+    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_MMS, 0, 0, RetryScene::RETRY_SCENE_OTHERS);
     EXPECT_GE(delay, 0);
 }
 
@@ -911,13 +900,13 @@ HWTEST_F(ApnManagerTest, ConvertPdpErrorToDisconnReason_001, TestSize.Level0)
     EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
     res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
         PdpErrorReason::PDP_ERR_SERVICE_OPTION_NOT_SUPPORTED);
-    EXPECT_EQ(res, DisConnectionReason::REASON_RETRY_CONNECTION);
+    EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
     res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
         PdpErrorReason::PDP_ERR_REQUESTED_SERVICE_OPTION_NOT_SUBSCRIBED);
-    EXPECT_EQ(res, DisConnectionReason::REASON_RETRY_CONNECTION);
+    EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
     res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
         PdpErrorReason::PDP_ERR_NSAPI_ALREADY_USED);
-    EXPECT_EQ(res, DisConnectionReason::REASON_RETRY_CONNECTION);
+    EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
     res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
         PdpErrorReason::PDP_ERR_IPV4_ONLY_ALLOWED);
     EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
@@ -926,7 +915,7 @@ HWTEST_F(ApnManagerTest, ConvertPdpErrorToDisconnReason_001, TestSize.Level0)
     EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
     res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
         PdpErrorReason::PDP_ERR_PROTOCOL_ERRORS);
-    EXPECT_EQ(res, DisConnectionReason::REASON_RETRY_CONNECTION);
+    EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
     res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
         PdpErrorReason::PDP_ERR_UNKNOWN_TO_CLEAR_CONNECTION);
     EXPECT_EQ(res, DisConnectionReason::REASON_CLEAR_CONNECTION);
