@@ -551,7 +551,7 @@ void ApnManager::ClearAllApnBad()
 {
     for (const sptr<ApnHolder> &apnHolder : apnHolders_) {
         if (apnHolder != nullptr) {
-            apnHolder->ClearCurrentApnBad();
+            apnHolder->SetApnBadState(false);
         }
     }
 }

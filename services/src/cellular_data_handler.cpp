@@ -461,6 +461,7 @@ void CellularDataHandler::EstablishAllApnsIfConnectable()
         TELEPHONY_LOGE("Slot%{public}d: apnManager is null", slotId_);
         return;
     }
+    apnManager_->ClearAllApnBad();
     for (sptr<ApnHolder> apnHolder : apnManager_->GetSortApnHolder()) {
         if (apnHolder == nullptr) {
             TELEPHONY_LOGE("Slot%{public}d: apn is null", slotId_);
@@ -968,17 +969,17 @@ void CellularDataHandler::RetryOrClearConnection(const sptr<ApnHolder> &apnHolde
     if (apnHolder == nullptr || netInfo == nullptr) {
         return;
     }
-    RetryScene scene = static_cast<RetryScene>(netInfo->retryScene);
-    int64_t delayTime = apnHolder->GetRetryDelay(netInfo->reason, netInfo->retryTime, scene, slotId_);
     if (reason == DisConnectionReason::REASON_CLEAR_CONNECTION) {
         TELEPHONY_LOGI("clear connection");
         ClearConnection(apnHolder, reason);
-    } else if ((reason == DisConnectionReason::REASON_PERMANENT_REJECT) || (delayTime == INVALID_DELAY_NO_RETRY)) {
+    } else if (reason == DisConnectionReason::REASON_PERMANENT_REJECT) {
         TELEPHONY_LOGI("permannent reject, mark bad and clear connection");
-        apnHolder->MarkCurrentApnBad();
+        apnHolder->SetApnBadState(true);
         ClearConnection(apnHolder, DisConnectionReason::REASON_CLEAR_CONNECTION);
     } else if (reason == DisConnectionReason::REASON_RETRY_CONNECTION) {
         apnHolder->SetApnState(PROFILE_STATE_RETRYING);
+        RetryScene scene = static_cast<RetryScene>(netInfo->retryScene);
+        int64_t delayTime = apnHolder->GetRetryDelay(netInfo->reason, netInfo->retryTime, scene);
         TELEPHONY_LOGI("cid=%{public}d, cause=%{public}d, suggest=%{public}d, delay=%{public}lld, scene=%{public}d",
             netInfo->cid, netInfo->reason, netInfo->retryTime, static_cast<long long>(delayTime), netInfo->retryScene);
         SendEvent(CellularDataEventCode::MSG_RETRY_TO_SETUP_DATACALL, netInfo->flag, delayTime);
@@ -1580,7 +1581,6 @@ void CellularDataHandler::HandleRadioStateChanged(const AppExecFwk::InnerEvent::
             break;
         }
         case CORE_SERVICE_POWER_ON:
-            apnManager_->ClearAllApnBad();
             SetRilLinkBandwidths();
             EstablishAllApnsIfConnectable();
             break;
@@ -1692,9 +1692,6 @@ void CellularDataHandler::PsDataRatChanged(const InnerEvent::Pointer &event)
     if (!attached) {
         TELEPHONY_LOGE("Slot%{public}d: attached is false", slotId_);
         return;
-    }
-    if (apnManager_ != nullptr) {
-        apnManager_->ClearAllApnBad();
     }
     ClearConnectionIfRequired();
     EstablishAllApnsIfConnectable();
@@ -2095,9 +2092,6 @@ void CellularDataHandler::HandleDBSettingEnableChanged(const AppExecFwk::InnerEv
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     if (dataEnabled && defSlotId == slotId_) {
-        if (apnManager_ != nullptr) {
-            apnManager_->ClearAllApnBad();
-        }
         EstablishAllApnsIfConnectable();
     } else {
         ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
