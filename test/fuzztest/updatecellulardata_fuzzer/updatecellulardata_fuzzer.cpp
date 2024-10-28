@@ -39,10 +39,6 @@ void UpdateCellularDataDumpHelperFuzz(const uint8_t *data, size_t size)
     help.Dump(args, result);
     help.ShowHelp(result);
     help.ShowCellularDataInfo(result);
-}
-
-void UpdateCellularDataIncallObserverFuzz(const uint8_t *data, size_t size)
-{
     std::shared_ptr<CellularDataHandler> cellularDataHandler = nullptr;
     auto cellularDataIncallObserver = std::make_shared<CellularDataIncallObserver>(cellularDataHandler);
     cellularDataIncallObserver->OnChange();
