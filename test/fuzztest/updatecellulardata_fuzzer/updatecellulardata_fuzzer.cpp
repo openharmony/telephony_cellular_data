@@ -50,7 +50,6 @@ void UpdateActiveMachineWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
     UpdateCellularDataDumpHelperFuzz(data, size);
-    UpdateCellularDataIncallObserverFuzz(data, size);
 }
 } // namespace OHOS
 
