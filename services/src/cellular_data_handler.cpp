@@ -2392,6 +2392,10 @@ void CellularDataHandler::ReleaseCellularDataConnection()
         TELEPHONY_LOGI("system using, can not release");
         return;
     }
+    if (apnHolder->GetApnState() == ApnProfileState::PROFILE_STATE_IDLE) {
+        TELEPHONY_LOGI("apn state idle, can not release");
+        return;
+    }
     apnHolder->ReleaseDataConnection();
 }
 
