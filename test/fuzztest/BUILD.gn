@@ -20,6 +20,7 @@ group("fuzztest") {
 
   deps += [ "getcellulardatastate_fuzzer:fuzztest" ]
   deps += [ "updateactivemachine_fuzzer:fuzztest" ]
+  deps += [ "updatecellulardata_fuzzer:fuzztest" ]
   deps += [ "updatedisconnectmachine_fuzzer:fuzztest" ]
   deps += [ "updateinactivemachine_fuzzer:fuzztest" ]
   deps += [ "updateincalldatamachine_fuzzer:fuzztest" ]
