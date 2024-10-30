@@ -1855,6 +1855,51 @@ HWTEST_F(BranchTest, GetOverallDefaultApnState_Test_01, Function | MediumTest | 
 }
 
 /**
+ * @tc.number   GetOverallDefaultApnState_Test_02
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, GetOverallDefaultApnState_Test_02, Function | MediumTest | Level3)
+{
+    auto apnManager = std::make_shared<ApnManager>();
+    apnManager->InitApnHolders();
+    auto &apnHolders = apnManager->apnHolders_;
+
+    for (auto &apnHolder : apnHolders) {
+        if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DEFAULT) {
+            apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_CONNECTED);
+        }
+        if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
+            apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_DISCONNECTING);
+        }
+    }
+    auto ret = apnManager->GetOverallDefaultApnState();
+    EXPECT_EQ(ret, ApnProfileState::PROFILE_STATE_CONNECTED);
+
+    for (auto &apnHolder : apnHolders) {
+        if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DEFAULT) {
+            apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_CONNECTED);
+        }
+        if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
+            apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_FAILED);
+        }
+    }
+    ret = apnManager->GetOverallDefaultApnState();
+    EXPECT_EQ(ret, ApnProfileState::PROFILE_STATE_CONNECTED);
+
+    for (auto &apnHolder : apnHolders) {
+        if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DEFAULT) {
+            apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_CONNECTING);
+        }
+        if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
+            apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_FAILED);
+        }
+    }
+    ret = apnManager->GetOverallDefaultApnState();
+    EXPECT_EQ(ret, ApnProfileState::PROFILE_STATE_CONNECTING);
+}
+
+/**
  * @tc.number   ParseIpAddr_001
  * @tc.name     test branch
  * @tc.desc     Function test
