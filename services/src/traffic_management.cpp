@@ -42,6 +42,8 @@ void TrafficManagement::UpdatePacketData()
         sendPackets_ = dataState.GetIfaceTxPackets(interfaceName);
         recvPackets_ = dataState.GetIfaceRxPackets(interfaceName);
     }
+    TELEPHONY_LOGD("Slot%{public}d: sendPackets:%{public}lld recvPackets:%{public}lld",
+        slotId_, sendPackets_, recvPackets_);
 }
 
 std::string TrafficManagement::GetIfaceName()
