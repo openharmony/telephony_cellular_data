@@ -24,6 +24,7 @@ namespace Telephony {
 namespace {
     constexpr int32_t SYSTEM_UID = 1e4;
     std::shared_mutex reqUidsMutex_;
+    std::mutex netRequestMutex_;
 }
 const std::map<std::string, int32_t> ApnHolder::apnTypeDataProfileMap_ {
     {DATA_CONTEXT_ROLE_DEFAULT, DATA_PROFILE_DEFAULT},
@@ -168,7 +169,7 @@ HasSystemUse ApnHolder::GetUidStatus() const
 
 void ApnHolder::RequestCellularData(const NetRequest &netRequest)
 {
-    std::lock_guard<std::mutex> lock(netRequestMutex_);
+    std::unique_lock<std::mutex> lock(netRequestMutex_);
     for (const NetRequest &request : netRequests_) {
         if ((netRequest.capability == request.capability) && (netRequest.ident == request.ident)) {
             return;
@@ -181,7 +182,7 @@ void ApnHolder::RequestCellularData(const NetRequest &netRequest)
 
 bool ApnHolder::ReleaseCellularData(const NetRequest &netRequest)
 {
-    std::lock_guard<std::mutex> lock(netRequestMutex_);
+    std::unique_lock<std::mutex> lock(netRequestMutex_);
     for (std::vector<NetRequest>::const_iterator it = netRequests_.begin(); it != netRequests_.end();) {
         if ((netRequest.capability == it->capability) && (netRequest.ident == it->ident)) {
             it = netRequests_.erase(it);
@@ -198,7 +199,7 @@ bool ApnHolder::ReleaseCellularData(const NetRequest &netRequest)
 
 void ApnHolder::ReleaseAllCellularData()
 {
-    std::lock_guard<std::mutex> lock(netRequestMutex_);
+    std::unique_lock<std::mutex> lock(netRequestMutex_);
     TELEPHONY_LOGI("clear all cellular data");
     netRequests_.clear();
     if (netRequests_.empty()) {
