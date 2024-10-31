@@ -18,6 +18,7 @@
 
 #include <map>
 #include <memory>
+#include <mutex>
 #include <set>
 
 #include "apn_item.h"
@@ -84,6 +85,7 @@ private:
     std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine_;
     std::vector<NetRequest> netRequests_;
     std::set<uint32_t> reqUids_;
+    std::mutex netRequestMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
