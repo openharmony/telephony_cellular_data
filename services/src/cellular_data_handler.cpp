@@ -2395,7 +2395,7 @@ void CellularDataHandler::ReleaseCellularDataConnection()
     ClearConnection(apnHolder, DisConnectionReason::REASON_CLEAR_CONNECTION);
 }
 
-bool CellularDataHandler::UpdateNetworkInfo
+bool CellularDataHandler::UpdateNetworkInfo()
 {
     if (connectionManager_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: connectionManager_ is null", slotId_);
