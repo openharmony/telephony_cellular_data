@@ -2392,10 +2392,10 @@ void CellularDataHandler::ReleaseCellularDataConnection()
         TELEPHONY_LOGI("system using, can not release");
         return;
     }
-    ClearConnection(anpHolder, DisConnectionReason::REASON_CLEAR_CONNECTION);
+    ClearConnection(apnHolder, DisConnectionReason::REASON_CLEAR_CONNECTION);
 }
 
-bool CellularDataHandler::UpdateNetworkInfo()
+bool CellularDataHandler::UpdateNetworkInfopn
 {
     if (connectionManager_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: connectionManager_ is null", slotId_);
