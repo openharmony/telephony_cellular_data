@@ -36,8 +36,7 @@ public:
     void SetStateMachine(const std::weak_ptr<CellularDataStateMachine> &stateMachine);
     void SetDeActiveApnTypeId(int32_t deActiveApnTypeId);
     void SetDataCallResultInfo(std::shared_ptr<SetupDataCallResultInfo> resultInfo);
-    void SetDataCallResultInfoToRetry();
-    void SetDataCallResultInfoToClear();
+    void SetPdpErrorReason(PdpErrorReason reason);
 
 private:
     std::weak_ptr<CellularDataStateMachine> stateMachine_;

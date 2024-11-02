@@ -128,6 +128,15 @@ void ConnectionRetryPolicy::OnPropChanged(const char *key, const char *value, vo
 DisConnectionReason ConnectionRetryPolicy::ConvertPdpErrorToDisconnReason(int32_t reason)
 {
     switch (reason) {
+        case PdpErrorReason::PDP_ERR_TO_NORMAL:
+            return DisConnectionReason::REASON_NORMAL;
+        case PdpErrorReason::PDP_ERR_TO_GSM_AND_CALLING_ONLY:
+            return DisConnectionReason::REASON_GSM_AND_CALLING_ONLY;
+        case PdpErrorReason::PDP_ERR_TO_CLEAR_CONNECTION:
+            return DisConnectionReason::REASON_CLEAR_CONNECTION;
+        case PdpErrorReason::PDP_ERR_TO_CHANGE_CONNECTION:
+            return DisConnectionReason::REASON_CHANGE_CONNECTION;
+        case PdpErrorReason::PDP_ERR_TO_PERMANENT_REJECT:
         case PdpErrorReason::PDP_ERR_OPERATOR_DETERMINED_BARRING:
         case PdpErrorReason::PDP_ERR_MISSING_OR_UNKNOWN_APN:
         case PdpErrorReason::PDP_ERR_UNKNOWN_PDP_ADDR_OR_TYPE:
@@ -140,8 +149,6 @@ DisConnectionReason ConnectionRetryPolicy::ConvertPdpErrorToDisconnReason(int32_
         case PdpErrorReason::PDP_ERR_IPV6_ONLY_ALLOWED:
         case PdpErrorReason::PDP_ERR_PROTOCOL_ERRORS:
             return DisConnectionReason::REASON_PERMANENT_REJECT;
-        case PdpErrorReason::PDP_ERR_UNKNOWN_TO_CLEAR_CONNECTION:
-            return DisConnectionReason::REASON_CLEAR_CONNECTION;
         default:
             return DisConnectionReason::REASON_RETRY_CONNECTION;
     }

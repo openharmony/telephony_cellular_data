@@ -124,16 +124,10 @@ void Inactive::SetDataCallResultInfo(std::shared_ptr<SetupDataCallResultInfo> re
     resultInfo_ = resultInfo;
 }
 
-void Inactive::SetDataCallResultInfoToRetry()
+void Inactive::SetPdpErrorReason(PdpErrorReason reason)
 {
     resultInfo_ = std::make_shared<SetupDataCallResultInfo>();
-    resultInfo_->reason = static_cast<int32_t>(PdpErrorReason::PDP_ERR_RETRY);
-}
-
-void Inactive::SetDataCallResultInfoToClear()
-{
-    resultInfo_ = std::make_shared<SetupDataCallResultInfo>();
-    resultInfo_->reason = static_cast<int32_t>(PdpErrorReason::PDP_ERR_UNKNOWN_TO_CLEAR_CONNECTION);
+    resultInfo_->reason = static_cast<int32_t>(reason);
 }
 } // namespace Telephony
 } // namespace OHOS

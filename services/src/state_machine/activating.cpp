@@ -114,7 +114,7 @@ bool Activating::RilErrorResponse(const AppExecFwk::InnerEvent::Pointer &event)
         case ErrType::ERR_GENERIC_FAILURE:
         case ErrType::ERR_CMD_SEND_FAILURE:
         case ErrType::ERR_NULL_POINT: {
-            inActive->SetDataCallResultInfoToRetry();
+            inActive->SetPdpErrorReason(PdpErrorReason::PDP_ERR_RETRY);
             CellularDataHiSysEvent::WriteDataActivateFaultEvent(INVALID_PARAMETER, SWITCH_ON,
                 CellularDataErrorCode::DATA_ERROR_RADIO_RESPONSEINFO_ERROR,
                 "ErrType " + std::to_string(static_cast<int32_t>(rilInfo->error)));
@@ -125,7 +125,7 @@ bool Activating::RilErrorResponse(const AppExecFwk::InnerEvent::Pointer &event)
         case ErrType::ERR_CMD_NO_CARRIER:
         case ErrType::ERR_HDF_IPC_FAILURE:
         default: {
-            inActive->SetDataCallResultInfoToClear();
+            inActive->SetPdpErrorReason(PdpErrorReason::PDP_ERR_TO_CLEAR_CONNECTION);
             TELEPHONY_LOGE("Handle error response to clear connection");
             break;
         }
@@ -156,7 +156,7 @@ void Activating::ProcessConnectTimeout(const AppExecFwk::InnerEvent::Pointer &ev
         return;
     }
     inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
-    inActive->SetDataCallResultInfoToRetry();
+    inActive->SetPdpErrorReason(PdpErrorReason::PDP_ERR_RETRY);
     stateMachine->TransitionTo(stateMachine->inActiveState_);
     std::string apnType = ApnManager::FindApnNameByApnId(stateMachine->apnId_);
     CellularDataHiSysEvent::WriteDataActivateFaultEvent(stateMachine->GetSlotId(), SWITCH_ON,
