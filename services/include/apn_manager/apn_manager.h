@@ -60,6 +60,7 @@ private:
 
 private:
     static const std::map<std::string, int32_t> apnIdApnNameMap_;
+    static const std::vector<ApnProfileState> apnStateArr_;
     std::vector<sptr<ApnItem>> allApnItem_;
     std::vector<sptr<ApnHolder>> apnHolders_;
     std::map<int32_t, sptr<ApnHolder>> apnIdApnHolderMap_;
