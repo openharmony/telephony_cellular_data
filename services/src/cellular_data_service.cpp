@@ -770,7 +770,7 @@ int32_t CellularDataService::ReleaseCellularDataConnection(int32_t slotId)
 
 int32_t CellularDataService::GetCellularDataSupplierId(int32_t slotId, uint64_t capability, uint32_t &supplierId)
 {
-    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
@@ -805,7 +805,7 @@ int32_t CellularDataService::CorrectNetSupplierNoAvailable(int32_t slotId)
 
 int32_t CellularDataService::GetSupplierRegisterState(uint32_t supplierId, int32_t &regState)
 {
-    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
