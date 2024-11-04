@@ -670,6 +670,12 @@ bool CellularDataHandler::CheckApnState(sptr<ApnHolder> &apnHolder)
 
 void CellularDataHandler::AttemptEstablishDataConnection(sptr<ApnHolder> &apnHolder)
 {
+    bool isAirplaneModeOn = false;
+    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
+    coreInner.GetAirplaneMode(isAirplaneModeOn);
+    if (isAirplaneModeOn) {
+        return;
+    }
     if (!CheckCellularDataSlotId(apnHolder) || !CheckAttachAndSimState(apnHolder) || !CheckRoamingState(apnHolder)) {
         return;
     }
@@ -679,7 +685,6 @@ void CellularDataHandler::AttemptEstablishDataConnection(sptr<ApnHolder> &apnHol
         FinishTrace(HITRACE_TAG_OHOS);
         return;
     }
-    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     coreInner.GetPsRadioTech(slotId_, radioTech);
     if (!EstablishDataConnection(apnHolder, radioTech)) {
@@ -803,6 +808,10 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
         CellularDataHiSysEvent::WriteDataConnectStateBehaviorEvent(slotId_, apnHolder->GetApnType(),
             apnHolder->GetCapability(), static_cast<int32_t>(PROFILE_STATE_CONNECTED));
         apnHolder->InitialApnRetryCount();
+        if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DEFAULT) {
+            TELEPHONY_LOGI("default apn has connected, to setup internal_default apn");
+            SendEvent(CellularDataEventCode::MSG_RETRY_TO_SETUP_DATACALL, DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID, 0);
+        }
         std::shared_ptr<CellularDataStateMachine> stateMachine = apnHolder->GetCellularDataStateMachine();
         if (stateMachine != nullptr) {
             std::string proxyIpAddress = "";

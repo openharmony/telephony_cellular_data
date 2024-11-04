@@ -388,6 +388,15 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_005, Function | MediumTest | 
     controller.cellularDataHandler_->PsDataRatChanged(event);
     sptr<ApnHolder> apnHolder = controller.cellularDataHandler_->apnManager_->FindApnHolderById(1);
     ASSERT_FALSE(controller.cellularDataHandler_->HasAnyHigherPriorityConnection(apnHolder));
+    auto dataInfo = std::make_shared<DataProfileDataInfo>();
+    auto event2 = AppExecFwk::InnerEvent::Get(0, dataInfo);
+    controller.cellularDataHandler_->EstablishDataConnectionComplete(event2);
+    ASSERT_FALSE(controller.cellularDataHandler_->HasAnyHigherPriorityConnection(apnHolder));
+    auto netInfo = std::make_shared<SetupDataCallResultInfo>();
+    auto event3 = AppExecFwk::InnerEvent::Get(0, netInfo);
+    controller.cellularDataHandler_->apnManager_ = nullptr;
+    controller.cellularDataHandler_->EstablishDataConnectionComplete(event3);
+    ASSERT_FALSE(controller.cellularDataHandler_->HasAnyHigherPriorityConnection(apnHolder));
     controller.cellularDataHandler_->UnRegisterDataSettingObserver();
     controller.cellularDataHandler_->RemoveAllEvents();
     sleep(SLEEP_TIME_SECONDS);
