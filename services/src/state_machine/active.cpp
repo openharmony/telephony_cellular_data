@@ -92,11 +92,7 @@ bool Active::ProcessDisconnectDone(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGE("inActive is null");
         return false;
     }
-    if (reason == DisConnectionReason::REASON_RETRY_CONNECTION) {
-        inActive->SetDataCallResultInfoToRetry();
-    } else {
-        inActive->SetDataCallResultInfoToClear();
-    }
+    inActive->SetPdpErrorReason(disconnReasonPdpErrorMap_[reason]);
     stateMachine->FreeConnection(*object);
     stateMachine->TransitionTo(stateMachine->disconnectingState_);
     return PROCESSED;
@@ -125,11 +121,7 @@ bool Active::ProcessDisconnectAllDone(const AppExecFwk::InnerEvent::Pointer &eve
         TELEPHONY_LOGE("inActive is null");
         return false;
     }
-    if (reason == DisConnectionReason::REASON_RETRY_CONNECTION) {
-        inActive->SetDataCallResultInfoToRetry();
-    } else {
-        inActive->SetDataCallResultInfoToClear();
-    }
+    inActive->SetPdpErrorReason(disconnReasonPdpErrorMap_[reason]);
     stateMachine->FreeConnection(*object);
     stateMachine->TransitionTo(stateMachine->disconnectingState_);
     return PROCESSED;
