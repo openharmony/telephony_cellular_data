@@ -36,7 +36,6 @@ namespace OHOS {
 namespace Telephony {
 using namespace NetManagerStandard;
 
-bool g_registerResult = SystemAbility::MakeAndRegisterAbility(&DelayedRefSingleton<CellularDataService>::GetInstance());
 CellularDataService::CellularDataService()
     : SystemAbility(TELEPHONY_CELLULAR_DATA_SYS_ABILITY_ID, true), registerToService_(false),
       state_(ServiceRunningState::STATE_NOT_START)
