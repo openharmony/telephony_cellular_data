@@ -995,6 +995,7 @@ static napi_value GetIntelligenceSwitchState(napi_env env, napi_callback_info in
 EXTERN_C_START
 napi_value RegistCellularData(napi_env env, napi_value exports)
 {
+    auto cellularDataPoxy = CellularDataClient::GetInstance().GetProxy();
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("getCellularDataState", GetCellularDataState),
         DECLARE_NAPI_FUNCTION("isCellularDataEnabled", IsCellularDataEnabled),
