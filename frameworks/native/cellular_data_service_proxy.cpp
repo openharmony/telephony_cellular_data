@@ -418,7 +418,7 @@ int32_t CellularDataServiceProxy::RegisterSimAccountCallback(const sptr<SimAccou
     return reply.ReadInt32();
 }
 
-int32_t CellularDataServiceProxy::UnregisterSimAccountCallback()
+int32_t CellularDataServiceProxy::UnregisterSimAccountCallback(const sptr<SimAccountCallback> callback)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -426,6 +426,10 @@ int32_t CellularDataServiceProxy::UnregisterSimAccountCallback()
     if (!data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write interface token failed!");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!data.WriteRemoteObject(callback->AsObject())) {
+        TELEPHONY_LOGE("write remote object failed!");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     sptr<OHOS::IRemoteObject> remote = Remote();
     if (remote == nullptr) {
