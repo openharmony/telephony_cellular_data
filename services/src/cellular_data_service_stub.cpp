@@ -307,8 +307,14 @@ int32_t CellularDataServiceStub::OnRegisterSimAccountCallback(MessageParcel &dat
 
 int32_t CellularDataServiceStub::OnUnregisterSimAccountCallback(MessageParcel &data, MessageParcel &reply)
 {
-    int32_t result = UnregisterSimAccountCallback();
-    reply.WriteInt32(result);
+    sptr<SimAccountCallback> callback = iface_cast<SimAccountCallback>(data.ReadRemoteObject());
+    int32_t result;
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("callback is nullptr!");
+        result = TELEPHONY_ERR_ARGUMENT_NULL;
+    } else {
+        result = UnregisterSimAccountCallback(callback);
+    }
     return result;
 }
 
