@@ -505,8 +505,8 @@ bool CellularDataHandler::CheckDataPermittedByDsds()
     if (TELEPHONY_EXT_WRAPPER.getVSimSlotId_) {
         int vSimSlotId = INVALID_SLOT_ID;
         TELEPHONY_EXT_WRAPPER.getVSimSlotId_(vSimSlotId);
-        if (vSimSlotId == CELLULAR_DATA_VSIM_SLOT_ID) {
-            return slotId_ == CELLULAR_DATA_VSIM_SLOT_ID;
+        if (vSimSlotId == CELLULAR_DATA_VSIM_SLOT_ID && slotId_ == CELLULAR_DATA_VSIM_SLOT_ID) {
+            return true;
         }
     }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
