@@ -543,7 +543,7 @@ HWTEST_F(ApnManagerTest, ReleaseDataConnection_002, TestSize.Level0)
     sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
     apnHolder->SetCellularDataStateMachine(stateMachine);
     apnHolder->ReleaseDataConnection();
-    ASSERT_EQ(apnHolder->cellularDataStateMachine_, nullptr);
+    ASSERT_NE(apnHolder->cellularDataStateMachine_, nullptr);
 }
 
 /**

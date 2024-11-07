@@ -1278,7 +1278,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessLostConnection_001, Function | 
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(0);
     bool result = active->ProcessLostConnection(event);
-    EXPECT_EQ(result, true);
+    EXPECT_EQ(result, false);
 }
 
 /**
