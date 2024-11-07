@@ -45,6 +45,7 @@
                 "ipc",
                 "napi",
                 "netmanager_base",
+                "preferences",
                 "relational_store",
                 "safwk",
                 "samgr",
