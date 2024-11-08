@@ -35,7 +35,7 @@ void UpdateCellularDataDumpHelperFuzz(const uint8_t *data, size_t size)
     std::string arg(reinterpret_cast<const char*>(data), size);
     std::vector<std::string> args;
     args.emplace_back(arg);
-    std::string result = reinterpret_cast<const char*>(data);
+    std::string result;
     help.Dump(args, result);
     help.ShowHelp(result);
     help.ShowCellularDataInfo(result);
