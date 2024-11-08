@@ -19,14 +19,16 @@
 #include <cstdint>
 #define private public
 #include "adddatatoken_fuzzer.h"
+#include "cellular_data_ipc_interface_code.h"
 #include "cellular_data_service.h"
 #include "cellular_data_service_stub.h"
 #include "system_ability_definition.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 using namespace OHOS::Telephony;
 namespace OHOS {
 static bool g_isInited = false;
-constexpr int32_t SLOT_NUM = 2;
+constexpr int32_t SLOT_NUM_MAX = 3;
 
 bool IsServiceInited()
 {
@@ -52,7 +54,9 @@ void OnRemoteRequest(const uint8_t *data, size_t size)
     }
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
-    uint32_t code = static_cast<uint32_t>(size);
+    FuzzedDataProvider fdp(data, size);
+    uint32_t code = fdp.ConsumeIntegralInRange<uint32_t>(0,
+        static_cast<uint32_t>(CellularDataInterfaceCode::GET_SUPPLIER_REGISTER_STATE) + 1);
     MessageParcel reply;
     MessageOption option;
     DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
@@ -102,8 +106,8 @@ void IsCellularDataRoamingEnabled(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return;
     }
-
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    FuzzedDataProvider fdp(data, size);
+    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -131,7 +135,8 @@ void EnableCellularDataRoaming(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    FuzzedDataProvider fdp(data, size);
+    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -146,7 +151,8 @@ void SetDefaultCellularDataSlotId(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    FuzzedDataProvider fdp(data, size);
+    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -161,7 +167,8 @@ void HasInternetCapability(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    FuzzedDataProvider fdp(data, size);
+    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -176,7 +183,8 @@ void ClearCellularDataConnections(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    FuzzedDataProvider fdp(data, size);
+    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);

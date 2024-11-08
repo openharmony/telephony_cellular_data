@@ -22,12 +22,14 @@
 #include "adddatatoken_fuzzer.h"
 #include "inactive.h"
 #include "statemachine_fuzzer.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
 using namespace OHOS::Telephony;
 using namespace AppExecFwk;
 using namespace OHOS::EventFwk;
-static int32_t SIM_COUNT = 2;
+constexpr int32_t SLOT_NUM_MAX = 3;
+constexpr int32_t EVENT_ID_MAX = 255;
 bool g_flag = false;
 
 void UpdateInActiveMachineFuzz(const uint8_t *data, size_t size)
@@ -36,7 +38,8 @@ void UpdateInActiveMachineFuzz(const uint8_t *data, size_t size)
     if (machine == nullptr) {
         return;
     }
-    int32_t slotId = static_cast<int32_t>(size % SIM_COUNT);
+    FuzzedDataProvider fdp(data, size);
+    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(slotId);
     if (cellularMachine == nullptr) {
         return;
@@ -53,7 +56,7 @@ void UpdateInActiveMachineFuzz(const uint8_t *data, size_t size)
         return;
     }
 
-    std::int32_t intValue = static_cast<int32_t>(size);
+    std::int32_t intValue = fdp.ConsumeIntegralInRange<uint32_t>(0, EVENT_ID_MAX);
     std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(*data);
     if (object == nullptr) {
         return;
