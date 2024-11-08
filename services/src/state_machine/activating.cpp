@@ -150,6 +150,14 @@ void Activating::ProcessConnectTimeout(const AppExecFwk::InnerEvent::Pointer &ev
     if (connectId != stateMachine->connectId_) {
         return;
     }
+    int64_t currentTime =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
+            .count();
+    if ((currentTime - stateMachine->startTimeConnectTimeoutTask_) < CONNECTION_TASK_TIME) {
+        TELEPHONY_LOGE("ProcessConnectTimeout error, delay: %{public}lld",
+            static_cast<long long>(currentTime - stateMachine->startTimeConnectTimeoutTask_));
+        return;
+    }
     Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
     if (inActive == nullptr) {
         TELEPHONY_LOGE("Inactive is null");

@@ -137,6 +137,9 @@ void CellularDataStateMachine::DoConnect(const DataConnectionParams &connectionP
         TELEPHONY_LOGE("stateMachineEventHandler_ is nullptr");
         return;
     }
+    startTimeConnectTimeoutTask_ =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
+            .count();
     stateMachineEventHandler_->SendEvent(
         CellularDataEventCode::MSG_CONNECT_TIMEOUT_CHECK, connectId_, CONNECTION_DISCONNECTION_TIMEOUT);
 }
