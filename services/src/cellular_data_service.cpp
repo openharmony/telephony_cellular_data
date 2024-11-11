@@ -650,12 +650,12 @@ int64_t CellularDataService::GetSpendTime()
     return endTime_ - beginTime_;
 }
 
-int32_t CellularDataService::RegisterSimAccountCallback(const sptr<SimAccountCallback> callback)
+int32_t CellularDataService::RegisterSimAccountCallback(const sptr<SimAccountCallback> &callback)
 {
     return CoreManagerInner::GetInstance().RegisterSimAccountCallback(GetTokenID(), callback);
 }
 
-int32_t CellularDataService::UnregisterSimAccountCallback(const sptr<SimAccountCallback> callback)
+int32_t CellularDataService::UnregisterSimAccountCallback(const sptr<SimAccountCallback> &callback)
 {
     return CoreManagerInner::GetInstance().UnregisterSimAccountCallback(callback);
 }
