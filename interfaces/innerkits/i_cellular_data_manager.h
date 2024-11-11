@@ -135,9 +135,9 @@ public:
 
     virtual int32_t ClearAllConnections(int32_t slotId, DisConnectionReason reason) = 0;
 
-    virtual int32_t RegisterSimAccountCallback(const sptr<SimAccountCallback> callback) = 0;
+    virtual int32_t RegisterSimAccountCallback(const sptr<SimAccountCallback> &callback) = 0;
 
-    virtual int32_t UnregisterSimAccountCallback(const sptr<SimAccountCallback> callback) = 0;
+    virtual int32_t UnregisterSimAccountCallback(const sptr<SimAccountCallback> &callback) = 0;
 
     virtual int32_t GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr) = 0;
 
