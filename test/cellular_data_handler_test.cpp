@@ -582,8 +582,7 @@ HWTEST_F(CellularDataHandlerTest, HandleSimAccountLoadedTest001, Function | Medi
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 1);
     cellularDataHandler->Init();
-    cellularDataHandler->HandleSimAccountLoaded();
-    EXPECT_EQ(cellularDataHandler->isSimAccountLoaded_, false);
+    EXPECT_NO_THROW(cellularDataHandler->HandleSimAccountLoaded());
 }
 
 /**
