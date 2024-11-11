@@ -527,12 +527,11 @@ bool CellularDataHandler::CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder)
     if (IsVSimSlotId(slotId_)) {
         return true;
     }
-    
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     std::string apnType = apnHolder->GetApnType();
     if (defSlotId != slotId_ && !apnType.compare(DATA_CONTEXT_ROLE_INTERNAL_DEFAULT)) {
-        TELEPHONY_LOGD("Slot%{public}d: default:%{public}d, current:%{public}d", slotId_, defSlotId, slotId_);
+        TELEPHONY_LOGD("Slot%{public}d: internalDefault:%{public}d, current:%{public}d", slotId_, defSlotId, slotId_);
         return false;
     }
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
