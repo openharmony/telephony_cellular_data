@@ -657,7 +657,7 @@ int32_t CellularDataService::RegisterSimAccountCallback(const sptr<SimAccountCal
 
 int32_t CellularDataService::UnregisterSimAccountCallback(const sptr<SimAccountCallback> callback)
 {
-    return CoreManagerInner::GetInstance().UnregisterSimAccountCallback(GetTokenID(), callback);
+    return CoreManagerInner::GetInstance().UnregisterSimAccountCallback(callback);
 }
 
 int32_t CellularDataService::GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr)
