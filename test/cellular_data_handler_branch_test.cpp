@@ -444,18 +444,11 @@ HWTEST_F(CellularDataHandlerBranchTest, HandleRecordsChanged, Function | MediumT
     EXPECT_CALL(*mockSimManager, GetSimId(_)).Times(AtLeast(0));
     EXPECT_CALL(*mockSimManager, GetSimOperatorNumeric(_, _)).Times(2);
     EXPECT_CALL(*mockSimManager, IsCTSimCard(_, _)).Times(2);
+    EXPECT_CALL(*mockSimManager, GetDefaultCellularDataSlotId()).WillOnce(Return(0));
+    cellularDataHandler_->HandleSimAccountLoaded();
     cellularDataHandler_->HandleRecordsChanged();
     ASSERT_EQ(cellularDataHandler_->lastIccId_, iccId);
 
-    UnmockManager();
-}
-
-HWTEST_F(CellularDataHandlerBranchTest, HandleSimAccountLoaded, Function | MediumTest | Level3)
-{
-    InitCellularDataHandler();
-    InitMockManager();
-    EXPECT_CALL(*mockSimManager, GetDefaultCellularDataSlotId()).WillOnce(Return(0));
-    EXPECT_NO_THROW(cellularDataHandler_->HandleRecordsChanged());
     UnmockManager();
 }
 
