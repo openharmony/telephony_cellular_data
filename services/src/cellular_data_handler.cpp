@@ -570,9 +570,8 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     bool attached = coreInner.GetPsRegState(slotId_) == (int32_t)RegServiceState::REG_STATE_IN_SERVICE;
     bool isSimStateReadyOrLoaded = IsSimStateReadyOrLoaded();
-    TELEPHONY_LOGD("Slot%{public}d: attached: %{public}d simState: %{public}d isSimAccountLoaded: %{public}d "
-        "isRilApnAttached: %{public}d", slotId_, attached, isSimStateReadyOrLoaded, isSimAccountLoaded_,
-        isRilApnAttached_);
+    TELEPHONY_LOGD("Slot%{public}d: attached: %{public}d simState: %{public}d isRilApnAttached: %{public}d",
+        slotId_, attached, isSimStateReadyOrLoaded, isRilApnAttached_);
     bool isEmergencyApn = apnHolder->IsEmergencyType();
     if (!isEmergencyApn && !attached) {
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
@@ -584,7 +583,7 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
             CellularDataErrorCode::DATA_ERROR_SIM_NOT_READY, "It is not emergencyApn and sim not ready");
         return false;
     }
-    return isEmergencyApn || isSimAccountLoaded_;
+    return isEmergencyApn || isSimStateReadyOrLoaded;
 }
 
 bool CellularDataHandler::CheckRoamingState(sptr<ApnHolder> &apnHolder)
@@ -1477,11 +1476,9 @@ void CellularDataHandler::HandleSimEvent(const AppExecFwk::InnerEvent::Pointer &
 
 void CellularDataHandler::HandleSimAccountLoaded()
 {
-    isSimAccountLoaded_ = true;
     CellularDataNetAgent::GetInstance().UnregisterNetSupplierForSimUpdate(slotId_);
     if (!CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_)) {
         TELEPHONY_LOGE("Slot%{public}d register supplierid fail", slotId_);
-        isSimAccountLoaded_ = false;
     }
     if (slotId_ == 0) {
         CellularDataNetAgent::GetInstance().UnregisterPolicyCallback();

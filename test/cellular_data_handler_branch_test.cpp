@@ -419,7 +419,6 @@ HWTEST_F(CellularDataHandlerBranchTest, HandleSimStateChanged, Function | Medium
     cellularDataHandler_->HandleSimStateChanged();
     ASSERT_EQ(cellularDataHandler_->lastIccId_, iccId);
 
-    cellularDataHandler_->isSimAccountLoaded_ = true;
     cellularDataHandler_->isRilApnAttached_ = true;
     simState = SimState::SIM_STATE_NOT_PRESENT;
     EXPECT_CALL(*mockSimManager, GetSimState(_, _)).WillOnce(DoAll(SetArgReferee<1>(simState), Return(0)));
@@ -445,25 +444,10 @@ HWTEST_F(CellularDataHandlerBranchTest, HandleRecordsChanged, Function | MediumT
     EXPECT_CALL(*mockSimManager, GetSimId(_)).Times(AtLeast(0));
     EXPECT_CALL(*mockSimManager, GetSimOperatorNumeric(_, _)).Times(2);
     EXPECT_CALL(*mockSimManager, IsCTSimCard(_, _)).Times(2);
+    EXPECT_CALL(*mockSimManager, GetDefaultCellularDataSlotId()).WillOnce(Return(0));
     cellularDataHandler_->HandleRecordsChanged();
+    cellularDataHandler_->HandleSimAccountLoaded();
     ASSERT_EQ(cellularDataHandler_->lastIccId_, iccId);
-
-    UnmockManager();
-}
-
-HWTEST_F(CellularDataHandlerBranchTest, HandleSimAccountLoaded, Function | MediumTest | Level3)
-{
-    InitCellularDataHandler();
-    InitMockManager();
-
-    ASSERT_FALSE(cellularDataHandler_->isSimAccountLoaded_);
-    EXPECT_CALL(*mockSimManager, GetDefaultCellularDataSlotId()).WillOnce(Return(0));
-    cellularDataHandler_->HandleSimAccountLoaded();
-    ASSERT_FALSE(cellularDataHandler_->isSimAccountLoaded_);
-    cellularDataHandler_->isSimAccountLoaded_ = true;
-    EXPECT_CALL(*mockSimManager, GetDefaultCellularDataSlotId()).WillOnce(Return(0));
-    cellularDataHandler_->HandleSimAccountLoaded();
-    ASSERT_FALSE(cellularDataHandler_->isSimAccountLoaded_);
 
     UnmockManager();
 }
