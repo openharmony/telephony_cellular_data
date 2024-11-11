@@ -527,7 +527,14 @@ bool CellularDataHandler::CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder)
     if (IsVSimSlotId(slotId_)) {
         return true;
     }
-
+    
+    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
+    const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
+    std::string apnType = apnHolder->GetApnType();
+    if (defSlotId != slotId_ && !apnType.compare(DATA_CONTEXT_ROLE_INTERNAL_DEFAULT)) {
+        TELEPHONY_LOGD("Slot%{public}d: default:%{public}d, current:%{public}d", slotId_, defSlotId, slotId_);
+        return false;
+    }
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     if (TELEPHONY_EXT_WRAPPER.isDualCellularCardAllowed_) {
         if (TELEPHONY_EXT_WRAPPER.isDualCellularCardAllowed_()) {
@@ -536,18 +543,11 @@ bool CellularDataHandler::CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder)
     }
 #endif
 
-    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
-    const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
-    std::string apnType = apnHolder->GetApnType();
     if (defSlotId != slotId_ && !apnType.compare(DATA_CONTEXT_ROLE_DEFAULT)) {
         TELEPHONY_LOGD("Slot%{public}d: default:%{public}d, current:%{public}d", slotId_, defSlotId, slotId_);
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
             CellularDataErrorCode::DATA_ERROR_CELLULAR_DATA_SLOT_ID_MISMATCH,
             "Default cellular data slot id is not current slot id");
-        return false;
-    }
-    if (defSlotId != slotId_ && !apnType.compare(DATA_CONTEXT_ROLE_INTERNAL_DEFAULT)) {
-        TELEPHONY_LOGD("Slot%{public}d: default:%{public}d, current:%{public}d", slotId_, defSlotId, slotId_);
         return false;
     }
     return true;
