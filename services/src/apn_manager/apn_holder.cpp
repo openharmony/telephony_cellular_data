@@ -32,7 +32,8 @@ const std::map<std::string, int32_t> ApnHolder::apnTypeDataProfileMap_ {
     {DATA_CONTEXT_ROLE_SUPL, DATA_PROFILE_SUPL},
     {DATA_CONTEXT_ROLE_DUN, DATA_PROFILE_DUN},
     {DATA_CONTEXT_ROLE_IA, DATA_PROFILE_IA},
-    {DATA_CONTEXT_ROLE_XCAP, DATA_PROFILE_XCAP}
+    {DATA_CONTEXT_ROLE_XCAP, DATA_PROFILE_XCAP},
+    {DATA_CONTEXT_ROLE_BIP, DATA_PROFILE_BIP},
 };
 
 ApnHolder::ApnHolder(const std::string &apnType, const int32_t priority) : apnType_(apnType), priority_(priority) {}
@@ -215,6 +216,11 @@ bool ApnHolder::IsEmergencyType() const
 bool ApnHolder::IsMmsType() const
 {
     return apnType_ == DATA_CONTEXT_ROLE_MMS;
+}
+
+bool ApnHolder::IsBipType() const
+{
+    return apnType_ == DATA_CONTEXT_ROLE_BIP;
 }
 
 void ApnHolder::InitialApnRetryCount()

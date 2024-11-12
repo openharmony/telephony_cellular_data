@@ -35,7 +35,8 @@ const std::map<std::string, int32_t> ApnManager::apnIdApnNameMap_ {
     {DATA_CONTEXT_ROLE_IA, DATA_CONTEXT_ROLE_IA_ID},
     {DATA_CONTEXT_ROLE_EMERGENCY, DATA_CONTEXT_ROLE_EMERGENCY_ID},
     {DATA_CONTEXT_ROLE_INTERNAL_DEFAULT, DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID},
-    {DATA_CONTEXT_ROLE_XCAP, DATA_CONTEXT_ROLE_XCAP_ID}
+    {DATA_CONTEXT_ROLE_XCAP, DATA_CONTEXT_ROLE_XCAP_ID},
+    {DATA_CONTEXT_ROLE_BIP, DATA_CONTEXT_ROLE_BIP_ID}
 };
 const std::map<std::string, ApnTypes> ApnManager::apnNameApnTypeMap_ {
     {DATA_CONTEXT_ROLE_ALL, ApnTypes::ALL},
@@ -47,6 +48,7 @@ const std::map<std::string, ApnTypes> ApnManager::apnNameApnTypeMap_ {
     {DATA_CONTEXT_ROLE_IA, ApnTypes::IA},
     {DATA_CONTEXT_ROLE_EMERGENCY, ApnTypes::EMERGENCY},
     {DATA_CONTEXT_ROLE_XCAP, ApnTypes::XCAP},
+    {DATA_CONTEXT_ROLE_BIP, ApnTypes::BIP},
     {DATA_CONTEXT_ROLE_INTERNAL_DEFAULT, ApnTypes::INTERNAL_DEFAULT}
 };
 const std::vector<ApnProfileState> ApnManager::apnStateArr_ = {
@@ -80,6 +82,7 @@ void ApnManager::InitApnHolders()
     AddApnHolder(DATA_CONTEXT_ROLE_DUN, static_cast<int32_t>(DataContextPriority::PRIORITY_NORMAL));
     AddApnHolder(DATA_CONTEXT_ROLE_IA, static_cast<int32_t>(DataContextPriority::PRIORITY_HIGH));
     AddApnHolder(DATA_CONTEXT_ROLE_SUPL, static_cast<int32_t>(DataContextPriority::PRIORITY_NORMAL));
+    AddApnHolder(DATA_CONTEXT_ROLE_BIP, static_cast<int32_t>(DataContextPriority::PRIORITY_NORMAL));
 }
 
 sptr<ApnHolder> ApnManager::FindApnHolderById(const int32_t id) const
@@ -147,6 +150,8 @@ int32_t ApnManager::FindApnIdByCapability(const uint64_t capability)
             return DATA_CONTEXT_ROLE_SUPL_ID;
         case NetManagerStandard::NetCap::NET_CAPABILITY_DUN:
             return DATA_CONTEXT_ROLE_DUN_ID;
+        case NetManagerStandard::NetCap::NET_CAPABILITY_BIP:
+            return DATA_CONTEXT_ROLE_BIP_ID;
         default:
             return DATA_CONTEXT_ROLE_INVALID_ID;
     }
@@ -180,6 +185,9 @@ NetManagerStandard::NetCap ApnManager::FindBestCapability(const uint64_t capabil
     }
     if (HasNetCap(capabilities, NetManagerStandard::NetCap::NET_CAPABILITY_IA)) {
         netCap = NetManagerStandard::NetCap::NET_CAPABILITY_IA;
+    }
+    if (HasNetCap(capabilities, NetManagerStandard::NetCap::NET_CAPABILITY_BIP)) {
+        netCap = NetManagerStandard::NetCap::NET_CAPABILITY_BIP;
     }
     return netCap;
 }

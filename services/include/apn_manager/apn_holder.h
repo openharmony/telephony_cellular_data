@@ -58,6 +58,7 @@ public:
     void ReleaseAllCellularData();
     bool IsEmergencyType() const;
     bool IsMmsType() const;
+    bool IsBipType() const;
     void InitialApnRetryCount();
     bool IsSameMatchedApns(std::vector<sptr<ApnItem>> newMatchedApns, bool roamingState);
     static bool IsSameApnItem(const sptr<ApnItem> &newApnItem, const sptr<ApnItem> &oldApnItem, bool roamingState);
