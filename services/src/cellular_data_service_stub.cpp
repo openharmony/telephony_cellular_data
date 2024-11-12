@@ -315,6 +315,7 @@ int32_t CellularDataServiceStub::OnUnregisterSimAccountCallback(MessageParcel &d
     } else {
         result = UnregisterSimAccountCallback(callback);
     }
+    reply.WriteInt32(result);
     return result;
 }
 
