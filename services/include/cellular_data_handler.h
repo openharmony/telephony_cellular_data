@@ -186,7 +186,6 @@ private:
     bool physicalConnectionActiveState_ = false;
     bool multipleConnectionsEnabled_ = false;
     bool defaultDataRoamingEnable_ = false;
-    bool isSimAccountLoaded_ = false;
     bool isRilApnAttached_ = false;
     std::mutex mtx_;
     std::vector<std::string> upLinkThresholds_;
