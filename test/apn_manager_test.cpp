@@ -17,23 +17,16 @@
 
 #include "apn_holder.h"
 #include "apn_manager.h"
-#include "core_manager_inner.h"
 #include "cellular_data_state_machine.h"
 #include "cellular_data_client.h"
 #include "data_connection_manager.h"
 #include "gtest/gtest.h"
-#include "mock/mock_sim_manager.h"
 #include "tel_event_handler.h"
 #include "pdp_profile_data.h"
 
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
-using ::testing::_;
-using ::testing::AtLeast;
-using ::testing::Return;
-using ::testing::DoAll;
-using ::testing::SetArgReferee;
 
 class ApnManagerTest : public testing::Test {
 public:
@@ -42,7 +35,6 @@ public:
     void SetUp();
     void TearDown();
     std::shared_ptr<ApnManager> apnManager;
-    MockSimManager *mockSimManager;
 };
 void ApnManagerTest::SetUpTestCase() {}
 
@@ -51,9 +43,6 @@ void ApnManagerTest::TearDownTestCase() {}
 void ApnManagerTest::SetUp()
 {
     apnManager = std::make_shared<ApnManager>();
-    mockSimManager = new MockSimManager();
-    std::shared_ptr<MockSimManager> mockSimManagerPtr(mockSimManager);
-    CoreManagerInner::GetInstance().simManager_ = mockSimManagerPtr;
 }
 
 void ApnManagerTest::TearDown()
