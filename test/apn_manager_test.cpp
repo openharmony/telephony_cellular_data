@@ -17,16 +17,23 @@
 
 #include "apn_holder.h"
 #include "apn_manager.h"
+#include "core_manager_inner.h"
 #include "cellular_data_state_machine.h"
 #include "cellular_data_client.h"
 #include "data_connection_manager.h"
 #include "gtest/gtest.h"
+#include "mock/mock_sim_manager.h"
 #include "tel_event_handler.h"
 #include "pdp_profile_data.h"
 
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
+using ::testing::_;
+using ::testing::AtLeast;
+using ::testing::Return;
+using ::testing::DoAll;
+using ::testing::SetArgReferee;
 
 class ApnManagerTest : public testing::Test {
 public:
@@ -35,6 +42,7 @@ public:
     void SetUp();
     void TearDown();
     std::shared_ptr<ApnManager> apnManager;
+    MockSimManager *mockSimManager;
 };
 void ApnManagerTest::SetUpTestCase() {}
 
@@ -43,6 +51,9 @@ void ApnManagerTest::TearDownTestCase() {}
 void ApnManagerTest::SetUp()
 {
     apnManager = std::make_shared<ApnManager>();
+    mockSimManager = new MockSimManager();
+    std::shared_ptr<MockSimManager> mockSimManagerPtr(mockSimManager);
+    CoreManagerInner::GetInstance().simManager_ = mockSimManagerPtr;
 }
 
 void ApnManagerTest::TearDown()
@@ -516,6 +527,48 @@ HWTEST_F(ApnManagerTest, GetRilAttachApn_001, Function | MediumTest | Level1)
     std::vector<sptr<ApnItem>> allApnItem;
     apnManager->allApnItem_ = allApnItem;
     ASSERT_EQ(apnManager->GetRilAttachApn(), nullptr);
+}
+
+/**
+ * @tc.number   GetRilAttachApn_002
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, GetRilAttachApn_002, Function | MediumTest | Level1)
+{
+    std::vector<sptr<ApnItem>> allApnItem;
+    sptr<ApnItem> defaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
+    allApnItem.push_back(defaultApnItem);
+    apnManager->allApnItem_ = allApnItem;
+    ASSERT_NE(apnManager->GetRilAttachApn(), nullptr);
+}
+
+/**
+ * @tc.number   GetRilAttachApn_003
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, GetRilAttachApn_003, Function | MediumTest | Level1)
+{
+    std::vector<sptr<ApnItem>> allApnItem;
+    sptr<ApnItem> apnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_IA);
+    allApnItem.push_back(apnItem);
+    apnManager->allApnItem_ = allApnItem;
+    ASSERT_NE(apnManager->GetRilAttachApn(), nullptr);
+}
+
+/**
+ * @tc.number   GetRilAttachApn_004
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, GetRilAttachApn_004, Function | MediumTest | Level1)
+{
+    std::vector<sptr<ApnItem>> allApnItem;
+    sptr<ApnItem> apnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_MMS);
+    allApnItem.push_back(apnItem);
+    apnManager->allApnItem_ = allApnItem;
+    ASSERT_NE(apnManager->GetRilAttachApn(), nullptr);
 }
 
 /**
@@ -1000,6 +1053,69 @@ HWTEST_F(ApnManagerTest, UpdateDefaultCellularDataSlotId_001, TestSize.Level0)
 {
     int32_t result = CellularDataClient::GetInstance().UpdateDefaultCellularDataSlotId();
     EXPECT_EQ(result, 0);
+}
+
+/**
+ * @tc.name  : ApnItem_CanDealWithType_001
+ * @tc.number: ApnItemTest_001
+ * @tc.desc  : Test when the type matches with the apnTypes_ then CanDealWithType returns true
+ */
+HWTEST_F(ApnManagerTest, ApnItem_CanDealWithType_001, TestSize.Level0)
+{
+    ApnItem apnItem;
+    apnItem.apnTypes_.push_back("default");
+    EXPECT_TRUE(apnItem.CanDealWithType("default"));
+}
+
+/**
+ * @tc.name  : ApnItem_CanDealWithType_002
+ * @tc.number: ApnItemTest_002
+ * @tc.desc  : Test when the type is DATA_CONTEXT_ROLE_INTERNAL_DEFAULT
+ * and apnTypes_ contains DATA_CONTEXT_ROLE_DEFAULT then CanDealWithType returns true
+ */
+HWTEST_F(ApnManagerTest, ApnItem_CanDealWithType_002, TestSize.Level0)
+{
+    ApnItem apnItem;
+    apnItem.apnTypes_.push_back(DATA_CONTEXT_ROLE_DEFAULT);
+    EXPECT_TRUE(apnItem.CanDealWithType(DATA_CONTEXT_ROLE_INTERNAL_DEFAULT));
+}
+
+/**
+ * @tc.name  : ApnItem_CanDealWithType_003
+ * @tc.number: ApnItemTest_003
+ * @tc.desc  : Test when the type is not DATA_CONTEXT_ROLE_IA and
+ * apnTypes_ contains DATA_CONTEXT_ROLE_ALL then CanDealWithType returns true
+ */
+HWTEST_F(ApnManagerTest, ApnItem_CanDealWithType_003, TestSize.Level0)
+{
+    ApnItem apnItem;
+    apnItem.apnTypes_.push_back(DATA_CONTEXT_ROLE_ALL);
+    EXPECT_TRUE(apnItem.CanDealWithType("not_ia"));
+}
+
+/**
+ * @tc.name  : ApnItem_CanDealWithType_004
+ * @tc.number: ApnItemTest_004
+ * @tc.desc  : Test when the type does not match with the apnTypes_ then CanDealWithType returns false
+ */
+HWTEST_F(ApnManagerTest, ApnItem_CanDealWithType_004, TestSize.Level0)
+{
+    ApnItem apnItem;
+    apnItem.apnTypes_.push_back("default");
+    EXPECT_FALSE(apnItem.CanDealWithType("other"));
+}
+
+/**
+ * @tc.name  : ApnManager_FindApnHolderById_001
+ * @tc.number: ApnItemTest_004
+ * @tc.desc  : Test when the type does not match with the apnTypes_ then CanDealWithType returns false
+ */
+HWTEST_F(ApnManagerTest, ApnManager_FindApnHolderById_001, TestSize.Level0)
+{
+    apnManager->apnIdApnHolderMap_.clear();
+    EXPECT_EQ(apnManager->FindApnHolderById(0), nullptr);
+    apnManager->AddApnHolder("default", 10);
+    EXPECT_EQ(apnManager->FindApnTypeByApnName("abc"), static_cast<uint64_t>(ApnTypes::NONETYPE));
 }
 } // namespace Telephony
 } // namespace OHOS
