@@ -1797,6 +1797,29 @@ HWTEST_F(CellularDataTest, NetStrategySwitch_003, TestSize.Level3)
 }
 
 /**
+ * @tc.number   GetSupplierRegState_001
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, GetSupplierRegState_001, TestSize.Level3)
+{
+    int32_t regState = 0;
+    int32_t result = netAgent.GetSupplierRegState(0, regState);
+    EXPECT_FALSE(result);
+
+    NetSupplier netSupplier = { 0 };
+    netSupplier.supplierId = 1000;
+    netSupplier.slotId = 0;
+    netAgent.AddNetSupplier(netSupplier);
+    result = netAgent.GetSupplierRegState(1000, regState);
+    EXPECT_TRUE(result);
+
+    sptr<NetSupplierInfo> netSupplierInfo = new (std::nothrow) NetSupplierInfo();
+    result = netAgent.UpdateNetSupplierInfo(1000, netSupplierInfo);
+    EXPECT_NE(result, 0);
+}
+
+/**
  * @tc.number   RdbUpdate_001
  * @tc.name     Test the function
  * @tc.desc     Function test
