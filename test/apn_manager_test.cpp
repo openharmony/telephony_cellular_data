@@ -519,6 +519,48 @@ HWTEST_F(ApnManagerTest, GetRilAttachApn_001, Function | MediumTest | Level1)
 }
 
 /**
+ * @tc.number   GetRilAttachApn_002
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, GetRilAttachApn_002, Function | MediumTest | Level1)
+{
+    std::vector<sptr<ApnItem>> allApnItem;
+    sptr<ApnItem> defaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
+    allApnItem.push_back(defaultApnItem);
+    apnManager->allApnItem_ = allApnItem;
+    ASSERT_NE(apnManager->GetRilAttachApn(), nullptr);
+}
+
+/**
+ * @tc.number   GetRilAttachApn_003
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, GetRilAttachApn_003, Function | MediumTest | Level1)
+{
+    std::vector<sptr<ApnItem>> allApnItem;
+    sptr<ApnItem> apnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_IA);
+    allApnItem.push_back(apnItem);
+    apnManager->allApnItem_ = allApnItem;
+    ASSERT_NE(apnManager->GetRilAttachApn(), nullptr);
+}
+
+/**
+ * @tc.number   GetRilAttachApn_004
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, GetRilAttachApn_004, Function | MediumTest | Level1)
+{
+    std::vector<sptr<ApnItem>> allApnItem;
+    sptr<ApnItem> apnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_MMS);
+    allApnItem.push_back(apnItem);
+    apnManager->allApnItem_ = allApnItem;
+    ASSERT_NE(apnManager->GetRilAttachApn(), nullptr);
+}
+
+/**
  * @tc.number   ReleaseDataConnection_001
  * @tc.name     test function branch
  * @tc.desc     Function test
@@ -543,7 +585,7 @@ HWTEST_F(ApnManagerTest, ReleaseDataConnection_002, TestSize.Level0)
     sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
     apnHolder->SetCellularDataStateMachine(stateMachine);
     apnHolder->ReleaseDataConnection();
-    ASSERT_EQ(apnHolder->cellularDataStateMachine_, nullptr);
+    ASSERT_NE(apnHolder->cellularDataStateMachine_, nullptr);
 }
 
 /**
@@ -904,7 +946,17 @@ HWTEST_F(ApnManagerTest, ConvertPdpErrorToDisconnReason_001, TestSize.Level0)
     res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
         PdpErrorReason::PDP_ERR_REQUESTED_SERVICE_OPTION_NOT_SUBSCRIBED);
     EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
-    res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
+}
+
+/**
+ * @tc.number   ConvertPdpErrorToDisconnReason_002
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, ConvertPdpErrorToDisconnReason_002, TestSize.Level0)
+{
+    std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
+    auto res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
         PdpErrorReason::PDP_ERR_NSAPI_ALREADY_USED);
     EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
     res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
@@ -917,11 +969,23 @@ HWTEST_F(ApnManagerTest, ConvertPdpErrorToDisconnReason_001, TestSize.Level0)
         PdpErrorReason::PDP_ERR_PROTOCOL_ERRORS);
     EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
     res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
-        PdpErrorReason::PDP_ERR_UNKNOWN_TO_CLEAR_CONNECTION);
-    EXPECT_EQ(res, DisConnectionReason::REASON_CLEAR_CONNECTION);
-    res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
         PdpErrorReason::PDP_ERR_RETRY);
     EXPECT_EQ(res, DisConnectionReason::REASON_RETRY_CONNECTION);
+    res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
+        PdpErrorReason::PDP_ERR_TO_NORMAL);
+    EXPECT_EQ(res, DisConnectionReason::REASON_NORMAL);
+    res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
+        PdpErrorReason::PDP_ERR_TO_GSM_AND_CALLING_ONLY);
+    EXPECT_EQ(res, DisConnectionReason::REASON_GSM_AND_CALLING_ONLY);
+    res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
+        PdpErrorReason::PDP_ERR_TO_CLEAR_CONNECTION);
+    EXPECT_EQ(res, DisConnectionReason::REASON_CLEAR_CONNECTION);
+    res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
+        PdpErrorReason::PDP_ERR_TO_CHANGE_CONNECTION);
+    EXPECT_EQ(res, DisConnectionReason::REASON_CHANGE_CONNECTION);
+    res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
+        PdpErrorReason::PDP_ERR_TO_PERMANENT_REJECT);
+    EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
 }
 
 /**

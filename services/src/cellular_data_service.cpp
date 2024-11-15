@@ -346,13 +346,18 @@ int32_t CellularDataService::InitCellularDataController(int32_t slotId)
     CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
     std::vector<uint64_t> netCapabilities;
     netCapabilities.push_back(NetCap::NET_CAPABILITY_INTERNET);
+    netCapabilities.push_back(NetCap::NET_CAPABILITY_INTERNAL_DEFAULT);
     AddNetSupplier(slotId, netAgent, netCapabilities);
     return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CellularDataService::ReleaseNet(const NetRequest &request)
 {
-    std::string requestIdent = request.ident.substr(strlen(IDENT_PREFIX));
+    size_t identPreLen = strlen(IDENT_PREFIX);
+    if (request.ident.length() < identPreLen) {
+        return CELLULAR_DATA_INVALID_PARAM;
+    }
+    std::string requestIdent = request.ident.substr(identPreLen);
     if (!IsValidDecValue(requestIdent)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
@@ -368,7 +373,11 @@ int32_t CellularDataService::ReleaseNet(const NetRequest &request)
 
 int32_t CellularDataService::RemoveUid(const NetRequest &request)
 {
-    std::string requestIdent = request.ident.substr(strlen(IDENT_PREFIX));
+    size_t identPreLen = strlen(IDENT_PREFIX);
+    if (request.ident.length() < identPreLen) {
+        return CELLULAR_DATA_INVALID_PARAM;
+    }
+    std::string requestIdent = request.ident.substr(identPreLen);
     if (!IsValidDecValue(requestIdent)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
@@ -384,7 +393,11 @@ int32_t CellularDataService::RemoveUid(const NetRequest &request)
 
 int32_t CellularDataService::AddUid(const NetRequest &request)
 {
-    std::string requestIdent = request.ident.substr(strlen(IDENT_PREFIX));
+    size_t identPreLen = strlen(IDENT_PREFIX);
+    if (request.ident.length() < identPreLen) {
+        return CELLULAR_DATA_INVALID_PARAM;
+    }
+    std::string requestIdent = request.ident.substr(identPreLen);
     if (!IsValidDecValue(requestIdent)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
@@ -400,7 +413,11 @@ int32_t CellularDataService::AddUid(const NetRequest &request)
 
 int32_t CellularDataService::RequestNet(const NetRequest &request)
 {
-    std::string requestIdent = request.ident.substr(strlen(IDENT_PREFIX));
+    size_t identPreLen = strlen(IDENT_PREFIX);
+    if (request.ident.length() < identPreLen) {
+        return CELLULAR_DATA_INVALID_PARAM;
+    }
+    std::string requestIdent = request.ident.substr(identPreLen);
     if (!IsValidDecValue(requestIdent)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
@@ -633,14 +650,14 @@ int64_t CellularDataService::GetSpendTime()
     return endTime_ - beginTime_;
 }
 
-int32_t CellularDataService::RegisterSimAccountCallback(const sptr<SimAccountCallback> callback)
+int32_t CellularDataService::RegisterSimAccountCallback(const sptr<SimAccountCallback> &callback)
 {
     return CoreManagerInner::GetInstance().RegisterSimAccountCallback(GetTokenID(), callback);
 }
 
-int32_t CellularDataService::UnregisterSimAccountCallback()
+int32_t CellularDataService::UnregisterSimAccountCallback(const sptr<SimAccountCallback> &callback)
 {
-    return CoreManagerInner::GetInstance().UnregisterSimAccountCallback(GetTokenID());
+    return CoreManagerInner::GetInstance().UnregisterSimAccountCallback(callback);
 }
 
 int32_t CellularDataService::GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr)
@@ -754,7 +771,7 @@ int32_t CellularDataService::ReleaseCellularDataConnection(int32_t slotId)
 
 int32_t CellularDataService::GetCellularDataSupplierId(int32_t slotId, uint64_t capability, uint32_t &supplierId)
 {
-    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
@@ -789,7 +806,7 @@ int32_t CellularDataService::CorrectNetSupplierNoAvailable(int32_t slotId)
 
 int32_t CellularDataService::GetSupplierRegisterState(uint32_t supplierId, int32_t &regState)
 {
-    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }

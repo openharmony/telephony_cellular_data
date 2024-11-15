@@ -571,22 +571,6 @@ HWTEST_F(CellularDataHandlerTest, HandleImsCallChangedTest001, Function | Medium
 }
 
 /**
- * @tc.number   HandleSimAccountLoadedTest001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataHandlerTest, HandleSimAccountLoadedTest001, Function | MediumTest | Level3)
-{
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 1);
-    cellularDataHandler->Init();
-    cellularDataHandler->HandleSimAccountLoaded();
-    EXPECT_EQ(cellularDataHandler->isSimAccountLoaded_, false);
-}
-
-/**
  * @tc.number   PsDataRatChangedTest001
  * @tc.name     test error branch
  * @tc.desc     Function test

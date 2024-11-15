@@ -550,11 +550,8 @@ HWTEST_F(CellularStateMachineTest, InactiveStateBegin_001, Function | MediumTest
     auto inactive = static_cast<Inactive *>(cellularMachine->inActiveState_.GetRefPtr());
     inactive->deActiveApnTypeId_ = 0;
     inactive->SetStateMachine(cellularMachine);
-    inactive->SetDataCallResultInfoToRetry();
+    inactive->SetPdpErrorReason(PdpErrorReason::PDP_ERR_RETRY);
     EXPECT_EQ(inactive->resultInfo_->reason, static_cast<int32_t>(PdpErrorReason::PDP_ERR_RETRY));
-    inactive->SetDataCallResultInfoToClear();
-    EXPECT_EQ(inactive->resultInfo_->reason,
-        static_cast<int32_t>(PdpErrorReason::PDP_ERR_UNKNOWN_TO_CLEAR_CONNECTION));
 }
 
 /**
@@ -1278,7 +1275,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessLostConnection_001, Function | 
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(0);
     bool result = active->ProcessLostConnection(event);
-    EXPECT_EQ(result, true);
+    EXPECT_EQ(result, false);
 }
 
 /**

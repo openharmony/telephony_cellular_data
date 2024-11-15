@@ -66,7 +66,7 @@ public:
     void AddUid(uint32_t uid);
     void RemoveUid(uint32_t uid);
     HasSystemUse GetUidStatus() const;
-    void MarkCurrentApnBad();
+    void SetApnBadState(bool isBad);
 
 private:
     ApnHolder(ApnHolder &apnHolder) = default;

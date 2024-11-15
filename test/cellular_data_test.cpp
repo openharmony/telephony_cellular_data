@@ -1222,7 +1222,7 @@ HWTEST_F(CellularDataTest, GetSupplierRegisterState_Test_01, TestSize.Level3)
     int32_t regState = -1;
     uint32_t supplierId = 1;
     int32_t result = CellularDataTest::GetSupplierRegisterState(supplierId, regState);
-    ASSERT_TRUE(result == TELEPHONY_ERR_FAIL);
+    ASSERT_TRUE(result == TELEPHONY_ERR_PERMISSION_ERR);
 
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
         return;

@@ -134,14 +134,14 @@ void CellularDataClient::UnregisterSimAccountCallback()
         TELEPHONY_LOGE("proxy is null");
         return;
     }
-    int32_t ret = proxy->UnregisterSimAccountCallback();
+    int32_t ret = proxy->UnregisterSimAccountCallback(callback_);
     TELEPHONY_LOGD("ret:%{public}d", ret);
 }
 
 int32_t CellularDataClient::GetDefaultCellularDataSlotId()
 {
     RegisterSimAccountCallback();
-    if (IsValidSlotId(defaultCellularDataSlotId_)) {
+    if (IsValidSlotId(defaultCellularDataSlotId_) && registerStatus_) {
         return defaultCellularDataSlotId_;
     }
     sptr<ICellularDataManager> proxy = GetProxy();

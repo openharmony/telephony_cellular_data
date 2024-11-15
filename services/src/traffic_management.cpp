@@ -15,6 +15,7 @@
 
 #include "traffic_management.h"
 
+#include <cinttypes>
 #include "core_manager_inner.h"
 #include "data_flow_statistics.h"
 #include "net_conn_client.h"
@@ -42,6 +43,8 @@ void TrafficManagement::UpdatePacketData()
         sendPackets_ = dataState.GetIfaceTxPackets(interfaceName);
         recvPackets_ = dataState.GetIfaceRxPackets(interfaceName);
     }
+    TELEPHONY_LOGD("Slot%{public}d: sendPackets:%{public}" PRId64 " recvPackets:%{public}" PRId64,
+        slotId_, sendPackets_, recvPackets_);
 }
 
 std::string TrafficManagement::GetIfaceName()

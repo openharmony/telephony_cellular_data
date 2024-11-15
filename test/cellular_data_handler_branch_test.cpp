@@ -87,7 +87,7 @@ HWTEST_F(CellularDataHandlerBranchTest, RoamingStateOn_001, Function | MediumTes
     EXPECT_CALL(*mockSimManager, GetSimId(_)).WillOnce(Return(0));
     auto event = AppExecFwk::InnerEvent::Get(0);
     cellularDataHandler_->RoamingStateOn(event);
-    
+
     // GetPsRoamingState return 1, dataRoamingEnabled is false
     EXPECT_CALL(*mockNetworkSearchManager, GetPsRoamingState(_)).WillOnce(Return(1));
     EXPECT_CALL(*mockSimManager, GetSimId(_)).Times(AtLeast(0)).WillRepeatedly(Return(1));
@@ -419,17 +419,14 @@ HWTEST_F(CellularDataHandlerBranchTest, HandleSimStateChanged, Function | Medium
     cellularDataHandler_->HandleSimStateChanged();
     ASSERT_EQ(cellularDataHandler_->lastIccId_, iccId);
 
-    cellularDataHandler_->isSimAccountLoaded_ = true;
     cellularDataHandler_->isRilApnAttached_ = true;
     simState = SimState::SIM_STATE_NOT_PRESENT;
     EXPECT_CALL(*mockSimManager, GetSimState(_, _)).WillOnce(DoAll(SetArgReferee<1>(simState), Return(0)));
-    EXPECT_CALL(*mockSimManager, GetSimId(_)).WillOnce(Return(0));
     cellularDataHandler_->HandleSimStateChanged();
 
     simState = SimState::SIM_STATE_NOT_READY;
     EXPECT_CALL(*mockSimManager, GetSimState(_, _)).WillOnce(DoAll(SetArgReferee<1>(simState), Return(0)));
     cellularDataHandler_->HandleSimStateChanged();
-    ASSERT_FALSE(cellularDataHandler_->isSimAccountLoaded_);
     ASSERT_FALSE(cellularDataHandler_->isRilApnAttached_);
 
     UnmockManager();
@@ -447,25 +444,10 @@ HWTEST_F(CellularDataHandlerBranchTest, HandleRecordsChanged, Function | MediumT
     EXPECT_CALL(*mockSimManager, GetSimId(_)).Times(AtLeast(0));
     EXPECT_CALL(*mockSimManager, GetSimOperatorNumeric(_, _)).Times(2);
     EXPECT_CALL(*mockSimManager, IsCTSimCard(_, _)).Times(2);
+    EXPECT_CALL(*mockSimManager, GetDefaultCellularDataSlotId()).WillOnce(Return(0));
+    cellularDataHandler_->HandleSimAccountLoaded();
     cellularDataHandler_->HandleRecordsChanged();
     ASSERT_EQ(cellularDataHandler_->lastIccId_, iccId);
-
-    UnmockManager();
-}
-
-HWTEST_F(CellularDataHandlerBranchTest, HandleSimAccountLoaded, Function | MediumTest | Level3)
-{
-    InitCellularDataHandler();
-    InitMockManager();
-
-    ASSERT_FALSE(cellularDataHandler_->isSimAccountLoaded_);
-    EXPECT_CALL(*mockSimManager, GetDefaultCellularDataSlotId()).WillOnce(Return(0));
-    EXPECT_CALL(*mockSimManager, GetSimId(_)).Times(AtLeast(0));
-    cellularDataHandler_->HandleSimAccountLoaded();
-    ASSERT_FALSE(cellularDataHandler_->isSimAccountLoaded_);
-    cellularDataHandler_->isSimAccountLoaded_ = true;
-    cellularDataHandler_->HandleSimAccountLoaded();
-    ASSERT_TRUE(cellularDataHandler_->isSimAccountLoaded_);
 
     UnmockManager();
 }
@@ -557,6 +539,36 @@ HWTEST_F(CellularDataHandlerBranchTest, ReleaseCellularDataConnection, Function 
     cellularDataHandler->Init();
     cellularDataHandler->ReleaseCellularDataConnection();
     ASSERT_NE(cellularDataHandler->apnManager_, nullptr);
+}
+
+HWTEST_F(CellularDataHandlerBranchTest, CheckCellularDataSlotId, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 2); // 2: vsim slot id
+    cellularDataHandler->Init();
+    sptr<ApnHolder> apnHolder = new ApnHolder(DATA_CONTEXT_ROLE_DEFAULT, 0);
+    cellularDataHandler->CheckCellularDataSlotId(apnHolder);
+
+    cellularDataHandler.reset();
+    cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0); // 0: sim0 slot id
+    cellularDataHandler->Init();
+    apnHolder = new ApnHolder(DATA_CONTEXT_ROLE_MMS, 0);
+    cellularDataHandler->CheckCellularDataSlotId(apnHolder);
+    apnHolder->apnType_ = DATA_CONTEXT_ROLE_DEFAULT;
+    bool ret = cellularDataHandler->CheckCellularDataSlotId(apnHolder);
+    EXPECT_FALSE(ret);
+
+    cellularDataHandler.reset();
+    cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 1); // 1: sim1 slot id
+    cellularDataHandler->Init();
+    apnHolder = new ApnHolder(DATA_CONTEXT_ROLE_MMS, 0);
+    cellularDataHandler->CheckCellularDataSlotId(apnHolder);
+    apnHolder->apnType_ = DATA_CONTEXT_ROLE_DEFAULT;
+    ret = cellularDataHandler->CheckCellularDataSlotId(apnHolder);
+    EXPECT_FALSE(ret);
 }
 
 }  // namespace Telephony

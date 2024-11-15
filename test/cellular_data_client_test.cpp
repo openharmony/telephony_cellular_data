@@ -224,5 +224,15 @@ HWTEST_F(CellularDataClientTest, GetSupplierRegisterState_001, TestSize.Level0)
     EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
 }
 
+/**
+ * @tc.number   OnInitCellularDataController_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataClientTest, OnInitCellularDataController_001, TestSize.Level0)
+{
+    int32_t result = CellularDataClient::GetInstance().InitCellularDataController(0);
+    EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+}
 } // namespace Telephony
 } // namespace OHOS

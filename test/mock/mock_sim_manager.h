@@ -56,7 +56,7 @@ public:
     MOCK_METHOD1(GetSimIst, std::u16string(int32_t));
     MOCK_METHOD1(ObtainAllSmsOfIcc, std::vector<std::string>(int32_t));
     MOCK_METHOD1(IsSetActiveSimInProgress, bool(int32_t));
-    MOCK_METHOD1(UnregisterSimAccountCallback, int32_t(const int32_t));
+    MOCK_METHOD1(UnregisterSimAccountCallback, int32_t(const sptr<SimAccountCallback> &));
     MOCK_METHOD1(GetSimTeleNumberIdentifier, std::u16string(const int32_t));
     MOCK_METHOD1(SavePrimarySlotId, int32_t(int32_t));
     MOCK_METHOD2(HasSimCard, int32_t(int32_t, bool &));

@@ -344,6 +344,8 @@ void CellularDataHandler::ClearConnection(const sptr<ApnHolder> &apn, DisConnect
         return;
     }
     apn->SetApnState(PROFILE_STATE_DISCONNECTING);
+    CellularDataHiSysEvent::WriteDataConnectStateBehaviorEvent(slotId_, apn->GetApnType(),
+        apn->GetCapability(), static_cast<int32_t>(PROFILE_STATE_DISCONNECTING));
     InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT, object);
     stateMachine->SendEvent(event);
 }
@@ -467,6 +469,7 @@ void CellularDataHandler::EstablishAllApnsIfConnectable()
         TELEPHONY_LOGE("Slot%{public}d: apnManager is null", slotId_);
         return;
     }
+    apnManager_->ClearAllApnBad();
     for (sptr<ApnHolder> apnHolder : apnManager_->GetSortApnHolder()) {
         if (apnHolder == nullptr) {
             TELEPHONY_LOGE("Slot%{public}d: apn is null", slotId_);
@@ -510,8 +513,8 @@ bool CellularDataHandler::CheckDataPermittedByDsds()
     if (TELEPHONY_EXT_WRAPPER.getVSimSlotId_) {
         int vSimSlotId = INVALID_SLOT_ID;
         TELEPHONY_EXT_WRAPPER.getVSimSlotId_(vSimSlotId);
-        if (vSimSlotId == CELLULAR_DATA_VSIM_SLOT_ID) {
-            return slotId_ == CELLULAR_DATA_VSIM_SLOT_ID;
+        if (vSimSlotId == CELLULAR_DATA_VSIM_SLOT_ID && slotId_ == CELLULAR_DATA_VSIM_SLOT_ID) {
+            return true;
         }
     }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
@@ -543,6 +546,11 @@ bool CellularDataHandler::CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder)
         return false;
     }
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (slotId_ != CELLULAR_DATA_VSIM_SLOT_ID && !apnHolder->IsMmsType() &&
+        TELEPHONY_EXT_WRAPPER.isVSimEnabled_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_()) {
+        TELEPHONY_LOGE("slot%{public}d, VSimEnabled & not mms type, ret false", slotId_);
+        return false;
+    }
     if (TELEPHONY_EXT_WRAPPER.isDualCellularCardAllowed_) {
         if (TELEPHONY_EXT_WRAPPER.isDualCellularCardAllowed_()) {
             return true;
@@ -569,9 +577,8 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     bool attached = coreInner.GetPsRegState(slotId_) == (int32_t)RegServiceState::REG_STATE_IN_SERVICE;
     bool isSimStateReadyOrLoaded = IsSimStateReadyOrLoaded();
-    TELEPHONY_LOGD("Slot%{public}d: attached: %{public}d simState: %{public}d isSimAccountLoaded: %{public}d "
-        "isRilApnAttached: %{public}d", slotId_, attached, isSimStateReadyOrLoaded, isSimAccountLoaded_,
-        isRilApnAttached_);
+    TELEPHONY_LOGD("Slot%{public}d: attached: %{public}d simState: %{public}d isRilApnAttached: %{public}d",
+        slotId_, attached, isSimStateReadyOrLoaded, isRilApnAttached_);
     bool isEmergencyApn = apnHolder->IsEmergencyType();
     if (!isEmergencyApn && !attached) {
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
@@ -583,7 +590,7 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
             CellularDataErrorCode::DATA_ERROR_SIM_NOT_READY, "It is not emergencyApn and sim not ready");
         return false;
     }
-    return isEmergencyApn || isSimAccountLoaded_;
+    return isEmergencyApn || isSimStateReadyOrLoaded;
 }
 
 bool CellularDataHandler::CheckRoamingState(sptr<ApnHolder> &apnHolder)
@@ -669,6 +676,12 @@ bool CellularDataHandler::CheckApnState(sptr<ApnHolder> &apnHolder)
 
 void CellularDataHandler::AttemptEstablishDataConnection(sptr<ApnHolder> &apnHolder)
 {
+    bool isAirplaneModeOn = false;
+    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
+    coreInner.GetAirplaneMode(isAirplaneModeOn);
+    if (isAirplaneModeOn) {
+        return;
+    }
     if (!CheckCellularDataSlotId(apnHolder) || !CheckAttachAndSimState(apnHolder) || !CheckRoamingState(apnHolder)) {
         return;
     }
@@ -678,7 +691,6 @@ void CellularDataHandler::AttemptEstablishDataConnection(sptr<ApnHolder> &apnHol
         FinishTrace(HITRACE_TAG_OHOS);
         return;
     }
-    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     coreInner.GetPsRadioTech(slotId_, radioTech);
     if (!EstablishDataConnection(apnHolder, radioTech)) {
@@ -766,6 +778,8 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
     cellularDataStateMachine->SetCapability(apnHolder->GetCapability());
     apnHolder->SetCurrentApn(apnItem);
     apnHolder->SetApnState(PROFILE_STATE_CONNECTING);
+    CellularDataHiSysEvent::WriteDataConnectStateBehaviorEvent(slotId_, apnHolder->GetApnType(),
+        apnHolder->GetCapability(), static_cast<int32_t>(PROFILE_STATE_CONNECTING));
     apnHolder->SetCellularDataStateMachine(cellularDataStateMachine);
     bool roamingState = CoreManagerInner::GetInstance().GetPsRoamingState(slotId_) > 0;
     bool userDataRoaming = dataSwitchSettings_->IsUserDataRoamingOn();
@@ -797,7 +811,13 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
             return;
         }
         apnHolder->SetApnState(PROFILE_STATE_CONNECTED);
+        CellularDataHiSysEvent::WriteDataConnectStateBehaviorEvent(slotId_, apnHolder->GetApnType(),
+            apnHolder->GetCapability(), static_cast<int32_t>(PROFILE_STATE_CONNECTED));
         apnHolder->InitialApnRetryCount();
+        if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DEFAULT) {
+            TELEPHONY_LOGI("default apn has connected, to setup internal_default apn");
+            SendEvent(CellularDataEventCode::MSG_RETRY_TO_SETUP_DATACALL, DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID, 0);
+        }
         std::shared_ptr<CellularDataStateMachine> stateMachine = apnHolder->GetCellularDataStateMachine();
         if (stateMachine != nullptr) {
             std::string proxyIpAddress = "";
@@ -938,6 +958,8 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
     connectionManager_->RemoveActiveConnectionByCid(stateMachine->GetCid());
     apnHolder->SetApnState(PROFILE_STATE_IDLE);
     apnHolder->SetCellularDataStateMachine(nullptr);
+    CellularDataHiSysEvent::WriteDataConnectStateBehaviorEvent(slotId_, apnHolder->GetApnType(),
+        apnHolder->GetCapability(), static_cast<int32_t>(PROFILE_STATE_IDLE));
     UpdateCellularDataConnectState(apnHolder->GetApnType());
     UpdatePhysicalConnectionState(connectionManager_->isNoActiveConnection());
     if (apnHolder->IsDataCallEnabled()) {
@@ -967,7 +989,7 @@ void CellularDataHandler::RetryOrClearConnection(const sptr<ApnHolder> &apnHolde
         ClearConnection(apnHolder, reason);
     } else if (reason == DisConnectionReason::REASON_PERMANENT_REJECT) {
         TELEPHONY_LOGI("permannent reject, mark bad and clear connection");
-        apnHolder->MarkCurrentApnBad();
+        apnHolder->SetApnBadState(true);
         ClearConnection(apnHolder, DisConnectionReason::REASON_CLEAR_CONNECTION);
     } else if (reason == DisConnectionReason::REASON_RETRY_CONNECTION) {
         apnHolder->SetApnState(PROFILE_STATE_RETRYING);
@@ -1461,11 +1483,9 @@ void CellularDataHandler::HandleSimEvent(const AppExecFwk::InnerEvent::Pointer &
 
 void CellularDataHandler::HandleSimAccountLoaded()
 {
-    isSimAccountLoaded_ = true;
     CellularDataNetAgent::GetInstance().UnregisterNetSupplierForSimUpdate(slotId_);
     if (!CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_)) {
         TELEPHONY_LOGE("Slot%{public}d register supplierid fail", slotId_);
-        isSimAccountLoaded_ = false;
     }
     if (slotId_ == 0) {
         CellularDataNetAgent::GetInstance().UnregisterPolicyCallback();
@@ -1527,6 +1547,7 @@ void CellularDataHandler::HandleApnChanged(const InnerEvent::Pointer &event)
     CreateApnItem();
     SetRilAttachApn();
     ClearConnectionsOnUpdateApns(DisConnectionReason::REASON_RETRY_CONNECTION);
+    apnManager_->ClearAllApnBad();
     for (const sptr<ApnHolder> &apnHolder : apnManager_->GetAllApnHolder()) {
         if (apnHolder == nullptr) {
             continue;

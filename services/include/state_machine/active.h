@@ -86,6 +86,14 @@ private:
         { RadioEvent::RADIO_RIL_SETUP_DATA_CALL,
             [this](const AppExecFwk::InnerEvent::Pointer &data) { return ProcessDataConnectionComplete(data); } },
     };
+    inline static std::map<DisConnectionReason, PdpErrorReason> disconnReasonPdpErrorMap_ {
+        { DisConnectionReason::REASON_NORMAL, PdpErrorReason::PDP_ERR_TO_NORMAL },
+        { DisConnectionReason::REASON_GSM_AND_CALLING_ONLY, PdpErrorReason::PDP_ERR_TO_GSM_AND_CALLING_ONLY },
+        { DisConnectionReason::REASON_RETRY_CONNECTION, PdpErrorReason::PDP_ERR_RETRY },
+        { DisConnectionReason::REASON_CLEAR_CONNECTION, PdpErrorReason::PDP_ERR_TO_CLEAR_CONNECTION },
+        { DisConnectionReason::REASON_CHANGE_CONNECTION, PdpErrorReason::PDP_ERR_TO_CHANGE_CONNECTION },
+        { DisConnectionReason::REASON_PERMANENT_REJECT, PdpErrorReason::PDP_ERR_TO_PERMANENT_REJECT },
+    };
     std::weak_ptr<CellularDataStateMachine> stateMachine_;
 };
 } // namespace Telephony

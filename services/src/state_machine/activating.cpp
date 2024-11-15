@@ -21,6 +21,7 @@
 #include "inactive.h"
 #include "radio_event.h"
 #include "telephony_log_wrapper.h"
+#include "apn_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -69,6 +70,7 @@ bool Activating::RilActivatePdpContextDone(const AppExecFwk::InnerEvent::Pointer
         TELEPHONY_LOGE("Inactive is null");
         return false;
     }
+    stateMachine->SetCid(resultInfo->cid);
     if (resultInfo->reason != 0 || resultInfo->active == 0) {
         resultInfo->retryScene = static_cast<int32_t>(RetryScene::RETRY_SCENE_SETUP_DATA);
         inActive->SetDataCallResultInfo(resultInfo);
@@ -76,7 +78,6 @@ bool Activating::RilActivatePdpContextDone(const AppExecFwk::InnerEvent::Pointer
         stateMachine->TransitionTo(stateMachine->inActiveState_);
         return true;
     }
-    stateMachine->SetCid(resultInfo->cid);
     if (stateMachine->cdConnectionManager_ != nullptr) {
         stateMachine->cdConnectionManager_->AddActiveConnectionByCid(stateMachine_.lock());
     } else {
@@ -113,7 +114,7 @@ bool Activating::RilErrorResponse(const AppExecFwk::InnerEvent::Pointer &event)
         case ErrType::ERR_GENERIC_FAILURE:
         case ErrType::ERR_CMD_SEND_FAILURE:
         case ErrType::ERR_NULL_POINT: {
-            inActive->SetDataCallResultInfoToRetry();
+            inActive->SetPdpErrorReason(PdpErrorReason::PDP_ERR_RETRY);
             CellularDataHiSysEvent::WriteDataActivateFaultEvent(INVALID_PARAMETER, SWITCH_ON,
                 CellularDataErrorCode::DATA_ERROR_RADIO_RESPONSEINFO_ERROR,
                 "ErrType " + std::to_string(static_cast<int32_t>(rilInfo->error)));
@@ -124,7 +125,7 @@ bool Activating::RilErrorResponse(const AppExecFwk::InnerEvent::Pointer &event)
         case ErrType::ERR_CMD_NO_CARRIER:
         case ErrType::ERR_HDF_IPC_FAILURE:
         default: {
-            inActive->SetDataCallResultInfoToClear();
+            inActive->SetPdpErrorReason(PdpErrorReason::PDP_ERR_TO_CLEAR_CONNECTION);
             TELEPHONY_LOGE("Handle error response to clear connection");
             break;
         }
@@ -149,14 +150,25 @@ void Activating::ProcessConnectTimeout(const AppExecFwk::InnerEvent::Pointer &ev
     if (connectId != stateMachine->connectId_) {
         return;
     }
+    int64_t currentTime =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
+            .count();
+    if ((currentTime - stateMachine->startTimeConnectTimeoutTask_) < CONNECTION_TASK_TIME) {
+        TELEPHONY_LOGE("ProcessConnectTimeout error, delay: %{public}lld",
+            static_cast<long long>(currentTime - stateMachine->startTimeConnectTimeoutTask_));
+        return;
+    }
     Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
     if (inActive == nullptr) {
         TELEPHONY_LOGE("Inactive is null");
         return;
     }
     inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
-    inActive->SetDataCallResultInfoToRetry();
+    inActive->SetPdpErrorReason(PdpErrorReason::PDP_ERR_RETRY);
     stateMachine->TransitionTo(stateMachine->inActiveState_);
+    std::string apnType = ApnManager::FindApnNameByApnId(stateMachine->apnId_);
+    CellularDataHiSysEvent::WriteDataActivateFaultEvent(stateMachine->GetSlotId(), SWITCH_ON,
+        CellularDataErrorCode::DATA_ERROR_DATA_ACTIVATE_TIME_OUT, apnType + " activate time out.");
     TELEPHONY_LOGI("ProcessConnectTimeout");
 }
 

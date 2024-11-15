@@ -388,6 +388,15 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_005, Function | MediumTest | 
     controller.cellularDataHandler_->PsDataRatChanged(event);
     sptr<ApnHolder> apnHolder = controller.cellularDataHandler_->apnManager_->FindApnHolderById(1);
     ASSERT_FALSE(controller.cellularDataHandler_->HasAnyHigherPriorityConnection(apnHolder));
+    auto dataInfo = std::make_shared<DataProfileDataInfo>();
+    auto event2 = AppExecFwk::InnerEvent::Get(0, dataInfo);
+    controller.cellularDataHandler_->EstablishDataConnectionComplete(event2);
+    ASSERT_FALSE(controller.cellularDataHandler_->HasAnyHigherPriorityConnection(apnHolder));
+    auto netInfo = std::make_shared<SetupDataCallResultInfo>();
+    auto event3 = AppExecFwk::InnerEvent::Get(0, netInfo);
+    controller.cellularDataHandler_->apnManager_ = nullptr;
+    controller.cellularDataHandler_->EstablishDataConnectionComplete(event3);
+    ASSERT_FALSE(controller.cellularDataHandler_->HasAnyHigherPriorityConnection(apnHolder));
     controller.cellularDataHandler_->UnRegisterDataSettingObserver();
     controller.cellularDataHandler_->RemoveAllEvents();
     sleep(SLEEP_TIME_SECONDS);
@@ -515,14 +524,13 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_009, Function | MediumTest | 
     
     apn->SetApnState(PROFILE_STATE_CONNECTED);
     controller.cellularDataHandler_->ClearConnection(apn, reason);
-    ASSERT_TRUE(apn->GetCellularDataStateMachine() == nullptr);
     ASSERT_EQ(apn->GetApnState(), PROFILE_STATE_DISCONNECTING);
 
     apn->SetApnState(PROFILE_STATE_CONNECTED);
     controller.cellularDataHandler_->ClearAllConnections(reason);
     apn->SetApnState(PROFILE_STATE_CONNECTING);
     controller.cellularDataHandler_->ClearAllConnections(reason);
-    ASSERT_EQ(apn->GetApnState(), PROFILE_STATE_CONNECTING);
+    ASSERT_EQ(apn->GetApnState(), PROFILE_STATE_DISCONNECTING);
 }
 
 /**
@@ -569,7 +577,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_010, Function | MediumTest | 
     ASSERT_EQ(controller.cellularDataHandler_->GetCellularDataState(), PROFILE_STATE_IDLE);
     controller.cellularDataHandler_->PsRadioEmergencyStateClose(event);
     ASSERT_EQ(apn3->GetApnState(), PROFILE_STATE_DISCONNECTING);
-    ASSERT_TRUE(apn3->GetCellularDataStateMachine() == nullptr);
 
     ASSERT_EQ(controller.cellularDataHandler_->GetCellularDataState("default"), PROFILE_STATE_IDLE);
 }
@@ -1225,9 +1232,15 @@ HWTEST_F(BranchTest, Telephony_ApnHolder_001, Function | MediumTest | Level3)
     std::vector<sptr<ApnItem>> matchedApns;
     apnHolder->SetAllMatchedApns(matchedApns);
     apnHolder->GetRetryDelay(0, 0, RetryScene::RETRY_SCENE_OTHERS);
-    apnHolder->MarkCurrentApnBad();
-    sptr<ApnItem> apnItem;
+    apnHolder->apnItem_ = nullptr;
+    apnHolder->SetApnBadState(true);
+    EXPECT_EQ(apnHolder->GetCurrentApn(), nullptr);
+    sptr<ApnItem> apnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
     apnHolder->SetCurrentApn(apnItem);
+    apnHolder->SetApnBadState(true);
+    EXPECT_TRUE(apnItem->IsBadApn());
+    apnHolder->SetApnBadState(false);
+    EXPECT_FALSE(apnItem->IsBadApn());
     apnHolder->GetCurrentApn();
     apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_IDLE);
     apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_FAILED);
@@ -1460,6 +1473,10 @@ HWTEST_F(BranchTest, ApnManager_Test_01, Function | MediumTest | Level3)
     apnManager->GetCTOperator(0, operatorNumeric);
     EXPECT_EQ(operatorNumeric, "46011");
     apnManager->GetApnHolder(DATA_CONTEXT_ROLE_DEFAULT);
+    apnManager->apnHolders_.push_back(nullptr);
+    apnManager->ClearAllApnBad();
+    EXPECT_EQ(apnManager->apnHolders_.back(), nullptr);
+    apnManager->apnHolders_.pop_back();
     apnManager->FindApnNameByApnId(1);
     std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
@@ -1838,6 +1855,51 @@ HWTEST_F(BranchTest, GetOverallDefaultApnState_Test_01, Function | MediumTest | 
         }
         if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
             apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_CONNECTING);
+        }
+    }
+    ret = apnManager->GetOverallDefaultApnState();
+    EXPECT_EQ(ret, ApnProfileState::PROFILE_STATE_CONNECTING);
+}
+
+/**
+ * @tc.number   GetOverallDefaultApnState_Test_02
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, GetOverallDefaultApnState_Test_02, Function | MediumTest | Level3)
+{
+    auto apnManager = std::make_shared<ApnManager>();
+    apnManager->InitApnHolders();
+    auto &apnHolders = apnManager->apnHolders_;
+
+    for (auto &apnHolder : apnHolders) {
+        if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DEFAULT) {
+            apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_CONNECTED);
+        }
+        if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
+            apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_DISCONNECTING);
+        }
+    }
+    auto ret = apnManager->GetOverallDefaultApnState();
+    EXPECT_EQ(ret, ApnProfileState::PROFILE_STATE_CONNECTED);
+
+    for (auto &apnHolder : apnHolders) {
+        if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DEFAULT) {
+            apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_CONNECTED);
+        }
+        if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
+            apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_FAILED);
+        }
+    }
+    ret = apnManager->GetOverallDefaultApnState();
+    EXPECT_EQ(ret, ApnProfileState::PROFILE_STATE_CONNECTED);
+
+    for (auto &apnHolder : apnHolders) {
+        if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DEFAULT) {
+            apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_CONNECTING);
+        }
+        if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
+            apnHolder->SetApnState(ApnProfileState::PROFILE_STATE_FAILED);
         }
     }
     ret = apnManager->GetOverallDefaultApnState();

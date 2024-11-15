@@ -49,6 +49,14 @@ const std::map<std::string, ApnTypes> ApnManager::apnNameApnTypeMap_ {
     {DATA_CONTEXT_ROLE_XCAP, ApnTypes::XCAP},
     {DATA_CONTEXT_ROLE_INTERNAL_DEFAULT, ApnTypes::INTERNAL_DEFAULT}
 };
+const std::vector<ApnProfileState> ApnManager::apnStateArr_ = {
+    PROFILE_STATE_CONNECTED,
+    PROFILE_STATE_DISCONNECTING,
+    PROFILE_STATE_CONNECTING,
+    PROFILE_STATE_IDLE,
+    PROFILE_STATE_RETRYING,
+    PROFILE_STATE_FAILED
+};
 constexpr const char *CT_MCC_MNC_1 = "46003";
 constexpr const char *CT_MCC_MNC_2 = "46011";
 constexpr const char *GC_ICCID = "8985231";
@@ -454,24 +462,28 @@ ApnProfileState ApnManager::GetOverallDefaultApnState() const
         TELEPHONY_LOGE("apn overall state is STATE_IDLE");
         return ApnProfileState::PROFILE_STATE_IDLE;
     }
-    auto defaultApnState = static_cast<int32_t>(ApnProfileState::PROFILE_STATE_IDLE);
-    auto internalApnState = static_cast<int32_t>(ApnProfileState::PROFILE_STATE_IDLE);
+    ApnProfileState defaultApnState = ApnProfileState::PROFILE_STATE_IDLE;
+    ApnProfileState internalApnState = ApnProfileState::PROFILE_STATE_IDLE;
 
     for (const sptr<ApnHolder> &apnHolder : apnHolders_) {
         if (apnHolder == nullptr) {
             continue;
         }
         if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DEFAULT) {
-            defaultApnState = static_cast<int32_t>(apnHolder->GetApnState());
+            defaultApnState = apnHolder->GetApnState();
         }
         if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
-            internalApnState = static_cast<int32_t>(apnHolder->GetApnState());
+            internalApnState = apnHolder->GetApnState();
         }
     }
     TELEPHONY_LOGI("defaultApnState is %{public}d, internalApnState is %{public}d", defaultApnState,
         internalApnState);
-    return defaultApnState > internalApnState ? static_cast<ApnProfileState>(defaultApnState)
-                                              : static_cast<ApnProfileState>(internalApnState);
+    for (auto apnState : apnStateArr_) {
+        if (defaultApnState == apnState || internalApnState == apnState) {
+            return apnState;
+        }
+    }
+    return ApnProfileState::PROFILE_STATE_IDLE;
 }
 
 sptr<ApnItem> ApnManager::GetRilAttachApn()
@@ -545,6 +557,15 @@ bool ApnManager::IsPreferredApnUserEdited()
         isUserEdited = (*it)->attr_.isEdited_;
     }
     return isUserEdited;
+}
+
+void ApnManager::ClearAllApnBad()
+{
+    for (const sptr<ApnHolder> &apnHolder : apnHolders_) {
+        if (apnHolder != nullptr) {
+            apnHolder->SetApnBadState(false);
+        }
+    }
 }
 }  // namespace Telephony
 }  // namespace OHOS
