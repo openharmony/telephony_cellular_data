@@ -287,7 +287,7 @@ HWTEST_F(CellularDataServiceTest, CellularDataController_OnAddSystemAbility_001,
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(CellularDataServiceTest, RemoveUid_ShouldReturnInvalidParam_WhenIdentLengthLessThanIdentPreLen, TestSize.Level1)
+HWTEST_F(CellularDataServiceTest, RemoveUid_WhenIdentLengthLessThanIdentPreLen, TestSize.Level1)
 {
     NetRequest request;
     request.iddent = "";
@@ -300,7 +300,7 @@ HWTEST_F(CellularDataServiceTest, RemoveUid_ShouldReturnInvalidParam_WhenIdentLe
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(CellularDataServiceTest, RemoveUid_ShouldReturnInvalidParam_WhenIdentIsNotValidDecValue, TestSize.Level1)
+HWTEST_F(CellularDataServiceTest, RemoveUid_WhenIdentIsNotValidDecValue, TestSize.Level1)
 {
     NetRequest request;
     request.iddent = "simIdABC";
@@ -313,7 +313,7 @@ HWTEST_F(CellularDataServiceTest, RemoveUid_ShouldReturnInvalidParam_WhenIdentIs
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(CellularDataServiceTest, RemoveUid_ShouldReturnInvalidParam_WhenCellularDataControllerIsNull, TestSize.Level1)
+HWTEST_F(CellularDataServiceTest, RemoveUid_WhenCellularDataControllerIsNull, TestSize.Level1)
 {
     NetRequest request;
     request.iddent = "simId1";
@@ -326,7 +326,7 @@ HWTEST_F(CellularDataServiceTest, RemoveUid_ShouldReturnInvalidParam_WhenCellula
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(CellularDataServiceTest, AddUid_ShouldReturnInvalidParam_WhenIdentLengthLessThanIdentPreLen, TestSize.Level1)
+HWTEST_F(CellularDataServiceTest, AddUid_WhenIdentLengthLessThanIdentPreLen, TestSize.Level1)
 {
     NetRequest request;
     request.iddent = "";
@@ -339,7 +339,7 @@ HWTEST_F(CellularDataServiceTest, AddUid_ShouldReturnInvalidParam_WhenIdentLengt
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(CellularDataServiceTest, AddUid_ShouldReturnInvalidParam_WhenIdentIsNotValidDecValue, TestSize.Level1)
+HWTEST_F(CellularDataServiceTest, AddUid_WhenIdentIsNotValidDecValue, TestSize.Level1)
 {
     NetRequest request;
     request.iddent = "simIdABC";
@@ -352,7 +352,7 @@ HWTEST_F(CellularDataServiceTest, AddUid_ShouldReturnInvalidParam_WhenIdentIsNot
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(CellularDataServiceTest, AddUid_ShouldReturnInvalidParam_WhenCellularDataControllerIsNull, TestSize.Level1)
+HWTEST_F(CellularDataServiceTest, AddUid_WhenCellularDataControllerIsNull, TestSize.Level1)
 {
     NetRequest request;
     request.iddent = "simId1";
