@@ -932,7 +932,7 @@ HWTEST_F(CellularDataHandlerTest, Telephony_CellularDataHandler_001, Function | 
     NetRequest request;
     request.ident = "simId1";
     EXPECT_FALSE(controller.AddUid(request));
-    controller.cellularDataController_ = nullptr;
+    controller.cellularDataHandler_ = nullptr;
     EXPECT_FALSE(controller.AddUid(request));
 }
 
@@ -948,7 +948,7 @@ HWTEST_F(CellularDataHandlerTest, Telephony_CellularDataHandler_002, Function | 
     NetRequest request;
     request.ident = "simId1";
     EXPECT_FALSE(controller.RemoveUid(request));
-    controller.cellularDataController_ = nullptr;
+    controller.cellularDataHandler_ = nullptr;
     EXPECT_FALSE(controller.RemoveUid(request));
 }
 } // namespace Telephony
