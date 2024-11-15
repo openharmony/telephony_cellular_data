@@ -931,9 +931,9 @@ HWTEST_F(CellularDataHandlerTest, Telephony_CellularDataHandler_001, Function | 
     controller.Init();
     NetRequest request;
     request.ident = "simId1";
-    EXPECT_FALSE(cellularDataHandler->AddUid(request));
-    cellularDataHandler->apnManager_ = nullptr;
-    EXPECT_FALSE(cellularDataHandler->AddUid(request));
+    EXPECT_FALSE(controller.AddUid(request));
+    controller.cellularDataController_ = nullptr;
+    EXPECT_FALSE(controller.AddUid(request));
 }
 
 /**
@@ -947,9 +947,9 @@ HWTEST_F(CellularDataHandlerTest, Telephony_CellularDataHandler_002, Function | 
     controller.Init();
     NetRequest request;
     request.ident = "simId1";
-    EXPECT_FALSE(cellularDataHandler->RemoveUid(request));
-    cellularDataHandler->apnManager_ = nullptr;
-    EXPECT_FALSE(cellularDataHandler->RemoveUid(request));
+    EXPECT_FALSE(controller.RemoveUid(request));
+    controller.cellularDataController_ = nullptr;
+    EXPECT_FALSE(controller.RemoveUid(request));
 }
 } // namespace Telephony
 } // namespace OHOS
