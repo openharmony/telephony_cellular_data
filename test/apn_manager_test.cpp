@@ -979,5 +979,19 @@ HWTEST_F(ApnManagerTest, UpdateDefaultCellularDataSlotId_001, TestSize.Level0)
     int32_t result = CellularDataClient::GetInstance().UpdateDefaultCellularDataSlotId();
     EXPECT_EQ(result, 0);
 }
+HWTEST_F(ApnManagerTest, ApnHolderAddUid001, TestSize.Level0)
+{
+    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
+    EXPECT_TRUE(apnHolder != nullptr);
+    apnHolder->AddUid(1);
+    apnHolder->AddUid(1);
+}
+HWTEST_F(ApnManagerTest, ApnHolderRemoveUid001, TestSize.Level0)
+{
+    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
+    EXPECT_TRUE(apnHolder != nullptr);
+    apnHolder->RemoveUid(1);
+    apnHolder->RemoveUid(1);
+}
 } // namespace Telephony
 } // namespace OHOS
