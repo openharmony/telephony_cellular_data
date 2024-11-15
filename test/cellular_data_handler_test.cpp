@@ -19,6 +19,7 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "cellular_data_handler.h"
+#include "cellular_data_controller.h"
 
 namespace OHOS {
 namespace Telephony {
