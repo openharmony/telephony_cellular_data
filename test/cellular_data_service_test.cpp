@@ -290,7 +290,7 @@ HWTEST_F(CellularDataServiceTest, CellularDataController_OnAddSystemAbility_001,
 HWTEST_F(CellularDataServiceTest, RemoveUid_WhenIdentLengthLessThanIdentPreLen, TestSize.Level1)
 {
     NetRequest request;
-    request.iddent = "";
+    request.ident = "";
     int32_t result = service->RemoveUid(request);
     EXPECT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
@@ -303,7 +303,7 @@ HWTEST_F(CellularDataServiceTest, RemoveUid_WhenIdentLengthLessThanIdentPreLen, 
 HWTEST_F(CellularDataServiceTest, RemoveUid_WhenIdentIsNotValidDecValue, TestSize.Level1)
 {
     NetRequest request;
-    request.iddent = "simIdABC";
+    request.ident = "simIdABC";
     int32_t result = service->RemoveUid(request);
     EXPECT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
@@ -316,7 +316,7 @@ HWTEST_F(CellularDataServiceTest, RemoveUid_WhenIdentIsNotValidDecValue, TestSiz
 HWTEST_F(CellularDataServiceTest, RemoveUid_WhenCellularDataControllerIsNull, TestSize.Level1)
 {
     NetRequest request;
-    request.iddent = "simId1";
+    request.ident = "simId1";
     int32_t result = service->RemoveUid(request);
     EXPECT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
@@ -329,7 +329,7 @@ HWTEST_F(CellularDataServiceTest, RemoveUid_WhenCellularDataControllerIsNull, Te
 HWTEST_F(CellularDataServiceTest, AddUid_WhenIdentLengthLessThanIdentPreLen, TestSize.Level1)
 {
     NetRequest request;
-    request.iddent = "";
+    request.ident = "";
     int32_t result = service->AddUid(request);
     EXPECT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
@@ -342,7 +342,7 @@ HWTEST_F(CellularDataServiceTest, AddUid_WhenIdentLengthLessThanIdentPreLen, Tes
 HWTEST_F(CellularDataServiceTest, AddUid_WhenIdentIsNotValidDecValue, TestSize.Level1)
 {
     NetRequest request;
-    request.iddent = "simIdABC";
+    request.ident = "simIdABC";
     int32_t result = service->AddUid(request);
     EXPECT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
@@ -355,7 +355,7 @@ HWTEST_F(CellularDataServiceTest, AddUid_WhenIdentIsNotValidDecValue, TestSize.L
 HWTEST_F(CellularDataServiceTest, AddUid_WhenCellularDataControllerIsNull, TestSize.Level1)
 {
     NetRequest request;
-    request.iddent = "simId1";
+    request.ident = "simId1";
     int32_t result = service->AddUid(request);
     EXPECT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
