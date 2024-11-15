@@ -896,5 +896,75 @@ HWTEST_F(CellularDataHandlerTest, UpdateNetworkInfo_002, Function | MediumTest |
     EXPECT_NE(cellularDataHandler->connectionManager_, nullptr);
     EXPECT_TRUE(cellularDataHandler->UpdateNetworkInfo());
 }
+
+/**
+ * @tc.number   AddUid001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, AddUid001, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    cellularDataHandler->Init();
+    NetRequest request;
+    request.uid = 1;
+    EXPECT_FALSE(cellularDataHandler->AddUid(request));
+    cellularDataHandler->apnManager_ = nullptr;
+    EXPECT_FALSE(cellularDataHandler->AddUid(request));
+}
+
+/**
+ * @tc.number   RemoveUid001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, RemoveUid001, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    cellularDataHandler->Init();
+    NetRequest request;
+    request.uid = 1;
+    EXPECT_FALSE(cellularDataHandler->RemoveUid(request));
+    cellularDataHandler->apnManager_ = nullptr;
+    EXPECT_FALSE(cellularDataHandler->RemoveUid(request));
+}
+
+/**
+ * @tc.number   Telephony_CellularDataHandler_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, Telephony_CellularDataHandler_001, Function | MediumTest | Level1)
+{
+    CellularDataController controller {0};
+    controller.Init();
+    NetRequest request;
+    request.ident = "simId1";
+    EXPECT_FALSE(cellularDataHandler->AddUid(request));
+    cellularDataHandler->apnManager_ = nullptr;
+    EXPECT_FALSE(cellularDataHandler->AddUid(request));
+}
+
+/**
+ * @tc.number   Telephony_CellularDataHandler_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, Telephony_CellularDataHandler_002, Function | MediumTest | Level1)
+{
+    CellularDataController controller {0};
+    controller.Init();
+    NetRequest request;
+    request.ident = "simId1";
+    EXPECT_FALSE(cellularDataHandler->RemoveUid(request));
+    cellularDataHandler->apnManager_ = nullptr;
+    EXPECT_FALSE(cellularDataHandler->RemoveUid(request));
+}
 } // namespace Telephony
 } // namespace OHOS
