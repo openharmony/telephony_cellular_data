@@ -77,7 +77,7 @@ HWTEST_F(CellularDataServiceTest, CellularDataService_001, TestSize.Level0)
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->ReleaseNet(request));
     auto event = AppExecFwk::InnerEvent::Get(0);
     service->DispatchEvent(DEFAULT_SIM_SLOT_ID, event);
-    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->HandleApnChanged(DEFAULT_SIM_SLOT_ID));
+    ASSERT_EQ(TELEPHONY_ERR_PERMISSION_ERR, service->HandleApnChanged(DEFAULT_SIM_SLOT_ID));
 }
 
 /**
@@ -107,6 +107,7 @@ HWTEST_F(CellularDataServiceTest, CellularDataService_002, TestSize.Level0)
     ASSERT_EQ(TELEPHONY_ERR_PERMISSION_ERR,
         service->GetCellularDataSupplierId(DEFAULT_SIM_SLOT_ID, NetCap::NET_CAPABILITY_END, supplierId));
     service->CorrectNetSupplierNoAvailable(DEFAULT_SIM_SLOT_ID);
+    ASSERT_EQ(TELEPHONY_ERR_PERMISSION_ERR, service->EstablishAllApnsIfConnectable(DEFAULT_SIM_SLOT_ID));
     int32_t regState = -1;
     service->GetSupplierRegisterState(supplierId, regState);
     service->OnStop();
