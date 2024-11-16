@@ -119,6 +119,10 @@ bool CellularDataHandler::AddUid(const NetRequest &request)
     }
 
     sptr<ApnHolder> apnHolder = apnManager_->FindApnHolderById(id);
+    if (apnHolder == nullptr) {
+        TELEPHONY_LOGE("apnHolder is nullptr");
+        return false;
+    }
     apnHolder->AddUid(request.uid);
 
     return true;
@@ -134,6 +138,10 @@ bool CellularDataHandler::RemoveUid(const NetRequest &request)
     }
 
     sptr<ApnHolder> apnHolder = apnManager_->FindApnHolderById(id);
+    if (apnHolder == nullptr) {
+        TELEPHONY_LOGE("apnHolder is nullptr");
+        return false;
+    }
     apnHolder->RemoveUid(request.uid);
     return true;
 }

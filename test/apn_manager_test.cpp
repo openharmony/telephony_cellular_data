@@ -1106,5 +1106,21 @@ HWTEST_F(ApnManagerTest, ApnManager_FindApnHolderById_001, TestSize.Level0)
     apnManager->AddApnHolder("default", 10);
     EXPECT_EQ(apnManager->FindApnTypeByApnName("abc"), static_cast<uint64_t>(ApnTypes::NONETYPE));
 }
+
+HWTEST_F(ApnManagerTest, ApnHolderAddUid001, TestSize.Level0)
+{
+    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
+    EXPECT_TRUE(apnHolder != nullptr);
+    apnHolder->AddUid(1);
+    apnHolder->AddUid(1);
+}
+
+HWTEST_F(ApnManagerTest, ApnHolderRemoveUid001, TestSize.Level0)
+{
+    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
+    EXPECT_TRUE(apnHolder != nullptr);
+    apnHolder->RemoveUid(1);
+    apnHolder->RemoveUid(1);
+}
 } // namespace Telephony
 } // namespace OHOS
