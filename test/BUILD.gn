@@ -74,7 +74,6 @@ ohos_unittest("tel_cellular_data_test") {
     "LOG_DOMAIN = 0xD000F00",
   ]
 
-
   part_name = "cellular_data"
   subsystem_name = "telephony"
 }
