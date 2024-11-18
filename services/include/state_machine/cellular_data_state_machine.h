@@ -109,6 +109,7 @@ private:
     int32_t connectId_ = 0;
     int32_t cause_ = 0;
     std::string ipType_ = "";
+    int64_t startTimeConnectTimeoutTask_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
