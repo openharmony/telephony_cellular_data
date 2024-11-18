@@ -475,7 +475,7 @@ void CellularDataHandler::EstablishAllApnsIfConnectable()
             TELEPHONY_LOGE("Slot%{public}d: apn is null", slotId_);
             continue;
         }
-        if (apnHolder->IsDataCallEnabled() || IsVSimSlotId(slotId_)) {
+        if (apnHolder->IsDataCallEnabled()) {
             ApnProfileState apnState = apnHolder->GetApnState();
             if (apnState == PROFILE_STATE_FAILED || apnState == PROFILE_STATE_RETRYING) {
                 apnHolder->ReleaseDataConnection();
@@ -598,6 +598,9 @@ bool CellularDataHandler::CheckRoamingState(sptr<ApnHolder> &apnHolder)
     if (dataSwitchSettings_ == nullptr || apnHolder == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ or apnManager_ is null", slotId_);
         return false;
+    }
+    if (IsVSimSlotId(slotId_)) {
+        return true;
     }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     bool isEmergencyApn = apnHolder->IsEmergencyType();
