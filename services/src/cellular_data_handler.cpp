@@ -984,7 +984,7 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
 void CellularDataHandler::RetryOrClearConnection(const sptr<ApnHolder> &apnHolder, DisConnectionReason reason,
     const std::shared_ptr<SetupDataCallResultInfo> &netInfo)
 {
-    if (apnHolder == nullptr || netInfo == nullptr) {
+    if (apnHolder == nullptr || netInfo == nullptr || apnManager_ == nullptr) {
         return;
     }
     if (reason == DisConnectionReason::REASON_CLEAR_CONNECTION) {
@@ -997,7 +997,8 @@ void CellularDataHandler::RetryOrClearConnection(const sptr<ApnHolder> &apnHolde
     } else if (reason == DisConnectionReason::REASON_RETRY_CONNECTION) {
         apnHolder->SetApnState(PROFILE_STATE_RETRYING);
         RetryScene scene = static_cast<RetryScene>(netInfo->retryScene);
-        int64_t delayTime = apnHolder->GetRetryDelay(netInfo->reason, netInfo->retryTime, scene);
+        bool isRetrying = (apnManager_->GetOverallDefaultApnState() == ApnProfileState::PROFILE_STATE_RETRYING);
+        int64_t delayTime = apnHolder->GetRetryDelay(netInfo->reason, netInfo->retryTime, scene, isRetrying);
         TELEPHONY_LOGI("cid=%{public}d, cause=%{public}d, suggest=%{public}d, delay=%{public}lld, scene=%{public}d",
             netInfo->cid, netInfo->reason, netInfo->retryTime, static_cast<long long>(delayTime), netInfo->retryScene);
         SendEvent(CellularDataEventCode::MSG_RETRY_TO_SETUP_DATACALL, netInfo->flag, delayTime);

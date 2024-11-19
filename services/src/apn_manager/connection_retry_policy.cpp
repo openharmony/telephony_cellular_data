@@ -27,7 +27,8 @@ namespace Telephony {
 static const char* PROP_RETRY_STRATEGY_ALLOW = "persist.telephony.retrystrategy.allow";
 static const char* DEFAULT_RETRY_STRATEGY_ALLOW = "false";
 static constexpr int32_t SYSPARA_SIZE = 8;
-static constexpr int64_t DEFAULT_DELAY_FOR_INTERNAL_DEFAULT_APN = 30 * 1000;
+static constexpr int64_t DEFAULT_DELAY_FOR_INTERNAL_DEFAULT_APN_L = 60 * 1000;
+static constexpr int64_t DEFAULT_DELAY_FOR_INTERNAL_DEFAULT_APN_S = 5 * 1000;
 static constexpr int64_t DEFAULT_DELAY_DATA_SETUP_FAIL = 3000;
 static constexpr int64_t DEFAULT_DELAY_MODEM_DEACTIVATE_FAIL = 1000;
 static constexpr int64_t DEFAULT_DELAY_FOR_OTHER_APN = 2 * 1000;
@@ -80,11 +81,12 @@ void ConnectionRetryPolicy::MarkBadApn(ApnItem &apn)
 }
 
 int64_t ConnectionRetryPolicy::GetNextRetryDelay(std::string apnType, int32_t cause, int64_t suggestTime,
-    RetryScene scene)
+    RetryScene scene, bool isDefaultApnRetrying)
 {
     int64_t retryDelay = GetRandomDelay();
     if (apnType == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
-        retryDelay += DEFAULT_DELAY_FOR_INTERNAL_DEFAULT_APN;
+        retryDelay += isDefaultApnRetrying ? DEFAULT_DELAY_FOR_INTERNAL_DEFAULT_APN_L :
+            DEFAULT_DELAY_FOR_INTERNAL_DEFAULT_APN_S;
     } else if (apnType == DATA_CONTEXT_ROLE_DEFAULT) {
         if (scene == RetryScene::RETRY_SCENE_MODEM_DEACTIVATE) {
             retryDelay += DEFAULT_DELAY_MODEM_DEACTIVATE_FAIL;

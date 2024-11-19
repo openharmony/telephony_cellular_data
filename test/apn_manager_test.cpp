@@ -858,13 +858,20 @@ HWTEST_F(ApnManagerTest, GetNextRetryDelay_001, TestSize.Level0)
     std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
     connectionRetryPolicy->matchedApns_.clear();
     auto delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_DEFAULT, 0, 0,
-        RetryScene::RETRY_SCENE_OTHERS);
+        RetryScene::RETRY_SCENE_OTHERS, true);
     EXPECT_GE(delay, 0);
     sptr<ApnItem> defaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
     defaultApnItem->MarkBadApn(true);
     connectionRetryPolicy->matchedApns_.push_back(defaultApnItem);
-    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_DEFAULT, 0, 0, RetryScene::RETRY_SCENE_OTHERS);
+    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_DEFAULT, 0, 0, RetryScene::RETRY_SCENE_OTHERS,
+        true);
     EXPECT_GE(delay, 0);
+    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_INTERNAL_DEFAULT, 0, 0,
+        RetryScene::RETRY_SCENE_OTHERS, true);
+    EXPECT_GE(delay, 60);
+    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_INTERNAL_DEFAULT, 0, 0,
+        RetryScene::RETRY_SCENE_OTHERS, false);
+    EXPECT_GE(delay, 5);
 }
 
 /**
@@ -880,15 +887,18 @@ HWTEST_F(ApnManagerTest, GetNextRetryDelay_002, TestSize.Level0)
     defaultApnItem->MarkBadApn(false);
     connectionRetryPolicy->matchedApns_.push_back(defaultApnItem);
     auto delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_DEFAULT, 0, 0,
-        RetryScene::RETRY_SCENE_OTHERS);
+        RetryScene::RETRY_SCENE_OTHERS, true);
     EXPECT_GE(delay, 0);
     connectionRetryPolicy->isPropOn_ = false;
-    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_DEFAULT, 0, 0, RetryScene::RETRY_SCENE_OTHERS);
+    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_DEFAULT, 0, 0, RetryScene::RETRY_SCENE_OTHERS,
+        true);
     EXPECT_GE(delay, 0);
     connectionRetryPolicy->isPropOn_ = true;
-    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_DEFAULT, 0, 0, RetryScene::RETRY_SCENE_OTHERS);
+    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_DEFAULT, 0, 0, RetryScene::RETRY_SCENE_OTHERS,
+        true);
     EXPECT_GE(delay, 0);
-    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_MMS, 0, 0, RetryScene::RETRY_SCENE_OTHERS);
+    delay = connectionRetryPolicy->GetNextRetryDelay(DATA_CONTEXT_ROLE_MMS, 0, 0, RetryScene::RETRY_SCENE_OTHERS,
+        true);
     EXPECT_GE(delay, 0);
 }
 

@@ -626,6 +626,9 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_012, Function | MediumTest | 
     ASSERT_TRUE(handler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_SETUP_DATACALL));
     handler->RetryOrClearConnection(apnHolder, DisConnectionReason::REASON_PERMANENT_REJECT, resultInfo);
     ASSERT_TRUE(handler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_SETUP_DATACALL));
+    handler->apnManager_ = nullptr;
+    handler->RetryOrClearConnection(apnHolder, DisConnectionReason::REASON_PERMANENT_REJECT, resultInfo);
+    ASSERT_TRUE(handler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_SETUP_DATACALL));
 }
 
 /**
@@ -1262,7 +1265,7 @@ HWTEST_F(BranchTest, Telephony_ApnHolder_001, Function | MediumTest | Level3)
     apnHolder->GetNextRetryApn();
     std::vector<sptr<ApnItem>> matchedApns;
     apnHolder->SetAllMatchedApns(matchedApns);
-    apnHolder->GetRetryDelay(0, 0, RetryScene::RETRY_SCENE_OTHERS);
+    apnHolder->GetRetryDelay(0, 0, RetryScene::RETRY_SCENE_OTHERS, true);
     apnHolder->apnItem_ = nullptr;
     apnHolder->SetApnBadState(true);
     EXPECT_EQ(apnHolder->GetCurrentApn(), nullptr);
