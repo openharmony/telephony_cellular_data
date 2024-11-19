@@ -1699,6 +1699,10 @@ void CellularDataHandler::PsDataRatChanged(const InnerEvent::Pointer &event)
         TELEPHONY_LOGE("Slot%{public}d: event is null", slotId_);
         return;
     }
+    if (dataSwitchSettings_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings is null", slotId_);
+        return;
+    }
     bool dataEnabled = dataSwitchSettings_->IsUserDataOn();
     if (!dataEnabled) {
         TELEPHONY_LOGE("Slot%{public}d: data enable is close", slotId_);
