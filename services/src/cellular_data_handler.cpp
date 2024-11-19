@@ -256,7 +256,7 @@ int32_t CellularDataHandler::SetCellularDataRoamingEnabled(bool dataRoamingEnabl
             apnState == ApnProfileState::PROFILE_STATE_CONNECTED) {
             ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
         }
-        EstablishAllApnsIfConnectable();
+        SendEvent(CellularDataEventCode::MSG_ESTABLISH_ALL_APNS_IF_CONNECTABLE);
     } else {
         TELEPHONY_LOGI("Slot%{public}d: Not roaming(%{public}d), not doing anything", slotId_, roamingState);
     }
@@ -959,8 +959,8 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
     }
     stateMachine->UpdateNetworkInfo(*netInfo);
     connectionManager_->RemoveActiveConnectionByCid(stateMachine->GetCid());
-    apnHolder->SetApnState(PROFILE_STATE_IDLE);
     apnHolder->SetCellularDataStateMachine(nullptr);
+    apnHolder->SetApnState(PROFILE_STATE_IDLE);
     CellularDataHiSysEvent::WriteDataConnectStateBehaviorEvent(slotId_, apnHolder->GetApnType(),
         apnHolder->GetCapability(), static_cast<int32_t>(PROFILE_STATE_IDLE));
     UpdateCellularDataConnectState(apnHolder->GetApnType());
@@ -1388,7 +1388,7 @@ void CellularDataHandler::HandleDefaultDataSubscriptionChanged()
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     if (defSlotId == slotId_) {
-        EstablishAllApnsIfConnectable();
+        SendEvent(CellularDataEventCode::MSG_ESTABLISH_ALL_APNS_IF_CONNECTABLE);
     } else {
         ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
     }
@@ -1482,6 +1482,14 @@ void CellularDataHandler::HandleSimEvent(const AppExecFwk::InnerEvent::Pointer &
         default:
             break;
     }
+}
+
+void CellularDataHandler::HandleEstablishAllApnsIfConnectable(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        return;
+    }
+    EstablishAllApnsIfConnectable();
 }
 
 void CellularDataHandler::HandleSimAccountLoaded()
@@ -1727,7 +1735,7 @@ void CellularDataHandler::SetPolicyDataOn(bool enable)
     if (policyDataOn != enable) {
         dataSwitchSettings_->SetPolicyDataOn(enable);
         if (enable) {
-            EstablishAllApnsIfConnectable();
+            SendEvent(CellularDataEventCode::MSG_ESTABLISH_ALL_APNS_IF_CONNECTABLE);
         } else {
             ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
         }
@@ -1900,7 +1908,7 @@ bool CellularDataHandler::ChangeConnectionForDsds(bool enable)
     }
     if (enable) {
         dataSwitchSettings_->SetInternalDataOn(true);
-        EstablishAllApnsIfConnectable();
+        SendEvent(CellularDataEventCode::MSG_ESTABLISH_ALL_APNS_IF_CONNECTABLE);
     } else {
         dataSwitchSettings_->SetInternalDataOn(false);
         ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
