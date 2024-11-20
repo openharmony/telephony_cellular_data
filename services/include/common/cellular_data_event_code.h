@@ -69,6 +69,7 @@ public:
     static const uint32_t MSG_DATA_CALL_LIST_CHANGED = BASE + 42;
     static const uint32_t MSG_RETRY_TO_SETUP_DATACALL = BASE + 43;
     static const uint32_t MSG_SM_UPDATE_NETWORK_INFO = BASE + 44;
+    static const uint32_t MSG_ESTABLISH_ALL_APNS_IF_CONNECTABLE = BASE + 45;
 };
 } // namespace Telephony
 } // namespace OHOS

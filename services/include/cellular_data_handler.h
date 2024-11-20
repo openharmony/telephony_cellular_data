@@ -150,6 +150,7 @@ private:
     bool IsGsm();
     bool IsCdma();
     void HandleScreenStateChanged(bool isScreenOn) const;
+    void HandleEstablishAllApnsIfConnectable(const AppExecFwk::InnerEvent::Pointer &event);
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     bool IsSimRequestNetOnVSimEnabled(int32_t reqType, bool isMmsType) const;
 #endif
@@ -261,6 +262,8 @@ private:
             [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleSimEvent(event); } },
         { CellularDataEventCode::MSG_RETRY_TO_SETUP_DATACALL,
             [this](const AppExecFwk::InnerEvent::Pointer &event) { RetryToSetupDatacall(event); } },
+        { CellularDataEventCode::MSG_ESTABLISH_ALL_APNS_IF_CONNECTABLE,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleEstablishAllApnsIfConnectable(event); } },
     };
 };
 } // namespace Telephony

@@ -218,6 +218,24 @@ HWTEST_F(CellularDataHandlerTest, HandleRoamingOff_002, Function | MediumTest | 
 }
 
 /**
+ * @tc.number   HandleEstablishAllApnsIfConnectable_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, HandleEstablishAllApnsIfConnectable_001, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    cellularDataHandler->Init();
+    AppExecFwk::InnerEvent::Pointer msgEvent =
+        AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_ESTABLISH_ALL_APNS_IF_CONNECTABLE);
+    cellularDataHandler->HandleEstablishAllApnsIfConnectable(msgEvent);
+    EXPECT_NE(cellularDataHandler->apnManager_, nullptr);
+}
+
+/**
  * @tc.number   HandleSimEvent_001
  * @tc.name     test error branch
  * @tc.desc     Function test
