@@ -25,6 +25,8 @@
 
 namespace OHOS {
 namespace Telephony {
+static const int32_t MAX_RIL_ERR_RETRY_COUNT = 3;
+
 void Activating::StateBegin()
 {
     TELEPHONY_LOGI("Enter activating state");
@@ -59,6 +61,7 @@ bool Activating::RilActivatePdpContextDone(const AppExecFwk::InnerEvent::Pointer
         TELEPHONY_LOGI("resultInfo null, goto RilErrorResponse");
         return RilErrorResponse(event);
     }
+    rilErrTryCount_ = 0;
     TELEPHONY_LOGI("callDone active: %{public}d flag: %{public}d, cid: %{public}d, reason: %{public}d",
         resultInfo->active, resultInfo->flag, resultInfo->cid, resultInfo->reason);
     if (stateMachine->connectId_ != resultInfo->flag) {
@@ -110,26 +113,16 @@ bool Activating::RilErrorResponse(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGE("Inactive is null");
         return false;
     }
-    switch (rilInfo->error) {
-        case ErrType::ERR_GENERIC_FAILURE:
-        case ErrType::ERR_CMD_SEND_FAILURE:
-        case ErrType::ERR_NULL_POINT: {
-            inActive->SetPdpErrorReason(PdpErrorReason::PDP_ERR_RETRY);
-            CellularDataHiSysEvent::WriteDataActivateFaultEvent(INVALID_PARAMETER, SWITCH_ON,
-                CellularDataErrorCode::DATA_ERROR_RADIO_RESPONSEINFO_ERROR,
-                "ErrType " + std::to_string(static_cast<int32_t>(rilInfo->error)));
-            TELEPHONY_LOGD("Handle supported error responses and retry the connection.");
-            break;
-        }
-        case ErrType::ERR_INVALID_RESPONSE:
-        case ErrType::ERR_CMD_NO_CARRIER:
-        case ErrType::ERR_HDF_IPC_FAILURE:
-        default: {
-            inActive->SetPdpErrorReason(PdpErrorReason::PDP_ERR_TO_CLEAR_CONNECTION);
-            TELEPHONY_LOGE("Handle error response to clear connection");
-            break;
-        }
+    ++rilErrTryCount_;
+    if (rilErrTryCount_ > MAX_RIL_ERR_RETRY_COUNT) {
+        rilErrTryCount_ = 0;
+        inActive->SetPdpErrorReason(PdpErrorReason::PDP_ERR_TO_CLEAR_CONNECTION);
+    } else {
+        inActive->SetPdpErrorReason(PdpErrorReason::PDP_ERR_RETRY);
     }
+    CellularDataHiSysEvent::WriteDataActivateFaultEvent(INVALID_PARAMETER, SWITCH_ON,
+        CellularDataErrorCode::DATA_ERROR_RADIO_RESPONSEINFO_ERROR,
+        "ErrType " + std::to_string(static_cast<int32_t>(rilInfo->error)));
     inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
     stateMachine->TransitionTo(stateMachine->inActiveState_);
     return true;
