@@ -33,7 +33,8 @@ public:
     void SetMatchedApns(std::vector<sptr<ApnItem>> &apns);
     void ClearRetryApns();
     void MarkBadApn(ApnItem &apn);
-    int64_t GetNextRetryDelay(std::string apnType, int32_t cause, int64_t suggestTime, RetryScene scene);
+    int64_t GetNextRetryDelay(std::string apnType, int32_t cause, int64_t suggestTime, RetryScene scene,
+        bool isDefaultApnRetrying);
     void InitialRetryCountValue();
     std::vector<sptr<ApnItem>> GetMatchedApns() const;
     static void OnPropChanged(const char *key, const char *value, void *context);

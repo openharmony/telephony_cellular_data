@@ -49,9 +49,9 @@ void ApnHolder::SetAllMatchedApns(std::vector<sptr<ApnItem>> &matchedApns)
     retryPolicy_.SetMatchedApns(matchedApns);
 }
 
-int64_t ApnHolder::GetRetryDelay(int32_t cause, int32_t suggestTime, RetryScene scene)
+int64_t ApnHolder::GetRetryDelay(int32_t cause, int32_t suggestTime, RetryScene scene, bool isDefaultApnRetrying)
 {
-    return retryPolicy_.GetNextRetryDelay(apnType_, cause, suggestTime, scene);
+    return retryPolicy_.GetNextRetryDelay(apnType_, cause, suggestTime, scene, isDefaultApnRetrying);
 }
 
 void ApnHolder::SetCurrentApn(sptr<ApnItem> &apnItem)
