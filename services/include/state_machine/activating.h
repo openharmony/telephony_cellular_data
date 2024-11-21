@@ -39,6 +39,7 @@ private:
     bool RilErrorResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessConnectTimeout(const AppExecFwk::InnerEvent::Pointer &event);
     std::weak_ptr<CellularDataStateMachine> stateMachine_;
+    int32_t rilErrTryCount_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
