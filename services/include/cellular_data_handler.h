@@ -143,6 +143,7 @@ private:
     void OnRilAdapterHostDied(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleFactoryReset(const AppExecFwk::InnerEvent::Pointer &event);
     void OnCleanAllDataConnectionsDone(const AppExecFwk::InnerEvent::Pointer &event);
+    void ResumeDataPermittedTimerOut(const AppExecFwk::InnerEvent::Pointer &event);
     void CreateApnItem();
     void UpdatePhysicalConnectionState(bool noActiveConnection);
     bool IsVSimSlotId(int32_t slotId);
@@ -166,6 +167,8 @@ private:
         const int32_t simId, int32_t &profileIdValue);
     void UpdateApnInfo(const int32_t profileId);
     bool WriteEventCellularRequest(NetRequest request, int32_t state);
+    void DataConnCompleteUpdateState(const sptr<ApnHolder> &apnHolder,
+        const std::shared_ptr<SetupDataCallResultInfo> &resultInfo);
 
 private:
     sptr<ApnManager> apnManager_;
@@ -264,6 +267,8 @@ private:
             [this](const AppExecFwk::InnerEvent::Pointer &event) { RetryToSetupDatacall(event); } },
         { CellularDataEventCode::MSG_ESTABLISH_ALL_APNS_IF_CONNECTABLE,
             [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleEstablishAllApnsIfConnectable(event); } },
+        { CellularDataEventCode::MSG_RESUME_DATA_PERMITTED_TIMEOUT,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { ResumeDataPermittedTimerOut(event); } },
     };
 };
 } // namespace Telephony
