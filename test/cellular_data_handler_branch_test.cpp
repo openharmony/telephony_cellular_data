@@ -571,5 +571,39 @@ HWTEST_F(CellularDataHandlerBranchTest, CheckCellularDataSlotId, Function | Medi
     EXPECT_FALSE(ret);
 }
 
+HWTEST_F(CellularDataHandlerBranchTest, ResumeDataPermittedTimerOut_001, Function | MediumTest | Level3)
+{
+    InitCellularDataHandler();
+    InitMockManager();
+
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    auto apnHolder =
+        cellularDataHandler_->apnManager_->FindApnHolderById(DataContextRolesId::DATA_CONTEXT_ROLE_MMS_ID);
+    apnHolder->SetApnState(PROFILE_STATE_IDLE);
+    cellularDataHandler_->ResumeDataPermittedTimerOut(event);
+    EXPECT_TRUE(cellularDataHandler_->dataSwitchSettings_->IsInternalDataOn());
+
+    cellularDataHandler_->apnManager_ = nullptr;
+    cellularDataHandler_->ResumeDataPermittedTimerOut(event);
+    EXPECT_TRUE(cellularDataHandler_->dataSwitchSettings_->IsInternalDataOn());
+}
+
+HWTEST_F(CellularDataHandlerBranchTest, CheckAttachAndSimState_001, Function | MediumTest | Level3)
+{
+    InitCellularDataHandler();
+    InitMockManager();
+
+    auto apnHolder =
+        cellularDataHandler_->apnManager_->FindApnHolderById(DataContextRolesId::DATA_CONTEXT_ROLE_MMS_ID);
+    SimState simState = SimState::SIM_STATE_READY;
+    EXPECT_CALL(*mockSimManager, GetSimState(_, _)).WillRepeatedly(DoAll(SetArgReferee<1>(simState), Return(0)));
+    EXPECT_CALL(*mockNetworkSearchManager, GetPsRegState(_)).WillOnce(Return(0));
+    EXPECT_FALSE(cellularDataHandler_->CheckAttachAndSimState(apnHolder));
+
+    cellularDataHandler_->RemoveAllEvents();
+    EXPECT_CALL(*mockNetworkSearchManager, GetPsRegState(_)).WillOnce(Return(1));
+    cellularDataHandler_->CheckAttachAndSimState(apnHolder);
+    EXPECT_FALSE(cellularDataHandler_->HasInnerEvent(CellularDataEventCode::MSG_RESUME_DATA_PERMITTED_TIMEOUT));
+}
 }  // namespace Telephony
 }  // namespace OHOS

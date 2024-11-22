@@ -579,6 +579,14 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
     bool isSimStateReadyOrLoaded = IsSimStateReadyOrLoaded();
     TELEPHONY_LOGD("Slot%{public}d: attached: %{public}d simState: %{public}d isRilApnAttached: %{public}d",
         slotId_, attached, isSimStateReadyOrLoaded, isRilApnAttached_);
+    if (apnHolder->IsMmsType() && isSimStateReadyOrLoaded && !attached) {
+        if (!HasInnerEvent(CellularDataEventCode::MSG_RESUME_DATA_PERMITTED_TIMEOUT)) {
+            SendEvent(CellularDataEventCode::MSG_RESUME_DATA_PERMITTED_TIMEOUT,
+                apnHolder->IsMmsType(), RESUME_DATA_PERMITTED_TIMEOUT);
+        }
+        SetDataPermittedForMms(true);
+        return false;
+    }
     bool isEmergencyApn = apnHolder->IsEmergencyType();
     if (!isEmergencyApn && !attached) {
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
@@ -821,34 +829,43 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
             TELEPHONY_LOGI("default apn has connected, to setup internal_default apn");
             SendEvent(CellularDataEventCode::MSG_RETRY_TO_SETUP_DATACALL, DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID, 0);
         }
-        std::shared_ptr<CellularDataStateMachine> stateMachine = apnHolder->GetCellularDataStateMachine();
-        if (stateMachine != nullptr) {
-            std::string proxyIpAddress = "";
-            sptr<ApnItem> attachApn = apnManager_->GetRilAttachApn();
-            if (attachApn != nullptr) {
-                proxyIpAddress = attachApn->attr_.proxyIpAddress_;
-            }
-            stateMachine->UpdateHttpProxy(proxyIpAddress);
-            stateMachine->UpdateNetworkInfo(*resultInfo);
-        } else {
-            apnHolder->SetApnState(PROFILE_STATE_IDLE);
-            TELEPHONY_LOGE(
-                "Slot%{public}d:update network info stateMachine(%{public}d) is null", slotId_, resultInfo->flag);
+        DataConnCompleteUpdateState(apnHolder, resultInfo);
+    }
+}
+
+void CellularDataHandler::DataConnCompleteUpdateState(const sptr<ApnHolder> &apnHolder,
+    const std::shared_ptr<SetupDataCallResultInfo> &resultInfo)
+{
+    std::shared_ptr<CellularDataStateMachine> stateMachine = apnHolder->GetCellularDataStateMachine();
+    if (stateMachine != nullptr) {
+        std::string proxyIpAddress = "";
+        sptr<ApnItem> attachApn = apnManager_->GetRilAttachApn();
+        if (attachApn != nullptr) {
+            proxyIpAddress = attachApn->attr_.proxyIpAddress_;
         }
-        if (connectionManager_ != nullptr) {
-            connectionManager_->StartStallDetectionTimer();
-            connectionManager_->BeginNetStatistics();
-        }
-        if (!physicalConnectionActiveState_) {
-            physicalConnectionActiveState_ = true;
-            CoreManagerInner::GetInstance().DcPhysicalLinkActiveUpdate(slotId_, physicalConnectionActiveState_);
-        }
-        if (incallDataStateMachine_ != nullptr) {
-            InnerEvent::Pointer incallEvent = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_CONNECTED);
-            incallDataStateMachine_->SendEvent(incallEvent);
-        }
-        UpdateCellularDataConnectState(apnHolder->GetApnType());
-        UpdateApnInfo(apnHolder->GetCurrentApn()->attr_.profileId_);
+        stateMachine->UpdateHttpProxy(proxyIpAddress);
+        stateMachine->UpdateNetworkInfo(*resultInfo);
+    } else {
+        apnHolder->SetApnState(PROFILE_STATE_IDLE);
+        TELEPHONY_LOGE(
+            "Slot%{public}d:update network info stateMachine(%{public}d) is null", slotId_, resultInfo->flag);
+    }
+    if (connectionManager_ != nullptr) {
+        connectionManager_->StartStallDetectionTimer();
+        connectionManager_->BeginNetStatistics();
+    }
+    if (!physicalConnectionActiveState_) {
+        physicalConnectionActiveState_ = true;
+        CoreManagerInner::GetInstance().DcPhysicalLinkActiveUpdate(slotId_, physicalConnectionActiveState_);
+    }
+    if (incallDataStateMachine_ != nullptr) {
+        InnerEvent::Pointer incallEvent = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_CONNECTED);
+        incallDataStateMachine_->SendEvent(incallEvent);
+    }
+    UpdateCellularDataConnectState(apnHolder->GetApnType());
+    UpdateApnInfo(apnHolder->GetCurrentApn()->attr_.profileId_);
+    if (apnHolder->IsMmsType()) {
+        RemoveEvent(CellularDataEventCode::MSG_RESUME_DATA_PERMITTED_TIMEOUT);
     }
 }
 
@@ -979,6 +996,10 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
     if (reason == DisConnectionReason::REASON_CHANGE_CONNECTION) {
         HandleSortConnection();
     }
+    if (apnHolder->IsMmsType()) {
+        SetDataPermittedForMms(false);
+        RemoveEvent(CellularDataEventCode::MSG_RESUME_DATA_PERMITTED_TIMEOUT);
+    }
 }
 
 void CellularDataHandler::RetryOrClearConnection(const sptr<ApnHolder> &apnHolder, DisConnectionReason reason,
@@ -1002,6 +1023,20 @@ void CellularDataHandler::RetryOrClearConnection(const sptr<ApnHolder> &apnHolde
         TELEPHONY_LOGI("cid=%{public}d, cause=%{public}d, suggest=%{public}d, delay=%{public}lld, scene=%{public}d",
             netInfo->cid, netInfo->reason, netInfo->retryTime, static_cast<long long>(delayTime), netInfo->retryScene);
         SendEvent(CellularDataEventCode::MSG_RETRY_TO_SETUP_DATACALL, netInfo->flag, delayTime);
+    }
+}
+
+void CellularDataHandler::ResumeDataPermittedTimerOut(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("SlotId=%{public}d, ResumeDataPermittedTimerOut", slotId_);
+    if (apnManager_ == nullptr) {
+        SetDataPermittedForMms(false);
+        return;
+    }
+    auto apnHolder = apnManager_->FindApnHolderById(DataContextRolesId::DATA_CONTEXT_ROLE_MMS_ID);
+    if (apnHolder == nullptr || apnHolder->GetApnState() == PROFILE_STATE_IDLE) {
+        TELEPHONY_LOGI("SlotId=%{public}d, mms resume data due time out", slotId_);
+        SetDataPermittedForMms(false);
     }
 }
 
@@ -1057,9 +1092,6 @@ void CellularDataHandler::MsgEstablishDataConnection(const InnerEvent::Pointer &
     }
     TELEPHONY_LOGD("Slot%{public}d: APN holder type:%{public}s call:%{public}d", slotId_,
         apnHolder->GetApnType().c_str(), apnHolder->IsDataCallEnabled());
-    if (apnHolder->IsMmsType()) {
-        SetDataPermittedForMms(apnHolder->IsDataCallEnabled());
-    }
     if (apnHolder->IsDataCallEnabled()) {
         AttemptEstablishDataConnection(apnHolder);
     } else {

@@ -246,6 +246,7 @@ static const int32_t DATA_STALL_ALARM_AGGRESSIVE_DELAY_IN_MS_DEFAULT = 1000 * 10
 static const int32_t ESTABLISH_DATA_CONNECTION_DELAY = 1 * 1000;
 static const int32_t CONNECTION_DISCONNECTION_TIMEOUT = 180 * 1000;
 static const int32_t CONNECTION_TASK_TIME = 170 * 1000;
+static const int32_t RESUME_DATA_PERMITTED_TIMEOUT = 30 * 1000;
 static const int32_t RECOVERY_TRIGGER_PACKET = 10;
 static const int32_t ERROR_APN_ID = -1;
 static const int32_t VALID_IP_SIZE = 2;
