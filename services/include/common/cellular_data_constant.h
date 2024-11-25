@@ -240,6 +240,8 @@ static constexpr const char *CELLULAR_DATA_SETTING_DATA_INCALL_URI =
 static constexpr const char *CELLULAR_DATA_SETTING_INTELLIGENCE_SWITCH_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?"
     "Proxy=true&key=intelligence_card_switch_enable";
+static constexpr const char *CELLULAR_DATA_AIRPLANE_MODE_URI =
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=airplane_mode";
 static const int32_t DEFAULT_NET_STATISTICS_PERIOD = 3 * 1000;
 static const int32_t DATA_STALL_ALARM_NON_AGGRESSIVE_DELAY_IN_MS_DEFAULT = 1000 * 60 * 10;
 static const int32_t DATA_STALL_ALARM_AGGRESSIVE_DELAY_IN_MS_DEFAULT = 1000 * 10;
@@ -301,6 +303,7 @@ static constexpr const char *CELLULAR_DATA_COLUMN_ENABLE = "cellular_data_enable
 static constexpr const char *CELLULAR_DATA_COLUMN_ROAMING = "cellular_data_roaming_enable";
 static constexpr const char *CELLULAR_DATA_COLUMN_INCALL = "cellular_data_incall_enable";
 static constexpr const char *INTELLIGENCE_SWITCH_COLUMN_ENABLE = "intelligence_card_switch_enable";
+static constexpr const char *CELLULAR_DATA_COLUMN_AIRPLANE = "settings.telephony.airplanemode";
 static constexpr const char *CELLULAR_DATA_COLUMN_KEYWORD = "KEYWORD";
 static constexpr const char *CELLULAR_DATA_COLUMN_VALUE = "VALUE";
 static const int32_t INVALID_SIM_ID = 0;

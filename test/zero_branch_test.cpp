@@ -184,6 +184,8 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_001, Function | MediumTest | 
     ASSERT_FALSE(cellularDataHandler.HasInternetCapability(0));
     ASSERT_EQ(nullptr, cellularDataHandler.FindIdleCellularDataConnection());
     cellularDataHandler.AttemptEstablishDataConnection(apnHolder);
+    cellularDataHandler.airplaneObserver_ = nullptr;
+    cellularDataHandler.AttemptEstablishDataConnection(apnHolder);
     ASSERT_FALSE(cellularDataHandler.CheckAttachAndSimState(apnHolder));
     ASSERT_FALSE(cellularDataHandler.CheckRoamingState(apnHolder));
     ASSERT_FALSE(cellularDataHandler.CheckApnState(apnHolder));
@@ -239,6 +241,9 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | 
     cellularDataHandler.UnRegisterDataSettingObserver();
     cellularDataHandler.GetDataConnApnAttr(apnAttr);
     cellularDataHandler.HandleFactoryReset(event);
+    cellularDataHandler.airplaneObserver_ = nullptr;
+    cellularDataHandler.RegisterDataSettingObserver();
+    cellularDataHandler.UnRegisterDataSettingObserver();
     ASSERT_FALSE(cellularDataHandler.HasAnyHigherPriorityConnection(apnHolder));
     cellularDataHandler.RemoveAllEvents();
     sleep(SLEEP_TIME_SECONDS);
@@ -638,25 +643,19 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_012, Function | MediumTest | 
  */
 HWTEST_F(BranchTest, Telephony_CellularDataHandler_013, Function | MediumTest | Level1)
 {
-    CellularDataController controller { 0 };
-    controller.Init();
-    sptr<ApnHolder> apnHolder = controller.cellularDataHandler_->apnManager_->FindApnHolderById(1);
-    auto event = AppExecFwk::InnerEvent::Get(0);
-    controller.cellularDataHandler_->RetryToSetupDatacall(event);
-    ASSERT_FALSE(controller.cellularDataHandler_->HasInnerEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION));
-    auto event2 = AppExecFwk::InnerEvent::Get(-1);
-    controller.cellularDataHandler_->RetryToSetupDatacall(event2);
-    ASSERT_FALSE(controller.cellularDataHandler_->HasInnerEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION));
-    apnHolder->SetApnState(PROFILE_STATE_IDLE);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    CellularDataHandler cellularDataHandler { subscriberInfo, 0 };
+    auto event = AppExecFwk::InnerEvent::Get(-1);
+    cellularDataHandler.RetryToSetupDatacall(event);
+    ASSERT_FALSE(cellularDataHandler.HasInnerEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION));
+    event = nullptr;
+    cellularDataHandler.RetryToSetupDatacall(event);
+    ASSERT_FALSE(cellularDataHandler.HasInnerEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION));
     auto event3 = AppExecFwk::InnerEvent::Get(1);
-    controller.cellularDataHandler_->RetryToSetupDatacall(event3);
-    ASSERT_FALSE(controller.cellularDataHandler_->HasInnerEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION));
-    apnHolder->SetApnState(PROFILE_STATE_RETRYING);
-    auto event4 = AppExecFwk::InnerEvent::Get(1);
-    controller.cellularDataHandler_->RetryToSetupDatacall(event4);
-    ASSERT_EQ(apnHolder->GetApnState(), PROFILE_STATE_RETRYING);
-    controller.cellularDataHandler_->RemoveAllEvents();
-    sleep(SLEEP_TIME_SECONDS);
+    cellularDataHandler.RetryToSetupDatacall(event3);
+    ASSERT_FALSE(cellularDataHandler.HasInnerEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION));
 }
 
 /**

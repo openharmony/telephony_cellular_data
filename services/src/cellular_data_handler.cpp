@@ -62,6 +62,7 @@ void CellularDataHandler::Init()
         std::weak_ptr<TelEventHandler>(std::static_pointer_cast<TelEventHandler>(shared_from_this())));
     cellularDataRdbObserver_ = new (std::nothrow) CellularDataRdbObserver(
         std::weak_ptr<TelEventHandler>(std::static_pointer_cast<TelEventHandler>(shared_from_this())));
+    airplaneObserver_ = new (std::nothrow) CellularDataAirplaneObserver();
     if ((apnManager_ == nullptr) || (dataSwitchSettings_ == nullptr) || (connectionManager_ == nullptr)) {
         TELEPHONY_LOGE("Slot%{public}d: apnManager_ or dataSwitchSettings_ or connectionManager_ is null", slotId_);
         return;
@@ -687,10 +688,7 @@ bool CellularDataHandler::CheckApnState(sptr<ApnHolder> &apnHolder)
 
 void CellularDataHandler::AttemptEstablishDataConnection(sptr<ApnHolder> &apnHolder)
 {
-    bool isAirplaneModeOn = false;
-    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
-    coreInner.GetAirplaneMode(isAirplaneModeOn);
-    if (isAirplaneModeOn) {
+    if ((airplaneObserver_ != nullptr) && (airplaneObserver_->IsAirplaneModeOn())) {
         return;
     }
     if (!CheckCellularDataSlotId(apnHolder) || !CheckAttachAndSimState(apnHolder) || !CheckRoamingState(apnHolder)) {
@@ -702,6 +700,7 @@ void CellularDataHandler::AttemptEstablishDataConnection(sptr<ApnHolder> &apnHol
         FinishTrace(HITRACE_TAG_OHOS);
         return;
     }
+    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     coreInner.GetPsRadioTech(slotId_, radioTech);
     if (!EstablishDataConnection(apnHolder, radioTech)) {
@@ -1042,6 +1041,9 @@ void CellularDataHandler::ResumeDataPermittedTimerOut(const AppExecFwk::InnerEve
 
 void CellularDataHandler::RetryToSetupDatacall(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr || apnManager_ == nullptr) {
+        return;
+    }
     int32_t apnId = event->GetParam();
     auto apnHolder = apnManager_->FindApnHolderById(apnId);
     if (apnHolder == nullptr || apnHolder->GetApnState() != PROFILE_STATE_RETRYING) {
@@ -2196,9 +2198,9 @@ void CellularDataHandler::HandleDBSettingRoamingChanged(const AppExecFwk::InnerE
 void CellularDataHandler::UnRegisterDataSettingObserver()
 {
     if (settingObserver_ == nullptr || roamingObserver_ == nullptr || incallObserver_ == nullptr ||
-        cellularDataRdbObserver_ == nullptr) {
+        cellularDataRdbObserver_ == nullptr || airplaneObserver_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: settingObserver_ or roamingObserver_ or incallObserver_ or "
-                       "cellularDataRdbObserver_ is null", slotId_);
+                       "cellularDataRdbObserver_ or airplaneObserver_ is null", slotId_);
         return;
     }
     std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
@@ -2218,6 +2220,8 @@ void CellularDataHandler::UnRegisterDataSettingObserver()
     settingHelper->UnRegisterSettingsObserver(dataRoamingUri, roamingObserver_);
     Uri dataIncallUri(CELLULAR_DATA_SETTING_DATA_INCALL_URI);
     settingHelper->UnRegisterSettingsObserver(dataIncallUri, incallObserver_);
+    Uri airplaneUri(CELLULAR_DATA_AIRPLANE_MODE_URI);
+    settingHelper->UnRegisterSettingsObserver(airplaneUri, airplaneObserver_);
 
     std::shared_ptr<CellularDataRdbHelper> cellularDataRdbHelper = CellularDataRdbHelper::GetInstance();
     if (cellularDataRdbHelper == nullptr) {
@@ -2230,9 +2234,9 @@ void CellularDataHandler::UnRegisterDataSettingObserver()
 void CellularDataHandler::RegisterDataSettingObserver()
 {
     if (settingObserver_ == nullptr || roamingObserver_ == nullptr || incallObserver_ == nullptr ||
-        cellularDataRdbObserver_ == nullptr) {
+        cellularDataRdbObserver_ == nullptr || airplaneObserver_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: settingObserver_ or roamingObserver_ or incallObserver_ or "
-                       "cellularDataRdbObserver_ is null", slotId_);
+                       "cellularDataRdbObserver_ or airplaneObserver_ is null", slotId_);
         return;
     }
     std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
@@ -2252,6 +2256,8 @@ void CellularDataHandler::RegisterDataSettingObserver()
     settingHelper->RegisterSettingsObserver(dataRoamingUri, roamingObserver_);
     Uri dataIncallUri(CELLULAR_DATA_SETTING_DATA_INCALL_URI);
     settingHelper->RegisterSettingsObserver(dataIncallUri, incallObserver_);
+    Uri airplaneUri(CELLULAR_DATA_AIRPLANE_MODE_URI);
+    settingHelper->RegisterSettingsObserver(airplaneUri, airplaneObserver_);
 
     std::shared_ptr<CellularDataRdbHelper> cellularDataRdbHelper = CellularDataRdbHelper::GetInstance();
     if (cellularDataRdbHelper == nullptr) {

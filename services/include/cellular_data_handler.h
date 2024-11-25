@@ -26,6 +26,7 @@
 #include "cellular_data_rdb_observer.h"
 #include "cellular_data_roaming_observer.h"
 #include "cellular_data_setting_observer.h"
+#include "cellular_data_airplane_observer.h"
 #include "cellular_data_state_machine.h"
 #include "common_event_manager.h"
 #include "data_switch_settings.h"
@@ -198,6 +199,7 @@ private:
     sptr<CellularDataRoamingObserver> roamingObserver_;
     sptr<CellularDataIncallObserver> incallObserver_;
     sptr<CellularDataRdbObserver> cellularDataRdbObserver_;
+    sptr<CellularDataAirplaneObserver> airplaneObserver_;
     std::shared_ptr<IncallDataStateMachine> incallDataStateMachine_;
     sptr<ApnItem> lastApnItem_ = nullptr;
 
