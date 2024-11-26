@@ -36,6 +36,7 @@ public:
     MOCK_METHOD1(InitTelExtraModule, int32_t(int32_t));
     MOCK_METHOD1(RefreshSimState, int32_t(int32_t));
     MOCK_METHOD1(IsSimActive, bool(int32_t));
+    MOCK_METHOD1(ResetSimLoadAccount, int32_t(int32_t));
     MOCK_METHOD1(SetDefaultVoiceSlotId, int32_t(int32_t));
     MOCK_METHOD1(SetDefaultSmsSlotId, int32_t(int32_t));
     MOCK_METHOD1(SetDefaultCellularDataSlotId, int32_t(int32_t));
