@@ -26,6 +26,7 @@
 #include "cellular_data_rdb_observer.h"
 #include "cellular_data_roaming_observer.h"
 #include "cellular_data_settings_rdb_helper.h"
+#include "cellular_data_airplane_observer.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -152,6 +153,22 @@ HWTEST_F(CellularDataObserverTest, CellularDataSettingObserver_04, Function | Me
     cellularDataSettingObserver = std::make_shared<CellularDataSettingObserver>(cellularDataHandler);
     cellularDataSettingObserver->OnChange();
     ASSERT_FALSE(cellularDataHandler == nullptr);
+}
+
+HWTEST_F(CellularDataObserverTest, CellularDataAirplaneObserver_05, Function | MediumTest | Level1)
+{
+    auto cellularDataAirplaneObserver = std::make_shared<CellularDataAirplaneObserver>();
+    
+    std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
+    Uri uri(CELLULAR_DATA_AIRPLANE_MODE_URI);
+    EXPECT_TRUE(settingHelper->PutValue(uri, CELLULAR_DATA_COLUMN_AIRPLANE, 1) == TELEPHONY_ERR_SUCCESS);
+    cellularDataAirplaneObserver->OnChange();
+    EXPECT_TRUE(cellularDataAirplaneObserver->isAirplaneModeOn_);
+
+    EXPECT_TRUE(settingHelper->PutValue(uri, CELLULAR_DATA_COLUMN_AIRPLANE, 0) == TELEPHONY_ERR_SUCCESS);
+    cellularDataAirplaneObserver->OnChange();
+    EXPECT_FALSE(cellularDataAirplaneObserver->isAirplaneModeOn_);
+    EXPECT_FALSE(cellularDataAirplaneObserver->IsAirplaneModeOn());
 }
 
 }  // namespace Telephony
