@@ -61,6 +61,7 @@ public:
     MOCK_METHOD2(GetImeiSv, int32_t(int32_t slotId, std::u16string &imeiSv));
     MOCK_METHOD3(GetImsRegStatus, int32_t(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info));
     MOCK_METHOD2(GetCellInfoList, int32_t(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo));
+    MOCK_METHOD2(GetNeighboringCellInfoList, int32_t(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo));
     MOCK_METHOD1(SendUpdateCellLocationRequest, int32_t(int32_t slotId));
     MOCK_METHOD1(GetCellLocation, sptr<CellLocation>(int32_t slotId));
     MOCK_METHOD2(GetMeid, int32_t(int32_t slotId, std::u16string &meid));
