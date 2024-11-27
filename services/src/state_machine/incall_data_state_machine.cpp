@@ -49,14 +49,29 @@ bool IncallDataStateMachine::IsIncallDataSwitchOn()
 {
     std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
     if (settingHelper == nullptr) {
-        return true;
+        TELEPHONY_LOGE("settingHelper null!");
+        return false;
     }
-    Uri uri(CELLULAR_DATA_SETTING_DATA_INCALL_URI);
-    int value = static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED);
-    if (settingHelper->GetValue(uri, CELLULAR_DATA_COLUMN_INCALL, value) != TELEPHONY_SUCCESS) {
+    int32_t value = static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_DISABLED);
+    int32_t intelligenceNetworkValue = static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_DISABLED);
+    Uri intelligenceNetworkUri(CELLULAR_DATA_SETTING_INTELLIGENCE_NETWORK_URI);
+    if (settingHelper->GetValue(
+        intelligenceNetworkUri, INTELLIGENCE_NETWORK_COLUMN_ENABLE,
+        intelligenceNetworkValue) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetValue failed!");
-        return true;
+        return false;
     }
+    int32_t smartDualCardValue = static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_DISABLED);
+    Uri smartDualCardUri(CELLULAR_DATA_SETTING_INTELLIGENCE_SWITCH_URI);
+    if (settingHelper->GetValue(
+        smartDualCardUri, INTELLIGENCE_SWITCH_COLUMN_ENABLE, smartDualCardValue) != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("GetValue failed!");
+        return false;
+    }
+    value = (intelligenceNetworkValue == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED) &&
+        smartDualCardValue == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED)) ?
+        static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED) :
+        static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_DISABLED);
     TELEPHONY_LOGI("Slot%{public}d: value=%{public}d", slotId_, value);
     return value == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED);
 }
