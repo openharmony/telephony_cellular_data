@@ -145,7 +145,8 @@ public:
     MOCK_METHOD(int32_t, UnlockSimLock, (int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response),
         (override));
     MOCK_METHOD(int32_t, GetCellInfoList, (int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo), (override));
-    MOCK_METHOD(int32_t, GetNeighboringCellInfoList, (int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo), (override));
+    MOCK_METHOD(int32_t, GetNeighboringCellInfoList, (int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo),
+        (override));
     MOCK_METHOD(int32_t, SendUpdateCellLocationRequest, (int32_t slotId), (override));
     MOCK_METHOD(int32_t, HasOperatorPrivileges, (const int32_t slotId, bool &hasOperatorPrivileges), (override));
     MOCK_METHOD(int32_t, SimAuthentication,
