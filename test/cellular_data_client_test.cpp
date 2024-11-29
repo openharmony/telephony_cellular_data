@@ -47,7 +47,7 @@ void CellularDataClientTest::TearDown() {}
  */
 HWTEST_F(CellularDataClientTest, CellularDataServiceValidTest_001, TestSize.Level0)
 {
-    auto proxy = DelayedRefSingleton<CellularDataService>::GetInstance()->GetProxy();
+    auto proxy = CellularDataClient::GetInstance().GetProxy();
     EXPECT_TRUE(proxy != nullptr);
 }
 
