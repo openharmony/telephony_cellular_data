@@ -45,6 +45,17 @@ void CellularDataClientTest::TearDown() {}
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
+HWTEST_F(CellularDataClientTest, CellularDataServiceValidTest_001, TestSize.Level0)
+{
+    auto proxy = DelayedRefSingleton<CellularDataService>::GetInstance()->GetProxy();
+    EXPECT_TRUE(proxy != nullptr);
+}
+
+/**
+ * @tc.number   EnableIntelligenceSwitch_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
 HWTEST_F(CellularDataClientTest, EnableIntelligenceSwitch_001, TestSize.Level0)
 {
     int32_t result = CellularDataClient::GetInstance().EnableIntelligenceSwitch(false);
