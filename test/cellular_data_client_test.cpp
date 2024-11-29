@@ -41,7 +41,7 @@ void CellularDataClientTest::SetUp() {}
 void CellularDataClientTest::TearDown() {}
 
 /**
- * @tc.number   EnableIntelligenceSwitch_001
+ * @tc.number   CellularDataServiceValidTest_001
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
