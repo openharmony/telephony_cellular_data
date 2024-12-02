@@ -27,7 +27,7 @@ SimAccountCallbackProxy::SimAccountCallbackProxy(const sptr<IRemoteObject> &impl
 void SimAccountCallbackProxy::OnSimAccountChanged()
 {
     MessageParcel data;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
     MessageParcel replyParcel;
     if (!data.WriteInterfaceToken(SimAccountCallbackProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write interface token failed!");
