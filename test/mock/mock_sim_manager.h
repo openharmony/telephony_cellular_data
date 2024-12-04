@@ -66,6 +66,7 @@ public:
     MOCK_METHOD2(GetCardType, int32_t(int32_t, CardType &));
     MOCK_METHOD2(SetModemInit, int32_t(int32_t, bool));
     MOCK_METHOD2(SetActiveSim, int32_t(int32_t, int32_t));
+    MOCK_METHOD2(SetActiveSimSatellite, int32_t(int32_t, int32_t));
     MOCK_METHOD2(GetShowNumber, int32_t(int32_t, std::u16string &));
     MOCK_METHOD2(GetShowName, int32_t(int32_t, std::u16string &));
     MOCK_METHOD2(GetActiveSimAccountInfoList, int32_t(bool, std::vector<IccAccountInfo> &));

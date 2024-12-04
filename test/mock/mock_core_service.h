@@ -109,6 +109,7 @@ public:
     MOCK_METHOD(int32_t, GetOperatorConfigs, (int32_t slotId, OperatorConfig &poc), (override));
     MOCK_METHOD(int32_t, RefreshSimState, (int32_t slotId), (override));
     MOCK_METHOD(int32_t, SetActiveSim, (int32_t slotId, int32_t enable), (override));
+    MOCK_METHOD(int32_t, SetActiveSimSatellite, (int32_t slotId, int32_t enable), (override));
     MOCK_METHOD(
         int32_t, GetPreferredNetwork, (int32_t slotId, const sptr<INetworkSearchCallback> &callback), (override));
     MOCK_METHOD(int32_t, SetPreferredNetwork,
