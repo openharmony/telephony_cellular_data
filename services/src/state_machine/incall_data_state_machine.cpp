@@ -154,6 +154,11 @@ sptr<State> IncallDataStateMachine::GetCurrentState() const
     return currentState_;
 }
 
+bool IncallDataStateMachine::IsSecondaryActiveState() const
+{
+    return currentState_ == activatingSecondaryState_ || currentState_ == activatedSecondaryState_;
+}
+
 void IdleState::StateBegin()
 {
     TELEPHONY_LOGI("Enter Idle State");

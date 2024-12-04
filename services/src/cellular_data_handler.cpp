@@ -1351,7 +1351,8 @@ void CellularDataHandler::HandleCallChanged(int32_t state)
     CoreManagerInner::GetInstance().GetImsRegStatus(slotId_, ImsServiceType::TYPE_VOICE, voiceInfo);
     ImsRegInfo videoInfo;
     CoreManagerInner::GetInstance().GetImsRegStatus(slotId_, ImsServiceType::TYPE_VIDEO, videoInfo);
-    if (voiceInfo.imsRegState == ImsRegState::IMS_REGISTERED || videoInfo.imsRegState == ImsRegState::IMS_REGISTERED) {
+    if (voiceInfo.imsRegState == ImsRegState::IMS_REGISTERED || videoInfo.imsRegState == ImsRegState::IMS_REGISTERED
+        || (incallDataStateMachine_ != nullptr && incallDataStateMachine_->IsSecondaryActiveState())) {
         HandleImsCallChanged(state);
     } else {
         HandleVoiceCallChanged(state);
