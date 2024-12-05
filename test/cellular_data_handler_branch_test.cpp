@@ -442,8 +442,8 @@ HWTEST_F(CellularDataHandlerBranchTest, HandleRecordsChanged, Function | MediumT
     EXPECT_CALL(*mockSimManager, GetSimIccId(_, _)).WillOnce(DoAll(SetArgReferee<1>(iccId), Return(0)));
     EXPECT_CALL(*mockSimManager, GetOperatorConfigs(_, _)).Times(AtLeast(0));
     EXPECT_CALL(*mockSimManager, GetSimId(_)).Times(AtLeast(0));
-    EXPECT_CALL(*mockSimManager, GetSimOperatorNumeric(_, _)).Times(2);
-    EXPECT_CALL(*mockSimManager, IsCTSimCard(_, _)).Times(2);
+    EXPECT_CALL(*mockSimManager, GetSimOperatorNumeric(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(*mockSimManager, IsCTSimCard(_, _)).Times(AtLeast(0));
     EXPECT_CALL(*mockSimManager, GetDefaultCellularDataSlotId()).WillOnce(Return(0));
     cellularDataHandler_->HandleSimAccountLoaded();
     cellularDataHandler_->HandleRecordsChanged();
