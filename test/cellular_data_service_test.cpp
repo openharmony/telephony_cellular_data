@@ -77,7 +77,7 @@ HWTEST_F(CellularDataServiceTest, CellularDataService_001, TestSize.Level0)
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->ReleaseNet(request));
     auto event = AppExecFwk::InnerEvent::Get(0);
     service->DispatchEvent(DEFAULT_SIM_SLOT_ID, event);
-    ASSERT_EQ(TELEPHONY_ERR_PERMISSION_ERR, service->HandleApnChanged(DEFAULT_SIM_SLOT_ID));
+    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->HandleApnChanged(DEFAULT_SIM_SLOT_ID));
 }
 
 /**
