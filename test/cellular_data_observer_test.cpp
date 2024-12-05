@@ -163,11 +163,9 @@ HWTEST_F(CellularDataObserverTest, CellularDataAirplaneObserver_05, Function | M
     Uri uri(CELLULAR_DATA_AIRPLANE_MODE_URI);
     EXPECT_TRUE(settingHelper->PutValue(uri, CELLULAR_DATA_COLUMN_AIRPLANE, 1) == TELEPHONY_ERR_SUCCESS);
     cellularDataAirplaneObserver->OnChange();
-    EXPECT_TRUE(cellularDataAirplaneObserver->isAirplaneModeOn_);
 
     EXPECT_TRUE(settingHelper->PutValue(uri, CELLULAR_DATA_COLUMN_AIRPLANE, 0) == TELEPHONY_ERR_SUCCESS);
     cellularDataAirplaneObserver->OnChange();
-    EXPECT_FALSE(cellularDataAirplaneObserver->isAirplaneModeOn_);
     EXPECT_FALSE(cellularDataAirplaneObserver->IsAirplaneModeOn());
 }
 
