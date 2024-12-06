@@ -135,10 +135,8 @@ void IncallDataStateMachine::Init(int32_t callState)
         TELEPHONY_LOGE("memory allocation failed");
         return;
     }
-    secondaryActiveState_->SetParentState(idleState_);
     activatingSecondaryState_->SetParentState(secondaryActiveState_);
     activatedSecondaryState_->SetParentState(secondaryActiveState_);
-    deactivatingSecondaryState_->SetParentState(idleState_);
     callState_ = callState;
     StateMachine::SetOriginalState(idleState_);
     StateMachine::Start();
