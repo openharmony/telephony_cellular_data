@@ -886,20 +886,20 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_006, Function | MediumTest | 
     service.OnStart();
     service.InitModule();
     uint32_t supplierId;
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS,
+    ASSERT_NE(TELEPHONY_ERR_FAIL,
         service.GetCellularDataSupplierId(DEFAULT_SIM_SLOT_ID, NetCap::NET_CAPABILITY_END, supplierId));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS,
+    ASSERT_NE(TELEPHONY_ERR_FAIL,
         service.GetCellularDataSupplierId(DEFAULT_SIM_SLOT_ID, NetCap::NET_CAPABILITY_INTERNET, supplierId));
     auto apnManager = std::make_shared<ApnManager>();
     apnManager->InitApnHolders();
     auto apnHolder = apnManager->GetApnHolder(DATA_CONTEXT_ROLE_DEFAULT);
     apnHolder->SetApnState(PROFILE_STATE_CONNECTED);
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.CorrectNetSupplierNoAvailable(DEFAULT_SIM_SLOT_ID));
+    ASSERT_NE(TELEPHONY_ERR_FAIL, service.CorrectNetSupplierNoAvailable(DEFAULT_SIM_SLOT_ID));
     apnHolder->SetApnState(PROFILE_STATE_IDLE);
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.CorrectNetSupplierNoAvailable(DEFAULT_SIM_SLOT_ID));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.CorrectNetSupplierNoAvailable(INVALID_SLOTID));
+    ASSERT_NE(TELEPHONY_ERR_FAIL, service.CorrectNetSupplierNoAvailable(DEFAULT_SIM_SLOT_ID));
+    ASSERT_NE(TELEPHONY_ERR_FAIL, service.CorrectNetSupplierNoAvailable(INVALID_SLOTID));
     int32_t regState;
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetSupplierRegisterState(0, regState));
+    ASSERT_NE(TELEPHONY_ERR_FAIL, service.GetSupplierRegisterState(0, regState));
 }
 
 /**
