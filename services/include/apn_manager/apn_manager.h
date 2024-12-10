@@ -47,6 +47,7 @@ public:
     ApnProfileState GetOverallApnState() const;
     ApnProfileState GetOverallDefaultApnState() const;
     sptr<ApnItem> GetRilAttachApn();
+    sptr<ApnItem> GetApnItemById(const int32_t id);
     bool ResetApns(int32_t slotId);
     void FetchDunApns(std::vector<sptr<ApnItem>> &matchApnItemList, const int32_t slotId);
     bool IsPreferredApnUserEdited();
