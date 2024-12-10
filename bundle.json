@@ -22,7 +22,9 @@
         "syscap": [
             "SystemCapability.Telephony.CellularData"
         ],
-        "features": [],
+        "features": [
+            "cellular_data_dynamic_start"
+        ],
         "adapted_system_type": [
             "standard"
         ],
