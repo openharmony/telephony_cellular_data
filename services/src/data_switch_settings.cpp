@@ -20,6 +20,7 @@
 #include "cellular_data_settings_rdb_helper.h"
 #include "core_manager_inner.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -229,6 +230,9 @@ bool DataSwitchSettings::IsUserDataOn()
 
 bool DataSwitchSettings::IsUserDataRoamingOn()
 {
+    if (TELEPHONY_EXT_WRAPPER.getUserDataRoamingExpend_) {
+        return TELEPHONY_EXT_WRAPPER.getUserDataRoamingExpend_(slotId_, userDataRoaming_);
+    }
     return userDataRoaming_;
 }
 

@@ -237,31 +237,20 @@ int32_t CellularDataHandler::GetIntelligenceSwitchState(bool &switchState)
 
 int32_t CellularDataHandler::SetCellularDataRoamingEnabled(bool dataRoamingEnabled)
 {
-    if (dataSwitchSettings_ == nullptr || apnManager_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ or apnManager_ is null", slotId_);
+    if (dataSwitchSettings_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ is null", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    bool currentDataEnabled = dataSwitchSettings_->IsUserDataRoamingOn();
-    if (currentDataEnabled == dataRoamingEnabled) {
-        TELEPHONY_LOGI("Slot%{public}d: The roaming switch status has not changed", slotId_);
+    bool currentDataRoamEnabled = false;
+    int32_t result = dataSwitchSettings_->QueryUserDataRoamingStatus(currentDataRoamEnabled);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("Slot%{public}d: Query result: %{public}d", slotId_, result)
+    }
+    if (currentDataRoamEnabled == dataRoamingEnabled) {
+        TELEPHONY_LOGI("Slot%{public}d: The status of the data roam switch has not changed", slotId_);
         return TELEPHONY_ERR_SUCCESS;
     }
-    int32_t result = dataSwitchSettings_->SetUserDataRoamingOn(dataRoamingEnabled);
-    if (result != TELEPHONY_ERR_SUCCESS) {
-        return result;
-    }
-    bool roamingState = CoreManagerInner::GetInstance().GetPsRoamingState(slotId_) > 0;
-    if (roamingState) {
-        ApnProfileState apnState = apnManager_->GetOverallApnState();
-        if (apnState == ApnProfileState::PROFILE_STATE_CONNECTING ||
-            apnState == ApnProfileState::PROFILE_STATE_CONNECTED) {
-            ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
-        }
-        SendEvent(CellularDataEventCode::MSG_ESTABLISH_ALL_APNS_IF_CONNECTABLE);
-    } else {
-        TELEPHONY_LOGI("Slot%{public}d: Not roaming(%{public}d), not doing anything", slotId_, roamingState);
-    }
-    return TELEPHONY_ERR_SUCCESS;
+    return dataSwitchSettings_->SetUserDataRoamingOn(dataRoamingEnabled);
 }
 
 void CellularDataHandler::ClearAllConnections(DisConnectionReason reason)
@@ -2164,35 +2153,19 @@ void CellularDataHandler::HandleDBSettingEnableChanged(const AppExecFwk::InnerEv
 
 void CellularDataHandler::HandleDBSettingRoamingChanged(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr) {
+    if (dataSwitchSettings_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ is null", slotId_);
         return;
     }
-    if (dataSwitchSettings_ == nullptr || apnManager_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ or apnManager_ is null", slotId_);
-        return;
+    bool dataRoamingEnabled = dataSwitchSettings_->IsUserDataRoamingOn();
+    bool roamingState = false;
+    if (CoreManagerInner::GetInstance().GetPsRoamingState(slotId_) > 0) {
+        roamingState = true;
     }
-    int32_t value = event->GetParam();
-    bool isDataRoamingEnabled = (value == static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_ENABLED));
-    bool dataRoamingEnabled = false;
-    dataSwitchSettings_->QueryUserDataRoamingStatus(dataRoamingEnabled);
-    if (dataRoamingEnabled != isDataRoamingEnabled) {
-        dataSwitchSettings_->SetUserDataRoamingOn(value);
-        bool roamingState = false;
-        if (CoreManagerInner::GetInstance().GetPsRoamingState(slotId_) > 0) {
-            roamingState = true;
-        }
-        if (roamingState) {
-            ApnProfileState apnState = apnManager_->GetOverallApnState();
-            if (apnState == ApnProfileState::PROFILE_STATE_CONNECTING ||
-                apnState == ApnProfileState::PROFILE_STATE_CONNECTED) {
-                ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
-            }
-            EstablishAllApnsIfConnectable();
-        } else {
-            TELEPHONY_LOGI("Slot%{public}d: Not roaming(%{public}d), not doing anything", slotId_, roamingState);
-        }
+    if (roamingState && dataRoamingEnabled) {
+        EstablishAllApnsIfConnectable();
     } else {
-        TELEPHONY_LOGI("Slot%{public}d: The roaming switch status has not changed", slotId_);
+        ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
     }
 }
 
