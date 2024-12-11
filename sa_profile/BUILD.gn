@@ -12,7 +12,17 @@
 # limitations under the License.
 
 import("//build/ohos/sa_profile/sa_profile.gni")
+
+declare_args() {
+  cellular_data_dynamic_start = false
+}
+
 ohos_sa_profile("cellular_data_sa_profile") {
-  sources = [ "4007.json" ]
+  if (!cellular_data_dynamic_start) {
+    sources = [ "4007.json" ]
+  } else {
+    sources = [ "4007_dynamic.json" ]
+  }
+
   part_name = "cellular_data"
 }
