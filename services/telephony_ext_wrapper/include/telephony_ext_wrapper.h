@@ -46,7 +46,7 @@ public:
         const NetRequest &, const HasSystemUse hasSystemUse);
     typedef bool (*IS_DUAL_CELLULAR_CARD_ALLOWED)();
     typedef void (*DATA_END_RETRY_STRATEGY)(int64_t&, int32_t&, int64_t&, int32_t&);
-    typedef bool (*GET_USER_DATA_ROAMING_EXPEND)(int32_t slotId, bool);
+    typedef bool (*GET_USER_DATA_ROAMING_EXPEND)(int32_t, bool);
     DATA_EDN_SELF_CURE dataEndSelfCure_ = nullptr;
     IS_APN_ALLOWED_ACTIVE isApnAllowedActive_ = nullptr;
     GET_VSIM_SLOT_ID getVSimSlotId_ = nullptr;

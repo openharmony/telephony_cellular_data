@@ -74,7 +74,7 @@ void TelephonyExtWrapper::InitDataEndSelfCure()
 void TelephonyExtWrapper::InitTelephonyExtForCustomization()
 {
     isApnAllowedActive_ = (IS_APN_ALLOWED_ACTIVE)dlsym(telephonyExtWrapperHandle_, "IsApnAllowedActive");
-    getUserDataRoamingExpend_ = (GET_USER_DATA_ROAMING_EXPEND)dlysm(telephonyExtWrapperHandle_,
+    getUserDataRoamingExpend_ = (GET_USER_DATA_ROAMING_EXPEND)dlsym(telephonyExtWrapperHandle_,
         "GetUserDataRoamingExpend");
     if (isApnAllowedActive_ == nullptr || getUserDataRoamingExpend_ == nullptr) {
         TELEPHONY_LOGE("InitTelephonyExtForCustomization failed, error: %{public}s", dlerror());

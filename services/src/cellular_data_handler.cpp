@@ -244,7 +244,7 @@ int32_t CellularDataHandler::SetCellularDataRoamingEnabled(bool dataRoamingEnabl
     bool currentDataRoamEnabled = false;
     int32_t result = dataSwitchSettings_->QueryUserDataRoamingStatus(currentDataRoamEnabled);
     if (result != TELEPHONY_ERR_SUCCESS) {
-        TELEPHONY_LOGE("Slot%{public}d: Query result: %{public}d", slotId_, result)
+        TELEPHONY_LOGE("Slot%{public}d: Query result: %{public}d", slotId_, result);
     }
     if (currentDataRoamEnabled == dataRoamingEnabled) {
         TELEPHONY_LOGI("Slot%{public}d: The status of the data roam switch has not changed", slotId_);
@@ -2162,10 +2162,12 @@ void CellularDataHandler::HandleDBSettingRoamingChanged(const AppExecFwk::InnerE
     if (CoreManagerInner::GetInstance().GetPsRoamingState(slotId_) > 0) {
         roamingState = true;
     }
-    if (roamingState && dataRoamingEnabled) {
-        EstablishAllApnsIfConnectable();
-    } else {
-        ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
+    if (roamingState) {
+        if (dataRoamingEnabled) {
+            EstablishAllApnsIfConnectable();
+        } else {
+            ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
+        }
     }
 }
 

@@ -230,9 +230,11 @@ bool DataSwitchSettings::IsUserDataOn()
 
 bool DataSwitchSettings::IsUserDataRoamingOn()
 {
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     if (TELEPHONY_EXT_WRAPPER.getUserDataRoamingExpend_) {
         return TELEPHONY_EXT_WRAPPER.getUserDataRoamingExpend_(slotId_, userDataRoaming_);
     }
+#endif
     return userDataRoaming_;
 }
 
