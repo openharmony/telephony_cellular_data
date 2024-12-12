@@ -64,10 +64,10 @@ private:
 
     void InitTelephonyExtWrapperForCellularData();
     void InitDataEndSelfCure();
-    void InitIsApnAllowedActive();
+    void InitTelephonyExtForCustomization();
     void InitTelephonyExtWrapperForVSim();
     void InitSendDataSwitchChangeInfo();
-    void InitTelephonyExtForCustomization();
+    void InitIsAllCellularDataAllowed();
     void InitIsDualCellularCardAllowed();
     void InitDataEndRetryStrategy();
 };
