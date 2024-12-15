@@ -996,6 +996,7 @@ void CellularDataHandler::RetryOrClearConnection(const sptr<ApnHolder> &apnHolde
     if (apnHolder == nullptr || netInfo == nullptr || apnManager_ == nullptr) {
         return;
     }
+    ConnectionRetryPolicy::RestartRadioIfRequired(netInfo->reason, slotId_);
     if (reason == DisConnectionReason::REASON_CLEAR_CONNECTION) {
         TELEPHONY_LOGI("clear connection");
         ClearConnection(apnHolder, reason);
