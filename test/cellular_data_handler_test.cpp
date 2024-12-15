@@ -370,6 +370,16 @@ HWTEST_F(CellularDataHandlerTest, ClearConnectionsOnUpdateApns_002, Function | M
     cellularDataHandler->ClearConnectionsOnUpdateApns(DisConnectionReason::REASON_RETRY_CONNECTION);
     EXPECT_NE(cellularDataHandler->connectionManager_, nullptr);
     EXPECT_NE(cellularDataHandler->apnManager_, nullptr);
+    cellularDataHandler->apnManager_->allApnItem_.clear();
+    cellularDataHandler->ClearConnectionsOnUpdateApns(DisConnectionReason::REASON_RETRY_CONNECTION);
+    EXPECT_NE(cellularDataHandler->apnManager_, nullptr);
+    std::vector<sptr<ApnItem>> allApnItem;
+    sptr<ApnItem> defaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
+    allApnItem.push_back(defaultApnItem);
+    cellularDataHandler->apnManager_->allApnItem_ = allApnItem;
+    EXPECT_NE(cellularDataHandler->apnManager_->GetRilAttachApn(), nullptr);
+    cellularDataHandler->ClearConnectionsOnUpdateApns(DisConnectionReason::REASON_RETRY_CONNECTION);
+    EXPECT_NE(cellularDataHandler->apnManager_, nullptr);
 }
 
 /**
