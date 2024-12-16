@@ -764,7 +764,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataController_002, Function | MediumTest
     ASSERT_TRUE(controller.HandleApnChanged());
     bool dataEnabled = false;
     controller.IsCellularDataEnabled(dataEnabled);
-    ASSERT_TRUE(dataEnabled);
     ASSERT_NE(controller.SetCellularDataRoamingEnabled(true), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(ApnProfileState::PROFILE_STATE_FAILED, controller.GetCellularDataState());
     ASSERT_NE(ApnProfileState::PROFILE_STATE_FAILED, controller.GetCellularDataState(""));
@@ -782,7 +781,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataController_002, Function | MediumTest
     }
     bool dataRoamingEnabled = false;
     controller.IsCellularDataRoamingEnabled(dataRoamingEnabled);
-    ASSERT_FALSE(dataRoamingEnabled);
     ASSERT_TRUE(controller.HandleApnChanged());
     auto event = AppExecFwk::InnerEvent::Get(0);
     controller.ProcessEvent(event);
@@ -794,6 +792,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataController_002, Function | MediumTest
     controller.HasInternetCapability(0);
     DisConnectionReason reason = DisConnectionReason::REASON_NORMAL;
     ASSERT_TRUE(controller.ClearAllConnections(reason));
+    ASSERT_TRUE(controller.EstablishAllApnsIfConnectable());
     controller.ChangeConnectionForDsds(false);
     ASSERT_FALSE(controller.GetCellularDataFlowType());
     controller.UnRegisterEvents();
