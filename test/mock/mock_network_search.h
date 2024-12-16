@@ -97,6 +97,7 @@ public:
     MOCK_METHOD2(ProcessSignalIntensity, int32_t(int32_t slotId, const struct Rssi &signalIntensity));
     MOCK_METHOD2(IsGsm, int32_t(int32_t slotId, bool &isGsm));
     MOCK_METHOD2(IsCdma, int32_t(int32_t slotId, bool &isCdma));
+    MOCK_METHOD1(UpdateOperatorName, int32_t(int32_t slotId));
 };
 
 }  // namespace Telephony
