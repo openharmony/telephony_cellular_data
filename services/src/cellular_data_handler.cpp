@@ -1998,6 +1998,13 @@ bool CellularDataHandler::IsSingleConnectionEnabled(int32_t radioTech)
     return !multipleConnectionsEnabled_;
 }
 
+void CellularDataHandler::GetDefaultCellularDataConfig()
+{
+    if (){
+        
+    }
+}
+
 void CellularDataHandler::GetDefaultDataRoamingConfig()
 {
     defaultDataRoamingEnable_ = false;
@@ -2062,6 +2069,7 @@ void CellularDataHandler::GetDefaultConfiguration()
     multipleConnectionsEnabled_ = CellularDataUtils::GetDefaultMultipleConnectionsConfig();
     GetSinglePdpEnabledFromOpCfg();
     GetDefaultDataRoamingConfig();
+    GetDefaultCellularDataConfig();
     TELEPHONY_LOGI("Slot%{public}d: multipleConnectionsEnabled_ = %{public}d, defaultDataRoamingEnable_ = %{public}d",
         slotId_, multipleConnectionsEnabled_, defaultDataRoamingEnable_);
 }
