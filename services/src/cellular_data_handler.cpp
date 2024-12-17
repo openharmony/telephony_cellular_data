@@ -2007,13 +2007,13 @@ void CellularDataHandler::GetDefaultDataEnableConfig()
     bool dataEnbaled = true;
     int32_t ret = dataSwitchSettings_->QueryUserDataStatus(dataEnbaled);
     const int32_t defSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
-    if (ret == TELEPHONY_ERR_SUCCESS && defSlotId == slotId_) {
+    if (ret == TELEPHONY_ERR_SUCCESS && defSlotId != slotId_) {
         return;
     }
     OperatorConfig config;
     CoreManagerInner::GetInstance().GetOperatorConfigs(slotId_, config);
-    if (config.boolValue.find("KEY_DEFAULT_DATA_ENABLE_BOOL") != config.boolValue.end()) {
-        dataEnbaled = config.boolValue["KEY_DEFAULT_DATA_ENABLE_BOOL"];
+    if (config.boolValue.find(KEY_DEFAULT_DATA_ENABLE_BOOL) != config.boolValue.end()) {
+        dataEnbaled = config.boolValue[KEY_DEFAULT_DATA_ENABLE_BOOL];
         TELEPHONY_LOGI("Slot%{public}d: OperatorConfig dataEnable_ = %{public}d", slotId_, dataEnbaled);
         dataSwitchSettings_->SetUserDataOn(dataEnbaled);
     }
