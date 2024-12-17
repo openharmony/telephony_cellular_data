@@ -117,6 +117,7 @@ private:
     void GetConfigurationFor5G();
     void GetDefaultConfiguration();
     void GetDefaultDataRoamingConfig();
+    void GetDefaultCellularDataConfig();
     bool ParseOperatorConfig(const std::u16string &configName);
     void HandleRadioNrStateChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleRadioNrFrequencyChanged(const AppExecFwk::InnerEvent::Pointer &event);
