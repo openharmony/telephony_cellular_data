@@ -1605,6 +1605,37 @@ HWTEST_F(BranchTest, Idle_Test_01, Function | MediumTest | Level3)
 }
 
 /**
+ * @tc.number   IdleState_Test_02
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Idle_Test_02, Function | MediumTest | Level3)
+{
+    std::shared_ptr<IncallStateMachineTest> incallStateMachineTest = std::make_shared<IncallStateMachineTest>();
+    std::shared_ptr<IncallDataStateMachine> incallStateMachine =
+        incallStateMachineTest->CreateIncallDataStateMachine(0);
+    incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
+    auto idleState = static_cast<IdleState *>(incallStateMachine->idleState_.GetRefPtr());
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    event = nullptr;
+    idleState->StateBegin();
+    std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
+    if (settingHelper == nullptr) {
+        return;
+    }
+    Uri intelligenceNetworkUri(CELLULAR_DATA_SETTING_INTELLIGENCE_NETWORK_URI);
+    settingHelper->PutValue(intelligenceNetworkUri, INTELLIGENCE_NETWORK_COLUMN_ENABLE, 0);
+    incallStateMachine->IsIncallDataSwitchOn();
+    settingHelper->PutValue(intelligenceNetworkUri, INTELLIGENCE_NETWORK_COLUMN_ENABLE, 1);
+    Uri smartDualCardUri(CELLULAR_DATA_SETTING_INTELLIGENCE_SWITCH_URI);
+    settingHelper->PutValue(smartDualCardUri, INTELLIGENCE_SWITCH_COLUMN_ENABLE, 0);
+    incallStateMachine->IsIncallDataSwitchOn();
+    settingHelper->PutValue(smartDualCardUri, INTELLIGENCE_SWITCH_COLUMN_ENABLE, 1);
+    ASSERT_NE(incallStateMachine->IsIncallDataSwitchOn(), -1);
+    idleState->StateEnd();
+}
+
+/**
  * @tc.number   ActivatingSecondaryState_Test_01
  * @tc.name     test error branch
  * @tc.desc     Function test
