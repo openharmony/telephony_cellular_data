@@ -2000,7 +2000,7 @@ bool CellularDataHandler::IsSingleConnectionEnabled(int32_t radioTech)
 
 void CellularDataHandler::GetDefaultDataEnableConfig()
 {
-    if (dataSwitchSettings_ == nullptr){
+    if (dataSwitchSettings_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ is null", slotId_);
         return;
     }
@@ -2011,7 +2011,7 @@ void CellularDataHandler::GetDefaultDataEnableConfig()
         return;
     }
     OperatorConfig config;
-    CoreManagerInner::GetInstance().GetDefaultDataRoamingConfig(slotId_, config);
+    CoreManagerInner::GetInstance().GetOperatorConfigs(slotId_, config);
     if (config.boolValue.find("KEY_DEFAULT_DATA_ENABLE_BOOL") != config.boolValue.end()) {
         dataEnbaled = config.boolValue["KEY_DEFAULT_DATA_ENABLE_BOOL"];
         TELEPHONY_LOGI("Slot%{public}d: OperatorConfig dataEnable_ = %{public}d", slotId_, dataEnbaled);
