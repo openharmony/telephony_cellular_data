@@ -101,6 +101,10 @@ public:
         (const std::string &iif, const std::string &devIface, const std::string &dstAddr));
     MOCK_METHOD(int32_t, DisableDistributedNet, (bool isServer));
     MOCK_METHOD(int32_t, CloseSocketsUid, (int32_t netId, uint32_t uid));
+    MOCK_METHOD(int32_t, SetNetInterfaceIpAddress, (const std::string &iface, const std::string &ipAddress));
+    MOCK_METHOD(int32_t, UnregisterNetInterfaceCallback, (const sptr<INetInterfaceStateCallback> &callback));
+    MOCK_METHOD(int32_t, SetInterfaceUp, (const std::string &iface));
+    MOCK_METHOD(int32_t, SetInterfaceDown, (const std::string &iface));
 };
 
 }  // namespace NetManagerStandard
