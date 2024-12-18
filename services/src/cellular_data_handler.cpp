@@ -1999,6 +1999,27 @@ bool CellularDataHandler::IsSingleConnectionEnabled(int32_t radioTech)
     return !multipleConnectionsEnabled_;
 }
 
+void CellularDataHandler::GetDefaultDataEnableConfig()
+{
+    if (dataSwitchSettings_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ is null", slotId_);
+        return;
+    }
+    bool dataEnbaled = true;
+    int32_t ret = dataSwitchSettings_->QueryUserDataStatus(dataEnbaled);
+    const int32_t defSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
+    if (ret == TELEPHONY_ERR_SUCCESS && defSlotId != slotId_) {
+        return;
+    }
+    OperatorConfig config;
+    CoreManagerInner::GetInstance().GetOperatorConfigs(slotId_, config);
+    if (config.boolValue.find(KEY_DEFAULT_DATA_ENABLE_BOOL) != config.boolValue.end()) {
+        dataEnbaled = config.boolValue[KEY_DEFAULT_DATA_ENABLE_BOOL];
+        TELEPHONY_LOGI("Slot%{public}d: OperatorConfig dataEnable_ = %{public}d", slotId_, dataEnbaled);
+        dataSwitchSettings_->SetUserDataOn(dataEnbaled);
+    }
+}
+
 void CellularDataHandler::GetDefaultDataRoamingConfig()
 {
     defaultDataRoamingEnable_ = false;
@@ -2063,6 +2084,7 @@ void CellularDataHandler::GetDefaultConfiguration()
     multipleConnectionsEnabled_ = CellularDataUtils::GetDefaultMultipleConnectionsConfig();
     GetSinglePdpEnabledFromOpCfg();
     GetDefaultDataRoamingConfig();
+    GetDefaultDataEnableConfig();
     TELEPHONY_LOGI("Slot%{public}d: multipleConnectionsEnabled_ = %{public}d, defaultDataRoamingEnable_ = %{public}d",
         slotId_, multipleConnectionsEnabled_, defaultDataRoamingEnable_);
 }
