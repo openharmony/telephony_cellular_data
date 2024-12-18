@@ -204,6 +204,19 @@ HWTEST_F(ApnManagerTest, FindApnIdByCapability_008, Function | MediumTest | Leve
 }
 
 /**
+ * @tc.number   FindApnIdByCapability_009
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, FindApnIdByCapability_009, Function | MediumTest | Level1)
+{
+    uint64_t capability = NetManagerStandard::NetCap::NET_CAPABILITY_BIP;
+    int32_t expected = DATA_CONTEXT_ROLE_BIP_ID;
+    int32_t actual = apnManager->FindApnIdByCapability(capability);
+    ASSERT_EQ(actual, expected);
+}
+
+/**
  * @tc.number   FindBestCapability_001
  * @tc.name     test function branch
  * @tc.desc     Function test
@@ -249,6 +262,18 @@ HWTEST_F(ApnManagerTest, FindBestCapability_004, Function | MediumTest | Level1)
     uint64_t capabilities = 1L << NetManagerStandard::NetCap::NET_CAPABILITY_IA;
     NetManagerStandard::NetCap netCap = apnManager->FindBestCapability(capabilities);
     ASSERT_EQ(netCap, NetManagerStandard::NetCap::NET_CAPABILITY_IA);
+}
+
+/**
+ * @tc.number   FindBestCapability_005
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, FindBestCapability_005, Function | MediumTest | Level1)
+{
+    uint64_t capabilities = 1L << NetManagerStandard::NetCap::NET_CAPABILITY_BIP;
+    NetManagerStandard::NetCap netCap = apnManager->FindBestCapability(capabilities);
+    ASSERT_EQ(netCap, NetManagerStandard::NetCap::NET_CAPABILITY_BIP);
 }
 
 /**
