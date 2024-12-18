@@ -1300,6 +1300,7 @@ HWTEST_F(BranchTest, Telephony_ApnHolder_001, Function | MediumTest | Level3)
     ASSERT_FALSE(apnHolder->IsMmsType());
     EXPECT_GE(apnHolder->GetProfileId(DATA_CONTEXT_ROLE_DEFAULT), DATA_PROFILE_DEFAULT);
     EXPECT_GE(apnHolder->GetProfileId("test"), DATA_PROFILE_DEFAULT);
+    EXPECT_GE(apnHolder->GetProfileId(DATA_CONTEXT_ROLE_BIP), DATA_PROFILE_BIP);
 }
 
 /**

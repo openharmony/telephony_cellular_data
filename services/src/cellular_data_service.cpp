@@ -294,6 +294,7 @@ void CellularDataService::InitModule()
     netCapabilities.push_back(NetCap::NET_CAPABILITY_DUN);
     netCapabilities.push_back(NetCap::NET_CAPABILITY_IA);
     netCapabilities.push_back(NetCap::NET_CAPABILITY_XCAP);
+    netCapabilities.push_back(NetCap::NET_CAPABILITY_BIP);
     int32_t simNum = CoreManagerInner::GetInstance().GetMaxSimCount();
     for (int32_t i = 0; i < simNum; ++i) {
         AddNetSupplier(i, netAgent, netCapabilities);

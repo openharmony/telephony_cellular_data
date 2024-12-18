@@ -131,7 +131,8 @@ enum DataContextRolesId {
     DATA_CONTEXT_ROLE_IA_ID = 6,
     DATA_CONTEXT_ROLE_EMERGENCY_ID = 7,
     DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID = 8,
-    DATA_CONTEXT_ROLE_XCAP_ID = 9
+    DATA_CONTEXT_ROLE_XCAP_ID = 9,
+    DATA_CONTEXT_ROLE_BIP_ID = 10
 };
 
 enum class DataContextPriority : int32_t { PRIORITY_NONE, PRIORITY_LOW, PRIORITY_NORMAL, PRIORITY_HIGH };
@@ -173,7 +174,8 @@ enum class ApnTypes : int32_t {
     MCX = 1024,
     XCAP = 2048,
     INTERNAL_DEFAULT = 4096,
-    ALL = 8191,
+    BIP = 8192,
+    ALL = 16383
 };
 
 enum class RetryScene : int32_t {
@@ -188,6 +190,7 @@ static constexpr const char *DATA_CONTEXT_ROLE_MMS = "mms";
 static constexpr const char *DATA_CONTEXT_ROLE_SUPL = "supl";
 static constexpr const char *DATA_CONTEXT_ROLE_DUN = "dun";
 static constexpr const char *DATA_CONTEXT_ROLE_IMS = "ims";
+static constexpr const char *DATA_CONTEXT_ROLE_BIP = "bip";
 static constexpr const char *DATA_CONTEXT_ROLE_IA = "ia";
 static constexpr const char *DATA_CONTEXT_ROLE_EMERGENCY = "emergency";
 static constexpr const char *DATA_CONTEXT_ROLE_INTERNAL_DEFAULT = "internal_default";
@@ -199,6 +202,7 @@ static const int32_t DATA_PROFILE_SUPL = 3;
 static const int32_t DATA_PROFILE_DUN = 4;
 static const int32_t DATA_PROFILE_IA = 5;
 static const int32_t DATA_PROFILE_XCAP = 6;
+static const int32_t DATA_PROFILE_BIP = 7;
 static const int32_t CMCC_MCC_MNC = 46002;
 static const int32_t DEFAULT_AUTH_TYPE = 0;
 static const int32_t DEFAULT_MTU = 1500;
