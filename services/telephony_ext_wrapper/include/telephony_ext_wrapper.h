@@ -45,7 +45,9 @@ public:
     typedef bool (*IS_ALL_CELLULAR_DATA_ALLOWED)(
         const NetRequest &, const HasSystemUse hasSystemUse);
     typedef bool (*IS_DUAL_CELLULAR_CARD_ALLOWED)();
-    typedef void (*DATA_END_RETRY_STRATEGY)(int64_t&, int32_t&, int64_t&, int32_t&);
+    typedef int64_t (*HANDLE_DEND_FAILCAUSE)(int32_t, int64_t);
+    typedef int32_t (*CONVERT_PDP_ERROR)(int32_t);
+    typedef void (*RESTART_RADIO_IF_RQUIRED)(int32_t, int32_t);
     typedef bool (*GET_USER_DATA_ROAMING_EXPEND)(int32_t, bool);
     DATA_EDN_SELF_CURE dataEndSelfCure_ = nullptr;
     IS_APN_ALLOWED_ACTIVE isApnAllowedActive_ = nullptr;
@@ -56,8 +58,10 @@ public:
     SEND_DATA_SWITCH_CHANGE_INFO sendDataSwitchChangeInfo_ = nullptr;
     IS_ALL_CELLULAR_DATA_ALLOWED isAllCellularDataAllowed_ = nullptr;
     IS_DUAL_CELLULAR_CARD_ALLOWED isDualCellularCardAllowed_ = nullptr;
-    DATA_END_RETRY_STRATEGY dataEndRetryStrategy_ = nullptr;
     GET_USER_DATA_ROAMING_EXPEND getUserDataRoamingExpend_;
+    HANDLE_DEND_FAILCAUSE handleDendFailcause_ = nullptr;
+    CONVERT_PDP_ERROR convertPdpError_ = nullptr;
+    RESTART_RADIO_IF_RQUIRED restartRadioIfRequired_ = nullptr;
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
     void* telephonyVSimWrapperHandle_ = nullptr;
@@ -69,7 +73,9 @@ private:
     void InitSendDataSwitchChangeInfo();
     void InitIsAllCellularDataAllowed();
     void InitIsDualCellularCardAllowed();
-    void InitDataEndRetryStrategy();
+    void InitHandleDendFailcause();
+    void InitConvertPdpError();
+    void InitRestartRadioIfRequired();
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()

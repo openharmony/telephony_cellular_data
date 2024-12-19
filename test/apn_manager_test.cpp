@@ -853,6 +853,14 @@ HWTEST_F(ApnManagerTest, OnPropChanged_001, TestSize.Level0)
     EXPECT_EQ(connectionRetryPolicy->isPropOn_, true);
     connectionRetryPolicy->OnPropChanged("fakeKey", "true", nullptr);
     EXPECT_EQ(connectionRetryPolicy->isPropOn_, true);
+    connectionRetryPolicy->OnPropChanged("persist.telephony.setupfail.delay", "3000", nullptr);
+    EXPECT_EQ(connectionRetryPolicy->defaultSetupFailDelay_, 3000);
+    connectionRetryPolicy->OnPropChanged("persist.telephony.setupfail.delay", "ABC", nullptr);
+    EXPECT_EQ(connectionRetryPolicy->defaultSetupFailDelay_, 3000);
+    connectionRetryPolicy->OnPropChanged("persist.telephony.modemdend.delay", "1000", nullptr);
+    EXPECT_EQ(connectionRetryPolicy->defaultModemDendDelay_, 1000);
+    connectionRetryPolicy->OnPropChanged("persist.telephony.modemdend.delay", "ABNC", nullptr);
+    EXPECT_EQ(connectionRetryPolicy->defaultModemDendDelay_, 1000);
 }
 
 /**
@@ -1021,6 +1029,41 @@ HWTEST_F(ApnManagerTest, ConvertPdpErrorToDisconnReason_002, TestSize.Level0)
     res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
         PdpErrorReason::PDP_ERR_TO_PERMANENT_REJECT);
     EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
+}
+
+/**
+@tc.number ConvertPdpErrorToDisconnReason_003
+@tc.name test function branch
+@tc.desc Function test
+*/
+HWTEST_F(ApnManagerTest, ConvertPdpErrorToDisconnReason_003, TestSize.Level0)
+{
+    std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
+    connectionRetryPolicy->isPropOn_ = false;
+    auto res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
+        PdpErrorReason::PDP_ERR_TO_PERMANENT_REJECT);
+    EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
+    connectionRetryPolicy->isPropOn_ = true;
+    res = connectionRetryPolicy->ConvertPdpErrorToDisconnReason(
+        PdpErrorReason::PDP_ERR_TO_PERMANENT_REJECT);
+    EXPECT_EQ(res, DisConnectionReason::REASON_PERMANENT_REJECT);
+}
+
+/**
+
+@tc.number RestartRadioIfRequired_001
+@tc.name test function branch
+@tc.desc Function test
+*/
+HWTEST_F(ApnManagerTest, RestartRadioIfRequired_003, TestSize.Level0)
+{
+    std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
+    connectionRetryPolicy->isPropOn_ = true;
+    int32_t failCause = 65536;
+    connectionRetryPolicy->RestartRadioIfRequired(failCause, 0);
+    connectionRetryPolicy->isPropOn_ = false;
+    connectionRetryPolicy->RestartRadioIfRequired(failCause, 0);
+    EXPECT_FALSE(connectionRetryPolicy->isPropOn_);
 }
 
 /**

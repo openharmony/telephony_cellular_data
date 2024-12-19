@@ -58,7 +58,9 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCellularData()
     InitSendDataSwitchChangeInfo();
     InitIsAllCellularDataAllowed();
     InitIsDualCellularCardAllowed();
-    InitDataEndRetryStrategy();
+    InitHandleDendFailcause();
+    InitConvertPdpError();
+    InitRestartRadioIfRequired();
 }
 
 void TelephonyExtWrapper::InitDataEndSelfCure()
@@ -139,16 +141,28 @@ void TelephonyExtWrapper::InitIsDualCellularCardAllowed()
     TELEPHONY_LOGD("telephony ext wrapper init IsDualCellularCardAllowed success");
 }
 
-void TelephonyExtWrapper::InitDataEndRetryStrategy()
+void TelephonyExtWrapper::InitHandleDendFailcause()
 {
-    dataEndRetryStrategy_ =
-        (DATA_END_RETRY_STRATEGY)dlsym(telephonyExtWrapperHandle_, "DataEndRetryStrategy");
-    if (dataEndRetryStrategy_ == nullptr) {
-        TELEPHONY_LOGE("telephony ext wrapper symbol DataEndRetryStrategy failed,\
-            error: %{public}s", dlerror());
-        return;
+    handleDendFailcause_ = (HANDLE_DEND_FAILCAUSE)dlsym(telephonyExtWrapperHandle_, "HandleDendFailcause");
+    if (handleDendFailcause_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol HandleDendFailcause failed, error: %{public}s", dlerror());
     }
-    TELEPHONY_LOGD("telephony ext wrapper init DataEndRetryStrategy success");
+}
+
+void TelephonyExtWrapper::InitConvertPdpError()
+{
+    convertPdpError_ = (CONVERT_PDP_ERROR)dlsym(telephonyExtWrapperHandle_, "ConvertPdpError");
+    if (convertPdpError_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol ConvertPdpError failed, error: %{public}s", dlerror());
+    }
+}
+
+void TelephonyExtWrapper::InitRestartRadioIfRequired()
+{
+    restartRadioIfRequired_ = (RESTART_RADIO_IF_RQUIRED)dlsym(telephonyExtWrapperHandle_, "RestartRadioIfRequired");
+    if (restartRadioIfRequired_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol RestartRadioIfRequired failed, error: %{public}s", dlerror());
+    }
 }
 
 } // namespace Telephony

@@ -25,6 +25,11 @@
 
 namespace OHOS {
 namespace Telephony {
+namespace {
+    constexpr int32_t DEFAULT_DELAY_FOR_SETUP_FAIL = 3000;
+    constexpr int32_t DEFAULT_DELAY_FOR_MODEM_DEND = 1000;
+}
+
 class ConnectionRetryPolicy {
 public:
     ConnectionRetryPolicy();
@@ -40,13 +45,17 @@ public:
     static void OnPropChanged(const char *key, const char *value, void *context);
     static DisConnectionReason ConvertPdpErrorToDisconnReason(int32_t reason);
     bool IsAllBadApn() const;
+    static void RestartRadioIfRequired(int32_t failCause, int32_t slotId);
 
 private:
     int64_t GetRandomDelay();
+    static bool ConvertStrToInt(const std::string& str, int32_t& value);
 
 private:
-    inline static bool isPropOn_ = false;
+    static inline bool isPropOn_ = false;
     std::vector<sptr<ApnItem>> matchedApns_;
+    static inline int32_t defaultSetupFailDelay_ = DEFAULT_DELAY_FOR_SETUP_FAIL;
+    static inline int32_t defaultModemDendDelay_ = DEFAULT_DELAY_FOR_MODEM_DEND;
     mutable int32_t tryCount_ = 0;
     int32_t maxCount_ = 5;
     mutable int32_t currentApnIndex_ = 0;
