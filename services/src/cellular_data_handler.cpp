@@ -2218,7 +2218,7 @@ void CellularDataHandler::UnRegisterDataSettingObserver()
     }
     Uri dataRoamingUri(std::string(CELLULAR_DATA_SETTING_DATA_ROAMING_URI) + std::to_string(simId));
     settingHelper->UnRegisterSettingsObserver(dataRoamingUri, roamingObserver_);
-    Uri dataIncallUri(CELLULAR_DATA_SETTING_DATA_INCALL_URI);
+    Uri dataIncallUri(CELLULAR_DATA_SETTING_INTELLIGENCE_NETWORK_URI);
     settingHelper->UnRegisterSettingsObserver(dataIncallUri, incallObserver_);
     Uri airplaneUri(CELLULAR_DATA_AIRPLANE_MODE_URI);
     settingHelper->UnRegisterSettingsObserver(airplaneUri, airplaneObserver_);
@@ -2254,7 +2254,7 @@ void CellularDataHandler::RegisterDataSettingObserver()
     }
     Uri dataRoamingUri(std::string(CELLULAR_DATA_SETTING_DATA_ROAMING_URI) + std::to_string(simId));
     settingHelper->RegisterSettingsObserver(dataRoamingUri, roamingObserver_);
-    Uri dataIncallUri(CELLULAR_DATA_SETTING_DATA_INCALL_URI);
+    Uri dataIncallUri(CELLULAR_DATA_SETTING_INTELLIGENCE_NETWORK_URI);
     settingHelper->RegisterSettingsObserver(dataIncallUri, incallObserver_);
     Uri airplaneUri(CELLULAR_DATA_AIRPLANE_MODE_URI);
     settingHelper->RegisterSettingsObserver(airplaneUri, airplaneObserver_);
