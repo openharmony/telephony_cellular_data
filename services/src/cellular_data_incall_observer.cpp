@@ -35,9 +35,9 @@ void CellularDataIncallObserver::OnChange()
     if (settingHelper == nullptr) {
         return;
     }
-    Uri uri(CELLULAR_DATA_SETTING_DATA_INCALL_URI);
+    Uri uri(CELLULAR_DATA_SETTING_INTELLIGENCE_NETWORK_URI);
     int value = static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_DISABLED);
-    if (settingHelper->GetValue(uri, CELLULAR_DATA_COLUMN_INCALL, value) != TELEPHONY_SUCCESS) {
+    if (settingHelper->GetValue(uri, INTELLIGENCE_NETWORK_COLUMN_ENABLE, value) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetValue failed!");
         return;
     }
