@@ -285,6 +285,10 @@ void CellularDataHandler::ClearConnectionsOnUpdateApns(DisConnectionReason reaso
         isRoaming = false;
     }
     auto apnItem = apnManager_->GetRilAttachApn();
+    if (apnItem != nullptr) {
+        TELEPHONY_LOGI("update preferId=%{public}d", apnItem->attr_.profileId_);
+        UpdateApnInfo(apnItem->attr_.profileId_);
+    }
     if (!ApnHolder::IsCompatibleApnItem(lastApnItem_, apnItem, isRoaming)) {
         ClearAllConnections(reason);
         if (lastApnItem_ == nullptr) {
