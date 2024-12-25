@@ -54,6 +54,7 @@ public:
     MOCK_METHOD2(GetIsoCountryCodeForNetwork, int32_t(int32_t slotId, std::u16string &countryCode));
     MOCK_METHOD2(GetPreferredNetwork, int32_t(int32_t slotId, NSCALLBACK &callback));
     MOCK_METHOD3(SetPreferredNetwork, int32_t(int32_t slotId, int32_t networkMode, NSCALLBACK &callback));
+    MOCK_METHOD2(SetPreferredNetwork, bool(int32_t, int32_t));
     MOCK_METHOD1(GetPsRegState, int32_t(int32_t slotId));
     MOCK_METHOD1(GetCsRegState, int32_t(int32_t slotId));
     MOCK_METHOD1(GetPsRoamingState, int32_t(int32_t slotId));
