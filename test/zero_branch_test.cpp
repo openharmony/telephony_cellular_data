@@ -2230,7 +2230,6 @@ HWTEST_F(BranchTest, GetCurrentApnId_Test_02, TestSize.Level3)
     controller.Init();
     int32_t profileId = controller.cellularDataHandler_->GetCurrentApnId();
     EXPECT_EQ(profileId, 0);
-
     ASSERT_NE(controller.cellularDataHandler_->apnManager_->FindApnHolderById(profileId), nullptr);
     
 }
