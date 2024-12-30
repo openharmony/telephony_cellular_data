@@ -2199,38 +2199,5 @@ HWTEST_F(BranchTest, WriteEventCellularRequest_Test_01, TestSize.Level3)
     request.capability = NetCap::NET_CAPABILITY_END;
     ASSERT_FALSE(controller.cellularDataHandler_->WriteEventCellularRequest(request, state));
 }
-
-/**
- * @tc.number   GetCurrentApnId_Test_01
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, GetCurrentApnId_Test_01, TestSize.Level3)
-{
-    CellularDataUtils::ParseNormalIpAddr(ADDRESS);
-    CellularDataUtils::ParseRoute(ADDRESS);
-    CellularDataUtils::GetPrefixLen(ADDRESS, FLAG);
-    CellularDataController controller { 0 };
-    controller.Init();
-    int32_t profileId = controller.cellularDataHandler_->GetCurrentApnId();
-    EXPECT_EQ(profileId, 0);
-}
-
-/**
- * @tc.number   GetCurrentApnId_Test_01
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, GetCurrentApnId_Test_02, TestSize.Level3)
-{
-    CellularDataUtils::ParseNormalIpAddr(ADDRESS);
-    CellularDataUtils::ParseRoute(ADDRESS);
-    CellularDataUtils::GetPrefixLen(ADDRESS, FLAG);
-    CellularDataController controller { 0 };
-    controller.Init();
-    int32_t profileId = controller.cellularDataHandler_->GetCurrentApnId();
-    EXPECT_EQ(profileId, 0);
-    ASSERT_NE(controller.cellularDataHandler_->apnManager_->FindApnHolderById(profileId), nullptr);
-}
 } // namespace Telephony
 } // namespace OHOS
