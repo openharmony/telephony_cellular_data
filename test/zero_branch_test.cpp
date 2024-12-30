@@ -2199,5 +2199,6 @@ HWTEST_F(BranchTest, WriteEventCellularRequest_Test_01, TestSize.Level3)
     request.capability = NetCap::NET_CAPABILITY_END;
     ASSERT_FALSE(controller.cellularDataHandler_->WriteEventCellularRequest(request, state));
 }
+
 } // namespace Telephony
 } // namespace OHOS
