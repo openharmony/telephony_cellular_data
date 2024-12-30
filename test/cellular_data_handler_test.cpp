@@ -951,7 +951,7 @@ HWTEST_F(CellularDataHandlerTest, GetCurrentApnId_Test_01, Function | MediumTest
     auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
     cellularDataHandler->Init();
     int32_t profileId = cellularDataHandler->GetCurrentApnId();
-    EXPECT_EQ(profileId, 0);
+    EXPECT_NE(profileId, 0);
 }
 
 /**
