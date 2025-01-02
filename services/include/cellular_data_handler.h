@@ -168,6 +168,7 @@ private:
     bool GetCurrentDataShareApnInfo(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,
         const int32_t simId, int32_t &profileIdValue);
     void UpdateApnInfo(const int32_t profileId);
+    int32_t GetCurrentApnId();
     bool WriteEventCellularRequest(NetRequest request, int32_t state);
     void DataConnCompleteUpdateState(const sptr<ApnHolder> &apnHolder,
         const std::shared_ptr<SetupDataCallResultInfo> &resultInfo);

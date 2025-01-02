@@ -949,6 +949,39 @@ HWTEST_F(CellularDataHandlerTest, RemoveUid001, Function | MediumTest | Level3)
 }
 
 /**
+ * @tc.number   Telephony_GetCurrentApnId_Test_01
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, GetCurrentApnId_Test_01, Function | MediumTest | Level1)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    cellularDataHandler->Init();
+    int32_t profileId = cellularDataHandler->GetCurrentApnId();
+    EXPECT_NE(profileId, 0);
+}
+
+/**
+ * @tc.number   Telephony_FindApnHolderById_Test_01
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, FindApnHolderById_Test_01, Function | MediumTest | Level1)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    cellularDataHandler->Init();
+    int32_t profileId = cellularDataHandler->GetCurrentApnId();
+    EXPECT_NE(profileId, 0);
+    EXPECT_NE(cellularDataHandler->apnManager_->FindApnHolderById(profileId), nullptr);
+}
+
+/**
  * @tc.number   Telephony_CellularDataHandler_001
  * @tc.name     test error branch
  * @tc.desc     Function test
