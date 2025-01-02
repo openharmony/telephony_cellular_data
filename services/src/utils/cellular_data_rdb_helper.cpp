@@ -14,7 +14,7 @@
  */
 
 #include "cellular_data_rdb_helper.h"
-
+#include "cellular_data_hisysevent.h"
 #include "cellular_data_constant.h"
 #include "core_manager_inner.h"
 #include "telephony_log_wrapper.h"
@@ -150,6 +150,8 @@ bool CellularDataRdbHelper::QueryPreferApn(int32_t slotId, std::vector<PdpProfil
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAbilityHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("dataShareHelper is null");
+        CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId, SWITCH_ON,
+            CellularDataErrorCode::DATA_ERROR_APN_CREATE_HELPER_FAIL, "Create dataHelper fail");
         return false;
     }
     std::vector<std::string> columns;
@@ -160,6 +162,8 @@ bool CellularDataRdbHelper::QueryPreferApn(int32_t slotId, std::vector<PdpProfil
     if (result == nullptr) {
         TELEPHONY_LOGE("query prefer apns error");
         dataShareHelper->Release();
+        CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId, SWITCH_ON,
+            CellularDataErrorCode::DATA_ERROR_APN_QUERY_FAIL, "Query apn fail");
         return false;
     }
     ReadApnResult(result, apnVec);
@@ -168,6 +172,8 @@ bool CellularDataRdbHelper::QueryPreferApn(int32_t slotId, std::vector<PdpProfil
     if (apnVec.size() > 0) {
         return true;
     }
+    CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId, SWITCH_ON,
+        CellularDataErrorCode::DATA_ERROR_APN_FOUND_EMPTY, "Apn list is empty");
     return false;
 }
 
