@@ -766,6 +766,48 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
     }
 }
 
+std::shared_ptr<DataShare::DataShareHelper> CellularDataHandler::CreatorDataShareHelper()
+{
+    sptr<ISystemAbilityManager> saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saManager == nullptr) {
+        TELEPHONY_LOGE("saManager is nullptr.");
+        return nullptr;
+    }
+    sptr<IRemoteObject> remoteObj = saManager->GetSystemAbility(TELEPHONY_CELLULAR_DATA_SYS_ABILITY_ID);
+    if (remoteObj == nullptr) {
+        TELEPHONY_LOGE("remoteObj is nullptr.");
+        return nullptr;
+    }
+    return DataShare::DataShareHelper::Creator(remoteObj, CELLULAR_DATA_RDB_URI);
+}
+
+bool CellularDataHandler::GetCurrentDataShareApnInfo(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,
+    const int32_t simId, int32_t &profileIdValue)
+{
+    Uri preferApnUri(std::string(CELLULAR_DATA_RDB_PREFER) + "?Proxy=true&simId=" + std::to_string(simId));
+    DataShare::DataSharePredicates predicates;
+    std::vector<std::string> columns;
+    std::shared_ptr<DataShare::DataShareResultSet> resultSet =
+        dataShareHelper->Query(preferApnUri, predicates, columns);
+    if (resultSet == nullptr) {
+        TELEPHONY_LOGI("Query CurrentDataShareApnInfo resultSet is nullptr.");
+        return false;
+    }
+    int count = 0;
+    resultSet->GetRowCount(count);
+    if (count <= 0) {
+        TELEPHONY_LOGI("GetRowCount is NULL.");
+        resultSet->Close();
+        return false;
+    }
+    int columnIndex = 0;
+    resultSet->GoToFirstRow();
+    resultSet->GetColumnIndex(PdpProfileData::PROFILE_ID, columnIndex);
+    resultSet->GetInt(columnIndex, profileIdValue);
+    resultSet->Close();
+    return true;
+}
+
 int32_t CellularDataHandler::GetCurrentApnId()
 {
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId_);
