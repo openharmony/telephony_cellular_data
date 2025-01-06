@@ -143,6 +143,7 @@ private:
     bool IsGsm();
     bool IsCdma();
     void HandleScreenStateChanged(bool isScreenOn) const;
+    std::shared_ptr<DataShare::DataShareHelper> CreatorDataShareHelper();
     int32_t GetCurrentApnId();
 
 private:

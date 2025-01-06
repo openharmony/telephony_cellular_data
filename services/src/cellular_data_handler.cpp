@@ -771,6 +771,21 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
     }
 }
 
+std::shared_ptr<DataShare::DataShareHelper> CellularDataHandler::CreatorDataShareHelper()
+{
+    sptr<ISystemAbilityManager> saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saManager == nullptr) {
+        TELEPHONY_LOGE("saManager is nullptr.");
+        return nullptr;
+    }
+    sptr<IRemoteObject> remoteObj = saManager->GetSystemAbility(TELEPHONY_CELLULAR_DATA_SYS_ABILITY_ID);
+    if (remoteObj == nullptr) {
+        TELEPHONY_LOGE("remoteObj is nullptr.");
+        return nullptr;
+    }
+    return DataShare::DataShareHelper::Creator(remoteObj, CELLULAR_DATA_RDB_URI);
+}
+
 int32_t CellularDataHandler::GetCurrentApnId()
 {
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId_);
