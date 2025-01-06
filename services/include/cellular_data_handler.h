@@ -144,6 +144,8 @@ private:
     bool IsCdma();
     void HandleScreenStateChanged(bool isScreenOn) const;
     std::shared_ptr<DataShare::DataShareHelper> CreatorDataShareHelper();
+    bool GetCurrentDataShareApnInfo(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,
+        const int32_t simId, int32_t &profileIdValue);
     int32_t GetCurrentApnId();
 
 private:
