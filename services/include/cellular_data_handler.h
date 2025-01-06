@@ -143,6 +143,7 @@ private:
     bool IsGsm();
     bool IsCdma();
     void HandleScreenStateChanged(bool isScreenOn) const;
+    int32_t GetCurrentApnId();
 
 private:
     sptr<ApnManager> apnManager_;
