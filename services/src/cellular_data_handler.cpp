@@ -643,7 +643,12 @@ std::shared_ptr<CellularDataStateMachine> CellularDataHandler::CreateCellularDat
 
 bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, int32_t radioTech)
 {
-    sptr<ApnItem> apnItem = apnHolder->GetNextRetryApn();
+    int32_t profileId = GetCurrentApnId();
+    sptr<ApnItem> apnItem = apnManager_->GetApnItemById(profileId);
+    if (apnItem == nullptr) {
+        TELEPHONY_LOGD("profileId: %{public}d: apnItem is null", profileId);
+        apnItem = apnHolder->GetNextRetryApn();
+    }
     if (apnItem == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: apnItem is null", slotId_);
         return false;
@@ -759,6 +764,26 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
                 slotId_, apnState, networkType);
         }
     }
+}
+
+int32_t CellularDataHandler::GetCurrentApnId()
+{
+    int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId_);
+    if (simId <= INVALID_SIM_ID) {
+        TELEPHONY_LOGE("Slot%{public}d: failed due to invalid sim id %{public}d", slotId_, simId);
+        return 0;
+    }
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreatorDataShareHelper();
+    if (dataShareHelper == nullptr) {
+        TELEPHONY_LOGE("dataShareHelper is nullptr.");
+        return 0;
+    }
+    int32_t profileIdValue = 0;
+    if (!GetCurrentDataShareApnInfo(dataShareHelper, simId, profileIdValue)) {
+        TELEPHONY_LOGE("GetCurrentDataShareApnInfo fail.");
+    }
+    dataShareHelper->Release();
+    return profileIdValue;
 }
 
 int32_t CellularDataHandler::GetSlotId() const
