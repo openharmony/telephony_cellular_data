@@ -1586,6 +1586,11 @@ void CellularDataHandler::CreateApnItem()
             break;
         }
     }
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (TELEPHONY_EXT_WRAPPER.sendApnNeedRetryInfo_) {
+        TELEPHONY_EXT_WRAPPER.sendApnNeedRetryInfo_(result);
+    }
+#endif
 }
 
 bool CellularDataHandler::HandleApnChanged()
