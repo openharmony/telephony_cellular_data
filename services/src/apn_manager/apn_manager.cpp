@@ -529,6 +529,23 @@ sptr<ApnItem> ApnManager::GetRilAttachApn()
     return attachApn;
 }
 
+sptr<ApnItem> ApnManager::GetApnItemById(const int32_t id)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (allApnItem_.empty()) {
+        TELEPHONY_LOGE("apn item is null");
+        return nullptr;
+    }
+    sptr<ApnItem> attachApn = nullptr;
+    for (const sptr<ApnItem> &apnItem : allApnItem_) {
+        if (id == apnItem->attr_.profileId_) {
+            attachApn = apnItem;
+            break;
+        }
+    }
+    return attachApn;
+}
+
 bool ApnManager::ResetApns(int32_t slotId)
 {
     auto helper = CellularDataRdbHelper::GetInstance();
