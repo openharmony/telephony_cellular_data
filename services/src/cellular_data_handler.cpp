@@ -643,7 +643,12 @@ std::shared_ptr<CellularDataStateMachine> CellularDataHandler::CreateCellularDat
 
 bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, int32_t radioTech)
 {
-    sptr<ApnItem> apnItem = apnHolder->GetNextRetryApn();
+    int32_t profileId = GetCurrentApnId();
+    sptr<ApnItem> apnItem = apnManager_->GetApnItemById(profileId);
+    if (apnItem == nullptr) {
+        TELEPHONY_LOGD("profileId: %{public}d: apnItem is null", profileId);
+        apnItem = apnHolder->GetNextRetryApn();
+    }
     if (apnItem == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: apnItem is null", slotId_);
         return false;
@@ -759,6 +764,68 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
                 slotId_, apnState, networkType);
         }
     }
+}
+
+std::shared_ptr<DataShare::DataShareHelper> CellularDataHandler::CreatorDataShareHelper()
+{
+    sptr<ISystemAbilityManager> saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saManager == nullptr) {
+        TELEPHONY_LOGE("saManager is nullptr.");
+        return nullptr;
+    }
+    sptr<IRemoteObject> remoteObj = saManager->GetSystemAbility(TELEPHONY_CELLULAR_DATA_SYS_ABILITY_ID);
+    if (remoteObj == nullptr) {
+        TELEPHONY_LOGE("remoteObj is nullptr.");
+        return nullptr;
+    }
+    return DataShare::DataShareHelper::Creator(remoteObj, CELLULAR_DATA_RDB_URI);
+}
+
+bool CellularDataHandler::GetCurrentDataShareApnInfo(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,
+    const int32_t simId, int32_t &profileIdValue)
+{
+    Uri preferApnUri(std::string(CELLULAR_DATA_RDB_PREFER) + "?Proxy=true&simId=" + std::to_string(simId));
+    DataShare::DataSharePredicates predicates;
+    std::vector<std::string> columns;
+    std::shared_ptr<DataShare::DataShareResultSet> resultSet =
+        dataShareHelper->Query(preferApnUri, predicates, columns);
+    if (resultSet == nullptr) {
+        TELEPHONY_LOGI("Query CurrentDataShareApnInfo resultSet is nullptr.");
+        return false;
+    }
+    int count = 0;
+    resultSet->GetRowCount(count);
+    if (count <= 0) {
+        TELEPHONY_LOGI("GetRowCount is NULL.");
+        resultSet->Close();
+        return false;
+    }
+    int columnIndex = 0;
+    resultSet->GoToFirstRow();
+    resultSet->GetColumnIndex(PdpProfileData::PROFILE_ID, columnIndex);
+    resultSet->GetInt(columnIndex, profileIdValue);
+    resultSet->Close();
+    return true;
+}
+
+int32_t CellularDataHandler::GetCurrentApnId()
+{
+    int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId_);
+    if (simId <= INVALID_SIM_ID) {
+        TELEPHONY_LOGE("Slot%{public}d: failed due to invalid sim id %{public}d", slotId_, simId);
+        return 0;
+    }
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreatorDataShareHelper();
+    if (dataShareHelper == nullptr) {
+        TELEPHONY_LOGE("dataShareHelper is nullptr.");
+        return 0;
+    }
+    int32_t profileIdValue = 0;
+    if (!GetCurrentDataShareApnInfo(dataShareHelper, simId, profileIdValue)) {
+        TELEPHONY_LOGE("GetCurrentDataShareApnInfo fail.");
+    }
+    dataShareHelper->Release();
+    return profileIdValue;
 }
 
 int32_t CellularDataHandler::GetSlotId() const
