@@ -49,6 +49,7 @@ public:
     typedef int32_t (*CONVERT_PDP_ERROR)(int32_t);
     typedef void (*RESTART_RADIO_IF_RQUIRED)(int32_t, int32_t);
     typedef bool (*GET_USER_DATA_ROAMING_EXPEND)(int32_t, bool);
+    typedef void (*SEND_APN_NEED_RETRY_INFO)(int32_t);
     DATA_EDN_SELF_CURE dataEndSelfCure_ = nullptr;
     IS_APN_ALLOWED_ACTIVE isApnAllowedActive_ = nullptr;
     GET_VSIM_SLOT_ID getVSimSlotId_ = nullptr;
@@ -59,6 +60,7 @@ public:
     IS_ALL_CELLULAR_DATA_ALLOWED isAllCellularDataAllowed_ = nullptr;
     IS_DUAL_CELLULAR_CARD_ALLOWED isDualCellularCardAllowed_ = nullptr;
     GET_USER_DATA_ROAMING_EXPEND getUserDataRoamingExpend_;
+    SEND_APN_NEED_RETRY_INFO sendApnNeedRetryInfo_ = nullptr;
     HANDLE_DEND_FAILCAUSE handleDendFailcause_ = nullptr;
     CONVERT_PDP_ERROR convertPdpError_ = nullptr;
     RESTART_RADIO_IF_RQUIRED restartRadioIfRequired_ = nullptr;
@@ -76,6 +78,7 @@ private:
     void InitHandleDendFailcause();
     void InitConvertPdpError();
     void InitRestartRadioIfRequired();
+    void InitSendApnNeedRetryInfo();
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()

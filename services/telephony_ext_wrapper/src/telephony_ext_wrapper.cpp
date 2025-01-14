@@ -61,6 +61,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCellularData()
     InitHandleDendFailcause();
     InitConvertPdpError();
     InitRestartRadioIfRequired();
+    InitSendApnNeedRetryInfo();
 }
 
 void TelephonyExtWrapper::InitDataEndSelfCure()
@@ -163,6 +164,17 @@ void TelephonyExtWrapper::InitRestartRadioIfRequired()
     if (restartRadioIfRequired_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol RestartRadioIfRequired failed, error: %{public}s", dlerror());
     }
+}
+
+void TelephonyExtWrapper::InitSendApnNeedRetryInfo()
+{
+    sendApnNeedRetryInfo_ =
+        (SEND_APN_NEED_RETRY_INFO)dlsym(telephonyExtWrapperHandle_, "SendApnNeedRetryInfo");
+    if (sendApnNeedRetryInfo_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol SendApnNeedRetryInfo failed, error: %{public}s", dlerror());
+        return;
+    }
+    TELEPHONY_LOGD("telephony ext wrapper init SendApnNeedRetryInfo success");
 }
 
 } // namespace Telephony
