@@ -59,7 +59,7 @@ public:
     SEND_DATA_SWITCH_CHANGE_INFO sendDataSwitchChangeInfo_ = nullptr;
     IS_ALL_CELLULAR_DATA_ALLOWED isAllCellularDataAllowed_ = nullptr;
     IS_DUAL_CELLULAR_CARD_ALLOWED isDualCellularCardAllowed_ = nullptr;
-    GET_USER_DATA_ROAMING_EXPEND getUserDataRoamingExpend_;
+    GET_USER_DATA_ROAMING_EXPEND getUserDataRoamingExpend_ = nullptr;
     SEND_APN_NEED_RETRY_INFO sendApnNeedRetryInfo_ = nullptr;
     HANDLE_DEND_FAILCAUSE handleDendFailcause_ = nullptr;
     CONVERT_PDP_ERROR convertPdpError_ = nullptr;
