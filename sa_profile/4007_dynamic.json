@@ -4,7 +4,7 @@
         {
             "name": 4007,
             "libpath": "libtel_cellular_data.z.so",
-            "run-on-create": false,
+            "run-on-create": true,
             "depend": [
                 4010
             ],
