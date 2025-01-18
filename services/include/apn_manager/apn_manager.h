@@ -50,6 +50,7 @@ public:
     sptr<ApnItem> GetApnItemById(const int32_t id);
     bool ResetApns(int32_t slotId);
     void FetchDunApns(std::vector<sptr<ApnItem>> &matchApnItemList, const int32_t slotId);
+    void FetchBipApns(std::vector<sptr<ApnItem>> &matchApnItemList);
     bool IsPreferredApnUserEdited();
     static int32_t FindApnTypeByApnName(const std::string &apnName);
     void ClearAllApnBad();

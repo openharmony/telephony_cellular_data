@@ -19,6 +19,7 @@
 #include "apn_manager.h"
 #include "cellular_data_state_machine.h"
 #include "cellular_data_client.h"
+#include "cellular_data_constant.h"
 #include "data_connection_manager.h"
 #include "gtest/gtest.h"
 #include "tel_event_handler.h"
@@ -97,6 +98,17 @@ HWTEST_F(ApnManagerTest, FindApnNameByApnId_002, Function | MediumTest | Level1)
     int32_t id = 2;
     std::string result = apnManager->FindApnNameByApnId(id);
     ASSERT_EQ(result, DATA_CONTEXT_ROLE_MMS);
+}
+
+/**
+ * @tc.number   FindApnNameByApnId_003
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, FindApnNameByApnId_003, Function | MediumTest | Level1)
+{
+    std::string result = apnManager->FindApnNameByApnId(DATA_CONTEXT_ROLE_BIP_ID);
+    ASSERT_EQ(result, DATA_CONTEXT_ROLE_BIP);
 }
 
 /**
