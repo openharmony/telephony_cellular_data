@@ -388,7 +388,11 @@ std::vector<sptr<ApnItem>> ApnManager::FilterMatchedApns(const std::string &requ
     if (requestApnType == DATA_CONTEXT_ROLE_DUN) {
         FetchDunApns(matchApnItemList, slotId);
         return matchApnItemList;
+    } else if (requestApnType == DATA_CONTEXT_ROLE_BIP) {
+        FetchBipApns(matchApnItemList);
+        return matchApnItemList;
     }
+
     for (const sptr<ApnItem> &apnItem : allApnItem_) {
         if (apnItem->CanDealWithType(requestApnType)) {
             matchApnItemList.push_back(apnItem);
@@ -542,6 +546,24 @@ bool ApnManager::ResetApns(int32_t slotId)
         return false;
     }
     return helper->ResetApns(slotId);
+}
+
+void ApnManager::FetchBipApns(std::vector<sptr<ApnItem>> &matchApnItemList)
+{
+    sptr<ApnItem> defaultApn = nullptr;
+    for (const sptr<ApnItem> &apnItem : allApnItem_) {
+        if (apnItem->CanDealWithType(DATA_CONTEXT_ROLE_BIP)) {
+            matchApnItemList.push_back(apnItem);
+            return;
+        }
+        if (apnItem->CanDealWithType(DATA_CONTEXT_ROLE_DEFAULT)) {
+            defaultApn = apnItem;
+        }
+    }
+
+    if (defaultApn != nullptr) {
+        matchApnItemList.push_back(defaultApn);
+    }
 }
 
 void ApnManager::FetchDunApns(std::vector<sptr<ApnItem>> &matchApnItemList, const int32_t slotId)
