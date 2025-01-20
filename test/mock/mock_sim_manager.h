@@ -34,6 +34,7 @@ public:
     MOCK_METHOD0(IsSetPrimarySlotIdInProgress, bool(void));
     MOCK_METHOD0(IsDataShareError, bool(void));
     MOCK_METHOD0(ResetDataShareError, void(void));
+    MOCK_METHOD0(GetDefaultMainSlotByIccId, int32_t(void));
     MOCK_METHOD1(OnInit, bool(int32_t));
     MOCK_METHOD1(InitTelExtraModule, int32_t(int32_t));
     MOCK_METHOD1(RefreshSimState, int32_t(int32_t));
