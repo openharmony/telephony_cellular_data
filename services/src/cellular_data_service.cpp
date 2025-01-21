@@ -202,6 +202,13 @@ int32_t CellularDataService::EnableIntelligenceSwitch(bool enable)
 int32_t CellularDataService::GetCellularDataState()
 {
     int32_t slotId = CellularDataService::GetDefaultCellularDataSlotId();
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (TELEPHONY_EXT_WRAPPER.isVSimEnabled_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_()) {
+        TELEPHONY_LOGI("VSimEnabled slotId: %{public}d => %{public}d", slotId, CELLULAR_DATA_VSIM_SLOT_ID);
+        slotId = CELLULAR_DATA_VSIM_SLOT_ID;
+    }
+#endif
+
     std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
     if (cellularDataController == nullptr) {
         TELEPHONY_LOGE("cellularDataControllers is null, slotId=%{public}d", slotId);
