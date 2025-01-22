@@ -68,6 +68,9 @@ public:
     void SetConnectionTcpBuffer(const std::string &tcpBuffer);
     void SplitProxyIpAddress(const std::string &proxyIpAddress, std::string &host, uint16_t &port);
     void UpdateNetworkInfoIfInActive(SetupDataCallResultInfo &info);
+    void UpdateReuseApnNetworkInfo(bool isAvailable);
+    void SetReuseApnCap(uint64_t cap);
+    uint64_t GetReuseApnCap() const;
 
 protected:
     sptr<State> activeState_;
@@ -113,6 +116,7 @@ private:
     int32_t cause_ = 0;
     std::string ipType_ = "";
     int64_t startTimeConnectTimeoutTask_ = 0;
+    uint64_t reuseApnCap_ = NetManagerStandard::NetCap::NET_CAPABILITY_END;
 };
 } // namespace Telephony
 } // namespace OHOS

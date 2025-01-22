@@ -1212,5 +1212,126 @@ HWTEST_F(ApnManagerTest, ApnHolderRemoveUid001, TestSize.Level0)
     apnHolder->RemoveUid(1);
     apnHolder->RemoveUid(1);
 }
+
+/**
+ * @tc.name  : ApnItem_IsSimilarPdpProfile_001
+ * @tc.number: ApnItemTest_005
+ */
+HWTEST_F(ApnManagerTest, ApnItem_IsSimilarPdpProfile_001, TestSize.Level0)
+{
+    PdpProfile p1;
+    PdpProfile p2;
+    EXPECT_TRUE(ApnItem::IsSimilarPdpProfile(p1, p2));
+    p1.apn = "1";
+    p2.apn = "2";
+    EXPECT_FALSE(ApnItem::IsSimilarPdpProfile(p1, p2));
+    p1.apn = "";
+    p2.apn = "";
+    p1.authType = 1;
+    p2.authType = 2;
+    EXPECT_FALSE(ApnItem::IsSimilarPdpProfile(p1, p2));
+    p1.authType = 1;
+    p2.authType = 1;
+    p1.authUser = "1";
+    p2.authUser = "2";
+    EXPECT_FALSE(ApnItem::IsSimilarPdpProfile(p1, p2));
+    p1.authUser = "1";
+    p2.authUser = "1";
+    p1.authPwd = "1";
+    p2.authPwd = "2";
+    EXPECT_FALSE(ApnItem::IsSimilarPdpProfile(p1, p2));
+}
+
+/**
+ * @tc.name  : ApnItem_IsSimilarProtocol_001
+ * @tc.number: ApnItemTest_006
+ */
+HWTEST_F(ApnManagerTest, ApnItem_IsSimilarProtocol_001, TestSize.Level0)
+{
+    std::string newProtocol;
+    std::string oldProtocol;
+    EXPECT_TRUE(ApnItem::IsSimilarProtocol(newProtocol, oldProtocol));
+    newProtocol = "IPV4V6";
+    oldProtocol = "IP";
+    EXPECT_TRUE(ApnItem::IsSimilarProtocol(newProtocol, oldProtocol));
+    newProtocol = "IPV4V6";
+    oldProtocol = "IPV6";
+    EXPECT_TRUE(ApnItem::IsSimilarProtocol(newProtocol, oldProtocol));
+    newProtocol = "IP";
+    oldProtocol = "IPV4V6";
+    EXPECT_TRUE(ApnItem::IsSimilarProtocol(newProtocol, oldProtocol));
+    newProtocol = "IPV6";
+    oldProtocol = "IPV4V6";
+    EXPECT_TRUE(ApnItem::IsSimilarProtocol(newProtocol, oldProtocol));
+    newProtocol = "IPV6";
+    oldProtocol = "IPV4";
+    EXPECT_FALSE(ApnItem::IsSimilarProtocol(newProtocol, oldProtocol));
+}
+
+/**
+ * @tc.name  : ApnManager_TryMergeSimilarPdpProfile_001
+ * @tc.number: ApnManagerTest_005
+ */
+HWTEST_F(ApnManagerTest, ApnManager_TryMergeSimilarPdpProfile_001, TestSize.Level0)
+{
+    auto preferId = 1;
+    apnManager->preferId_ = preferId;
+    PdpProfile pdpProfile;
+    pdpProfile.profileId = preferId;
+    pdpProfile.apnTypes = "";
+    std::vector<PdpProfile> apnVec;
+    apnVec.push_back(pdpProfile);
+    apnManager->TryMergeSimilarPdpProfile(apnVec);
+    EXPECT_EQ(apnVec.size(), 1);
+    PdpProfile pdpProfile2 = pdpProfile;
+    apnVec.push_back(pdpProfile2);
+    apnManager->TryMergeSimilarPdpProfile(apnVec);
+    EXPECT_EQ(apnVec.size(), 1);
+}
+
+/**
+ * @tc.name  : ApnManager_TryMergeSimilarPdpProfile_002
+ * @tc.number: ApnManagerTest_005
+ */
+HWTEST_F(ApnManagerTest, ApnManager_TryMergeSimilarPdpProfile_002, TestSize.Level0)
+{
+    uint64_t expected = NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET;
+    int32_t apnId = DATA_CONTEXT_ROLE_DEFAULT_ID;
+    uint64_t actual = apnManager->FindCapabilityByApnId(apnId);
+    EXPECT_EQ(actual, expected);
+    expected = NetManagerStandard::NetCap::NET_CAPABILITY_INTERNAL_DEFAULT;
+    apnId = DATA_CONTEXT_ROLE_MMS_ID;
+    actual = apnManager->FindCapabilityByApnId(apnId);
+    EXPECT_EQ(actual, expected);
+    expected = NetManagerStandard::NetCap::NET_CAPABILITY_INTERNAL_DEFAULT;
+    apnId = DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID;
+    actual = apnManager->FindCapabilityByApnId(apnId);
+    EXPECT_EQ(actual, expected);
+    expected = NetManagerStandard::NetCap::NET_CAPABILITY_IA;
+    apnId = DATA_CONTEXT_ROLE_IA_ID;
+    actual = apnManager->FindCapabilityByApnId(apnId);
+    EXPECT_EQ(actual, expected);
+    expected = NetManagerStandard::NetCap::NET_CAPABILITY_XCAP;
+    apnId = DATA_CONTEXT_ROLE_XCAP_ID;
+    actual = apnManager->FindCapabilityByApnId(apnId);
+    EXPECT_EQ(actual, expected);
+    expected = NetManagerStandard::NetCap::NET_CAPABILITY_SUPL;
+    apnId = DATA_CONTEXT_ROLE_SUPL_ID;
+    actual = apnManager->FindCapabilityByApnId(apnId);
+    EXPECT_EQ(actual, expected);
+    expected = NetManagerStandard::NetCap::NET_CAPABILITY_DUN;
+    apnId = DATA_CONTEXT_ROLE_DUN_ID;
+    actual = apnManager->FindCapabilityByApnId(apnId);
+    EXPECT_EQ(actual, expected);
+    expected = NetManagerStandard::NetCap::NET_CAPABILITY_BIP;
+    apnId = DATA_CONTEXT_ROLE_BIP_ID;
+    actual = apnManager->FindCapabilityByApnId(apnId);
+    EXPECT_EQ(actual, expected);
+    expected = NetManagerStandard::NetCap::NET_CAPABILITY_END;
+    apnId = -1;
+    actual = apnManager->FindCapabilityByApnId(apnId);
+    EXPECT_EQ(actual, expected);
+}
+
 } // namespace Telephony
 } // namespace OHOS

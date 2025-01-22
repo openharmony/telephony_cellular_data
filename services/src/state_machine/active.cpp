@@ -15,6 +15,7 @@
 
 #include "active.h"
 
+#include "apn_manager.h"
 #include "cellular_data_hisysevent.h"
 #include "cellular_data_utils.h"
 #include "core_manager_inner.h"
@@ -84,6 +85,14 @@ bool Active::ProcessDisconnectDone(const AppExecFwk::InnerEvent::Pointer &event)
     if (object == nullptr) {
         TELEPHONY_LOGE("object is null");
         return false;
+    }
+    int32_t disConnApnId = ApnManager::FindApnIdByApnName(object->GetApnType());
+    uint64_t disConnApnCap = ApnManager::FindCapabilityByApnId(disConnApnId);
+    if (disConnApnCap == stateMachine->GetReuseApnCap()) {
+        TELEPHONY_LOGI("free reuse apnId=%{public}d", disConnApnId);
+        stateMachine->UpdateReuseApnNetworkInfo(false);
+        stateMachine->SetReuseApnCap(NetManagerStandard::NetCap::NET_CAPABILITY_END);
+        return PROCESSED;
     }
 
     DisConnectionReason reason = object->GetReason();

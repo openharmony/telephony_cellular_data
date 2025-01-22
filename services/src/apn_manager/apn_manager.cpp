@@ -357,6 +357,7 @@ int32_t ApnManager::MakeSpecificApnItem(std::vector<PdpProfile> &apnVec)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     allApnItem_.clear();
+    TryMergeSimilarPdpProfile(apnVec);
     int32_t count = 0;
     for (PdpProfile &apnData : apnVec) {
         TELEPHONY_LOGI("profileId = %{public}d, profileName = %{public}s, mvnoType = %{public}s",
@@ -612,6 +613,64 @@ void ApnManager::ClearAllApnBad()
         if (apnHolder != nullptr) {
             apnHolder->SetApnBadState(false);
         }
+    }
+}
+
+void ApnManager::TryMergeSimilarPdpProfile(std::vector<PdpProfile> &apnVec)
+{
+    // coalesce similar APNs to prevent bringing up two data calls with same interface
+    std::vector<PdpProfile> newApnVec;
+    for (size_t i = 0; i < apnVec.size(); i++) {
+        if (apnVec[i].profileId == -1) {
+            continue;
+        }
+        for (size_t j = i + 1; j < apnVec.size(); j++) {
+            if (ApnItem::IsSimilarPdpProfile(apnVec[i], apnVec[j])) {
+                MergePdpProfile(apnVec[i], apnVec[j]);
+                apnVec[j].profileId = -1;
+            }
+        }
+        newApnVec.push_back(apnVec[i]);
+    }
+    apnVec.assign(newApnVec.begin(), newApnVec.end());
+}
+
+void ApnManager::MergePdpProfile(PdpProfile &newProfile, PdpProfile &oldProfile)
+{
+    newProfile.apnTypes = newProfile.apnTypes + ',' + oldProfile.apnTypes;
+    newProfile.pdpProtocol = (newProfile.pdpProtocol == PROTOCOL_IPV4V6) ?
+        newProfile.pdpProtocol : oldProfile.pdpProtocol;
+    newProfile.roamPdpProtocol = (newProfile.roamPdpProtocol == PROTOCOL_IPV4V6) ?
+        newProfile.roamPdpProtocol : oldProfile.roamPdpProtocol;
+    if (preferId_ == oldProfile.profileId) {
+        TELEPHONY_LOGI("preferId change from %{public}d to %{public}d", oldProfile.profileId, newProfile.profileId);
+        preferId_ = newProfile.profileId;
+    }
+    TELEPHONY_LOGI("merge %{public}d and %{public}d: apn[%{public}s], apnTypes[%{public}s]",
+        newProfile.profileId, oldProfile.profileId, newProfile.apn.c_str(), newProfile.apnTypes.c_str());
+}
+
+uint64_t ApnManager::FindCapabilityByApnId(int32_t apnId)
+{
+    switch (apnId) {
+        case DATA_CONTEXT_ROLE_DEFAULT_ID:
+            return NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET;
+        case DATA_CONTEXT_ROLE_MMS_ID:
+            return NetManagerStandard::NetCap::NET_CAPABILITY_MMS;
+        case DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID:
+            return NetManagerStandard::NetCap::NET_CAPABILITY_INTERNAL_DEFAULT;
+        case DATA_CONTEXT_ROLE_IA_ID:
+            return NetManagerStandard::NetCap::NET_CAPABILITY_IA;
+        case DATA_CONTEXT_ROLE_XCAP_ID:
+            return NetManagerStandard::NetCap::NET_CAPABILITY_XCAP;
+        case DATA_CONTEXT_ROLE_SUPL_ID:
+            return NetManagerStandard::NetCap::NET_CAPABILITY_SUPL;
+        case DATA_CONTEXT_ROLE_DUN_ID:
+            return NetManagerStandard::NetCap::NET_CAPABILITY_DUN;
+        case DATA_CONTEXT_ROLE_BIP_ID:
+            return NetManagerStandard::NetCap::NET_CAPABILITY_BIP;
+        default:
+            return NetManagerStandard::NetCap::NET_CAPABILITY_END;
     }
 }
 }  // namespace Telephony
