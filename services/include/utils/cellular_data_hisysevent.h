@@ -19,6 +19,7 @@
 #include <stdint.h>
 
 #include "iosfwd"
+#include "apn_item.h"
 #include "telephony_hisysevent.h"
 
 namespace OHOS {
@@ -45,6 +46,7 @@ public:
         const uint32_t uid, const std::string name, const uint64_t type, const int32_t state);
     static void WriteDataActivateFaultEvent(const int32_t slotId, const int32_t switchState,
         const CellularDataErrorCode errorType, const std::string &errorMsg);
+    static void WriteApnInfoBehaviorEvent(const int32_t slotId, struct PdpProfile &apnData);
     void SetCellularDataActivateStartTime();
     void JudgingDataActivateTimeOut(const int32_t slotId, const int32_t switchState);
 

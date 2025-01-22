@@ -16,6 +16,7 @@
 #include "apn_manager.h"
 
 #include "cellular_data_utils.h"
+#include "cellular_data_hisysevent.h"
 #include "core_manager_inner.h"
 #include "net_specifier.h"
 #include "string_ex.h"
@@ -286,7 +287,7 @@ int32_t ApnManager::CreateAllApnItemByDatabase(int32_t slotId)
         TELEPHONY_LOGE("query apns from data ability fail");
         return count;
     }
-    return MakeSpecificApnItem(apnVec);
+    return MakeSpecificApnItem(apnVec, slotId);
 }
 
 void ApnManager::GetCTOperator(int32_t slotId, std::string &numeric)
@@ -350,10 +351,21 @@ int32_t ApnManager::CreateMvnoApnItems(int32_t slotId, const std::string &mcc, c
         TELEPHONY_LOGE("query mvno apns by iccId fail");
         return count;
     }
-    return MakeSpecificApnItem(mvnoApnVec);
+    return MakeSpecificApnItem(mvnoApnVec, slotId);
 }
 
-int32_t ApnManager::MakeSpecificApnItem(std::vector<PdpProfile> &apnVec)
+void ApnManager::ReportApnInfo(int32_t slotId, PdpProfile &apnData)
+{
+    if (apnData.apnTypes.empty()) {
+        return;
+    }
+    if (apnData.apnTypes.find(DATA_CONTEXT_ROLE_DEFAULT) == std::string::npos) {
+        return;
+    }
+    CellularDataHiSysEvent::WriteApnInfoBehaviorEvent(slotId, apnData);
+}
+
+int32_t ApnManager::MakeSpecificApnItem(std::vector<PdpProfile> &apnVec, int32_t slotId)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     allApnItem_.clear();
@@ -364,6 +376,7 @@ int32_t ApnManager::MakeSpecificApnItem(std::vector<PdpProfile> &apnVec)
         if (apnData.profileId == preferId_ && apnData.apnTypes.empty()) {
             apnData.apnTypes = DATA_CONTEXT_ROLE_DEFAULT;
         }
+        ReportApnInfo(slotId, apnData);
         sptr<ApnItem> apnItem = ApnItem::MakeApn(apnData);
         if (apnItem != nullptr) {
             allApnItem_.push_back(apnItem);

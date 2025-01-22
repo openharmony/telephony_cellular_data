@@ -56,9 +56,10 @@ public:
     void ClearAllApnBad();
 
 private:
+    void ReportApnInfo(int32_t slotId, PdpProfile &apnData);
     void AddApnHolder(const std::string &apnType, const int32_t priority);
     int32_t CreateMvnoApnItems(int32_t slotId, const std::string &mcc, const std::string &mnc);
-    int32_t MakeSpecificApnItem(std::vector<PdpProfile> &apnVec);
+    int32_t MakeSpecificApnItem(std::vector<PdpProfile> &apnVec, int32_t slotId);
     void GetCTOperator(int32_t slotId, std::string &numeric);
 
 private:
