@@ -361,6 +361,7 @@ void CellularDataStateMachine::UpdateNetworkInfo(const SetupDataCallResultInfo &
     if (netSupplierInfo_->isAvailable_) {
         netAgent.UpdateNetLinkInfo(supplierId, netLinkInfo_);
     }
+    UpdateReuseApnNetworkInfo(netSupplierInfo_->isAvailable_);
 }
 
 void CellularDataStateMachine::UpdateNetworkInfo()
@@ -377,6 +378,29 @@ void CellularDataStateMachine::UpdateNetworkInfo()
     if (netSupplierInfo_->isAvailable_) {
         netAgent.UpdateNetLinkInfo(supplierId, netLinkInfo_);
     }
+}
+
+void CellularDataStateMachine::UpdateReuseApnNetworkInfo(bool isAvailable)
+{
+    if (reuseApnCap_ == NetManagerStandard::NetCap::NET_CAPABILITY_END) {
+        return;
+    }
+    TELEPHONY_LOGI("UpdateReuseApnNetworkInfo: cap[%{public}d], avail[%{public}d]", static_cast<int32_t>(reuseApnCap_),
+        isAvailable);
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t slotId = GetSlotId();
+    CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
+    bool oldIsAvailable = netSupplierInfo_->isAvailable_;
+    netSupplierInfo_->isAvailable_ = isAvailable;
+    netLinkInfo_->tcpBufferSizes_ = tcpBuffer_;
+    netSupplierInfo_->linkUpBandwidthKbps_ = upBandwidth_;
+    netSupplierInfo_->linkDownBandwidthKbps_ = downBandwidth_;
+    int32_t supplierId = netAgent.GetSupplierId(slotId, reuseApnCap_);
+    netAgent.UpdateNetSupplierInfo(supplierId, netSupplierInfo_);
+    if (isAvailable) {
+        netAgent.UpdateNetLinkInfo(supplierId, netLinkInfo_);
+    }
+    netSupplierInfo_->isAvailable_ = oldIsAvailable;
 }
 
 void CellularDataStateMachine::ResolveIp(std::vector<AddressInfo> &ipInfoArray)
@@ -460,6 +484,16 @@ void CellularDataStateMachine::UpdateNetworkInfoIfInActive(SetupDataCallResultIn
     auto netInfo = std::make_shared<SetupDataCallResultInfo>(info);
     netInfo->flag = apnId_;
     cellularDataHandler_->SendEvent(CellularDataEventCode::MSG_DATA_CALL_LIST_CHANGED, netInfo);
+}
+
+void CellularDataStateMachine::SetReuseApnCap(uint64_t cap)
+{
+    reuseApnCap_ = cap;
+}
+
+uint64_t CellularDataStateMachine::GetReuseApnCap() const
+{
+    return reuseApnCap_;
 }
 } // namespace Telephony
 } // namespace OHOS

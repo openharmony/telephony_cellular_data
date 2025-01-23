@@ -783,6 +783,9 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
             }
             connectionManager_->AddConnectionStateMachine(cellularDataStateMachine);
         }
+    } else if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_XCAP && cellularDataStateMachine->GetCapability() ==
+        NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET) {
+        return HandleCompatibleDataConnection(cellularDataStateMachine, apnHolder);
     }
     cellularDataStateMachine->SetCapability(apnHolder->GetCapability());
     apnHolder->SetCurrentApn(apnItem);
@@ -804,6 +807,22 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
     }
     cellularDataStateMachine->SendEvent(event);
     return true;
+}
+
+bool CellularDataHandler::HandleCompatibleDataConnection(
+    std::shared_ptr<CellularDataStateMachine> stateMachine, const sptr<ApnHolder> &apnHolder)
+{
+    int32_t oldApnId = ApnManager::FindApnIdByCapability(stateMachine->GetCapability());
+    int32_t newApnId = ApnManager::FindApnIdByCapability(apnHolder->GetCapability());
+    if (stateMachine->IsActiveState()) {
+        TELEPHONY_LOGI("set reuse apnId[%{public}d] for apnId[%{public}d]", newApnId, oldApnId);
+        stateMachine->SetReuseApnCap(apnHolder->GetCapability());
+        stateMachine->UpdateReuseApnNetworkInfo(true);
+        return true;
+    }
+    TELEPHONY_LOGI("HandleCompatibleDataConnection later");
+    SendEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, newApnId, ESTABLISH_DATA_CONNECTION_DELAY);
+    return false;
 }
 
 void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Pointer &event)
@@ -2411,20 +2430,13 @@ std::shared_ptr<CellularDataStateMachine> CellularDataHandler::CheckForCompatibl
     sptr<ApnHolder> &apnHolder)
 {
     std::shared_ptr<CellularDataStateMachine> potentialDc = nullptr;
-    if (apnHolder == nullptr || apnManager_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: CheckForCompatibleDataConnection failed, apnHolder or apnManager_null",
-            slotId_);
+    if (apnManager_ == nullptr || connectionManager_ == nullptr ||
+        apnHolder->GetApnType() == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
         return potentialDc;
     }
     std::vector<sptr<ApnItem>> dunApnList;
     if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DUN) {
         apnManager_->FetchDunApns(dunApnList, slotId_);
-    }
-    if (dunApnList.size() == 0) {
-        return potentialDc;
-    }
-    if (connectionManager_ == nullptr) {
-        return potentialDc;
     }
     auto allDCs = connectionManager_->GetAllConnectionMachine();
     bool isRoaming = false;
@@ -2446,6 +2458,15 @@ std::shared_ptr<CellularDataStateMachine> CellularDataHandler::CheckForCompatibl
                 if (potentialDc == nullptr) {
                     potentialDc = curDc;
                 }
+            }
+        }
+        if (dunApnList.size() == 0 && apnItem->CanDealWithType(apnHolder->GetApnType())) {
+            if (curDc->IsActiveState()) {
+                return curDc;
+            } else if (curDc->IsActivatingState()) {
+                potentialDc = curDc;
+            } else if (curDc->IsDisconnectingState() && potentialDc == nullptr) {
+                potentialDc = curDc;
             }
         }
     }

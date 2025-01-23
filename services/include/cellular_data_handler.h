@@ -172,6 +172,8 @@ private:
     bool WriteEventCellularRequest(NetRequest request, int32_t state);
     void DataConnCompleteUpdateState(const sptr<ApnHolder> &apnHolder,
         const std::shared_ptr<SetupDataCallResultInfo> &resultInfo);
+    bool HandleCompatibleDataConnection(std::shared_ptr<CellularDataStateMachine> stateMachine,
+        const sptr<ApnHolder> &apnHolder);
 
 private:
     sptr<ApnManager> apnManager_;

@@ -152,5 +152,24 @@ sptr<ApnItem> ApnItem::BuildOtherApnAttributes(sptr<ApnItem> &apnItem, const Pdp
     TELEPHONY_LOGI("The APN name is:%{public}s", apnItem->attr_.apnName_);
     return apnItem;
 }
+
+bool ApnItem::IsSimilarPdpProfile(const PdpProfile &newPdpProfile, const PdpProfile &oldPdpProfile)
+{
+    return (newPdpProfile.apn == oldPdpProfile.apn) && (newPdpProfile.authType == oldPdpProfile.authType) &&
+        (newPdpProfile.authUser == oldPdpProfile.authUser) && (newPdpProfile.authPwd == oldPdpProfile.authPwd) &&
+        (newPdpProfile.proxyIpAddress == oldPdpProfile.proxyIpAddress) &&
+        (newPdpProfile.mmsIpAddress == oldPdpProfile.mmsIpAddress) &&
+        IsSimilarProtocol(newPdpProfile.pdpProtocol, oldPdpProfile.pdpProtocol) &&
+        IsSimilarProtocol(newPdpProfile.roamPdpProtocol, oldPdpProfile.roamPdpProtocol);
+}
+
+bool ApnItem::IsSimilarProtocol(const std::string &newProtocol, const std::string &oldProtocol)
+{
+    return (newProtocol == oldProtocol) ||
+        (newProtocol == PROTOCOL_IPV4V6 && oldProtocol == PROTOCOL_IPV4) ||
+        (newProtocol == PROTOCOL_IPV4V6 && oldProtocol == PROTOCOL_IPV6) ||
+        (newProtocol == PROTOCOL_IPV4 && oldProtocol == PROTOCOL_IPV4V6) ||
+        (newProtocol == PROTOCOL_IPV6 && oldProtocol == PROTOCOL_IPV4V6);
+}
 } // namespace Telephony
 } // namespace OHOS

@@ -37,9 +37,11 @@ public:
     bool IsBadApn() const;
     static sptr<ApnItem> MakeDefaultApn(const std::string &apnType);
     static sptr<ApnItem> MakeApn(const PdpProfile &apnData);
+    static bool IsSimilarPdpProfile(const PdpProfile &newPdpProfile, const PdpProfile &oldPdpProfile);
 
 private:
     static sptr<ApnItem> BuildOtherApnAttributes(sptr<ApnItem> &apnItem, const PdpProfile &apnData);
+    static bool IsSimilarProtocol(const std::string &newProtocol, const std::string &oldProtocol);
 
 public:
     constexpr static int ALL_APN_ITEM_CHAR_LENGTH = 256;

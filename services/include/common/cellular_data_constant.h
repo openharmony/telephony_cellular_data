@@ -318,6 +318,9 @@ static const int32_t INVALID_SIM_ID = 0;
 static const int32_t INVALID_SLOT_ID = -1;
 static const int32_t CELLULAR_DATA_VSIM_SLOT_ID = 2;
 static const int32_t SUPPLIER_INVALID_REG_STATE = -1;
+static constexpr const char *PROTOCOL_IPV4 = "IP";
+static constexpr const char *PROTOCOL_IPV6 = "IPV6";
+static constexpr const char *PROTOCOL_IPV4V6 = "IPV4V6";
 } // namespace Telephony
 } // namespace OHOS
 #endif // CELLULAR_DATA_CONSTANT_H
