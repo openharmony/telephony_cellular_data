@@ -443,7 +443,7 @@ HWTEST_F(ApnManagerTest, MakeSpecificApnItem_001, Function | MediumTest | Level1
     pdpProfile.apnTypes = "";
     std::vector<PdpProfile> apnVec;
     apnVec.push_back(pdpProfile);
-    bool result = apnManager->MakeSpecificApnItem(apnVec);
+    bool result = apnManager->MakeSpecificApnItem(apnVec, 0);
     ASSERT_EQ(result, 1);
 }
 
@@ -461,7 +461,7 @@ HWTEST_F(ApnManagerTest, MakeSpecificApnItem_002, Function | MediumTest | Level1
     pdpProfile.apnTypes = "default";
     std::vector<PdpProfile> apnVec;
     apnVec.push_back(pdpProfile);
-    bool result = apnManager->MakeSpecificApnItem(apnVec);
+    bool result = apnManager->MakeSpecificApnItem(apnVec, 0);
     ASSERT_EQ(result, 1);
 }
 
@@ -479,7 +479,7 @@ HWTEST_F(ApnManagerTest, MakeSpecificApnItem_003, Function | MediumTest | Level1
     pdpProfile.apnTypes = "default";
     std::vector<PdpProfile> apnVec;
     apnVec.push_back(pdpProfile);
-    bool result = apnManager->MakeSpecificApnItem(apnVec);
+    bool result = apnManager->MakeSpecificApnItem(apnVec, 0);
     ASSERT_EQ(result, 1);
 }
 
