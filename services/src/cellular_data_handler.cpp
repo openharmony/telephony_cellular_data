@@ -324,7 +324,8 @@ void CellularDataHandler::ClearConnection(const sptr<ApnHolder> &apn, DisConnect
         TELEPHONY_LOGD("Slot%{public}d: stateMachine is null", slotId_);
         return;
     }
-    TELEPHONY_LOGI("Slot%{public}d: The APN holder is of type %{public}s", slotId_, apn->GetApnType().c_str());
+    TELEPHONY_LOGI("Slot%{public}d: The APN holder is of type %{public}s, reason:%{public}d",
+        slotId_, apn->GetApnType().c_str(), reason);
     std::unique_ptr<DataDisconnectParams> object = std::make_unique<DataDisconnectParams>(apn->GetApnType(), reason);
     if (object == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: ClearConnection fail, object is null", slotId_);
@@ -1136,6 +1137,7 @@ void CellularDataHandler::MsgEstablishDataConnection(const InnerEvent::Pointer &
     if (apnHolder->IsDataCallEnabled()) {
         AttemptEstablishDataConnection(apnHolder);
     } else {
+        TELEPHONY_LOGI("MsgEstablishDataConnection IsDataCallEnabled is false");
         DisConnectionReason reason = DisConnectionReason::REASON_CHANGE_CONNECTION;
         int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
         CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, radioTech);
