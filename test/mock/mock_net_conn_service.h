@@ -105,6 +105,8 @@ public:
     MOCK_METHOD(int32_t, UnregisterNetInterfaceCallback, (const sptr<INetInterfaceStateCallback> &callback));
     MOCK_METHOD(int32_t, SetInterfaceUp, (const std::string &iface));
     MOCK_METHOD(int32_t, SetInterfaceDown, (const std::string &iface));
+    MOCK_METHOD(int32_t, SetPacUrl, (const std::string &pacUrl));
+    MOCK_METHOD(int32_t, GetPacUrl, (std::string &pacUrl));
 };
 
 }  // namespace NetManagerStandard
