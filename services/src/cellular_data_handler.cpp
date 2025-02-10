@@ -241,7 +241,7 @@ int32_t CellularDataHandler::SetCellularDataRoamingEnabled(bool dataRoamingEnabl
         TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ is null", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    bool currentDataRoamEnabled = false;
+    bool currentDataRoamEnabled = defaultDataRoamingEnable_;
     int32_t result = dataSwitchSettings_->QueryUserDataRoamingStatus(currentDataRoamEnabled);
     if (result != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("Slot%{public}d: Query result: %{public}d", slotId_, result);
