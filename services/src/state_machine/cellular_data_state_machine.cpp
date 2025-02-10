@@ -378,6 +378,7 @@ void CellularDataStateMachine::UpdateNetworkInfo()
     if (netSupplierInfo_->isAvailable_) {
         netAgent.UpdateNetLinkInfo(supplierId, netLinkInfo_);
     }
+    UpdateReuseApnNetworkInfo(netSupplierInfo_->isAvailable_);
 }
 
 void CellularDataStateMachine::UpdateReuseApnNetworkInfo(bool isAvailable)
