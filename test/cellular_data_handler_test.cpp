@@ -194,6 +194,7 @@ HWTEST_F(CellularDataHandlerTest, HandleRoamingOff_001, Function | MediumTest | 
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    EXPECT_NE(cellularDataHandler, nullptr);
     cellularDataHandler->Init();
     cellularDataHandler->SetCellularDataRoamingEnabled(true);
     auto event = AppExecFwk::InnerEvent::Get(0);
@@ -211,6 +212,7 @@ HWTEST_F(CellularDataHandlerTest, HandleRoamingOff_002, Function | MediumTest | 
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    EXPECT_NE(cellularDataHandler, nullptr);
     cellularDataHandler->Init();
     cellularDataHandler->SetCellularDataRoamingEnabled(false);
     auto event = AppExecFwk::InnerEvent::Get(0);
