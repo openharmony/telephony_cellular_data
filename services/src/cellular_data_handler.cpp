@@ -784,8 +784,7 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
             }
             connectionManager_->AddConnectionStateMachine(cellularDataStateMachine);
         }
-    } else if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_XCAP && cellularDataStateMachine->GetCapability() ==
-        NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET) {
+    } else {
         return HandleCompatibleDataConnection(cellularDataStateMachine, apnHolder);
     }
     cellularDataStateMachine->SetCapability(apnHolder->GetCapability());
@@ -813,6 +812,7 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
 bool CellularDataHandler::HandleCompatibleDataConnection(
     std::shared_ptr<CellularDataStateMachine> stateMachine, const sptr<ApnHolder> &apnHolder)
 {
+    TELEPHONY_LOGI("Enter HandleCompatibleDataConnection");
     int32_t oldApnId = ApnManager::FindApnIdByCapability(stateMachine->GetCapability());
     int32_t newApnId = ApnManager::FindApnIdByCapability(apnHolder->GetCapability());
     if (stateMachine->IsActiveState()) {
@@ -821,7 +821,6 @@ bool CellularDataHandler::HandleCompatibleDataConnection(
         stateMachine->UpdateReuseApnNetworkInfo(true);
         return true;
     }
-    TELEPHONY_LOGI("HandleCompatibleDataConnection later");
     SendEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, newApnId, ESTABLISH_DATA_CONNECTION_DELAY);
     return false;
 }
@@ -2433,6 +2432,7 @@ std::shared_ptr<CellularDataStateMachine> CellularDataHandler::CheckForCompatibl
 {
     std::shared_ptr<CellularDataStateMachine> potentialDc = nullptr;
     if (apnManager_ == nullptr || connectionManager_ == nullptr ||
+        apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DEFAULT ||
         apnHolder->GetApnType() == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
         return potentialDc;
     }
