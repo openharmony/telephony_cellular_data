@@ -110,6 +110,8 @@ HWTEST_F(CellularDataServiceTest, CellularDataService_002, TestSize.Level0)
     ASSERT_EQ(TELEPHONY_ERR_PERMISSION_ERR, service->EstablishAllApnsIfConnectable(DEFAULT_SIM_SLOT_ID));
     int32_t regState = -1;
     service->GetSupplierRegisterState(supplierId, regState);
+    bool isSupportDun = false;
+    EXPECT_EQ(TELEPHONY_ERR_PERMISSION_ERR, service->GetIfSupportDunApn(isSupportDun));
     service->OnStop();
 }
 

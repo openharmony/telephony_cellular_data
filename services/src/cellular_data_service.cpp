@@ -821,5 +821,21 @@ int32_t CellularDataService::GetSupplierRegisterState(uint32_t supplierId, int32
     bool result = CellularDataNetAgent::GetInstance().GetSupplierRegState(supplierId, regState);
     return result ? TELEPHONY_ERR_SUCCESS : TELEPHONY_ERR_FAIL;
 }
+
+int32_t CellularDataService::GetIfSupportDunApn(bool &isSupportDun)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    int32_t slotId = CellularDataService::GetDefaultCellularDataSlotId();
+    auto cellularDataController = GetCellularDataController(slotId);
+    if (cellularDataController == nullptr) {
+        TELEPHONY_LOGE("cellularDataControllers is null, slotId=%{public}d", slotId);
+        return CELLULAR_DATA_INVALID_PARAM;
+    }
+    isSupportDun = cellularDataController->IsSupportDunApn();
+    return TELEPHONY_ERR_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS

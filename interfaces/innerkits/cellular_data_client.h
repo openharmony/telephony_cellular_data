@@ -245,6 +245,14 @@ public:
      */
     int32_t GetSupplierRegisterState(uint32_t supplierId, int32_t &regState);
 
+    /**
+    * @brief Get If Cellular data Support Dun Apn
+    *
+    * @param isSupportDun if support dun apn.
+    * @return 0 set success, others set fail.
+    */
+    int32_t GetIfSupportDunApn(bool &isSupportDun);
+
 private:
     class CellularDataDeathRecipient : public IRemoteObject::DeathRecipient {
     public:

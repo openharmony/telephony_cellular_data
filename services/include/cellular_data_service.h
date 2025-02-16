@@ -90,6 +90,7 @@ public:
     int32_t GetCellularDataSupplierId(int32_t slotId, uint64_t capability, uint32_t &supplierId) override;
     int32_t CorrectNetSupplierNoAvailable(int32_t slotId) override;
     int32_t GetSupplierRegisterState(uint32_t supplierId, int32_t &regState) override;
+    int32_t GetIfSupportDunApn(bool &isSupportDun) override;
 
 private:
     bool Init();

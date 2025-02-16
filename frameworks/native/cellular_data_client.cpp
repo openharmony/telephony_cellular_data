@@ -450,5 +450,15 @@ int32_t CellularDataClient::GetSupplierRegisterState(uint32_t supplierId, int32_
     }
     return proxy->GetSupplierRegisterState(supplierId, regState);
 }
+
+int32_t CellularDataClient::GetIfSupportDunApn(bool &isSupportDun)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetIfSupportDunApn(isSupportDun);
+}
 } // namespace Telephony
 } // namespace OHOS

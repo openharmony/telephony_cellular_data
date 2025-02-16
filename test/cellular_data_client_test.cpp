@@ -245,5 +245,18 @@ HWTEST_F(CellularDataClientTest, OnInitCellularDataController_001, TestSize.Leve
     int32_t result = CellularDataClient::GetInstance().InitCellularDataController(0);
     EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
 }
+
+/**
+ * @tc.number   GetIfSupportDunApn_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataClientTest, GetIfSupportDunApn_001, TestSize.Level0)
+{
+    bool isSupportDun = false;
+    int32_t result = CellularDataClient::GetInstance().GetIfSupportDunApn(isSupportDun);
+    EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+}
+
 } // namespace Telephony
 } // namespace OHOS

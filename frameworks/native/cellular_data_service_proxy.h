@@ -177,6 +177,8 @@ public:
 
     int32_t GetSupplierRegisterState(uint32_t supplierId, int32_t &regState);
 
+    int32_t GetIfSupportDunApn(bool &isSupportDun);
+
 private:
     static inline BrokerDelegator<CellularDataServiceProxy> delegator_;
 };

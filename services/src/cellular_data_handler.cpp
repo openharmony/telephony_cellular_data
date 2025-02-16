@@ -2548,5 +2548,19 @@ bool CellularDataHandler::UpdateNetworkInfo()
     }
     return true;
 }
+
+bool CellularDataHandler::IsSupportDunApn()
+{
+    if (apnManager_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: apnManager is null", slotId_);
+        return false;
+    }
+    std::vector<sptr<ApnItem>> dunApnList;
+    apnManager_->FetchDunApns(dunApnList, slotId_);
+    ApnProfileState apnState = apnManager_->GetOverallDefaultApnState();
+    TELEPHONY_LOGI("Slot%{public}d: IsSupportDun=%{public}d, apnState=%{public}d", slotId_, !dunApnList.empty(),
+        apnState);
+    return (!dunApnList.empty() && apnState == ApnProfileState::PROFILE_STATE_CONNECTED);
+}
 } // namespace Telephony
 } // namespace OHOS

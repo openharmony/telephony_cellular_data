@@ -48,6 +48,7 @@ enum class CellularDataInterfaceCode {
     GET_CELLULAR_DATA_SUPPLIERID,
     CORRECT_NET_SUPPLIER_NO_AVAILABLE,
     GET_SUPPLIER_REGISTER_STATE,
+    GET_IF_SUPPORT_DUN_APN,
 };
 } // namespace Telephony
 } // namespace OHOS

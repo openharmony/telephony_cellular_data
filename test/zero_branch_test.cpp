@@ -2232,5 +2232,19 @@ HWTEST_F(BranchTest, WriteEventCellularRequest_Test_01, TestSize.Level3)
     ASSERT_FALSE(controller.cellularDataHandler_->WriteEventCellularRequest(request, state));
 }
 
+/**
+ * @tc.number   IsSupportDunApn_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, IsSupportDunApn_001, Function | MediumTest | Level1)
+{
+    CellularDataController controller { 0 };
+    EXPECT_FALSE(controller.IsSupportDunApn());
+    controller.Init();
+    controller.cellularDataHandler_->apnManager_ = nullptr;
+    EXPECT_FALSE(controller.IsSupportDunApn());
+}
+
 } // namespace Telephony
 } // namespace OHOS
