@@ -465,5 +465,20 @@ int32_t CellularDataServiceStub::OnGetSupplierRegisterState(MessageParcel &data,
     }
     return result;
 }
+
+int32_t CellularDataServiceStub::OnIsSupportDunApn(MessageParcel &data, MessageParcel &reply)
+{
+    bool isSupportDun = false;
+    int32_t result = GetIfSupportDunApn(isSupportDun);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteBool(isSupportDun)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
 } // namespace Telephony
 } // namespace OHOS

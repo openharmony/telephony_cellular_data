@@ -59,6 +59,7 @@ public:
     bool RemoveUid(const NetRequest &request);
     bool ReleaseCellularDataConnection() const;
     bool UpdateNetworkInfo();
+    bool IsSupportDunApn();
 
 private:
     void RegisterEvents();

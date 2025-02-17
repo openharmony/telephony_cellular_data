@@ -161,6 +161,8 @@ public:
 
     virtual int32_t GetSupplierRegisterState(uint32_t supplierId, int32_t &regState) = 0;
 
+    virtual int32_t GetIfSupportDunApn(bool &isSupportDun) = 0;
+
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.telephony.ICellularDataManager");
 };

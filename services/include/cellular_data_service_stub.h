@@ -64,6 +64,7 @@ private:
     int32_t OnGetSupplierRegisterState(MessageParcel &data, MessageParcel &reply);
     int32_t SetTimer(uint32_t code);
     void CancelTimer(int32_t id);
+    int32_t OnIsSupportDunApn(MessageParcel &data, MessageParcel &reply);
 
 private:
     using Fun = std::function<int32_t(MessageParcel &data, MessageParcel &reply)>;
@@ -125,7 +126,9 @@ private:
             [this](MessageParcel &data, MessageParcel &reply) {
                 return OnCorrectNetSupplierNoAvailable(data, reply); } },
         { (uint32_t)CellularDataInterfaceCode::GET_SUPPLIER_REGISTER_STATE,
-            [this](MessageParcel &data, MessageParcel &reply) { return OnGetSupplierRegisterState(data, reply); } }
+            [this](MessageParcel &data, MessageParcel &reply) { return OnGetSupplierRegisterState(data, reply); } },
+        { (uint32_t)CellularDataInterfaceCode::GET_IF_SUPPORT_DUN_APN,
+            [this](MessageParcel &data, MessageParcel &reply) { return OnIsSupportDunApn(data, reply); } }
     };
     std::map<uint32_t, std::string> collieCodeStringMap_ = {
         { uint32_t(CellularDataInterfaceCode::GET_CELLULAR_DATA_STATE), "GET_CELLULAR_DATA_STATE" },

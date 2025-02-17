@@ -492,5 +492,14 @@ bool CellularDataController::UpdateNetworkInfo()
     return cellularDataHandler_->UpdateNetworkInfo();
 }
 
+bool CellularDataController::IsSupportDunApn()
+{
+    if (cellularDataHandler_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler_ is null", slotId_);
+        return false;
+    }
+    return cellularDataHandler_->IsSupportDunApn();
+}
+
 } // namespace Telephony
 } // namespace OHOS

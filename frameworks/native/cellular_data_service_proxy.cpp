@@ -705,5 +705,32 @@ int32_t CellularDataServiceProxy::GetSupplierRegisterState(uint32_t supplierId, 
     }
     return result;
 }
+
+int32_t CellularDataServiceProxy::GetIfSupportDunApn(bool &isSupportDun)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write interface token failed!");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    sptr<OHOS::IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("remote is nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest((uint32_t)CellularDataInterfaceCode::GET_IF_SUPPORT_DUN_APN, data,
+        reply, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        isSupportDun = reply.ReadBool();
+    }
+    return result;
+}
 } // namespace Telephony
 } // namespace OHOS

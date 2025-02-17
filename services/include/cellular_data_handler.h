@@ -82,6 +82,7 @@ public:
     void HandleUpdateNetInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void ReleaseCellularDataConnection();
     bool UpdateNetworkInfo();
+    bool IsSupportDunApn();
 
 private:
     std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect();
