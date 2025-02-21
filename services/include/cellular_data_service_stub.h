@@ -65,6 +65,8 @@ private:
     int32_t SetTimer(uint32_t code);
     void CancelTimer(int32_t id);
     int32_t OnIsSupportDunApn(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetDefaultActReportInfo(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetInternalActReportInfo(MessageParcel &data, MessageParcel &reply);
 
 private:
     using Fun = std::function<int32_t(MessageParcel &data, MessageParcel &reply)>;
