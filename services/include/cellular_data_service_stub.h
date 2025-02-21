@@ -128,7 +128,11 @@ private:
         { (uint32_t)CellularDataInterfaceCode::GET_SUPPLIER_REGISTER_STATE,
             [this](MessageParcel &data, MessageParcel &reply) { return OnGetSupplierRegisterState(data, reply); } },
         { (uint32_t)CellularDataInterfaceCode::GET_IF_SUPPORT_DUN_APN,
-            [this](MessageParcel &data, MessageParcel &reply) { return OnIsSupportDunApn(data, reply); } }
+            [this](MessageParcel &data, MessageParcel &reply) { return OnIsSupportDunApn(data, reply); } },
+        { (uint32_t)CellularDataInterfaceCode::GET_DEFAULT_ACT_REPORT_INFO,
+            [this](MessageParcel &data, MessageParcel &reply) { return OnGetDefaultActReportInfo(data, reply); } },
+        { (uint32_t)CellularDataInterfaceCode::GET_INTERNAL_ACT_REPORT_INFO,
+            [this](MessageParcel &data, MessageParcel &reply) { return OnGetInternalActReportInfo(data, reply); } }
     };
     std::map<uint32_t, std::string> collieCodeStringMap_ = {
         { uint32_t(CellularDataInterfaceCode::GET_CELLULAR_DATA_STATE), "GET_CELLULAR_DATA_STATE" },

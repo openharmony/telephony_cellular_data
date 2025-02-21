@@ -40,6 +40,7 @@
 #include "telephony_types.h"
 namespace OHOS {
 namespace Telephony {
+const uint32_t KEEP_APN_ACTIVATE_PERIOD = 30 * 1000;
 class CellularDataHandler : public TelEventHandler, public EventFwk::CommonEventSubscriber {
 public:
     explicit CellularDataHandler(const EventFwk::CommonEventSubscribeInfo &sp, int32_t slotId);
@@ -83,6 +84,8 @@ public:
     void ReleaseCellularDataConnection();
     bool UpdateNetworkInfo();
     bool IsSupportDunApn();
+    ApnActivateReportInfo GetDefaultActReportInfo();
+    ApnActivateReportInfo GetInternalActReportInfo();
 
 private:
     std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect();
@@ -175,6 +178,11 @@ private:
         const std::shared_ptr<SetupDataCallResultInfo> &resultInfo);
     bool HandleCompatibleDataConnection(std::shared_ptr<CellularDataStateMachine> stateMachine,
         const sptr<ApnHolder> &apnHolder);
+    int64_t GetCurTime();
+    void SetApnActivateStart(const std::string &apnType);
+    void SetApnActivateEnd(const std::shared_ptr<SetupDataCallResultInfo> &resultInfo);
+    void EraseApnActivateList();
+    ApnActivateReportInfo GetApnActReportInfo(uint32_t apnId);
 
 private:
     sptr<ApnManager> apnManager_;
@@ -198,6 +206,7 @@ private:
     bool defaultDataRoamingEnable_ = false;
     bool isRilApnAttached_ = false;
     std::mutex mtx_;
+    std::mutex apnActivateListMutex_;
     std::vector<std::string> upLinkThresholds_;
     std::vector<std::string> downLinkThresholds_;
     sptr<CellularDataSettingObserver> settingObserver_;
@@ -207,6 +216,9 @@ private:
     sptr<CellularDataAirplaneObserver> airplaneObserver_;
     std::shared_ptr<IncallDataStateMachine> incallDataStateMachine_;
     sptr<ApnItem> lastApnItem_ = nullptr;
+    std::vector<ApnActivateInfo> apnActivateChrList_;
+    uint64_t defaultApnActTime_ = 0;
+    uint64_t internalApnActTime_ = 0;
 
     using Fun = std::function<void(const AppExecFwk::InnerEvent::Pointer &event)>;
     std::map<uint32_t, Fun> eventIdMap_ {

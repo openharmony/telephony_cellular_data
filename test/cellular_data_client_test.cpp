@@ -258,5 +258,28 @@ HWTEST_F(CellularDataClientTest, GetIfSupportDunApn_001, TestSize.Level0)
     EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
 }
 
+/**
+ * @tc.number   GetSupplierRegisterState_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataClientTest, GetDefaultActReportInfo_001, TestSize.Level0)
+{
+    ApnActivateReportInfo info;
+    int32_t result = CellularDataClient::GetInstance().GetDefaultActReportInfo(0, info);
+    EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+}
+
+/**
+ * @tc.number   GetSupplierRegisterState_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataClientTest, GetInternalActReportInfo_001, TestSize.Level0)
+{
+    ApnActivateReportInfo info;
+    int32_t result = CellularDataClient::GetInstance().GetInternalActReportInfo(0, info);
+    EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+}
 } // namespace Telephony
 } // namespace OHOS

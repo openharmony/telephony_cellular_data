@@ -732,5 +732,70 @@ int32_t CellularDataServiceProxy::GetIfSupportDunApn(bool &isSupportDun)
     }
     return result;
 }
+
+int32_t CellularDataServiceProxy::GetDefaultActReportInfo(int32_t slotId, ApnActivateReportInfo &info)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    if (!dataParcel.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write interface token failed!");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt32(slotId);
+    sptr<OHOS::IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("remote is nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest((uint32_t)CellularDataInterfaceCode::GET_DEFAULT_ACT_REPORT_INFO,
+        dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function GetDefaultActReportInfo call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = replyParcel.ReadInt32();
+    TELEPHONY_LOGD("end: result=%{public}d", result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        info.actTimes = replyParcel.ReadUint32();
+        info.averDuration = replyParcel.ReadUint32();
+        info.topReason = replyParcel.ReadUint32();
+        info.actSuccTimes = replyParcel.ReadUint32();
+    }
+    return result;
+}
+
+int32_t CellularDataServiceProxy::GetInternalActReportInfo(int32_t slotId, ApnActivateReportInfo &info)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    if (!dataParcel.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write interface token failed!");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt32(slotId);
+    sptr<OHOS::IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("remote is nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest((uint32_t)CellularDataInterfaceCode::GET_INTERNAL_ACT_REPORT_INFO,
+        dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function GetInternalActReportInfo call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = replyParcel.ReadInt32();
+    TELEPHONY_LOGD("end: result=%{public}d", result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        info.actTimes = replyParcel.ReadUint32();
+        info.averDuration = replyParcel.ReadUint32();
+        info.topReason = replyParcel.ReadUint32();
+        info.actSuccTimes = replyParcel.ReadUint32();
+    }
+    return result;
+}
+
 } // namespace Telephony
 } // namespace OHOS

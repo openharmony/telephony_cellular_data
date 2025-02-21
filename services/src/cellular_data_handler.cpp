@@ -806,6 +806,7 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
         return false;
     }
     cellularDataStateMachine->SendEvent(event);
+    SetApnActivateStart(apnHolder->GetApnType());
     return true;
 }
 
@@ -832,6 +833,9 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
         return;
     }
     std::shared_ptr<SetupDataCallResultInfo> resultInfo = event->GetSharedObject<SetupDataCallResultInfo>();
+    TELEPHONY_LOGI("EstablishDataConnectionComplete reason: %{public}d, flag: %{public}d",
+        resultInfo->reason, resultInfo->flag);
+    SetApnActivateEnd(resultInfo);
     if ((resultInfo != nullptr) && (apnManager_ != nullptr)) {
         sptr<ApnHolder> apnHolder = apnManager_->GetApnHolder(apnManager_->FindApnNameByApnId(resultInfo->flag));
         if (apnHolder == nullptr) {
@@ -2561,6 +2565,111 @@ bool CellularDataHandler::IsSupportDunApn()
     TELEPHONY_LOGI("Slot%{public}d: IsSupportDun=%{public}d, apnState=%{public}d", slotId_, !dunApnList.empty(),
         apnState);
     return (!dunApnList.empty() && apnState == ApnProfileState::PROFILE_STATE_CONNECTED);
+}
+
+ApnActivateReportInfo CellularDataHandler::GetDefaultActReportInfo()
+{
+    return GetApnActReportInfo(DATA_CONTEXT_ROLE_DEFAULT_ID);
+}
+
+ApnActivateReportInfo CellularDataHandler::GetInternalActReportInfo()
+{
+    return GetApnActReportInfo(DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID);
+}
+
+ApnActivateReportInfo CellularDataHandler::GetApnActReportInfo(uint32_t apnId)
+{
+    struct ApnActivateReportInfo info;
+    uint32_t totalDuration = 0;
+    uint32_t totalActTimes = 0;
+    uint32_t totalActSuccTimes = 0;
+    uint32_t topReason = 0;
+    uint32_t topReasonCnt = 0;
+    std::map<uint32_t, uint32_t> errorMap;
+    std::lock_guard<std::mutex> lock(apnActivateListMutex_);
+    EraseApnActivateList();
+    for (uint32_t i = 0; i < apnActivateChrList_.size(); i++) {
+        ApnActivateInfo info = apnActivateChrList_[i];
+        if (info.apnId != apnId) {
+            continue;
+        }
+        totalDuration += info.duration;
+        totalActTimes++;
+        if (info.reason == 0) {
+            totalActSuccTimes++;
+            continue;
+        }
+        if (errorMap.find(info.reason) != errorMap.end()) {
+            errorMap[info.reason] = errorMap[info.reason]+1;
+        } else {
+            errorMap[info.reason] = 1;
+        }
+    }
+    apnActivateListMutex_.unlock();
+    info.actTimes = totalActTimes;
+    info.actSuccTimes = totalActSuccTimes;
+    info.averDuration = totalActSuccTimes == 0 ? 0 : totalDuration / totalActSuccTimes;
+    std::map<uint32_t, uint32_t>::iterator iter;
+    for (iter = errorMap.begin(); iter != errorMap.end(); ++iter) {
+        if (iter->second > topReasonCnt) {
+            topReason = iter->first;
+            topReasonCnt = iter->second;
+        }
+    }
+    info.topReason = topReason;
+    TELEPHONY_LOGI("GetApnActReportInfo,%{public}d,%{public}d,%{public}d,%{public}d,%{public}d,",
+        totalDuration, totalActTimes, totalActSuccTimes, topReason, topReasonCnt);
+    return info;
+}
+
+void CellularDataHandler::SetApnActivateStart(const std::string &apnType)
+{
+    uint64_t currentTime = GetCurTime();
+    if (apnType == DATA_CONTEXT_ROLE_DEFAULT) {
+        defaultApnActTime_ = currentTime;
+    }
+    if (apnType == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
+        internalApnActTime_ = currentTime;
+    }
+}
+
+void CellularDataHandler::SetApnActivateEnd(const std::shared_ptr<SetupDataCallResultInfo> &resultInfo)
+{
+    struct ApnActivateInfo info;
+    info.actSuccTime = GetCurTime();
+    info.reason = resultInfo->reason;
+    info.apnId = resultInfo->flag;
+    if (resultInfo->flag == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID
+        && internalApnActTime_ != 0) {
+        info.duration = info.actSuccTime - internalApnActTime_;
+    }
+    if (resultInfo->flag == DATA_CONTEXT_ROLE_DEFAULT_ID
+        && defaultApnActTime_ != 0) {
+        info.duration = info.actSuccTime - defaultApnActTime_;
+    }
+    std::lock_guard<std::mutex> lock(apnActivateListMutex_);
+    EraseApnActivateList();
+    apnActivateChrList_.push_back(info);
+    apnActivateListMutex_.unlock();
+}
+
+void CellularDataHandler::EraseApnActivateList()
+{
+    int64_t currentTime = GetCurTime();
+    for (std::vector<ApnActivateInfo>::iterator iter = apnActivateChrList_.begin();
+        iter != apnActivateChrList_.end();) {
+        if ((currentTime - iter->actSuccTime) > KEEP_APN_ACTIVATE_PERIOD) {
+            apnActivateChrList_.erase(iter);
+        } else {
+            iter++;
+        }
+    }
+}
+
+int64_t CellularDataHandler::GetCurTime()
+{
+    return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now()
+        .time_since_epoch()).count();
 }
 } // namespace Telephony
 } // namespace OHOS

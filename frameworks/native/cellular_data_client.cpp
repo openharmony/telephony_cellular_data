@@ -460,5 +460,25 @@ int32_t CellularDataClient::GetIfSupportDunApn(bool &isSupportDun)
     }
     return proxy->GetIfSupportDunApn(isSupportDun);
 }
+
+int32_t CellularDataClient::GetDefaultActReportInfo(int32_t slotId, ApnActivateReportInfo &info)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetDefaultActReportInfo(slotId, info);
+}
+
+int32_t CellularDataClient::GetInternalActReportInfo(int32_t slotId, ApnActivateReportInfo &info)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetInternalActReportInfo(slotId, info);
+}
 } // namespace Telephony
 } // namespace OHOS

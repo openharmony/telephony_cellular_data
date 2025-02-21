@@ -163,6 +163,10 @@ public:
 
     virtual int32_t GetIfSupportDunApn(bool &isSupportDun) = 0;
 
+    virtual int32_t GetDefaultActReportInfo(int32_t slotId, ApnActivateReportInfo &info) = 0;
+
+    virtual int32_t GetInternalActReportInfo(int32_t slotId, ApnActivateReportInfo &info) = 0;
+
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.telephony.ICellularDataManager");
 };

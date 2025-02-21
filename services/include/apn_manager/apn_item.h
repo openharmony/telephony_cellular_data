@@ -27,6 +27,19 @@
 
 namespace OHOS {
 namespace Telephony {
+struct ApnActivateInfo {
+    uint64_t actSuccTime;
+    uint32_t duration;
+    uint32_t reason;
+    uint32_t apnId;
+};
+
+struct ApnActivateReportInfo {
+    uint32_t actTimes;
+    uint32_t averDuration;
+    uint32_t topReason;
+    uint32_t actSuccTimes;
+};
 class ApnItem : public RefBase {
 public:
     ApnItem();

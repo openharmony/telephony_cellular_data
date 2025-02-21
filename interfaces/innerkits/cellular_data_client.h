@@ -253,6 +253,24 @@ public:
     */
     int32_t GetIfSupportDunApn(bool &isSupportDun);
 
+    /**
+     * @brief Get last 30 default apn activate info
+     *
+     * @param slotId slotId
+     * @param ApnActivateReportInfo default apn act info
+     * @return 0 set success, others set fail.
+     */
+    int32_t GetDefaultActReportInfo(int32_t slotId, ApnActivateReportInfo &info);
+
+    /**
+     * @brief Get last 30 internal_default apn activate info
+     *
+     * @param slotId slotId
+     * @param ApnActivateReportInfo internal_default apn act info
+     * @return 0 set success, others set fail.
+     */
+    int32_t GetInternalActReportInfo(int32_t slotId, ApnActivateReportInfo &info);
+
 private:
     class CellularDataDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
