@@ -230,6 +230,30 @@ void UnregisterSimAccountCallback(const uint8_t *data, size_t size)
     DelayedSingleton<CellularDataService>::GetInstance()->OnUnregisterSimAccountCallback(dataMessageParcel, reply);
 }
 
+void GetDefaultActReportInfo(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CellularDataService>::GetInstance()->OnGetDefaultActReportInfo(dataMessageParcel, reply);
+}
+
+void GetInternalActReportInfo(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CellularDataService>::GetInstance()->OnGetInternalActReportInfo(dataMessageParcel, reply);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -249,6 +273,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     ClearCellularDataConnections(data, size);
     RegisterSimAccountCallback(data, size);
     UnregisterSimAccountCallback(data, size);
+    GetDefaultActReportInfo(data, size);
+    GetInternalActReportInfo(data, size);
 }
 } // namespace OHOS
 
