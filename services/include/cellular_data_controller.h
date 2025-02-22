@@ -60,6 +60,8 @@ public:
     bool ReleaseCellularDataConnection() const;
     bool UpdateNetworkInfo();
     bool IsSupportDunApn();
+    bool GetDefaultActReportInfo(ApnActivateReportInfo &info);
+    bool GetInternalActReportInfo(ApnActivateReportInfo &info);
 
 private:
     void RegisterEvents();

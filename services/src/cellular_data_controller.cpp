@@ -501,5 +501,33 @@ bool CellularDataController::IsSupportDunApn()
     return cellularDataHandler_->IsSupportDunApn();
 }
 
+bool CellularDataController::GetDefaultActReportInfo(ApnActivateReportInfo &info)
+{
+    if (cellularDataHandler_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler is null", slotId_);
+        return false;
+    }
+    ApnActivateReportInfo reportInfo = cellularDataHandler_->GetDefaultActReportInfo();
+    info.actTimes = reportInfo.actTimes;
+    info.averDuration = reportInfo.averDuration;
+    info.topReason = reportInfo.topReason;
+    info.actSuccTimes = reportInfo.actSuccTimes;
+    return true;
+}
+
+bool CellularDataController::GetInternalActReportInfo(ApnActivateReportInfo &info)
+{
+    if (cellularDataHandler_ == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler is null", slotId_);
+        return false;
+    }
+    ApnActivateReportInfo reportInfo = cellularDataHandler_->GetInternalActReportInfo();
+    info.actTimes = reportInfo.actTimes;
+    info.averDuration = reportInfo.averDuration;
+    info.topReason = reportInfo.topReason;
+    info.actSuccTimes = reportInfo.actSuccTimes;
+    return true;
+}
+
 } // namespace Telephony
 } // namespace OHOS

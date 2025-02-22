@@ -179,6 +179,10 @@ public:
 
     int32_t GetIfSupportDunApn(bool &isSupportDun);
 
+    int32_t GetDefaultActReportInfo(int32_t slotId, ApnActivateReportInfo &info);
+
+    int32_t GetInternalActReportInfo(int32_t slotId, ApnActivateReportInfo &info);
+
 private:
     static inline BrokerDelegator<CellularDataServiceProxy> delegator_;
 };

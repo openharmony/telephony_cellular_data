@@ -480,5 +480,37 @@ int32_t CellularDataServiceStub::OnIsSupportDunApn(MessageParcel &data, MessageP
     }
     return result;
 }
+
+int32_t CellularDataServiceStub::OnGetDefaultActReportInfo(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    ApnActivateReportInfo info;
+    int32_t result = GetDefaultActReportInfo(slotId, info);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnGetDefaultActReportInfo write int32 reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    reply.WriteInt32(info.actTimes);
+    reply.WriteInt32(info.averDuration);
+    reply.WriteInt32(info.topReason);
+    reply.WriteInt32(info.actSuccTimes);
+    return result;
+}
+
+int32_t CellularDataServiceStub::OnGetInternalActReportInfo(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    ApnActivateReportInfo info;
+    int32_t result = GetInternalActReportInfo(slotId, info);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnGetInternalActReportInfo write int32 reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    reply.WriteInt32(info.actTimes);
+    reply.WriteInt32(info.averDuration);
+    reply.WriteInt32(info.topReason);
+    reply.WriteInt32(info.actSuccTimes);
+    return result;
+}
 } // namespace Telephony
 } // namespace OHOS

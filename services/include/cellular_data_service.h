@@ -91,6 +91,8 @@ public:
     int32_t CorrectNetSupplierNoAvailable(int32_t slotId) override;
     int32_t GetSupplierRegisterState(uint32_t supplierId, int32_t &regState) override;
     int32_t GetIfSupportDunApn(bool &isSupportDun) override;
+    int32_t GetDefaultActReportInfo(int32_t slotId, ApnActivateReportInfo &info) override;
+    int32_t GetInternalActReportInfo(int32_t slotId, ApnActivateReportInfo &info) override;
 
 private:
     bool Init();

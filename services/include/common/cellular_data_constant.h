@@ -318,6 +318,7 @@ static const int32_t INVALID_SIM_ID = 0;
 static const int32_t INVALID_SLOT_ID = -1;
 static const int32_t CELLULAR_DATA_VSIM_SLOT_ID = 2;
 static const int32_t SUPPLIER_INVALID_REG_STATE = -1;
+static const int32_t MAX_SLOT_NUM = 2;
 static constexpr const char *PROTOCOL_IPV4 = "IP";
 static constexpr const char *PROTOCOL_IPV6 = "IPV6";
 static constexpr const char *PROTOCOL_IPV4V6 = "IPV4V6";
