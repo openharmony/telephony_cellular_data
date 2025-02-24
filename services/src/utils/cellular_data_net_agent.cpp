@@ -26,9 +26,13 @@
 namespace OHOS {
 namespace Telephony {
 using namespace NetManagerStandard;
+namespace {
+constexpr int32_t MAX_CAPABILITY_SIZE = 13;
+}
 
 CellularDataNetAgent::CellularDataNetAgent()
 {
+    netSuppliers_.resize(CoreManagerInner::GetInstance().GetMaxSimCount() * MAX_CAPABILITY_SIZE);
     callBack_ = std::make_unique<NetManagerCallBack>().release();
     tacticsCallBack_ = std::make_unique<NetManagerTacticsCallBack>().release();
     if (callBack_ == nullptr || tacticsCallBack_ == nullptr) {
