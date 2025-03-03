@@ -1576,7 +1576,8 @@ void CellularDataHandler::HandleEstablishAllApnsIfConnectable(const AppExecFwk::
 void CellularDataHandler::HandleSimAccountLoaded()
 {
     CellularDataNetAgent::GetInstance().UnregisterNetSupplierForSimUpdate(slotId_);
-    if (!CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_)) {
+    bool registerRes = CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
+    if (!registerRes) {
         TELEPHONY_LOGE("Slot%{public}d register supplierid fail", slotId_);
     }
     if (slotId_ == 0) {
@@ -1592,6 +1593,9 @@ void CellularDataHandler::HandleSimAccountLoaded()
     CreateApnItem();
     if (defSlotId == slotId_) {
         EstablishAllApnsIfConnectable();
+        if (registerRes) {
+            UpdateNetworkInfo();
+        }
     } else {
         ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
     }
