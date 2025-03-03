@@ -1593,7 +1593,8 @@ void CellularDataHandler::HandleSimAccountLoaded()
     CreateApnItem();
     if (defSlotId == slotId_) {
         EstablishAllApnsIfConnectable();
-        if (registerRes) {
+        ApnProfileState apnState = apnManager_->GetOverallApnState();
+        if (registerRes && apnState == ApnProfileState::PROFILE_STATE_CONNECTED) {
             UpdateNetworkInfo();
         }
     } else {
