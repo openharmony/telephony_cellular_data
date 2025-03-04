@@ -519,6 +519,10 @@ sptr<ApnItem> ApnManager::GetRilAttachApn()
         TELEPHONY_LOGE("apn item is null");
         return nullptr;
     }
+    if (preferId_ != INVALID_PROFILE_ID) {
+        TELEPHONY_LOGI("GetRilAttachApn use prefer apn");
+        return allApnItem_[0];
+    }
     sptr<ApnItem> attachApn = nullptr;
     for (const sptr<ApnItem> &apnItem : allApnItem_) {
         if (apnItem->CanDealWithType(DATA_CONTEXT_ROLE_IA)) {
