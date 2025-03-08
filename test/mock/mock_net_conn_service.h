@@ -59,7 +59,8 @@ public:
     MOCK_METHOD(int32_t, GetAddressesByName, (const std::string &host, int32_t netId, std::vector<INetAddr> &addrList));
     MOCK_METHOD(int32_t, GetAddressByName, (const std::string &host, int32_t netId, INetAddr &addr));
     MOCK_METHOD(int32_t, GetSpecificNet, (NetBearType bearerType, std::list<int32_t> &netIdList));
-    MOCK_METHOD(int32_t, GetSpecificNetByIdent, (NetBearType bearerType, const std::string &ident, std::list<int32_t> &netIdList));
+    MOCK_METHOD(int32_t, GetSpecificNetByIdent,
+        (NetBearType bearerType, const std::string &ident, std::list<int32_t> &netIdList));
     MOCK_METHOD(int32_t, GetAllNets, (std::list<int32_t> & netIdList));
     MOCK_METHOD(int32_t, GetSpecificUidNet, (int32_t uid, int32_t &netId));
     MOCK_METHOD(int32_t, GetConnectionProperties, (int32_t netId, NetLinkInfo &info));
