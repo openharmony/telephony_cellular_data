@@ -242,7 +242,7 @@ ohos_static_library("tel_cellular_data_static") {
       defined(global_parts_info.communication_netmanager_enhanced)) {
     defines += [ "OHOS_BUILD_ENABLE_DATA_SERVICE_EXT" ]
   }
-  
+
   cflags_cc = [
     "-O2",
     "-D_FORTIFY_SOURCE=2",
