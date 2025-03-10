@@ -358,7 +358,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_004, Function | MediumTest | 
  */
 HWTEST_F(BranchTest, Telephony_CellularDataHandler_005, Function | MediumTest | Level1)
 {
-    CellularDataController controller{0};
+    CellularDataController controller { 0 };
     controller.Init();
     ASSERT_FALSE(controller.cellularDataHandler_ == nullptr);
     auto event = AppExecFwk::InnerEvent::Get(0);
