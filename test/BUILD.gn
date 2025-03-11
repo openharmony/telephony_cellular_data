@@ -37,7 +37,7 @@ ohos_unittest("tel_cellular_data_test") {
   ]
 
   deps = [
-    "$SOURCE_DIR:tel_cellular_data",
+    "$SOURCE_DIR:tel_cellular_data_static",
     "$SOURCE_DIR/frameworks/native:tel_cellular_data_api",
   ]
 
@@ -100,7 +100,7 @@ ohos_unittest("tel_cellular_state_machine_test") {
   ]
 
   deps = [
-    "$SOURCE_DIR:tel_cellular_data",
+    "$SOURCE_DIR:tel_cellular_data_static",
     "$SOURCE_DIR/frameworks/native:tel_cellular_data_api",
     "//third_party/googletest:gmock_main",
   ]
@@ -163,7 +163,7 @@ ohos_unittest("tel_cellular_state_branch_test") {
   ]
 
   deps = [
-    "$SOURCE_DIR:tel_cellular_data",
+    "$SOURCE_DIR:tel_cellular_data_static",
     "$SOURCE_DIR/frameworks/native:tel_cellular_data_api",
   ]
 
@@ -226,7 +226,7 @@ ohos_unittest("tel_cellular_data_client_test") {
   ]
 
   deps = [
-    "$SOURCE_DIR:tel_cellular_data",
+    "$SOURCE_DIR:tel_cellular_data_static",
     "$SOURCE_DIR/frameworks/native:tel_cellular_data_api",
   ]
 
@@ -292,7 +292,7 @@ ohos_unittest("tel_cellular_data_traffic_test") {
   ]
 
   deps = [
-    "$SOURCE_DIR:tel_cellular_data",
+    "$SOURCE_DIR:tel_cellular_data_static",
     "$SOURCE_DIR/frameworks/native:tel_cellular_data_api",
     "//third_party/googletest:gmock_main",
   ]
