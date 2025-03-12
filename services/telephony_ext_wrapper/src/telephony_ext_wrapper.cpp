@@ -98,6 +98,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForVSim()
     createAllApnItemExt_ = (CREATE_ALL_APN_ITEM_EXT) dlsym(telephonyVSimWrapperHandle_, "CreateAllApnItemExt");
     isCardAllowData_ = (IS_CARD_ALLOW_DATA) dlsym(telephonyVSimWrapperHandle_, "IsCardAllowData");
     isVSimEnabled_ = (IS_VSIM_ENABLED) dlsym(telephonyVSimWrapperHandle_, "IsVSimEnabled");
+    isVSimInDisableProcess_ = (IS_VSIM_ENABLED) dlsym(telephonyVSimWrapperHandle_, "IsVSimInDisableProcess");
 
     bool hasFuncNull = (getVSimSlotId_ == nullptr || createAllApnItemExt_ == nullptr || isCardAllowData_ == nullptr ||
         isVSimEnabled_ == nullptr);
