@@ -542,7 +542,8 @@ bool CellularDataHandler::CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder)
     }
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     if (slotId_ != CELLULAR_DATA_VSIM_SLOT_ID && !apnHolder->IsMmsType() &&
-        TELEPHONY_EXT_WRAPPER.isVSimEnabled_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_()) {
+        TELEPHONY_EXT_WRAPPER.isVSimEnabled_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_() &&
+        TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_ && !TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_()) {
         TELEPHONY_LOGE("slot%{public}d, VSimEnabled & not mms type, ret false", slotId_);
         return false;
     }
@@ -1156,7 +1157,8 @@ bool CellularDataHandler::IsSimRequestNetOnVSimEnabled(int32_t reqType, bool isM
 {
     if (reqType == TYPE_REQUEST_NET) {
         if (slotId_ != CELLULAR_DATA_VSIM_SLOT_ID &&
-            TELEPHONY_EXT_WRAPPER.isVSimEnabled_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_() && !isMmsType) {
+            TELEPHONY_EXT_WRAPPER.isVSimEnabled_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_() && !isMmsType &&
+            TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_ && !TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_()) {
             TELEPHONY_LOGE("Slot%{public}d, VSimEnabled & not mms type", slotId_);
             return true;
         }
