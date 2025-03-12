@@ -40,6 +40,7 @@ public:
     typedef bool (*CREATE_ALL_APN_ITEM_EXT)(int32_t slotId, sptr<ApnItem> &apnItem);
     typedef bool (*IS_CARD_ALLOW_DATA)(int32_t simId, int32_t capability);
     typedef bool (*IS_VSIM_ENABLED)(void);
+    typedef bool (*IS_VSIM_IN_DISABLE_PROCESS)(void);
     /* add for vsim end */
     typedef void (*SEND_DATA_SWITCH_CHANGE_INFO)(const char*, bool);
     typedef bool (*IS_ALL_CELLULAR_DATA_ALLOWED)(
@@ -56,6 +57,7 @@ public:
     CREATE_ALL_APN_ITEM_EXT createAllApnItemExt_ = nullptr;
     IS_CARD_ALLOW_DATA isCardAllowData_ = nullptr;
     IS_VSIM_ENABLED isVSimEnabled_ = nullptr;
+    IS_VSIM_IN_DISABLE_PROCESS isVSimInDisableProcess_ = nullptr;
     SEND_DATA_SWITCH_CHANGE_INFO sendDataSwitchChangeInfo_ = nullptr;
     IS_ALL_CELLULAR_DATA_ALLOWED isAllCellularDataAllowed_ = nullptr;
     IS_DUAL_CELLULAR_CARD_ALLOWED isDualCellularCardAllowed_ = nullptr;
