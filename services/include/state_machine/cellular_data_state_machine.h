@@ -71,6 +71,7 @@ public:
     void UpdateReuseApnNetworkInfo(bool isAvailable);
     void SetReuseApnCap(uint64_t cap);
     uint64_t GetReuseApnCap() const;
+    void SetIfReuseSupplierId(bool isReused);
 
 protected:
     sptr<State> activeState_;

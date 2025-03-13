@@ -748,7 +748,8 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
         return false;
     }
     std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine = nullptr;
-    if (apnHolder->GetApnType() != DATA_CONTEXT_ROLE_DUN) {
+    if ((apnHolder->GetApnType() != DATA_CONTEXT_ROLE_DEFAULT) &&
+        (apnHolder->GetApnType() != DATA_CONTEXT_ROLE_INTERNAL_DEFAULT)) {
         cellularDataStateMachine = CheckForCompatibleDataConnection(apnHolder);
         if (cellularDataStateMachine != nullptr) {
             sptr<ApnItem> dcApnItem = cellularDataStateMachine->GetApnItem();
@@ -819,7 +820,7 @@ bool CellularDataHandler::HandleCompatibleDataConnection(
     if (stateMachine->IsActiveState()) {
         TELEPHONY_LOGI("set reuse apnId[%{public}d] for apnId[%{public}d]", newApnId, oldApnId);
         stateMachine->SetReuseApnCap(apnHolder->GetCapability());
-        stateMachine->UpdateReuseApnNetworkInfo(true);
+        stateMachine->SetIfReuseSupplierId(true);
         return true;
     }
     SendEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, newApnId, ESTABLISH_DATA_CONNECTION_DELAY);
@@ -884,7 +885,10 @@ void CellularDataHandler::DataConnCompleteUpdateState(const sptr<ApnHolder> &apn
         incallDataStateMachine_->SendEvent(incallEvent);
     }
     UpdateCellularDataConnectState(apnHolder->GetApnType());
-    UpdateApnInfo(apnHolder->GetCurrentApn()->attr_.profileId_);
+    if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DEFAULT) {
+        TELEPHONY_LOGI("update default apn info");
+        UpdateApnInfo(apnHolder->GetCurrentApn()->attr_.profileId_);
+    }
     if (apnHolder->IsMmsType()) {
         RemoveEvent(CellularDataEventCode::MSG_RESUME_DATA_PERMITTED_TIMEOUT);
     }
@@ -947,8 +951,6 @@ void CellularDataHandler::UpdateApnInfo(const int32_t profileId)
     int32_t profileIdValue = 0;
     if (!GetCurrentDataShareApnInfo(dataShareHelper, simId, profileIdValue)) {
         TELEPHONY_LOGE("GetCurrentDataShareApnInfo fail.");
-        dataShareHelper->Release();
-        return;
     }
     if (profileIdValue != profileId) {
         DataShare::DataSharePredicates predicates;
@@ -1648,7 +1650,7 @@ void CellularDataHandler::HandleApnChanged(const InnerEvent::Pointer &event)
     }
     CreateApnItem();
     SetRilAttachApn();
-    ClearConnectionsOnUpdateApns(DisConnectionReason::REASON_RETRY_CONNECTION);
+    ClearConnectionsOnUpdateApns(DisConnectionReason::REASON_CLEAR_CONNECTION);
     apnManager_->ClearAllApnBad();
     for (const sptr<ApnHolder> &apnHolder : apnManager_->GetAllApnHolder()) {
         if (apnHolder == nullptr) {
@@ -2440,14 +2442,18 @@ std::shared_ptr<CellularDataStateMachine> CellularDataHandler::CheckForCompatibl
     sptr<ApnHolder> &apnHolder)
 {
     std::shared_ptr<CellularDataStateMachine> potentialDc = nullptr;
-    if (apnManager_ == nullptr || connectionManager_ == nullptr ||
-        apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DEFAULT ||
-        apnHolder->GetApnType() == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) {
+    if (apnManager_ == nullptr || connectionManager_ == nullptr) {
         return potentialDc;
     }
     std::vector<sptr<ApnItem>> dunApnList;
     if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DUN) {
         apnManager_->FetchDunApns(dunApnList, slotId_);
+    } else if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_BIP) {
+        sptr<ApnItem> bipApn = nullptr;
+        apnManager_->GetBipApnItem(bipApn);
+        if (bipApn != nullptr) {
+            return potentialDc;
+        }
     }
     auto allDCs = connectionManager_->GetAllConnectionMachine();
     bool isRoaming = false;
