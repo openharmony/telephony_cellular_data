@@ -2340,8 +2340,10 @@ void CellularDataHandler::OnRilAdapterHostDied(const AppExecFwk::InnerEvent::Poi
     TELEPHONY_LOGI("Slot%{public}d: receive event", slotId_);
     std::vector<std::shared_ptr<CellularDataStateMachine>> stateMachines =
         connectionManager_->GetAllConnectionMachine();
+    std::shared_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_shared<SetupDataCallResultInfo>();
     for (const std::shared_ptr<CellularDataStateMachine> &cellularDataStateMachine : stateMachines) {
-        InnerEvent::Pointer eventCode = InnerEvent::Get(CellularDataEventCode::MSG_SM_RIL_ADAPTER_HOST_DIED);
+        InnerEvent::Pointer eventCode =
+            InnerEvent::Get(CellularDataEventCode::MSG_SM_RIL_ADAPTER_HOST_DIED, setupDataCallResultInfo);
         cellularDataStateMachine->SendEvent(eventCode);
     }
 }
