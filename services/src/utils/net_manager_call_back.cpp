@@ -36,6 +36,7 @@ int32_t NetManagerCallBack::RequestNetwork(const std::string &ident,
     }
     request.ident = ident;
     request.registerType = netrequest.registerType;
+    request.uid = netrequest.uid;
     for (const auto &netBearType : netrequest.bearTypes) {
         request.bearTypes |= 1L << netBearType;
     }
