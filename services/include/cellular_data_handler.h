@@ -97,7 +97,6 @@ private:
     void AttemptEstablishDataConnection(sptr<ApnHolder> &apnHolder);
     bool EstablishDataConnection(sptr<ApnHolder> &apnHolder, int32_t radioTech);
     void RadioPsConnectionAttached(const AppExecFwk::InnerEvent::Pointer &event);
-    void RadioPsConnectionDetached(const AppExecFwk::InnerEvent::Pointer &event);
     void RoamingStateOn(const AppExecFwk::InnerEvent::Pointer &event);
     void RoamingStateOff(const AppExecFwk::InnerEvent::Pointer &event);
     void PsRadioEmergencyStateOpen(const AppExecFwk::InnerEvent::Pointer &event);
@@ -224,8 +223,6 @@ private:
     std::map<uint32_t, Fun> eventIdMap_ {
         { RadioEvent::RADIO_PS_CONNECTION_ATTACHED,
             [this](const AppExecFwk::InnerEvent::Pointer &event) { RadioPsConnectionAttached(event); } },
-        { RadioEvent::RADIO_PS_CONNECTION_DETACHED,
-            [this](const AppExecFwk::InnerEvent::Pointer &event) { RadioPsConnectionDetached(event); } },
         { RadioEvent::RADIO_PS_ROAMING_OPEN,
             [this](const AppExecFwk::InnerEvent::Pointer &event) { RoamingStateOn(event); } },
         { RadioEvent::RADIO_PS_ROAMING_CLOSE,

@@ -378,16 +378,6 @@ void CellularDataHandler::RadioPsConnectionAttached(const InnerEvent::Pointer &e
     EstablishAllApnsIfConnectable();
 }
 
-void CellularDataHandler::RadioPsConnectionDetached(const InnerEvent::Pointer &event)
-{
-    TELEPHONY_LOGI("Slot%{public}d: ps detached", slotId_);
-    if (event == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: event is null", slotId_);
-        return;
-    }
-    ClearAllConnections(DisConnectionReason::REASON_RETRY_CONNECTION);
-}
-
 void CellularDataHandler::RoamingStateOn(const InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("Slot%{public}d: roaming on", slotId_);
@@ -471,6 +461,7 @@ void CellularDataHandler::EstablishAllApnsIfConnectable()
             continue;
         }
         if (apnHolder->IsDataCallEnabled()) {
+            UpdateCellularDataConnectState(apnHolder->GetApnType());
             ApnProfileState apnState = apnHolder->GetApnState();
             if (apnState == PROFILE_STATE_FAILED || apnState == PROFILE_STATE_RETRYING) {
                 apnHolder->ReleaseDataConnection();

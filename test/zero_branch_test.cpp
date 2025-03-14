@@ -209,7 +209,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | 
     sptr<ApnHolder> apnHolder;
     ApnItem::Attribute apnAttr;
     cellularDataHandler.RadioPsConnectionAttached(event);
-    cellularDataHandler.RadioPsConnectionDetached(event);
     cellularDataHandler.RoamingStateOn(event);
     cellularDataHandler.RoamingStateOff(event);
     cellularDataHandler.EstablishDataConnectionComplete(event);
@@ -363,7 +362,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_005, Function | MediumTest | 
     ASSERT_FALSE(controller.cellularDataHandler_ == nullptr);
     auto event = AppExecFwk::InnerEvent::Get(0);
     controller.cellularDataHandler_->RadioPsConnectionAttached(event);
-    controller.cellularDataHandler_->RadioPsConnectionDetached(event);
     controller.cellularDataHandler_->RoamingStateOn(event);
     controller.cellularDataHandler_->RoamingStateOff(event);
     controller.cellularDataHandler_->MsgEstablishDataConnection(event);
