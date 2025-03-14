@@ -105,6 +105,7 @@ bool CellularDataHandler::RequestNet(const NetRequest &request)
     netRequest->ident = request.ident;
     netRequest->registerType = request.registerType;
     netRequest->bearTypes = request.bearTypes;
+    netRequest->uid = request.uid;
     AppExecFwk::InnerEvent::Pointer event =
         InnerEvent::Get(CellularDataEventCode::MSG_REQUEST_NETWORK, netRequest, TYPE_REQUEST_NET);
     return SendEvent(event);
