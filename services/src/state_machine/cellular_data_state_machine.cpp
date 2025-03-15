@@ -361,7 +361,6 @@ void CellularDataStateMachine::UpdateNetworkInfo(const SetupDataCallResultInfo &
     if (netSupplierInfo_->isAvailable_) {
         netAgent.UpdateNetLinkInfo(supplierId, netLinkInfo_);
     }
-    UpdateReuseApnNetworkInfo(netSupplierInfo_->isAvailable_);
 }
 
 void CellularDataStateMachine::UpdateNetworkInfo()
@@ -378,30 +377,20 @@ void CellularDataStateMachine::UpdateNetworkInfo()
     if (netSupplierInfo_->isAvailable_) {
         netAgent.UpdateNetLinkInfo(supplierId, netLinkInfo_);
     }
-    UpdateReuseApnNetworkInfo(netSupplierInfo_->isAvailable_);
 }
 
-void CellularDataStateMachine::UpdateReuseApnNetworkInfo(bool isAvailable)
+void CellularDataStateMachine::SetIfReuseSupplierId(bool isReused)
 {
     if (reuseApnCap_ == NetManagerStandard::NetCap::NET_CAPABILITY_END) {
         return;
     }
-    TELEPHONY_LOGI("UpdateReuseApnNetworkInfo: cap[%{public}d], avail[%{public}d]", static_cast<int32_t>(reuseApnCap_),
-        isAvailable);
-    std::lock_guard<std::mutex> guard(mtx_);
     int32_t slotId = GetSlotId();
     CellularDataNetAgent &netAgent = CellularDataNetAgent::GetInstance();
-    bool oldIsAvailable = netSupplierInfo_->isAvailable_;
-    netSupplierInfo_->isAvailable_ = isAvailable;
-    netLinkInfo_->tcpBufferSizes_ = tcpBuffer_;
-    netSupplierInfo_->linkUpBandwidthKbps_ = upBandwidth_;
-    netSupplierInfo_->linkDownBandwidthKbps_ = downBandwidth_;
-    int32_t supplierId = netAgent.GetSupplierId(slotId, reuseApnCap_);
-    netAgent.UpdateNetSupplierInfo(supplierId, netSupplierInfo_);
-    if (isAvailable) {
-        netAgent.UpdateNetLinkInfo(supplierId, netLinkInfo_);
-    }
-    netSupplierInfo_->isAvailable_ = oldIsAvailable;
+    int32_t supplierId = netAgent.GetSupplierId(slotId, capability_);
+    int32_t reuseSupplierId = netAgent.GetSupplierId(slotId, reuseApnCap_);
+    TELEPHONY_LOGI("SetIfReuseSupplierId: cap[%{public}d], reuseCap[%{public}d], reuse[%{public}d]",
+        static_cast<int32_t>(capability_), static_cast<int32_t>(reuseApnCap_), isReused);
+    netAgent.SetReuseSupplierId(supplierId, reuseSupplierId, isReused);
 }
 
 void CellularDataStateMachine::ResolveIp(std::vector<AddressInfo> &ipInfoArray)

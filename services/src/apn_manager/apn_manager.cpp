@@ -568,19 +568,17 @@ bool ApnManager::ResetApns(int32_t slotId)
 
 void ApnManager::FetchBipApns(std::vector<sptr<ApnItem>> &matchApnItemList)
 {
-    sptr<ApnItem> defaultApn = nullptr;
+    sptr<ApnItem> bipApn = nullptr;
+    GetBipApnItem(bipApn);
+    if (bipApn != nullptr) {
+        matchApnItemList.push_back(bipApn);
+        return;
+    }
     for (const sptr<ApnItem> &apnItem : allApnItem_) {
         if (apnItem->CanDealWithType(DATA_CONTEXT_ROLE_BIP)) {
             matchApnItemList.push_back(apnItem);
             return;
         }
-        if (apnItem->CanDealWithType(DATA_CONTEXT_ROLE_DEFAULT)) {
-            defaultApn = apnItem;
-        }
-    }
-
-    if (defaultApn != nullptr) {
-        matchApnItemList.push_back(defaultApn);
     }
 }
 
@@ -659,6 +657,8 @@ void ApnManager::MergePdpProfile(PdpProfile &newProfile, PdpProfile &oldProfile)
         newProfile.pdpProtocol : oldProfile.pdpProtocol;
     newProfile.roamPdpProtocol = (newProfile.roamPdpProtocol == PROTOCOL_IPV4V6) ?
         newProfile.roamPdpProtocol : oldProfile.roamPdpProtocol;
+    newProfile.homeUrl = newProfile.homeUrl.empty() ? oldProfile.homeUrl : newProfile.homeUrl;
+    newProfile.mmsIpAddress = newProfile.mmsIpAddress.empty() ? oldProfile.mmsIpAddress : newProfile.mmsIpAddress;
     if (preferId_ == oldProfile.profileId) {
         TELEPHONY_LOGI("preferId change from %{public}d to %{public}d", oldProfile.profileId, newProfile.profileId);
         preferId_ = newProfile.profileId;
@@ -688,6 +688,18 @@ uint64_t ApnManager::FindCapabilityByApnId(int32_t apnId)
             return NetManagerStandard::NetCap::NET_CAPABILITY_BIP;
         default:
             return NetManagerStandard::NetCap::NET_CAPABILITY_END;
+    }
+}
+
+void ApnManager::GetBipApnItem(sptr<ApnItem> &bipApn)
+{
+    for (const sptr<ApnItem> &apnItem : allApnItem_) {
+        for (auto apnType : apnItem->GetApnTypes()) {
+            if (apnType == DATA_CONTEXT_ROLE_BIP) {
+                bipApn = apnItem;
+                return;
+            }
+        }
     }
 }
 }  // namespace Telephony

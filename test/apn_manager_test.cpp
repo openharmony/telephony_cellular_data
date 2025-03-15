@@ -1333,5 +1333,64 @@ HWTEST_F(ApnManagerTest, ApnManager_TryMergeSimilarPdpProfile_002, TestSize.Leve
     EXPECT_EQ(actual, expected);
 }
 
+/**
+ * @tc.name  : ApnItem_IsSimilarProperty_001
+ * @tc.number: ApnItemTest_006
+ */
+HWTEST_F(ApnManagerTest, ApnItem_IsSimilarProperty_001, TestSize.Level0)
+{
+    std::string newProtocol;
+    std::string oldProtocol;
+    EXPECT_TRUE(ApnItem::IsSimilarProperty(newProtocol, oldProtocol));
+    newProtocol = "IPV4V6";
+    oldProtocol = "IPV4V6";
+    EXPECT_TRUE(ApnItem::IsSimilarProperty(newProtocol, oldProtocol));
+    newProtocol = "";
+    oldProtocol = "IPV6";
+    EXPECT_TRUE(ApnItem::IsSimilarProperty(newProtocol, oldProtocol));
+    newProtocol = "IP";
+    oldProtocol = "";
+    EXPECT_TRUE(ApnItem::IsSimilarProperty(newProtocol, oldProtocol));
+    newProtocol = "IP";
+    oldProtocol = "IPV6";
+    EXPECT_FALSE(ApnItem::IsSimilarProperty(newProtocol, oldProtocol));
+}
+ 
+/**
+ * @tc.name  : ApnItem_CanDealWithType_005
+ * @tc.number: ApnItemTest_004
+ * @tc.desc  : Test when the type does not match with the apnTypes_ then CanDealWithType returns false
+ */
+HWTEST_F(ApnManagerTest, ApnItem_CanDealWithType_005, TestSize.Level0)
+{
+    ApnItem apnItem;
+    apnItem.apnTypes_.push_back("default");
+    EXPECT_TRUE(apnItem.CanDealWithType("bip"));
+}
+ 
+/**
+ * @tc.number   FetchBipApns_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, FetchBipApns_001, TestSize.Level0)
+{
+    sptr<ApnItem> defaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
+    apnManager->allApnItem_.push_back(defaultApnItem);
+    std::vector<sptr<ApnItem>> bipApnList;
+    apnManager->FetchBipApns(bipApnList);
+    sptr<ApnItem> bipApn = nullptr;
+    apnManager->GetBipApnItem(bipApn);
+    EXPECT_GE(bipApnList.size(), 0);
+    EXPECT_EQ(bipApn, nullptr);
+    sptr<ApnItem> bipApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_BIP);
+    apnManager->allApnItem_.push_back(bipApnItem);
+    bipApnList.clear();
+    apnManager->FetchBipApns(bipApnList);
+    apnManager->GetBipApnItem(bipApn);
+    EXPECT_GE(bipApnList.size(), 0);
+    EXPECT_NE(bipApn, nullptr);
+}
+
 } // namespace Telephony
 } // namespace OHOS

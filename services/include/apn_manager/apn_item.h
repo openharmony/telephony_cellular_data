@@ -51,6 +51,10 @@ public:
     static sptr<ApnItem> MakeDefaultApn(const std::string &apnType);
     static sptr<ApnItem> MakeApn(const PdpProfile &apnData);
     static bool IsSimilarPdpProfile(const PdpProfile &newPdpProfile, const PdpProfile &oldPdpProfile);
+    static inline bool IsSimilarProperty(const std::string &newProp, const std::string &oldProp)
+    {
+        return (newProp == oldProp) || (newProp.empty()) || (oldProp.empty());
+    }
 
 private:
     static sptr<ApnItem> BuildOtherApnAttributes(sptr<ApnItem> &apnItem, const PdpProfile &apnData);

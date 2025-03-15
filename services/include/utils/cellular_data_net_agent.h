@@ -82,6 +82,14 @@ public:
     void UpdateNetLinkInfo(int32_t supplierId, sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo);
 
     /**
+     * Set reused supplier id
+     * @param supplierId network unique identity id returned after network registration
+     * @param reuseSupplierId network identity id to be reused
+     * @param isReused whether to be reused or removed
+     */
+    void SetReuseSupplierId(int32_t supplierId, int32_t reuseSupplierId, bool isReused);
+
+    /**
      * Collect all network
      *
      * @param netSupplier a specific network

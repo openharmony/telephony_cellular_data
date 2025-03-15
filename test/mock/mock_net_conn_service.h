@@ -46,6 +46,7 @@ public:
     MOCK_METHOD(int32_t, UpdateNetStateForTest, (const sptr<NetSpecifier> &netSpecifier, int32_t netState));
     MOCK_METHOD(int32_t, UpdateNetSupplierInfo, (uint32_t supplierId, const sptr<NetSupplierInfo> &netSupplierInfo));
     MOCK_METHOD(int32_t, UpdateNetLinkInfo, (uint32_t supplierId, const sptr<NetLinkInfo> &netLinkInfo));
+    MOCK_METHOD(int32_t, SetReuseSupplierId, (uint32_t supplierId, uint32_t reuseSupplierId, bool isReused));
     MOCK_METHOD(int32_t, GetIfaceNames, (NetBearType bearerType, std::list<std::string> &ifaceNames));
     MOCK_METHOD(
         int32_t, GetIfaceNameByType, (NetBearType bearerType, const std::string &ident, std::string &ifaceName));

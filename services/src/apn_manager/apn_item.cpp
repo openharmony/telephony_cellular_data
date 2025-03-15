@@ -55,6 +55,9 @@ bool ApnItem::CanDealWithType(const std::string &type) const
         if ((type != DATA_CONTEXT_ROLE_IA) && (apnType == DATA_CONTEXT_ROLE_ALL)) {
             return true;
         }
+        if (type == DATA_CONTEXT_ROLE_BIP && apnType == DATA_CONTEXT_ROLE_DEFAULT) {
+            return true;
+        }
     }
     return false;
 }
@@ -160,7 +163,9 @@ bool ApnItem::IsSimilarPdpProfile(const PdpProfile &newPdpProfile, const PdpProf
         (newPdpProfile.proxyIpAddress == oldPdpProfile.proxyIpAddress) &&
         (newPdpProfile.mmsIpAddress == oldPdpProfile.mmsIpAddress) &&
         IsSimilarProtocol(newPdpProfile.pdpProtocol, oldPdpProfile.pdpProtocol) &&
-        IsSimilarProtocol(newPdpProfile.roamPdpProtocol, oldPdpProfile.roamPdpProtocol);
+        IsSimilarProtocol(newPdpProfile.roamPdpProtocol, oldPdpProfile.roamPdpProtocol) &&
+        IsSimilarProperty(newPdpProfile.homeUrl, oldPdpProfile.homeUrl) &&
+        IsSimilarProperty(newPdpProfile.mmsIpAddress, oldPdpProfile.mmsIpAddress);
 }
 
 bool ApnItem::IsSimilarProtocol(const std::string &newProtocol, const std::string &oldProtocol)

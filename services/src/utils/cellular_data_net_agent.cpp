@@ -216,5 +216,12 @@ bool CellularDataNetAgent::GetSupplierRegState(uint32_t supplierId, int32_t &reg
         return false;
     }
 }
+
+void CellularDataNetAgent::SetReuseSupplierId(int32_t supplierId, int32_t reuseSupplierId, bool isReused)
+{
+    int32_t result = NetConnClient::GetInstance().SetReuseSupplierId(supplierId, reuseSupplierId, isReused);
+    TELEPHONY_LOGI("result:%{public}d", result);
+}
+
 } // namespace Telephony
 } // namespace OHOS
