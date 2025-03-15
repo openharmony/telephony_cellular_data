@@ -333,14 +333,14 @@ int32_t CellularDataRdbHelper::GetSimId()
 }
 
 std::string CellularDataRdbHelper::GetOpKey(int slotId)
- {
+{
     std::string opkey;
     std::u16string opkeyU16;
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpKey(slotId, opkeyU16);
     opkey = Str16ToStr8(opkeyU16);
     TELEPHONY_LOGI("GetOpKey##slotId = %{public}d, opkey = %{public}s", slotId, opkey.c_str());
     return opkey;
- }
+}
 
 void CellularDataRdbHelper::QueryApnIds(const ApnInfo &apnInfo, std::vector<uint32_t> &apnIdList)
 {
