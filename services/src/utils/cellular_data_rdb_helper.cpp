@@ -17,6 +17,7 @@
 #include "cellular_data_hisysevent.h"
 #include "cellular_data_constant.h"
 #include "core_manager_inner.h"
+#include "core_service_client.h"
 #include "telephony_log_wrapper.h"
 
 static constexpr const char *SIM_ID = "simId";
@@ -313,6 +314,187 @@ void CellularDataRdbHelper::UnRegisterObserver(const sptr<AAFwk::IDataAbilityObs
     dataShareHelper->UnregisterObserver(cellularDataUri_, dataObserver);
     dataShareHelper->Release();
     TELEPHONY_LOGI("UnRegisterObserver Success");
+}
+
+int32_t CellularDataRdbHelper::GetSimId()
+{
+    int32_t slotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
+    if ((slotId < DEFAULT_SIM_SLOT_ID) || (slotId > SIM_SLOT_COUNT)) {
+        TELEPHONY_LOGE("slotId invalid slotId = %{public}d", slotId);
+        return -1;
+    }
+    int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
+    if (simId <= 0) {
+        TELEPHONY_LOGE("simId invalid simId = %{public}d", simId);
+        return -1;
+    }
+    TELEPHONY_LOGI("GetSimId simId = %{public}d", simId);
+    return simId;
+}
+
+std::string CellularDataRdbHelper::GetOpKey(int slotId)
+ {
+    std::string opkey;
+    std::u16string opkeyU16;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpKey(slotId, opkeyU16);
+    opkey = Str16ToStr8(opkeyU16);
+    TELEPHONY_LOGI("GetOpKey##slotId = %{public}d, opkey = %{public}s", slotId, opkey.c_str());
+    return opkey;
+ }
+
+void CellularDataRdbHelper::QueryApnIds(const ApnInfo &apnInfo, std::vector<uint32_t> &apnIdList)
+{
+    if (GetSimId() == -1) {
+        return;
+    }
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAbilityHelper();
+    if (dataShareHelper == nullptr) {
+        return;
+    }
+    std::vector<std::string> columns;
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(Telephony::PdpProfileData::PROFILE_NAME, Str16ToStr8(apnInfo.apnName));
+    predicates.EqualTo(Telephony::PdpProfileData::APN, Str16ToStr8(apnInfo.apn));
+    predicates.EqualTo(Telephony::PdpProfileData::MCC, Str16ToStr8(apnInfo.mcc));
+    predicates.EqualTo(Telephony::PdpProfileData::MNC, Str16ToStr8(apnInfo.mnc));
+    if (strcmp(NOT_FILLED_IN, (Str16ToStr8(apnInfo.user)).c_str()) != 0) {
+        predicates.EqualTo(Telephony::PdpProfileData::AUTH_USER, Str16ToStr8(apnInfo.user));
+    }
+    if (strcmp(NOT_FILLED_IN, (Str16ToStr8(apnInfo.type)).c_str()) != 0) {
+        predicates.EqualTo(Telephony::PdpProfileData::APN_TYPES, Str16ToStr8(apnInfo.type));
+    }
+    if (strcmp(NOT_FILLED_IN, (Str16ToStr8(apnInfo.proxy)).c_str()) != 0) {
+        predicates.EqualTo(Telephony::PdpProfileData::PROXY_IP_ADDRESS, Str16ToStr8(apnInfo.proxy));
+    }
+    if (strcmp(NOT_FILLED_IN, (Str16ToStr8(apnInfo.mmsproxy)).c_str()) != 0) {
+        predicates.EqualTo(Telephony::PdpProfileData::MMS_IP_ADDRESS, Str16ToStr8(apnInfo.mmsproxy));
+    }
+    std::string opkey = GetOpKey(CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId());
+    predicates.EqualTo(Telephony::PdpProfileData::OPKEY, opkey);
+    Uri cellularDataUri(std::string(CELLULAR_DATA_RDB_SELECTION) + "?Proxy=true&simId=" + std::to_string(GetSimId()));
+    std::shared_ptr<DataShare::DataShareResultSet> rst = dataShareHelper->Query(cellularDataUri, predicates, columns);
+    if (rst == nullptr) {
+        TELEPHONY_LOGE("QueryApnIds: query apns error");
+        dataShareHelper->Release();
+        return;
+    }
+    int rowCnt = 0;
+    rst->GetRowCount(rowCnt);
+    TELEPHONY_LOGI("QueryApnIds::query apns rowCnt = %{public}d, opkey= %{public}s", rowCnt, opkey.c_str());
+    for (int i = 0; i < rowCnt; ++i) {
+        int index = 0;
+        int profileId;
+        rst->GoToRow(i);
+        rst->GetColumnIndex(Telephony::PdpProfileData::PROFILE_ID, index);
+        rst->GetInt(index, profileId);
+        TELEPHONY_LOGI("profileId: %{public}d", profileId);
+        apnIdList.push_back(profileId);
+    }
+    rst->Close();
+    dataShareHelper->Release();
+}
+
+int32_t CellularDataRdbHelper::SetPreferApn(int32_t apnId)
+{
+    if (GetSimId() == -1) {
+        return -1;
+    }
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAbilityHelper();
+    if (dataShareHelper == nullptr) {
+        TELEPHONY_LOGE("SetPreferApn dataShareHelper is null");
+        return -1;
+    }
+    TELEPHONY_LOGI("SetPreferApn apnId:%{public}d", apnId);
+    DataShare::DataSharePredicates predicates;
+    DataShare::DataShareValuesBucket values;
+    double profileIdAsDouble = static_cast<double>(apnId);
+    double simIdAsDouble = static_cast<double>(GetSimId());
+    values.Put(PdpProfileData::PROFILE_ID, profileIdAsDouble);
+    values.Put(PdpProfileData::SIM_ID, simIdAsDouble);
+    Uri preferApnUri(CELLULAR_DATA_RDB_PREFER);
+    int32_t result = dataShareHelper->Update(preferApnUri, predicates, values);
+    if (result < TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("SetPreferApn fail! result:%{public}d", result);
+        dataShareHelper->Release();
+        return -1;
+    }
+    TELEPHONY_LOGI("SetPreferApn result:%{public}d", result);
+    dataShareHelper->Release();
+    return 0;
+}
+
+void CellularDataRdbHelper::GetApnInfo(ApnInfo &apnInfo,
+    int rowIndex, std::shared_ptr<DataShare::DataShareResultSet> result)
+{
+    int index = 0;
+    std::string apnName;
+    std::string apn;
+    std::string mcc;
+    std::string mnc;
+    std::string user;
+    std::string type;
+    std::string proxy;
+    std::string mmsproxy;
+    result->GoToRow(rowIndex);
+    result->GetColumnIndex(Telephony::PdpProfileData::PROFILE_NAME, index);
+    result->GetString(index, apnName);
+    result->GetColumnIndex(Telephony::PdpProfileData::APN, index);
+    result->GetString(index, apn);
+    result->GetColumnIndex(Telephony::PdpProfileData::MCC, index);
+    result->GetString(index, mcc);
+    result->GetColumnIndex(Telephony::PdpProfileData::MNC, index);
+    result->GetString(index, mnc);
+    result->GetColumnIndex(Telephony::PdpProfileData::AUTH_USER, index);
+    result->GetString(index, user);
+    result->GetColumnIndex(Telephony::PdpProfileData::APN_TYPES, index);
+    result->GetString(index, type);
+    result->GetColumnIndex(Telephony::PdpProfileData::PROXY_IP_ADDRESS, index);
+    result->GetString(index, proxy);
+    result->GetColumnIndex(Telephony::PdpProfileData::MMS_IP_ADDRESS, index);
+    result->GetString(index, mmsproxy);
+    apnInfo.apnName = Str8ToStr16(apnName);
+    apnInfo.apn = Str8ToStr16(apn);
+    apnInfo.mcc = Str8ToStr16(mcc);
+    apnInfo.mnc = Str8ToStr16(mnc);
+    apnInfo.user = Str8ToStr16(user);
+    apnInfo.type = Str8ToStr16(type);
+    apnInfo.proxy = Str8ToStr16(proxy);
+    apnInfo.mmsproxy = Str8ToStr16(mmsproxy);
+}
+
+void CellularDataRdbHelper::QueryAllApnInfo(std::vector<ApnInfo> &apnInfoList)
+{
+    TELEPHONY_LOGI("QueryAllApnInfo");
+    if (GetSimId() == -1) {
+        return;
+    }
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAbilityHelper();
+    if (dataShareHelper == nullptr) {
+        TELEPHONY_LOGE("QueryAllApnInfo dataShareHelper is null");
+        return;
+    }
+    std::vector<std::string> columns;
+    DataShare::DataSharePredicates predicates;
+    std::string opkey = GetOpKey(CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId());
+    predicates.EqualTo(Telephony::PdpProfileData::OPKEY, opkey);
+    Uri cellularDataUri(std::string(CELLULAR_DATA_RDB_SELECTION) + "?Proxy=true&simId=" + std::to_string(GetSimId()));
+    std::shared_ptr<DataShare::DataShareResultSet> result =
+        dataShareHelper->Query(cellularDataUri, predicates, columns);
+    if (result == nullptr) {
+        TELEPHONY_LOGE("QueryAllApnInfo error");
+        dataShareHelper->Release();
+        return;
+    }
+    int rowCnt = 0;
+    result->GetRowCount(rowCnt);
+    TELEPHONY_LOGI("QueryAllApnInfo rowCnt:%{public}d, simId:%{public}d,", rowCnt, GetSimId());
+    for (int i = 0; i < rowCnt; ++i) {
+        ApnInfo apnInfo;
+        GetApnInfo(apnInfo, i, result);
+        apnInfoList.push_back(apnInfo);
+    }
+    result->Close();
+    dataShareHelper->Release();
 }
 } // namespace Telephony
 } // namespace OHOS
