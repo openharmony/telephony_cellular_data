@@ -183,6 +183,12 @@ public:
 
     int32_t GetInternalActReportInfo(int32_t slotId, ApnActivateReportInfo &info);
 
+    int32_t QueryApnIds(ApnInfo apnInfo, std::vector<uint32_t> &apnIdList);
+
+    int32_t SetPreferApn(int32_t apnId);
+
+    int32_t QueryAllApnInfo(std::vector<ApnInfo> &apnInfoList);
+
 private:
     static inline BrokerDelegator<CellularDataServiceProxy> delegator_;
 };
