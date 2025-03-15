@@ -21,6 +21,7 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "securec.h"
+#include "string_ex.h"
 
 namespace OHOS {
 namespace Telephony {
