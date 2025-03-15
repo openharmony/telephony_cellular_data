@@ -167,9 +167,10 @@ int32_t CellularDataHandler::SetCellularDataEnable(bool userDataOn)
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     if (TELEPHONY_EXT_WRAPPER.sendDataSwitchChangeInfo_) {
         int32_t callingUid = IPCSkeleton::GetCallingUid();
+        int32_t callingPid = IPCSkeleton::GetCallingPid();
         std::string bundleName = "";
         TelephonyPermission::GetBundleNameByUid(callingUid, bundleName);
-        TELEPHONY_EXT_WRAPPER.sendDataSwitchChangeInfo_(bundleName.c_str(), userDataOn);
+        TELEPHONY_EXT_WRAPPER.sendDataSwitchChangeInfo_(bundleName.c_str(), callingPid, userDataOn);
     }
 #endif
     return dataSwitchSettings_->SetUserDataOn(userDataOn);

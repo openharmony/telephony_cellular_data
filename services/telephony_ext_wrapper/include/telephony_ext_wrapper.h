@@ -41,7 +41,7 @@ public:
     typedef bool (*IS_CARD_ALLOW_DATA)(int32_t simId, int32_t capability);
     typedef bool (*IS_VSIM_ENABLED)(void);
     /* add for vsim end */
-    typedef void (*SEND_DATA_SWITCH_CHANGE_INFO)(const char*, bool);
+    typedef void (*SEND_DATA_SWITCH_CHANGE_INFO)(const char*, int32_t, bool);
     typedef bool (*IS_ALL_CELLULAR_DATA_ALLOWED)(
         const NetRequest &, const HasSystemUse hasSystemUse);
     typedef bool (*IS_DUAL_CELLULAR_CARD_ALLOWED)();
