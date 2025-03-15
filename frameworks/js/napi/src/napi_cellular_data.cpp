@@ -1198,7 +1198,7 @@ void QueryApnIdsCallback(napi_env env, napi_status status, void *data)
     AsyncContext1<napi_value> &asyncContext = info->asyncContext;
     asyncContext.callbackVal = nullptr;
     napi_create_array(env, &asyncContext.callbackVal);
-    TELEPHONY_LOGI("QueryApnCallback info->apnIdList.size = %{public}u", info->apnIdList.size());
+    TELEPHONY_LOGI("QueryApnCallback info->apnIdList.size = %{public}zu", info->apnIdList.size());
     for (size_t i = 0; i < info->apnIdList.size(); i++) {
         napi_value val;
         napi_create_int32(env, info->apnIdList.at(i), &val);
@@ -1349,7 +1349,7 @@ void QueryAllApnCallback(napi_env env, napi_status status, void *data)
     AsyncContext1<napi_value> &asyncContext = info->asyncContext;
     asyncContext.callbackVal = nullptr;
     napi_create_array(env, &asyncContext.callbackVal);
-    TELEPHONY_LOGI("QueryAllApnCallback info->allApnInfoList.size = %{public}u", info->allApnInfoList.size());
+    TELEPHONY_LOGI("QueryAllApnCallback info->allApnInfoList.size = %{public}zu", info->allApnInfoList.size());
     for (size_t i = 0; i < info->allApnInfoList.size(); i++) {
         napi_value val = ApnInfoConversion(env, info->allApnInfoList.at(i));
         napi_set_element(env, asyncContext.callbackVal, i, val);
