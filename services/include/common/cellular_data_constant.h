@@ -322,6 +322,7 @@ static const int32_t MAX_SLOT_NUM = 2;
 static constexpr const char *PROTOCOL_IPV4 = "IP";
 static constexpr const char *PROTOCOL_IPV6 = "IPV6";
 static constexpr const char *PROTOCOL_IPV4V6 = "IPV4V6";
+static constexpr const char *NOT_FILLED_IN = "not-filled-in";
 } // namespace Telephony
 } // namespace OHOS
 #endif // CELLULAR_DATA_CONSTANT_H
