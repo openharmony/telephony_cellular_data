@@ -1297,32 +1297,32 @@ static napi_value SetPreferApn(napi_env env, napi_callback_info info)
         return nullptr;
     }
     auto asyncContext = std::make_unique<AsyncSetPreferApnContext>();
-     if (asyncContext == nullptr) {
-         TELEPHONY_LOGE("SetPreferApn asyncContext is nullptr.");
-         NapiUtil::ThrowParameterError(env);
-         return nullptr;
-     }
-     napi_get_value_int32(env, parameters[0], &asyncContext->apnId);
-     return NapiUtil::HandleAsyncWork(env, asyncContext.release(), "SetPreferApn",
-         NativeSetPreferApn, SetPreferApnCallback);
+    if (asyncContext == nullptr) {
+        TELEPHONY_LOGE("SetPreferApn asyncContext is nullptr.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    napi_get_value_int32(env, parameters[0], &asyncContext->apnId);
+    return NapiUtil::HandleAsyncWork(env, asyncContext.release(), "SetPreferApn",
+        NativeSetPreferApn, SetPreferApnCallback);
 }
 
 napi_value ApnInfoConversion(napi_env env, const ApnInfo &asyncQueryApnPara)
- {
-     napi_value val = nullptr;
-     napi_create_object(env, &val);
-     SetPropertyToNapiObject(env, val, "apnName", NapiUtil::ToUtf8(asyncQueryApnPara.apnName));
-     SetPropertyToNapiObject(env, val, "apn", NapiUtil::ToUtf8(asyncQueryApnPara.apn));
-     SetPropertyToNapiObject(env, val, "mcc", NapiUtil::ToUtf8(asyncQueryApnPara.mcc));
-     SetPropertyToNapiObject(env, val, "mnc", NapiUtil::ToUtf8(asyncQueryApnPara.mnc));
-     SetPropertyToNapiObject(env, val, "user", NapiUtil::ToUtf8(asyncQueryApnPara.user));
-     SetPropertyToNapiObject(env, val, "type", NapiUtil::ToUtf8(asyncQueryApnPara.type));
-     SetPropertyToNapiObject(env, val, "proxy", NapiUtil::ToUtf8(asyncQueryApnPara.proxy));
-     SetPropertyToNapiObject(env, val, "mmsproxy", NapiUtil::ToUtf8(asyncQueryApnPara.mmsproxy));
-     return val;
- }
+{
+    napi_value val = nullptr;
+    napi_create_object(env, &val);
+    SetPropertyToNapiObject(env, val, "apnName", NapiUtil::ToUtf8(asyncQueryApnPara.apnName));
+    SetPropertyToNapiObject(env, val, "apn", NapiUtil::ToUtf8(asyncQueryApnPara.apn));
+    SetPropertyToNapiObject(env, val, "mcc", NapiUtil::ToUtf8(asyncQueryApnPara.mcc));
+    SetPropertyToNapiObject(env, val, "mnc", NapiUtil::ToUtf8(asyncQueryApnPara.mnc));
+    SetPropertyToNapiObject(env, val, "user", NapiUtil::ToUtf8(asyncQueryApnPara.user));
+    SetPropertyToNapiObject(env, val, "type", NapiUtil::ToUtf8(asyncQueryApnPara.type));
+    SetPropertyToNapiObject(env, val, "proxy", NapiUtil::ToUtf8(asyncQueryApnPara.proxy));
+    SetPropertyToNapiObject(env, val, "mmsproxy", NapiUtil::ToUtf8(asyncQueryApnPara.mmsproxy));
+    return val;
+}
 
- void NativeQueryAllApn(napi_env env, void *data)
+void NativeQueryAllApn(napi_env env, void *data)
 {
     if (data == nullptr) {
         return;
