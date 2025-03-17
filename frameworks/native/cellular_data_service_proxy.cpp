@@ -21,6 +21,7 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "securec.h"
+#include "string_ex.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -793,6 +794,117 @@ int32_t CellularDataServiceProxy::GetInternalActReportInfo(int32_t slotId, ApnAc
         info.averDuration = replyParcel.ReadUint32();
         info.topReason = replyParcel.ReadUint32();
         info.actSuccTimes = replyParcel.ReadUint32();
+    }
+    return result;
+}
+
+int32_t CellularDataServiceProxy::QueryApnIds(ApnInfo apnInfo, std::vector<uint32_t> &apnIdList)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    if (!dataParcel.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write interface token failed!");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteString16(apnInfo.apnName);
+    dataParcel.WriteString16(apnInfo.apn);
+    dataParcel.WriteString16(apnInfo.mcc);
+    dataParcel.WriteString16(apnInfo.mnc);
+    dataParcel.WriteString16(apnInfo.user);
+    dataParcel.WriteString16(apnInfo.type);
+    dataParcel.WriteString16(apnInfo.proxy);
+    dataParcel.WriteString16(apnInfo.mmsproxy);
+    TELEPHONY_LOGI("QueryApnIds type: %{public}s", Str16ToStr8(apnInfo.type).c_str());
+    sptr<OHOS::IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("remote is nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest((uint32_t)CellularDataInterfaceCode::QUERY_APN_INFO,
+        dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function QueryApnIds call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = replyParcel.ReadInt32();
+    TELEPHONY_LOGI("QueryApnIds end: result=%{public}d", result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        int32_t size = replyParcel.ReadInt32();
+        if (size > MAX_REPLY_COUNT) {
+            TELEPHONY_LOGE("QueryApnIds size error = %{public}d", size);
+            return result;
+        }
+        TELEPHONY_LOGI("QueryApnIds size = %{public}d", size);
+        apnIdList.clear();
+        for (int i = 0; i < size; i++) {
+            int apnId = replyParcel.ReadInt32();
+            TELEPHONY_LOGI("QueryApnIds success apnId = %{public}d", apnId);
+            apnIdList.emplace_back(apnId);
+        }
+    }
+    return result;
+}
+
+int32_t CellularDataServiceProxy::SetPreferApn(int32_t apnId)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    if (!dataParcel.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write interface token failed!");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt32(apnId);
+    sptr<OHOS::IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("remote is nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest((uint32_t)CellularDataInterfaceCode::SET_PREFER_APN,
+        dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function SetPreferApn call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t CellularDataServiceProxy::QueryAllApnInfo(std::vector<ApnInfo> &apnInfoList)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    if (!dataParcel.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write interface token failed!");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    sptr<OHOS::IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("remote is nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest((uint32_t)CellularDataInterfaceCode::QUERY_ALL_APN_INFO,
+        dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function QueryAllApnInfo call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = replyParcel.ReadInt32();
+    TELEPHONY_LOGI("QueryAllApnInfo end: result=%{public}d", result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        int32_t size = replyParcel.ReadInt32();
+        if (size > MAX_REPLY_COUNT) {
+            TELEPHONY_LOGE("QueryAllApnInfo size error = %{public}d", size);
+            return result;
+        }
+        TELEPHONY_LOGI("QueryAllApnInfo size = %{public}d", size);
+        apnInfoList.clear();
+        for (int i = 0; i < size; i++) {
+            ApnInfo apnInfo;
+            apnInfo.ReadFromParcel(replyParcel);
+            apnInfoList.emplace_back(apnInfo);
+        }
     }
     return result;
 }

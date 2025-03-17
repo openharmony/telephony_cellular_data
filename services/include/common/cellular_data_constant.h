@@ -306,6 +306,7 @@ static const int UP_DOWN_LINK_SIZE = 100;
 static const int32_t VALID_VECTOR_SIZE = 2;
 static const int32_t DELAY_SET_RIL_BANDWIDTH_MS = 3000;
 static const int32_t DELAY_SET_RIL_UP_DOWN_BANDWIDTH_MS = 50;
+static const int32_t MAX_REPLY_COUNT = 200;
 static constexpr const char *CELLULAR_DATA_COLUMN_ENABLE = "cellular_data_enable";
 static constexpr const char *CELLULAR_DATA_COLUMN_ROAMING = "cellular_data_roaming_enable";
 static constexpr const char *CELLULAR_DATA_COLUMN_INCALL = "cellular_data_incall_enable";
@@ -322,6 +323,7 @@ static const int32_t MAX_SLOT_NUM = 2;
 static constexpr const char *PROTOCOL_IPV4 = "IP";
 static constexpr const char *PROTOCOL_IPV6 = "IPV6";
 static constexpr const char *PROTOCOL_IPV4V6 = "IPV4V6";
+static constexpr const char *NOT_FILLED_IN = "not-filled-in";
 } // namespace Telephony
 } // namespace OHOS
 #endif // CELLULAR_DATA_CONSTANT_H

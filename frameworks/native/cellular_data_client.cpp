@@ -480,5 +480,38 @@ int32_t CellularDataClient::GetInternalActReportInfo(int32_t slotId, ApnActivate
     }
     return proxy->GetInternalActReportInfo(slotId, info);
 }
+
+int32_t CellularDataClient::QueryApnIds(ApnInfo apnInfo, std::vector<uint32_t> &apnIdList)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    TELEPHONY_LOGI("QueryApnIds apnInfo");
+    return proxy->QueryApnIds(apnInfo, apnIdList);
+}
+
+int32_t CellularDataClient::SetPreferApn(int32_t apnId)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    TELEPHONY_LOGI("SetPreferApn");
+    return proxy->SetPreferApn(apnId);
+}
+
+int32_t CellularDataClient::QueryAllApnInfo(std::vector<ApnInfo> &apnInfoList)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    TELEPHONY_LOGI("QueryAllApnInfo");
+    return proxy->QueryAllApnInfo(apnInfoList);
+}
 } // namespace Telephony
 } // namespace OHOS

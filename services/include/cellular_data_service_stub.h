@@ -67,6 +67,9 @@ private:
     int32_t OnIsSupportDunApn(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetDefaultActReportInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetInternalActReportInfo(MessageParcel &data, MessageParcel &reply);
+    int32_t OnQueryApnInfo(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetPreferApn(MessageParcel &data, MessageParcel &reply);
+    int32_t OnQueryAllApnInfo(MessageParcel &data, MessageParcel &reply);
 
 private:
     using Fun = std::function<int32_t(MessageParcel &data, MessageParcel &reply)>;
@@ -134,7 +137,13 @@ private:
         { (uint32_t)CellularDataInterfaceCode::GET_DEFAULT_ACT_REPORT_INFO,
             [this](MessageParcel &data, MessageParcel &reply) { return OnGetDefaultActReportInfo(data, reply); } },
         { (uint32_t)CellularDataInterfaceCode::GET_INTERNAL_ACT_REPORT_INFO,
-            [this](MessageParcel &data, MessageParcel &reply) { return OnGetInternalActReportInfo(data, reply); } }
+            [this](MessageParcel &data, MessageParcel &reply) { return OnGetInternalActReportInfo(data, reply); } },
+        { (uint32_t)CellularDataInterfaceCode::QUERY_APN_INFO,
+            [this](MessageParcel &data, MessageParcel &reply) { return OnQueryApnInfo(data, reply); } },
+        { (uint32_t)CellularDataInterfaceCode::SET_PREFER_APN,
+            [this](MessageParcel &data, MessageParcel &reply) { return OnSetPreferApn(data, reply); } },
+        { (uint32_t)CellularDataInterfaceCode::QUERY_ALL_APN_INFO,
+            [this](MessageParcel &data, MessageParcel &reply) { return OnQueryAllApnInfo(data, reply); } }
     };
     std::map<uint32_t, std::string> collieCodeStringMap_ = {
         { uint32_t(CellularDataInterfaceCode::GET_CELLULAR_DATA_STATE), "GET_CELLULAR_DATA_STATE" },
