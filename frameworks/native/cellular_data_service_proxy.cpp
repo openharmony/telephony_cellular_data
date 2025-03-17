@@ -815,7 +815,7 @@ int32_t CellularDataServiceProxy::QueryApnIds(ApnInfo apnInfo, std::vector<uint3
     dataParcel.WriteString16(apnInfo.type);
     dataParcel.WriteString16(apnInfo.proxy);
     dataParcel.WriteString16(apnInfo.mmsproxy);
-    TELEPHONY_LOGE("QueryApnIds type: %{public}s", Str16ToStr8(apnInfo.type).c_str());
+    TELEPHONY_LOGI("QueryApnIds type: %{public}s", Str16ToStr8(apnInfo.type).c_str());
     sptr<OHOS::IRemoteObject> remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("remote is nullptr!");
@@ -839,7 +839,7 @@ int32_t CellularDataServiceProxy::QueryApnIds(ApnInfo apnInfo, std::vector<uint3
         apnIdList.clear();
         for (int i = 0; i < size; i++) {
             int apnId = replyParcel.ReadInt32();
-            TELEPHONY_LOGE("QueryApnIds success apnId = %{public}d", apnId);
+            TELEPHONY_LOGI("QueryApnIds success apnId = %{public}d", apnId);
             apnIdList.emplace_back(apnId);
         }
     }
