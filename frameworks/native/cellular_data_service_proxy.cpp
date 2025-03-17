@@ -831,6 +831,10 @@ int32_t CellularDataServiceProxy::QueryApnIds(ApnInfo apnInfo, std::vector<uint3
     TELEPHONY_LOGI("QueryApnIds end: result=%{public}d", result);
     if (result == TELEPHONY_ERR_SUCCESS) {
         int32_t size = replyParcel.ReadInt32();
+        if (size > MAX_REPLY_COUNT) {
+            TELEPHONY_LOGE("QueryApnIds size error = %{public}d", size);
+            return result;
+        }
         TELEPHONY_LOGI("QueryApnIds size = %{public}d", size);
         apnIdList.clear();
         for (int i = 0; i < size; i++) {
@@ -890,6 +894,10 @@ int32_t CellularDataServiceProxy::QueryAllApnInfo(std::vector<ApnInfo> &apnInfoL
     TELEPHONY_LOGI("QueryAllApnInfo end: result=%{public}d", result);
     if (result == TELEPHONY_ERR_SUCCESS) {
         int32_t size = replyParcel.ReadInt32();
+        if (size > MAX_REPLY_COUNT) {
+            TELEPHONY_LOGE("QueryAllApnInfo size error = %{public}d", size);
+            return result;
+        }
         TELEPHONY_LOGI("QueryAllApnInfo size = %{public}d", size);
         apnInfoList.clear();
         for (int i = 0; i < size; i++) {
