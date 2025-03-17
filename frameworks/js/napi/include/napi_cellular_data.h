@@ -31,7 +31,7 @@ struct AsyncContext : BaseContext {
 };
 
 struct AsyncSetPreferApnContext : BaseContext {
-        int32_t apnId = 0;
+    int32_t apnId = 0;
     int32_t result = ERROR_SERVICE_UNAVAILABLE;
 };
 
