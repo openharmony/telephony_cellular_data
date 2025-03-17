@@ -1204,12 +1204,12 @@ void QueryApnIdsCallback(napi_env env, napi_status status, void *data)
         napi_set_element(env, asyncContext.callbackVal, i, val);
     }
     NapiAsyncPermissionCompleteCallback(
-        env, status, asyncContext, false, { "QueryApn", MANAGE_APN_SETTING });
+        env, status, asyncContext, false, { "QueryApnIds", MANAGE_APN_SETTING });
 }
 
 static napi_value QueryApnIds(napi_env env, napi_callback_info info)
 {
-    TELEPHONY_LOGE("QueryApn enter!");
+    TELEPHONY_LOGI("QueryApnIds enter!");
     auto queryApnInfo = std::make_unique<AsyncQueryApnInfo>();
     if (queryApnInfo == nullptr) {
         return nullptr;
@@ -1274,15 +1274,15 @@ static void SetPreferApnCallback(napi_env env, napi_status status, void *data)
         NAPI_CALL_RETURN_VOID(env, status);
     } else {
         JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
-            asyncContext->errorCode, "setPreferredApn", MANAGE_APN_SETTING);
+            asyncContext->errorCode, "SetPreferredApn", MANAGE_APN_SETTING);
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, asyncContext.release(), callbackValue);
 }
 
-static napi_value setPreferredApn(napi_env env, napi_callback_info info)
+static napi_value SetPreferredApn(napi_env env, napi_callback_info info)
 {
-    TELEPHONY_LOGI("setPreferredApn enter!");
+    TELEPHONY_LOGI("SetPreferredApn enter!");
     const size_t paramLimitTwo = 2;
     size_t parameterCount = paramLimitTwo;
     napi_value parameters[] = { nullptr, nullptr };
@@ -1296,12 +1296,12 @@ static napi_value setPreferredApn(napi_env env, napi_callback_info info)
     }
     auto asyncContext = std::make_unique<AsyncSetPreferApnContext>();
     if (asyncContext == nullptr) {
-        TELEPHONY_LOGE("setPreferredApn asyncContext is nullptr.");
+        TELEPHONY_LOGE("SetPreferredApn asyncContext is nullptr.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
     napi_get_value_int32(env, parameters[0], &asyncContext->apnId);
-    return NapiUtil::HandleAsyncWork(env, asyncContext.release(), "setPreferredApn",
+    return NapiUtil::HandleAsyncWork(env, asyncContext.release(), "SetPreferredApn",
         NativeSetPreferApn, SetPreferApnCallback);
 }
 
