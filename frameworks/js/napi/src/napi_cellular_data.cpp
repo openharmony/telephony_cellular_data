@@ -1176,8 +1176,6 @@ napi_value NapiCreateAsyncWork2(const AsyncPara &para, AsyncContextType *asyncCo
     apnInfoStru.type = queryApnInfoContext->queryApnPara.type;
     apnInfoStru.proxy = queryApnInfoContext->queryApnPara.proxy;
     apnInfoStru.mmsproxy = queryApnInfoContext->queryApnPara.mmsproxy;
-    TELEPHONY_LOGI("NativeQueryApnIds type = %{public}s",
-        NapiUtil::ToUtf8(queryApnInfoContext->queryApnPara.type).c_str());
     std::vector<uint32_t> apnIdList;
     std::unique_lock<std::mutex> callbackLock(queryApnInfoContext->asyncContext.callbackMutex);
     int32_t errorCode = CellularDataClient::GetInstance().QueryApnIds(apnInfoStru, apnIdList);
