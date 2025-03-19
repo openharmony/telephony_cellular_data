@@ -103,6 +103,7 @@ ohos_shared_library("tel_cellular_data") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "telephony_data:tel_telephony_data",
+    "netmanager_ext:networkslice_manager_if",
   ]
 
   defines = [

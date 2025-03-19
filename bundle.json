@@ -52,7 +52,8 @@
                 "safwk",
                 "samgr",
                 "telephony_data",
-                "power_manager"
+                "power_manager",
+                "netmanager_ext"
             ]
         },
         "build": {

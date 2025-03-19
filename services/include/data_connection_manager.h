@@ -91,6 +91,9 @@ protected:
     void RadioDataCallListChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioLinkCapabilityChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void UpdateNetworkInfo(const AppExecFwk::InnerEvent::Pointer &event);
+    void RadioNetworkSliceUrspRpt(const AppExecFwk::InnerEvent::Pointer &event);
+    void RadioNetworkSliceAllowedNssaiRpt(const AppExecFwk::InnerEvent::Pointer &event);
+    void RadioNetworkSliceEhplmnRpt(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     DataConnectionManager &connectManager_;

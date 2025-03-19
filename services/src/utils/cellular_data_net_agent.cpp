@@ -44,13 +44,14 @@ CellularDataNetAgent::~CellularDataNetAgent() = default;
 
 bool CellularDataNetAgent::RegisterNetSupplier(const int32_t slotId)
 {
+    TELEPHONY_LOGI("RegisterNetSupplier, slotId = %{public}d", slotId);
     bool flag = false;
     for (NetSupplier &netSupplier : netSuppliers_) {
         if (netSupplier.slotId != slotId) {
             continue;
         }
         auto& netManager = NetConnClient::GetInstance();
-        if (netSupplier.capability > NetCap::NET_CAPABILITY_INTERNAL_DEFAULT) {
+        if (netSupplier.capability > NetCap::NET_CAPABILITY_SNSSAI6) {
             TELEPHONY_LOGE("capabilities(%{public}" PRIu64 ") not support", netSupplier.capability);
             continue;
         }

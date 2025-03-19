@@ -71,6 +71,12 @@ public:
     static const uint32_t MSG_SM_UPDATE_NETWORK_INFO = BASE + 44;
     static const uint32_t MSG_ESTABLISH_ALL_APNS_IF_CONNECTABLE = BASE + 45;
     static const uint32_t MSG_RESUME_DATA_PERMITTED_TIMEOUT = BASE + 46;
+    static const uint32_t MSG_SEND_UEPOLICY_COMPLETE = BASE + 47;
+    static const uint32_t MSG_SEND_UEPOLICY_COMMAND_REJECT = BASE + 48;
+    static const uint32_t MSG_SEND_UE_STATE_INDICATION = BASE + 49;
+    static const uint32_t MSG_SEND_IMS_RSDLIST = BASE + 50;
+    static const uint32_t MSG_SYNC_ALLOWED_NSSAI_WITH_MODEM = BASE + 51;
+    static const uint32_t MSG_SYNC_EHPLMN_WITH_MODEM = BASE + 52;
 };
 } // namespace Telephony
 } // namespace OHOS

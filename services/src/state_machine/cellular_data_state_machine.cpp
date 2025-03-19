@@ -30,11 +30,13 @@
 #include "radio_event.h"
 #include "telephony_common_utils.h"
 #include "telephony_log_wrapper.h"
+#include "networkslice_client.h"
 
 namespace OHOS {
 using namespace NetManagerStandard;
 namespace Telephony {
 static const int32_t INVALID_MTU_VALUE = -1;
+static const bool IS_SUPPORT_NR_SLICE = system::GetBoolParameter("persist.netmgr_ext.networkslice", false);
 bool CellularDataStateMachine::IsInactiveState() const
 {
     return currentState_ == inActiveState_;
@@ -94,6 +96,17 @@ sptr<ApnItem> CellularDataStateMachine::GetApnItem() const
     return apnItem_;
 }
 
+static void FillActivateDataParam(ActivateDataParam& activeDataParam, sptr<ApnItem> apn)
+{
+    activeDataParam.dataProfile.profileId = apn->attr_.profileId_;
+    activeDataParam.dataProfile.apn = apn->attr_.apn_;
+    activeDataParam.dataProfile.protocol = apn->attr_.protocol_;
+    activeDataParam.dataProfile.verType = apn->attr_.authType_;
+    activeDataParam.dataProfile.userName = apn->attr_.user_;
+    activeDataParam.dataProfile.password = apn->attr_.password_;
+    activeDataParam.dataProfile.roamingProtocol = apn->attr_.roamingProtocol_;
+}
+
 void CellularDataStateMachine::DoConnect(const DataConnectionParams &connectionParams)
 {
     if (connectionParams.GetApnHolder() == nullptr) {
@@ -115,13 +128,14 @@ void CellularDataStateMachine::DoConnect(const DataConnectionParams &connectionP
     activeDataParam.radioTechnology = radioTech;
     activeDataParam.allowRoaming = connectionParams.GetRoamingState();
     activeDataParam.isRoaming = connectionParams.GetUserDataRoaming();
-    activeDataParam.dataProfile.profileId = apn->attr_.profileId_;
-    activeDataParam.dataProfile.apn = apn->attr_.apn_;
-    activeDataParam.dataProfile.protocol = apn->attr_.protocol_;
-    activeDataParam.dataProfile.verType = apn->attr_.authType_;
-    activeDataParam.dataProfile.userName = apn->attr_.user_;
-    activeDataParam.dataProfile.password = apn->attr_.password_;
-    activeDataParam.dataProfile.roamingProtocol = apn->attr_.roamingProtocol_;
+    FillActivateDataParam(activeDataParam, apn);
+    if (IS_SUPPORT_NR_SLICE) {
+        GetNetworkSlicePara(connectionParams, apn);
+        activeDataParam.dataProfile.snssai = apn->attr_.snssai_;
+        activeDataParam.dataProfile.sscMode = apn->attr_.sscMode_;
+        activeDataParam.dataProfile.apn = apn->attr_.apn_;
+        activeDataParam.dataProfile.protocol = apn->attr_.protocol_;
+    }
     int32_t bitMap = ApnManager::FindApnTypeByApnName(connectionParams.GetApnHolder()->GetApnType());
     activeDataParam.dataProfile.supportedApnTypesBitmap = bitMap;
     TELEPHONY_LOGI("Slot%{public}d: Activate PDP context (%{public}d, %{public}s, %{public}s, %{public}s, %{public}d)",
@@ -484,6 +498,75 @@ void CellularDataStateMachine::SetReuseApnCap(uint64_t cap)
 uint64_t CellularDataStateMachine::GetReuseApnCap() const
 {
     return reuseApnCap_;
+}
+
+void CellularDataStateMachine::GetNetworkSlicePara(const DataConnectionParams& connectionParams, sptr<ApnItem> apn)
+{
+    std::string apnType = connectionParams.GetApnHolder()->GetApnType();
+    bool isNr_Sa = false;
+    int slotId = 0;
+    sptr<NetworkState> networkState(new NetworkState());
+    CoreManagerInner::GetInstance().GetNetworkStatus(slotId, networkState);
+    if (networkState->GetPsRadioTech() == RadioTech::RADIO_TECHNOLOGY_NR &&
+            networkState->GetNrState() == NrState::NR_NSA_STATE_SA_ATTACHED) {
+        isNr_Sa = true;
+    }
+    if (!isNr_Sa) {
+        return;
+    }
+    std::string dnn = apn->attr_.apn_;
+    TELEPHONY_LOGI("GetNetworkSlicePara apnType = %{public}s, dnn = %{public}s",
+        apnType.c_str(), dnn.c_str());
+    if (apnType.find("snssai") != std::string::npos) {
+        int32_t apnId = ApnManager::FindApnIdByApnName(apnType);
+        int32_t netcap = ApnManager::FindCapabilityByApnId(apnId);
+        std::map<std::string, std::string> networkSliceParas;
+        DelayedSingleton<NetManagerStandard::NetworkSliceClient>::GetInstance()->GetRSDByNetCap(
+            netcap, networkSliceParas);
+        FillRSDFromNetCap(networkSliceParas, apn);
+    } else if (!dnn.empty()) {
+        std::string snssai;
+        uint8_t sscMode = 0;
+        DelayedSingleton<NetManagerStandard::NetworkSliceClient>::GetInstance()->GetRouteSelectionDescriptorByDNN(
+            dnn, snssai, sscMode);
+        apn->attr_.sscMode_ = sscMode;
+        if (!snssai.empty()) {
+            std::fill(apn->attr_.snssai_, apn->attr_.snssai_ + ApnItem::ALL_APN_ITEM_CHAR_LENGTH, '\0');
+            std::copy(snssai.begin(), snssai.end(), apn->attr_.snssai_);
+            apn->attr_.snssai_[std::min((int)snssai.size(), ApnItem::ALL_APN_ITEM_CHAR_LENGTH - 1)] = '\0';
+        }
+        TELEPHONY_LOGI("GetRouteSelectionDescriptorByDNN snssai = %{public}s, sscmode = %{public}d",
+            snssai.c_str(), sscMode);
+    }
+}
+
+void CellularDataStateMachine::FillRSDFromNetCap(
+    std::map<std::string, std::string> networkSliceParas, sptr<ApnItem> apn)
+{
+    if (networkSliceParas["sscmode"] != "0") {
+        apn->attr_.sscMode_ = std::stoi(networkSliceParas["sscmode"]);
+    }
+    if (networkSliceParas["snssai"] != "") {
+        std::string snssai = networkSliceParas["snssai"];
+        std::fill(apn->attr_.snssai_, apn->attr_.snssai_ + ApnItem::ALL_APN_ITEM_CHAR_LENGTH, '\0');
+        std::copy(snssai.begin(), snssai.end(), apn->attr_.snssai_);
+        apn->attr_.snssai_[std::min((int)snssai.size(), ApnItem::ALL_APN_ITEM_CHAR_LENGTH - 1)] = '\0';
+    }
+    if (networkSliceParas["dnn"] != "") {
+        std::string dnn = networkSliceParas["dnn"];
+        std::fill(apn->attr_.apn_, apn->attr_.apn_ + ApnItem::ALL_APN_ITEM_CHAR_LENGTH, '\0');
+        std::copy(dnn.begin(), dnn.end(), apn->attr_.apn_);
+        apn->attr_.apn_[std::min((int)dnn.size(), ApnItem::ALL_APN_ITEM_CHAR_LENGTH - 1)] = '\0';
+    }
+    if (networkSliceParas["pdusessiontype"] != "0") {
+        std::string pdusessiontype = networkSliceParas["pdusessiontype"];
+        std::fill(apn->attr_.protocol_, apn->attr_.protocol_ + ApnItem::ALL_APN_ITEM_CHAR_LENGTH, '\0');
+        std::copy(pdusessiontype.begin(), pdusessiontype.end(), apn->attr_.protocol_);
+        apn->attr_.apn_[std::min((int)pdusessiontype.size(), ApnItem::ALL_APN_ITEM_CHAR_LENGTH - 1)] = '\0';
+    }
+    TELEPHONY_LOGI("FillRSD: snssai = %{public}s, sscmode = %{public}s, dnn = %{public}s, pdusession = %{public}s",
+        networkSliceParas["snssai"].c_str(), networkSliceParas["sscmode"].c_str(), networkSliceParas["dnn"].c_str(),
+        networkSliceParas["pdusessiontype"].c_str());
 }
 } // namespace Telephony
 } // namespace OHOS

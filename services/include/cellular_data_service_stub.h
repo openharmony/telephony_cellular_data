@@ -70,6 +70,11 @@ private:
     int32_t OnQueryApnInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetPreferApn(MessageParcel &data, MessageParcel &reply);
     int32_t OnQueryAllApnInfo(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSendUrspDecodeResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSendUePolicySectionIdentifier(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSendImsRsdList(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetNetworkSliceAllowedNssai(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetNetworkSliceEhplmn(MessageParcel &data, MessageParcel &reply);
 
 private:
     using Fun = std::function<int32_t(MessageParcel &data, MessageParcel &reply)>;
@@ -143,7 +148,17 @@ private:
         { (uint32_t)CellularDataInterfaceCode::SET_PREFER_APN,
             [this](MessageParcel &data, MessageParcel &reply) { return OnSetPreferApn(data, reply); } },
         { (uint32_t)CellularDataInterfaceCode::QUERY_ALL_APN_INFO,
-            [this](MessageParcel &data, MessageParcel &reply) { return OnQueryAllApnInfo(data, reply); } }
+            [this](MessageParcel &data, MessageParcel &reply) { return OnQueryAllApnInfo(data, reply); } },
+        { (uint32_t)CellularDataInterfaceCode::SEND_MANAGE_UEPOLICY_DECODE_RESULT,
+            [this](MessageParcel &data, MessageParcel &reply) { return OnSendUrspDecodeResult(data, reply); } },
+        { (uint32_t)CellularDataInterfaceCode::SEND_UE_STATE_INDICATION,
+            [this](MessageParcel &data, MessageParcel &reply) { return OnSendUePolicySectionIdentifier(data, reply); }},
+        { (uint32_t)CellularDataInterfaceCode::SEND_IMS_RSDLIST,
+            [this](MessageParcel &data, MessageParcel &reply) { return OnSendImsRsdList(data, reply); } },
+        { (uint32_t)CellularDataInterfaceCode::SYNC_ALLOWED_NSSAI_WITH_MODEM,
+            [this](MessageParcel &data, MessageParcel &reply) { return OnGetNetworkSliceAllowedNssai(data, reply); } },
+        { (uint32_t)CellularDataInterfaceCode::SYNC_EHPLMN_WITH_MODEM,
+            [this](MessageParcel &data, MessageParcel &reply) { return OnGetNetworkSliceEhplmn(data, reply); } }
     };
     std::map<uint32_t, std::string> collieCodeStringMap_ = {
         { uint32_t(CellularDataInterfaceCode::GET_CELLULAR_DATA_STATE), "GET_CELLULAR_DATA_STATE" },

@@ -37,7 +37,13 @@ const std::map<std::string, int32_t> ApnManager::apnIdApnNameMap_ {
     {DATA_CONTEXT_ROLE_EMERGENCY, DATA_CONTEXT_ROLE_EMERGENCY_ID},
     {DATA_CONTEXT_ROLE_INTERNAL_DEFAULT, DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID},
     {DATA_CONTEXT_ROLE_XCAP, DATA_CONTEXT_ROLE_XCAP_ID},
-    {DATA_CONTEXT_ROLE_BIP, DATA_CONTEXT_ROLE_BIP_ID}
+    {DATA_CONTEXT_ROLE_BIP, DATA_CONTEXT_ROLE_BIP_ID},
+    {DATA_CONTEXT_ROLE_SNSSAI1, DATA_CONTEXT_ROLE_SNSSAI1_ID},
+    {DATA_CONTEXT_ROLE_SNSSAI2, DATA_CONTEXT_ROLE_SNSSAI2_ID},
+    {DATA_CONTEXT_ROLE_SNSSAI3, DATA_CONTEXT_ROLE_SNSSAI3_ID},
+    {DATA_CONTEXT_ROLE_SNSSAI4, DATA_CONTEXT_ROLE_SNSSAI4_ID},
+    {DATA_CONTEXT_ROLE_SNSSAI5, DATA_CONTEXT_ROLE_SNSSAI5_ID},
+    {DATA_CONTEXT_ROLE_SNSSAI6, DATA_CONTEXT_ROLE_SNSSAI6_ID}
 };
 const std::map<std::string, ApnTypes> ApnManager::apnNameApnTypeMap_ {
     {DATA_CONTEXT_ROLE_ALL, ApnTypes::ALL},
@@ -50,7 +56,13 @@ const std::map<std::string, ApnTypes> ApnManager::apnNameApnTypeMap_ {
     {DATA_CONTEXT_ROLE_EMERGENCY, ApnTypes::EMERGENCY},
     {DATA_CONTEXT_ROLE_XCAP, ApnTypes::XCAP},
     {DATA_CONTEXT_ROLE_BIP, ApnTypes::BIP},
-    {DATA_CONTEXT_ROLE_INTERNAL_DEFAULT, ApnTypes::INTERNAL_DEFAULT}
+    {DATA_CONTEXT_ROLE_INTERNAL_DEFAULT, ApnTypes::INTERNAL_DEFAULT},
+    {DATA_CONTEXT_ROLE_SNSSAI1, ApnTypes::SNSSAI1},
+    {DATA_CONTEXT_ROLE_SNSSAI2, ApnTypes::SNSSAI2},
+    {DATA_CONTEXT_ROLE_SNSSAI3, ApnTypes::SNSSAI3},
+    {DATA_CONTEXT_ROLE_SNSSAI4, ApnTypes::SNSSAI4},
+    {DATA_CONTEXT_ROLE_SNSSAI5, ApnTypes::SNSSAI5},
+    {DATA_CONTEXT_ROLE_SNSSAI6, ApnTypes::SNSSAI6}
 };
 const std::vector<ApnProfileState> ApnManager::apnStateArr_ = {
     PROFILE_STATE_CONNECTED,
@@ -84,6 +96,12 @@ void ApnManager::InitApnHolders()
     AddApnHolder(DATA_CONTEXT_ROLE_IA, static_cast<int32_t>(DataContextPriority::PRIORITY_HIGH));
     AddApnHolder(DATA_CONTEXT_ROLE_SUPL, static_cast<int32_t>(DataContextPriority::PRIORITY_NORMAL));
     AddApnHolder(DATA_CONTEXT_ROLE_BIP, static_cast<int32_t>(DataContextPriority::PRIORITY_NORMAL));
+    AddApnHolder(DATA_CONTEXT_ROLE_SNSSAI1, static_cast<int32_t>(DataContextPriority::PRIORITY_NORMAL));
+    AddApnHolder(DATA_CONTEXT_ROLE_SNSSAI2, static_cast<int32_t>(DataContextPriority::PRIORITY_NORMAL));
+    AddApnHolder(DATA_CONTEXT_ROLE_SNSSAI3, static_cast<int32_t>(DataContextPriority::PRIORITY_NORMAL));
+    AddApnHolder(DATA_CONTEXT_ROLE_SNSSAI4, static_cast<int32_t>(DataContextPriority::PRIORITY_NORMAL));
+    AddApnHolder(DATA_CONTEXT_ROLE_SNSSAI5, static_cast<int32_t>(DataContextPriority::PRIORITY_NORMAL));
+    AddApnHolder(DATA_CONTEXT_ROLE_SNSSAI6, static_cast<int32_t>(DataContextPriority::PRIORITY_NORMAL));
 }
 
 sptr<ApnHolder> ApnManager::FindApnHolderById(const int32_t id) const
@@ -153,6 +171,18 @@ int32_t ApnManager::FindApnIdByCapability(const uint64_t capability)
             return DATA_CONTEXT_ROLE_DUN_ID;
         case NetManagerStandard::NetCap::NET_CAPABILITY_BIP:
             return DATA_CONTEXT_ROLE_BIP_ID;
+        case NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI1:
+            return DATA_CONTEXT_ROLE_SNSSAI1_ID;
+        case NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI2:
+            return DATA_CONTEXT_ROLE_SNSSAI2_ID;
+        case NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI3:
+            return DATA_CONTEXT_ROLE_SNSSAI3_ID;
+        case NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI4:
+            return DATA_CONTEXT_ROLE_SNSSAI4_ID;
+        case NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI5:
+            return DATA_CONTEXT_ROLE_SNSSAI5_ID;
+        case NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI6:
+            return DATA_CONTEXT_ROLE_SNSSAI6_ID;
         default:
             return DATA_CONTEXT_ROLE_INVALID_ID;
     }
@@ -189,6 +219,24 @@ NetManagerStandard::NetCap ApnManager::FindBestCapability(const uint64_t capabil
     }
     if (HasNetCap(capabilities, NetManagerStandard::NetCap::NET_CAPABILITY_BIP)) {
         netCap = NetManagerStandard::NetCap::NET_CAPABILITY_BIP;
+    }
+    if (HasNetCap(capabilities, NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI1)) {
+        netCap = NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI1;
+    }
+    if (HasNetCap(capabilities, NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI2)) {
+        netCap = NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI2;
+    }
+    if (HasNetCap(capabilities, NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI3)) {
+        netCap = NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI3;
+    }
+    if (HasNetCap(capabilities, NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI4)) {
+        netCap = NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI4;
+    }
+    if (HasNetCap(capabilities, NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI5)) {
+        netCap = NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI5;
+    }
+    if (HasNetCap(capabilities, NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI6)) {
+        netCap = NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI6;
     }
     return netCap;
 }
@@ -246,6 +294,7 @@ std::vector<sptr<ApnHolder>> ApnManager::GetSortApnHolder() const
 
 int32_t ApnManager::CreateAllApnItemByDatabase(int32_t slotId)
 {
+    TELEPHONY_LOGI("CreateAllApnItemByDatabase");
     int32_t count = 0;
     if (TELEPHONY_EXT_WRAPPER.createAllApnItemExt_) {
         sptr<ApnItem> extraApnItem = ApnItem::MakeDefaultApn("default");
@@ -320,6 +369,7 @@ void ApnManager::GetCTOperator(int32_t slotId, std::string &numeric)
 
 int32_t ApnManager::CreateMvnoApnItems(int32_t slotId, const std::string &mcc, const std::string &mnc)
 {
+    TELEPHONY_LOGI("CreateMvnoApnItems");
     int32_t count = 0;
     auto helper = CellularDataRdbHelper::GetInstance();
     if (helper == nullptr) {
@@ -367,6 +417,7 @@ void ApnManager::ReportApnInfo(int32_t slotId, PdpProfile &apnData)
 
 int32_t ApnManager::MakeSpecificApnItem(std::vector<PdpProfile> &apnVec, int32_t slotId)
 {
+    TELEPHONY_LOGI("MakeSpecificApnItem");
     std::lock_guard<std::mutex> lock(mutex_);
     allApnItem_.clear();
     TryMergeSimilarPdpProfile(apnVec);
@@ -406,7 +457,6 @@ std::vector<sptr<ApnItem>> ApnManager::FilterMatchedApns(const std::string &requ
         FetchBipApns(matchApnItemList);
         return matchApnItemList;
     }
-
     for (const sptr<ApnItem> &apnItem : allApnItem_) {
         if (apnItem->CanDealWithType(requestApnType)) {
             matchApnItemList.push_back(apnItem);
@@ -686,6 +736,18 @@ uint64_t ApnManager::FindCapabilityByApnId(int32_t apnId)
             return NetManagerStandard::NetCap::NET_CAPABILITY_DUN;
         case DATA_CONTEXT_ROLE_BIP_ID:
             return NetManagerStandard::NetCap::NET_CAPABILITY_BIP;
+        case DATA_CONTEXT_ROLE_SNSSAI1_ID:
+            return NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI1;
+        case DATA_CONTEXT_ROLE_SNSSAI2_ID:
+            return NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI2;
+        case DATA_CONTEXT_ROLE_SNSSAI3_ID:
+            return NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI3;
+        case DATA_CONTEXT_ROLE_SNSSAI4_ID:
+            return NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI4;
+        case DATA_CONTEXT_ROLE_SNSSAI5_ID:
+            return NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI5;
+        case DATA_CONTEXT_ROLE_SNSSAI6_ID:
+            return NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI6;
         default:
             return NetManagerStandard::NetCap::NET_CAPABILITY_END;
     }
