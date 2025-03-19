@@ -585,13 +585,11 @@ int32_t CellularDataServiceStub::OnSendUrspDecodeResult(MessageParcel &data, Mes
     int32_t slotId = data.ReadInt32();
     int32_t buffer_len = data.ReadInt32();
     std::vector<uint8_t> buffer;
-    for (int i = 0; i < buffer_len; ++i)
-    {
+    for (int i = 0; i < buffer_len; ++i) {
         buffer.push_back(data.ReadUint8());   
     }
     int32_t result = SendUrspDecodeResult(slotId, buffer);
-    if (result != TELEPHONY_ERR_SUCCESS)
-    {
+    if (result != TELEPHONY_ERR_SUCCESS) {
         return result;
     }
     return TELEPHONY_SUCCESS;
@@ -603,13 +601,11 @@ int32_t CellularDataServiceStub::OnSendUePolicySectionIdentifier(MessageParcel &
     int32_t slotId = data.ReadInt32();
     int32_t buffer_len = data.ReadInt32();
     std::vector<uint8_t> buffer;
-    for (int i = 0; i < buffer_len; ++i)
-    {
+    for (int i = 0; i < buffer_len; ++i) {
         buffer.push_back(data.ReadUint8());
     }
     int32_t result = SendUePolicySectionIdentifier(slotId, buffer);
-    if (result != TELEPHONY_ERR_SUCCESS)
-    {
+    if (result != TELEPHONY_ERR_SUCCESS) {
         return result;
     }
     return TELEPHONY_SUCCESS;
@@ -621,13 +617,11 @@ int32_t CellularDataServiceStub::OnSendImsRsdList(MessageParcel &data, MessagePa
     int32_t slotId = data.ReadInt32();
     int32_t buffer_len = data.ReadInt32();
     std::vector<uint8_t> buffer;
-    for (int i = 0; i < buffer_len; ++i)
-    {
+    for (int i = 0; i < buffer_len; ++i) {
         buffer.push_back(data.ReadUint8());
     }
     int32_t result = SendImsRsdList(slotId, buffer);
-    if (result != TELEPHONY_ERR_SUCCESS)
-    {
+    if (result != TELEPHONY_ERR_SUCCESS) {
         return result;
     }
     return TELEPHONY_SUCCESS;
@@ -639,13 +633,11 @@ int32_t CellularDataServiceStub::OnGetNetworkSliceAllowedNssai(MessageParcel &da
     int32_t slotId = data.ReadInt32();
     int32_t buffer_len = data.ReadInt32();
     std::vector<uint8_t> buffer;
-    for (int i = 0; i < buffer_len; ++i)
-    {
+    for (int i = 0; i < buffer_len; ++i) {
         buffer.push_back(data.ReadUint8());
     }
     int32_t result = GetNetworkSliceAllowedNssai(slotId, buffer);
-    if (result != TELEPHONY_ERR_SUCCESS)
-    {
+    if (result != TELEPHONY_ERR_SUCCESS) {
         return result;
     }
     return TELEPHONY_SUCCESS;
@@ -656,8 +648,7 @@ int32_t CellularDataServiceStub::OnGetNetworkSliceEhplmn(MessageParcel &data, Me
     TELEPHONY_LOGI("CellularDataServiceStub::OnGetNetworkSliceEhplmn");
     int32_t slotId = data.ReadInt32();
     int32_t result = GetNetworkSliceEhplmn(slotId);
-    if (result != TELEPHONY_ERR_SUCCESS)
-    {
+    if (result != TELEPHONY_ERR_SUCCESS) {
         return result;
     }
     return TELEPHONY_SUCCESS;
