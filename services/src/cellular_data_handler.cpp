@@ -828,10 +828,10 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
         return;
     }
     std::shared_ptr<SetupDataCallResultInfo> resultInfo = event->GetSharedObject<SetupDataCallResultInfo>();
-    TELEPHONY_LOGI("EstablishDataConnectionComplete reason: %{public}d, flag: %{public}d",
-        resultInfo->reason, resultInfo->flag);
-    SetApnActivateEnd(resultInfo);
     if ((resultInfo != nullptr) && (apnManager_ != nullptr)) {
+        TELEPHONY_LOGI("EstablishDataConnectionComplete reason: %{public}d, flag: %{public}d",
+            resultInfo->reason, resultInfo->flag);
+        SetApnActivateEnd(resultInfo);
         sptr<ApnHolder> apnHolder = apnManager_->GetApnHolder(apnManager_->FindApnNameByApnId(resultInfo->flag));
         if (apnHolder == nullptr) {
             TELEPHONY_LOGE("Slot%{public}d: flag:%{public}d complete apnHolder is null", slotId_, resultInfo->flag);
