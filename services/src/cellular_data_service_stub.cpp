@@ -586,7 +586,7 @@ int32_t CellularDataServiceStub::OnSendUrspDecodeResult(MessageParcel &data, Mes
     int32_t buffer_len = data.ReadInt32();
     std::vector<uint8_t> buffer;
     for (int i = 0; i < buffer_len; ++i) {
-        buffer.push_back(data.ReadUint8());   
+        buffer.push_back(data.ReadUint8());
     }
     int32_t result = SendUrspDecodeResult(slotId, buffer);
     if (result != TELEPHONY_ERR_SUCCESS) {
