@@ -644,7 +644,7 @@ static napi_value IsCellularDataRoamingEnabledSync(napi_env env, napi_callback_i
         if (errorCode != TELEPHONY_SUCCESS) {
             JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
                 errorCode, "isCellularDataRoamingEnabledSync", GET_NETWORK_INFO);
-             NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
+            NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
             return value;
         }
     } else {
