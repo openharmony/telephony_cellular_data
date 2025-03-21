@@ -112,7 +112,7 @@ HWTEST_F(CellularDataServiceTest, CellularDataService_002, TestSize.Level0)
     std::vector<uint8_t> buffer = {};
     ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, service->SendUrspDecodeResult(slotId, buffer));
     ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, service->SendUePolicySectionIdentifier(slotId, buffer));
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, service->SndImsRsdList(slotId, buffer));
+    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, service->SendImsRsdList(slotId, buffer));
     ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, service->GetNetworkSliceAllowedNssai(slotId, buffer));
     ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, service->GetNetworkSliceEhplmn(slotId));
     int32_t regState = -1;
