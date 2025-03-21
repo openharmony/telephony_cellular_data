@@ -503,15 +503,15 @@ uint64_t CellularDataStateMachine::GetReuseApnCap() const
 void CellularDataStateMachine::GetNetworkSlicePara(const DataConnectionParams& connectionParams, sptr<ApnItem> apn)
 {
     std::string apnType = connectionParams.GetApnHolder()->GetApnType();
-    bool isNr_Sa = false;
+    bool isNrSa = false;
     int slotId = 0;
     sptr<NetworkState> networkState(new NetworkState());
     CoreManagerInner::GetInstance().GetNetworkStatus(slotId, networkState);
     if (networkState->GetPsRadioTech() == RadioTech::RADIO_TECHNOLOGY_NR &&
             networkState->GetNrState() == NrState::NR_NSA_STATE_SA_ATTACHED) {
-        isNr_Sa = true;
+        isNrSa = true;
     }
-    if (!isNr_Sa) {
+    if (!isNrSa) {
         return;
     }
     std::string dnn = apn->attr_.apn_;
