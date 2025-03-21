@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <limits>
+
 #include "cellular_data_service_proxy.h"
 
 #include "iremote_object.h"
