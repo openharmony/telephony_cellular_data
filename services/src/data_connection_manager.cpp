@@ -486,7 +486,6 @@ void DataConnectionManager::HandleScreenStateChanged(bool isScreenOn) const
 
 void CcmDefaultState::RadioNetworkSliceUrspRpt(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("CcmDefaultState::RadioNetworkSliceUrspRpt");
     std::shared_ptr<NetworkSliceUrspInfo> networkSliceUrspInfo = event->GetSharedObject<NetworkSliceUrspInfo>();
     if (networkSliceUrspInfo == nullptr) {
         TELEPHONY_LOGE("networkSliceClient is null");
@@ -498,7 +497,6 @@ void CcmDefaultState::RadioNetworkSliceUrspRpt(const AppExecFwk::InnerEvent::Poi
 
 void CcmDefaultState::RadioNetworkSliceAllowedNssaiRpt(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("CcmDefaultState::RadioNetworkSliceAllowedNssaiRpt");
     std::shared_ptr<NetworkSliceAllowedNssaiInfo> networkSliceAllowedNssaiInfo
         = event->GetSharedObject<NetworkSliceAllowedNssaiInfo>();
     if (networkSliceAllowedNssaiInfo == nullptr) {
@@ -511,7 +509,6 @@ void CcmDefaultState::RadioNetworkSliceAllowedNssaiRpt(const AppExecFwk::InnerEv
 
 void CcmDefaultState::RadioNetworkSliceEhplmnRpt(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("CcmDefaultState::RadioNetworkSliceEhplmnRpt");
     std::shared_ptr<NetworkSliceEhplmnInfo> networkSliceEhplmnInfo
         = event->GetSharedObject<NetworkSliceEhplmnInfo>();
     if (networkSliceEhplmnInfo == nullptr) {
