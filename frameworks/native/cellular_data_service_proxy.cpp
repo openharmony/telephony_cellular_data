@@ -1028,7 +1028,7 @@ int32_t CellularDataServiceProxy::GetNetworkSliceAllowedNssai(int32_t slotId, st
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     data.WriteInt32(bufferlen);
-    for (size_t i = 0; i < buffer.size(); ++i) {
+    for (int i = 0; i < bufferlen; ++i) {
         data.WriteInt32(buffer[i]);
     }
     if (Remote() == nullptr) {
