@@ -911,7 +911,6 @@ int32_t CellularDataServiceProxy::QueryAllApnInfo(std::vector<ApnInfo> &apnInfoL
 
 int32_t CellularDataServiceProxy::SendUrspDecodeResult(int32_t slotId, std::vector<uint8_t> buffer)
 {
-    TELEPHONY_LOGI("CellularDataServiceProxy::SendUrspDecodeResult");
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -942,7 +941,6 @@ int32_t CellularDataServiceProxy::SendUrspDecodeResult(int32_t slotId, std::vect
 
 int32_t CellularDataServiceProxy::SendUePolicySectionIdentifier(int32_t slotId, std::vector<uint8_t> buffer)
 {
-    TELEPHONY_LOGI("CellularDataServiceProxy::SendUePolicySectionIdentifier");
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -973,7 +971,6 @@ int32_t CellularDataServiceProxy::SendUePolicySectionIdentifier(int32_t slotId, 
  
 int32_t CellularDataServiceProxy::SendImsRsdList(int32_t slotId, std::vector<uint8_t> buffer)
 {
-    TELEPHONY_LOGI("CellularDataServiceProxy::SendImsRsdList");
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -1004,7 +1001,6 @@ int32_t CellularDataServiceProxy::SendImsRsdList(int32_t slotId, std::vector<uin
  
 int32_t CellularDataServiceProxy::GetNetworkSliceAllowedNssai(int32_t slotId, std::vector<uint8_t> buffer)
 {
-    TELEPHONY_LOGI("CellularDataServiceProxy::GetNetworkSliceAllowedNssai");
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -1035,7 +1031,6 @@ int32_t CellularDataServiceProxy::GetNetworkSliceAllowedNssai(int32_t slotId, st
  
 int32_t CellularDataServiceProxy::GetNetworkSliceEhplmn(int32_t slotId)
 {
-    TELEPHONY_LOGI("CellularDataServiceProxy::GetNetworkSliceEhplmn");
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
