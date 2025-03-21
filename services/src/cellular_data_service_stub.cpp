@@ -585,6 +585,11 @@ int32_t CellularDataServiceStub::OnSendUrspDecodeResult(MessageParcel &data, Mes
     int32_t buffer_len = data.ReadInt32();
     std::vector<uint8_t> buffer;
     for (int i = 0; i < buffer_len; ++i) {
+        uint8_t temp;
+        if (!data.ReadUint8(temp)) {
+            TELEPHONY_LOGE("write Uint8 buffer failed.");
+            return TELEPHONY_ERR_READ_DATA_FAIL;
+        }
         buffer.push_back(data.ReadUint8());
     }
     int32_t result = SendUrspDecodeResult(slotId, buffer);
@@ -600,6 +605,11 @@ int32_t CellularDataServiceStub::OnSendUePolicySectionIdentifier(MessageParcel &
     int32_t buffer_len = data.ReadInt32();
     std::vector<uint8_t> buffer;
     for (int i = 0; i < buffer_len; ++i) {
+        uint8_t temp;
+        if (!data.ReadUint8(temp)) {
+            TELEPHONY_LOGE("write Uint8 buffer failed.");
+            return TELEPHONY_ERR_READ_DATA_FAIL;
+        }
         buffer.push_back(data.ReadUint8());
     }
     int32_t result = SendUePolicySectionIdentifier(slotId, buffer);
@@ -615,6 +625,11 @@ int32_t CellularDataServiceStub::OnSendImsRsdList(MessageParcel &data, MessagePa
     int32_t buffer_len = data.ReadInt32();
     std::vector<uint8_t> buffer;
     for (int i = 0; i < buffer_len; ++i) {
+        uint8_t temp;
+        if (!data.ReadUint8(temp)) {
+            TELEPHONY_LOGE("write Uint8 buffer failed.");
+            return TELEPHONY_ERR_READ_DATA_FAIL;
+        }
         buffer.push_back(data.ReadUint8());
     }
     int32_t result = SendImsRsdList(slotId, buffer);
@@ -630,6 +645,11 @@ int32_t CellularDataServiceStub::OnGetNetworkSliceAllowedNssai(MessageParcel &da
     int32_t buffer_len = data.ReadInt32();
     std::vector<uint8_t> buffer;
     for (int i = 0; i < buffer_len; ++i) {
+        uint8_t temp;
+        if (!data.ReadUint8(temp)) {
+            TELEPHONY_LOGE("write Uint8 buffer failed.");
+            return TELEPHONY_ERR_READ_DATA_FAIL;
+        }
         buffer.push_back(data.ReadUint8());
     }
     int32_t result = GetNetworkSliceAllowedNssai(slotId, buffer);
