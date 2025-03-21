@@ -336,7 +336,6 @@ public:
      * @brief Sync Ehplmn With Modem
     *
      * @param slotId Card slot identification.
-     * @param buffer msginfo
      * @return 0 set success, others set fail
      */
     int32_t GetNetworkSliceEhplmn(int32_t slotId);
