@@ -44,7 +44,6 @@ CellularDataNetAgent::~CellularDataNetAgent() = default;
 
 bool CellularDataNetAgent::RegisterNetSupplier(const int32_t slotId)
 {
-    TELEPHONY_LOGI("RegisterNetSupplier, slotId = %{public}d", slotId);
     bool flag = false;
     for (NetSupplier &netSupplier : netSuppliers_) {
         if (netSupplier.slotId != slotId) {
