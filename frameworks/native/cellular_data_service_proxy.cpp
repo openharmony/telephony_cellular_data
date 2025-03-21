@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <limits>
 #include "cellular_data_service_proxy.h"
 
 #include "iremote_object.h"
@@ -25,6 +25,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t INT32_MAX = std::numeric_limits<int32_t>::max();
 int32_t CellularDataServiceProxy::IsCellularDataEnabled(bool &dataEnabled)
 {
     MessageParcel data;
@@ -920,8 +921,12 @@ int32_t CellularDataServiceProxy::SendUrspDecodeResult(int32_t slotId, std::vect
     }
     data.WriteInt32(slotId);
     int32_t bufferlen = (int32_t)buffer.size();
+    if (bufferlen <= 0 || bufferlen > INT32_MAX) {
+        TELEPHONY_LOGE("buffer length is invalid: %{public}d", bufferlen);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
     data.WriteInt32(bufferlen);
-    for (size_t i = 0; i < buffer.size(); ++i) {
+    for (int i = 0; i < bufferlen; ++i) {
         data.WriteInt32(buffer[i]);
     }
     if (Remote() == nullptr) {
@@ -950,8 +955,12 @@ int32_t CellularDataServiceProxy::SendUePolicySectionIdentifier(int32_t slotId, 
     }
     data.WriteInt32(slotId);
     int32_t bufferlen = (int32_t)buffer.size();
+    if (bufferlen <= 0 || bufferlen > INT32_MAX) {
+        TELEPHONY_LOGE("buffer length is invalid: %{public}d", bufferlen);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
     data.WriteInt32(bufferlen);
-    for (size_t i = 0; i < buffer.size(); ++i) {
+    for (int i = 0; i < bufferlen; ++i) {
         data.WriteInt32(buffer[i]);
     }
     if (Remote() == nullptr) {
@@ -980,8 +989,12 @@ int32_t CellularDataServiceProxy::SendImsRsdList(int32_t slotId, std::vector<uin
     }
     data.WriteInt32(slotId);
     int32_t bufferlen = (int32_t)buffer.size();
+    if (bufferlen <= 0 || bufferlen > INT32_MAX) {
+        TELEPHONY_LOGE("buffer length is invalid: %{public}d", bufferlen);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
     data.WriteInt32(bufferlen);
-    for (size_t i = 0; i < buffer.size(); ++i) {
+    for (int i = 0; i < bufferlen; ++i) {
         data.WriteInt32(buffer[i]);
     }
     if (Remote() == nullptr) {
@@ -1010,6 +1023,10 @@ int32_t CellularDataServiceProxy::GetNetworkSliceAllowedNssai(int32_t slotId, st
     }
     data.WriteInt32(slotId);
     int32_t bufferlen = (int32_t)buffer.size();
+    if (bufferlen <= 0 || bufferlen > INT32_MAX) {
+        TELEPHONY_LOGE("buffer length is invalid: %{public}d", bufferlen);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
     data.WriteInt32(bufferlen);
     for (size_t i = 0; i < buffer.size(); ++i) {
         data.WriteInt32(buffer[i]);
