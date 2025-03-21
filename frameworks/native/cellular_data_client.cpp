@@ -470,7 +470,7 @@ int32_t CellularDataClient::GetDefaultActReportInfo(int32_t slotId, ApnActivateR
     }
     return proxy->GetDefaultActReportInfo(slotId, info);
 }
- 
+
 int32_t CellularDataClient::GetInternalActReportInfo(int32_t slotId, ApnActivateReportInfo &info)
 {
     sptr<ICellularDataManager> proxy = GetProxy();
