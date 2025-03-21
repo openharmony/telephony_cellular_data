@@ -516,7 +516,6 @@ int32_t CellularDataClient::QueryAllApnInfo(std::vector<ApnInfo> &apnInfoList)
 
 int32_t CellularDataClient::SendUrspDecodeResult(int32_t slotId, std::vector<uint8_t> buffer)
 {
-    TELEPHONY_LOGI("CellularDataClient::SendUrspDecodeResult");
     sptr<ICellularDataManager> proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null");
@@ -528,7 +527,6 @@ int32_t CellularDataClient::SendUrspDecodeResult(int32_t slotId, std::vector<uin
  
 int32_t CellularDataClient::SendUePolicySectionIdentifier(int32_t slotId, std::vector<uint8_t> buffer)
 {
-    TELEPHONY_LOGI("CellularDataClient::SendUePolicySectionIdentifier");
     sptr<ICellularDataManager> proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null");
@@ -540,7 +538,6 @@ int32_t CellularDataClient::SendUePolicySectionIdentifier(int32_t slotId, std::v
  
 int32_t CellularDataClient::SendImsRsdList(int32_t slotId, std::vector<uint8_t> buffer)
 {
-    TELEPHONY_LOGI("CellularDataClient::SendImsRsdList");
     sptr<ICellularDataManager> proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null");
@@ -552,7 +549,6 @@ int32_t CellularDataClient::SendImsRsdList(int32_t slotId, std::vector<uint8_t> 
  
 int32_t CellularDataClient::GetNetworkSliceAllowedNssai(int32_t slotId, std::vector<uint8_t> buffer)
 {
-    TELEPHONY_LOGI("CellularDataClient::GetNetworkSliceAllowedNssai");
     sptr<ICellularDataManager> proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null");
@@ -564,7 +560,6 @@ int32_t CellularDataClient::GetNetworkSliceAllowedNssai(int32_t slotId, std::vec
  
 int32_t CellularDataClient::GetNetworkSliceEhplmn(int32_t slotId)
 {
-    TELEPHONY_LOGI("CellularDataClient::GetNetworkSliceEhplmn");
     sptr<ICellularDataManager> proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null");
