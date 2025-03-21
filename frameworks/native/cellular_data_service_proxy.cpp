@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int32_t INT32_MAX = std::numeric_limits<int32_t>::max();
+constexpr int32_t BUFFER_MAX = 65538;
 int32_t CellularDataServiceProxy::IsCellularDataEnabled(bool &dataEnabled)
 {
     MessageParcel data;
@@ -921,7 +921,7 @@ int32_t CellularDataServiceProxy::SendUrspDecodeResult(int32_t slotId, std::vect
     }
     data.WriteInt32(slotId);
     int32_t bufferlen = (int32_t)buffer.size();
-    if (bufferlen <= 0 || bufferlen > INT32_MAX) {
+    if (bufferlen <= 0 || bufferlen > BUFFER_MAX) {
         TELEPHONY_LOGE("buffer length is invalid: %{public}d", bufferlen);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -955,7 +955,7 @@ int32_t CellularDataServiceProxy::SendUePolicySectionIdentifier(int32_t slotId, 
     }
     data.WriteInt32(slotId);
     int32_t bufferlen = (int32_t)buffer.size();
-    if (bufferlen <= 0 || bufferlen > INT32_MAX) {
+    if (bufferlen <= 0 || bufferlen > BUFFER_MAX) {
         TELEPHONY_LOGE("buffer length is invalid: %{public}d", bufferlen);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -989,7 +989,7 @@ int32_t CellularDataServiceProxy::SendImsRsdList(int32_t slotId, std::vector<uin
     }
     data.WriteInt32(slotId);
     int32_t bufferlen = (int32_t)buffer.size();
-    if (bufferlen <= 0 || bufferlen > INT32_MAX) {
+    if (bufferlen <= 0 || bufferlen > BUFFER_MAX) {
         TELEPHONY_LOGE("buffer length is invalid: %{public}d", bufferlen);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -1023,7 +1023,7 @@ int32_t CellularDataServiceProxy::GetNetworkSliceAllowedNssai(int32_t slotId, st
     }
     data.WriteInt32(slotId);
     int32_t bufferlen = (int32_t)buffer.size();
-    if (bufferlen <= 0 || bufferlen > INT32_MAX) {
+    if (bufferlen <= 0 || bufferlen > BUFFER_MAX) {
         TELEPHONY_LOGE("buffer length is invalid: %{public}d", bufferlen);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
