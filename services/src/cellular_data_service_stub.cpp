@@ -581,7 +581,6 @@ int32_t CellularDataServiceStub::OnQueryAllApnInfo(MessageParcel &data, MessageP
 
 int32_t CellularDataServiceStub::OnSendUrspDecodeResult(MessageParcel &data, MessageParcel &reply)
 {
-    TELEPHONY_LOGI("CellularDataServiceStub::OnSendUrspDecodeResult");
     int32_t slotId = data.ReadInt32();
     int32_t buffer_len = data.ReadInt32();
     std::vector<uint8_t> buffer;
@@ -597,7 +596,6 @@ int32_t CellularDataServiceStub::OnSendUrspDecodeResult(MessageParcel &data, Mes
 
 int32_t CellularDataServiceStub::OnSendUePolicySectionIdentifier(MessageParcel &data, MessageParcel &reply)
 {
-    TELEPHONY_LOGI("CellularDataServiceStub::OnSendUePolicySectionIdentifier");
     int32_t slotId = data.ReadInt32();
     int32_t buffer_len = data.ReadInt32();
     std::vector<uint8_t> buffer;
@@ -613,7 +611,6 @@ int32_t CellularDataServiceStub::OnSendUePolicySectionIdentifier(MessageParcel &
 
 int32_t CellularDataServiceStub::OnSendImsRsdList(MessageParcel &data, MessageParcel &reply)
 {
-    TELEPHONY_LOGI("CellularDataServiceStub::OnSendImsRsdList");
     int32_t slotId = data.ReadInt32();
     int32_t buffer_len = data.ReadInt32();
     std::vector<uint8_t> buffer;
@@ -629,7 +626,6 @@ int32_t CellularDataServiceStub::OnSendImsRsdList(MessageParcel &data, MessagePa
 
 int32_t CellularDataServiceStub::OnGetNetworkSliceAllowedNssai(MessageParcel &data, MessageParcel &reply)
 {
-    TELEPHONY_LOGI("CellularDataServiceStub::OnGetNetworkSliceAllowedNssai");
     int32_t slotId = data.ReadInt32();
     int32_t buffer_len = data.ReadInt32();
     std::vector<uint8_t> buffer;
@@ -645,7 +641,6 @@ int32_t CellularDataServiceStub::OnGetNetworkSliceAllowedNssai(MessageParcel &da
 
 int32_t CellularDataServiceStub::OnGetNetworkSliceEhplmn(MessageParcel &data, MessageParcel &reply)
 {
-    TELEPHONY_LOGI("CellularDataServiceStub::OnGetNetworkSliceEhplmn");
     int32_t slotId = data.ReadInt32();
     int32_t result = GetNetworkSliceEhplmn(slotId);
     if (result != TELEPHONY_ERR_SUCCESS) {
