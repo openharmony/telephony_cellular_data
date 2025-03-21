@@ -294,7 +294,6 @@ std::vector<sptr<ApnHolder>> ApnManager::GetSortApnHolder() const
 
 int32_t ApnManager::CreateAllApnItemByDatabase(int32_t slotId)
 {
-    TELEPHONY_LOGI("CreateAllApnItemByDatabase");
     int32_t count = 0;
     if (TELEPHONY_EXT_WRAPPER.createAllApnItemExt_) {
         sptr<ApnItem> extraApnItem = ApnItem::MakeDefaultApn("default");
@@ -369,7 +368,6 @@ void ApnManager::GetCTOperator(int32_t slotId, std::string &numeric)
 
 int32_t ApnManager::CreateMvnoApnItems(int32_t slotId, const std::string &mcc, const std::string &mnc)
 {
-    TELEPHONY_LOGI("CreateMvnoApnItems");
     int32_t count = 0;
     auto helper = CellularDataRdbHelper::GetInstance();
     if (helper == nullptr) {
@@ -417,7 +415,6 @@ void ApnManager::ReportApnInfo(int32_t slotId, PdpProfile &apnData)
 
 int32_t ApnManager::MakeSpecificApnItem(std::vector<PdpProfile> &apnVec, int32_t slotId)
 {
-    TELEPHONY_LOGI("MakeSpecificApnItem");
     std::lock_guard<std::mutex> lock(mutex_);
     allApnItem_.clear();
     TryMergeSimilarPdpProfile(apnVec);
