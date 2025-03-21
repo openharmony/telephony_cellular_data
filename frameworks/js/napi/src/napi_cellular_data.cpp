@@ -266,7 +266,7 @@ static napi_value IsCellularDataEnabledSync(napi_env env, napi_callback_info inf
         auto errorCode = CellularDataClient::GetInstance().IsCellularDataEnabled(isEnabled);
         if (errorCode != TELEPHONY_SUCCESS) {
             JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
-                 errorCode, "isCellularDataEnabledSync", GET_NETWORK_INFO);
+                errorCode, "isCellularDataEnabledSync", GET_NETWORK_INFO);
             NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
             return value;
         }
