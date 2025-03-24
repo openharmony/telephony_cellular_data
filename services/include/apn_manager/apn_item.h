@@ -78,6 +78,12 @@ public:
         char proxyIpAddress_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
         char mmsIpAddress_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
         bool isEdited_ = false;
+        /* For networkslice*/
+        char snssai_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
+        uint8_t sscMode_ = 0;
+        char dnn_[ALL_APN_ITEM_CHAR_LENGTH] = { 0 };
+        int32_t PduSessionType_ = 0;
+        uint8_t RouteBitmap_ = 0;
     } attr_;
 
 private:

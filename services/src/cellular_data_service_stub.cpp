@@ -32,6 +32,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t BUFFER_MAX = 65538;
 CellularDataServiceStub::CellularDataServiceStub() = default;
 
 CellularDataServiceStub::~CellularDataServiceStub() = default;
@@ -577,6 +578,102 @@ int32_t CellularDataServiceStub::OnQueryAllApnInfo(MessageParcel &data, MessageP
         ++it;
     }
     return 0;
+}
+
+int32_t CellularDataServiceStub::OnSendUrspDecodeResult(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t buffer_len = data.ReadInt32();
+    if (buffer_len <= 0 || buffer_len > BUFFER_MAX) {
+        TELEPHONY_LOGE("buffer length is invalid: %{public}d", buffer_len);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    std::vector<uint8_t> buffer;
+    for (int i = 0; i < buffer_len; ++i) {
+        buffer.push_back(data.ReadUint8());
+    }
+    int32_t result = SendUrspDecodeResult(slotId, buffer);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CellularDataServiceStub::OnSendUePolicySectionIdentifier(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t buffer_len = data.ReadInt32();
+    if (buffer_len <= 0 || buffer_len > BUFFER_MAX) {
+        TELEPHONY_LOGE("buffer length is invalid: %{public}d", buffer_len);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    std::vector<uint8_t> buffer;
+    for (int i = 0; i < buffer_len; ++i) {
+        buffer.push_back(data.ReadUint8());
+    }
+    int32_t result = SendUePolicySectionIdentifier(slotId, buffer);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CellularDataServiceStub::OnSendImsRsdList(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t buffer_len = data.ReadInt32();
+    if (buffer_len <= 0 || buffer_len > BUFFER_MAX) {
+        TELEPHONY_LOGE("buffer length is invalid: %{public}d", buffer_len);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    std::vector<uint8_t> buffer;
+    for (int i = 0; i < buffer_len; ++i) {
+        uint8_t temp;
+        if (!data.ReadUint8(temp)) {
+            TELEPHONY_LOGE("write Uint8 buffer failed.");
+            return TELEPHONY_ERR_READ_DATA_FAIL;
+        }
+        buffer.push_back(data.ReadUint8());
+    }
+    int32_t result = SendImsRsdList(slotId, buffer);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CellularDataServiceStub::OnGetNetworkSliceAllowedNssai(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t buffer_len = data.ReadInt32();
+    if (buffer_len <= 0 || buffer_len > BUFFER_MAX) {
+        TELEPHONY_LOGE("buffer length is invalid: %{public}d", buffer_len);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    std::vector<uint8_t> buffer;
+    for (int i = 0; i < buffer_len; ++i) {
+        uint8_t temp;
+        if (!data.ReadUint8(temp)) {
+            TELEPHONY_LOGE("write Uint8 buffer failed.");
+            return TELEPHONY_ERR_READ_DATA_FAIL;
+        }
+        buffer.push_back(data.ReadUint8());
+    }
+    int32_t result = GetNetworkSliceAllowedNssai(slotId, buffer);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CellularDataServiceStub::OnGetNetworkSliceEhplmn(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t result = GetNetworkSliceEhplmn(slotId);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

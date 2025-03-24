@@ -25,6 +25,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t BUFFER_MAX = 65538;
 int32_t CellularDataServiceProxy::IsCellularDataEnabled(bool &dataEnabled)
 {
     MessageParcel data;
@@ -906,6 +907,167 @@ int32_t CellularDataServiceProxy::QueryAllApnInfo(std::vector<ApnInfo> &apnInfoL
             apnInfoList.emplace_back(apnInfo);
         }
     }
+    return result;
+}
+
+int32_t CellularDataServiceProxy::SendUrspDecodeResult(int32_t slotId, std::vector<uint8_t> buffer)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write interface token failed!");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    int32_t bufferlen = (int32_t)buffer.size();
+    if (bufferlen <= 0 || bufferlen > BUFFER_MAX) {
+        TELEPHONY_LOGE("buffer length is invalid: %{public}d", bufferlen);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    data.WriteInt32(bufferlen);
+    for (int i = 0; i < bufferlen; ++i) {
+        data.WriteInt32(buffer[i]);
+    }
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+ 
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::SEND_MANAGE_UEPOLICY_DECODE_RESULT,
+        data, reply, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("SendUrspDecodeResult fail! errCode: %{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    return result;
+}
+
+int32_t CellularDataServiceProxy::SendUePolicySectionIdentifier(int32_t slotId, std::vector<uint8_t> buffer)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write interface token failed!");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    int32_t bufferlen = (int32_t)buffer.size();
+    if (bufferlen <= 0 || bufferlen > BUFFER_MAX) {
+        TELEPHONY_LOGE("buffer length is invalid: %{public}d", bufferlen);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    data.WriteInt32(bufferlen);
+    for (int i = 0; i < bufferlen; ++i) {
+        data.WriteInt32(buffer[i]);
+    }
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+ 
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::SEND_UE_STATE_INDICATION,
+        data, reply, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("SendUePolicySectionIdentifier fail! errCode: %{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    return result;
+}
+ 
+int32_t CellularDataServiceProxy::SendImsRsdList(int32_t slotId, std::vector<uint8_t> buffer)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write interface token failed!");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    int32_t bufferlen = (int32_t)buffer.size();
+    if (bufferlen <= 0 || bufferlen > BUFFER_MAX) {
+        TELEPHONY_LOGE("buffer length is invalid: %{public}d", bufferlen);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    data.WriteInt32(bufferlen);
+    for (int i = 0; i < bufferlen; ++i) {
+        data.WriteInt32(buffer[i]);
+    }
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+ 
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::SEND_IMS_RSDLIST,
+        data, reply, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("SendImsRsdList fail! errCode: %{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    return result;
+}
+ 
+int32_t CellularDataServiceProxy::GetNetworkSliceAllowedNssai(int32_t slotId, std::vector<uint8_t> buffer)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write interface token failed!");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    int32_t bufferlen = (int32_t)buffer.size();
+    if (bufferlen <= 0 || bufferlen > BUFFER_MAX) {
+        TELEPHONY_LOGE("buffer length is invalid: %{public}d", bufferlen);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    data.WriteInt32(bufferlen);
+    for (int i = 0; i < bufferlen; ++i) {
+        data.WriteInt32(buffer[i]);
+    }
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+ 
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::SYNC_ALLOWED_NSSAI_WITH_MODEM,
+        data, reply, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("GetNetworkSliceAllowedNssai fail! errCode: %{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    return result;
+}
+ 
+int32_t CellularDataServiceProxy::GetNetworkSliceEhplmn(int32_t slotId)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(CellularDataServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write interface token failed!");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+ 
+    int32_t error = Remote()->SendRequest((uint32_t)CellularDataInterfaceCode::SYNC_EHPLMN_WITH_MODEM,
+        data, reply, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("GetNetworkSliceEhplmn fail! errCode: %{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
     return result;
 }
 

@@ -108,6 +108,13 @@ HWTEST_F(CellularDataServiceTest, CellularDataService_002, TestSize.Level0)
         service->GetCellularDataSupplierId(DEFAULT_SIM_SLOT_ID, NetCap::NET_CAPABILITY_END, supplierId));
     service->CorrectNetSupplierNoAvailable(DEFAULT_SIM_SLOT_ID);
     ASSERT_EQ(TELEPHONY_ERR_PERMISSION_ERR, service->EstablishAllApnsIfConnectable(DEFAULT_SIM_SLOT_ID));
+    int32_t slotId = 0;
+    std::vector<uint8_t> buffer = {};
+    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, service->SendUrspDecodeResult(slotId, buffer));
+    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, service->SendUePolicySectionIdentifier(slotId, buffer));
+    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, service->SendImsRsdList(slotId, buffer));
+    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, service->GetNetworkSliceAllowedNssai(slotId, buffer));
+    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, service->GetNetworkSliceEhplmn(slotId));
     int32_t regState = -1;
     service->GetSupplierRegisterState(supplierId, regState);
     bool isSupportDun = false;

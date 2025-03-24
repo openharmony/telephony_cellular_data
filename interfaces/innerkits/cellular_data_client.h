@@ -296,6 +296,50 @@ public:
      */
     int32_t QueryAllApnInfo(std::vector<ApnInfo> &apnInfoList);
 
+    /**
+     * @brief Snd Ursp Decode Result
+     *
+     * @param slotId Card slot identification.
+     * @param buffer msginfo
+     * @return 0 set success, others set fail
+     */
+    int32_t SendUrspDecodeResult(int32_t slotId, std::vector<uint8_t> buffer);
+
+    /**
+     * @brief Snd Ue Policy Section Identifier
+    *
+     * @param slotId Card slot identification.
+     * @param buffer msginfo
+     * @return 0 set success, others set fail
+     */
+    int32_t SendUePolicySectionIdentifier(int32_t slotId, std::vector<uint8_t> buffer);
+
+    /**
+     * @brief Snd ImsRsdList
+    *
+     * @param slotId Card slot identification.
+     * @param buffer msginfo
+     * @return 0 set success, others set fail
+     */
+    int32_t SendImsRsdList(int32_t slotId, std::vector<uint8_t> buffer);
+
+    /**
+     * @brief Sync AllowedNssai With Modem
+    *
+     * @param slotId Card slot identification.
+     * @param buffer msginfo
+     * @return 0 set success, others set fail
+     */
+    int32_t GetNetworkSliceAllowedNssai(int32_t slotId, std::vector<uint8_t> buffer);
+
+    /**
+     * @brief Sync Ehplmn With Modem
+    *
+     * @param slotId Card slot identification.
+     * @return 0 set success, others set fail
+     */
+    int32_t GetNetworkSliceEhplmn(int32_t slotId);
+
 private:
     class CellularDataDeathRecipient : public IRemoteObject::DeathRecipient {
     public:

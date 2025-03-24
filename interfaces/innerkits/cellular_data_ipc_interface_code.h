@@ -54,6 +54,11 @@ enum class CellularDataInterfaceCode {
     QUERY_APN_INFO,
     SET_PREFER_APN,
     QUERY_ALL_APN_INFO,
+    SEND_MANAGE_UEPOLICY_DECODE_RESULT,
+    SEND_UE_STATE_INDICATION,
+    SEND_IMS_RSDLIST,
+    SYNC_ALLOWED_NSSAI_WITH_MODEM,
+    SYNC_EHPLMN_WITH_MODEM,
 };
 } // namespace Telephony
 } // namespace OHOS

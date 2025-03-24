@@ -24,6 +24,8 @@
 #include "operator_config_types.h"
 #include "radio_event.h"
 #include "telephony_log_wrapper.h"
+#include "networkslice_client.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -155,6 +157,11 @@ void DataConnectionManager::RegisterRadioObserver()
     coreInner.RegisterCoreNotify(slotId_, stateMachineEventHandler_, RadioEvent::RADIO_DATA_CALL_LIST_CHANGED, nullptr);
     coreInner.RegisterCoreNotify(
         slotId_, stateMachineEventHandler_, RadioEvent::RADIO_LINK_CAPABILITY_CHANGED, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, stateMachineEventHandler_, RadioEvent::RADIO_NETWORKSLICE_URSP_RPT, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, stateMachineEventHandler_,
+        RadioEvent::RADIO_NETWORKSLICE_ALLOWEDNSSAI_RPT, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, stateMachineEventHandler_,
+        RadioEvent::RADIO_NETWORKSLICE_EHPLMN_RPT, nullptr);
 }
 
 void DataConnectionManager::UnRegisterRadioObserver() const
@@ -167,6 +174,9 @@ void DataConnectionManager::UnRegisterRadioObserver() const
     coreInner.UnRegisterCoreNotify(slotId_, stateMachineEventHandler_, RadioEvent::RADIO_CONNECTED);
     coreInner.UnRegisterCoreNotify(slotId_, stateMachineEventHandler_, RadioEvent::RADIO_DATA_CALL_LIST_CHANGED);
     coreInner.UnRegisterCoreNotify(slotId_, stateMachineEventHandler_, RadioEvent::RADIO_LINK_CAPABILITY_CHANGED);
+    coreInner.UnRegisterCoreNotify(slotId_, stateMachineEventHandler_, RadioEvent::RADIO_NETWORKSLICE_URSP_RPT);
+    coreInner.UnRegisterCoreNotify(slotId_, stateMachineEventHandler_, RadioEvent::RADIO_NETWORKSLICE_ALLOWEDNSSAI_RPT);
+    coreInner.UnRegisterCoreNotify(slotId_, stateMachineEventHandler_, RadioEvent::RADIO_NETWORKSLICE_EHPLMN_RPT);
 }
 
 void CcmDefaultState::StateBegin()
@@ -195,6 +205,15 @@ bool CcmDefaultState::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
             break;
         case RadioEvent::RADIO_LINK_CAPABILITY_CHANGED:
             RadioLinkCapabilityChanged(event);
+            break;
+        case RadioEvent::RADIO_NETWORKSLICE_URSP_RPT:
+            RadioNetworkSliceUrspRpt(event);
+            break;
+        case RadioEvent::RADIO_NETWORKSLICE_ALLOWEDNSSAI_RPT:
+            RadioNetworkSliceAllowedNssaiRpt(event);
+            break;
+        case RadioEvent::RADIO_NETWORKSLICE_EHPLMN_RPT:
+            RadioNetworkSliceEhplmnRpt(event);
             break;
         default:
             TELEPHONY_LOGE("handle nothing!");
@@ -464,5 +483,41 @@ void DataConnectionManager::HandleScreenStateChanged(bool isScreenOn) const
     }
     connectionMonitor_->HandleScreenStateChanged(isScreenOn);
 }
+
+void CcmDefaultState::RadioNetworkSliceUrspRpt(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::shared_ptr<NetworkSliceUrspInfo> networkSliceUrspInfo = event->GetSharedObject<NetworkSliceUrspInfo>();
+    if (networkSliceUrspInfo == nullptr) {
+        TELEPHONY_LOGE("networkSliceClient is null");
+        return;
+    }
+    std::vector<uint8_t> buffer = networkSliceUrspInfo->urspInfo;
+    DelayedSingleton<NetManagerStandard::NetworkSliceClient>::GetInstance()->SetNetworkSliceUePolicy(buffer);
+}
+
+void CcmDefaultState::RadioNetworkSliceAllowedNssaiRpt(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::shared_ptr<NetworkSliceAllowedNssaiInfo> networkSliceAllowedNssaiInfo
+        = event->GetSharedObject<NetworkSliceAllowedNssaiInfo>();
+    if (networkSliceAllowedNssaiInfo == nullptr) {
+        TELEPHONY_LOGE("networkSliceClient is null");
+        return;
+    }
+    std::vector<uint8_t> buffer = networkSliceAllowedNssaiInfo->allowednssaiInfo;
+    DelayedSingleton<NetManagerStandard::NetworkSliceClient>::GetInstance()->NetworkSliceAllowedNssaiRpt(buffer);
+}
+
+void CcmDefaultState::RadioNetworkSliceEhplmnRpt(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::shared_ptr<NetworkSliceEhplmnInfo> networkSliceEhplmnInfo
+        = event->GetSharedObject<NetworkSliceEhplmnInfo>();
+    if (networkSliceEhplmnInfo == nullptr) {
+        TELEPHONY_LOGE("networkSliceClient is null");
+        return;
+    }
+    std::vector<uint8_t> buffer = networkSliceEhplmnInfo->ehplmnInfo;
+    DelayedSingleton<NetManagerStandard::NetworkSliceClient>::GetInstance()->NetworkSliceEhplmnRpt(buffer);
+}
+
 } // namespace Telephony
 } // namespace OHOS

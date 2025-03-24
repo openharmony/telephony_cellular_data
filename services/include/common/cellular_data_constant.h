@@ -132,7 +132,13 @@ enum DataContextRolesId {
     DATA_CONTEXT_ROLE_EMERGENCY_ID = 7,
     DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID = 8,
     DATA_CONTEXT_ROLE_XCAP_ID = 9,
-    DATA_CONTEXT_ROLE_BIP_ID = 10
+    DATA_CONTEXT_ROLE_BIP_ID = 10,
+    DATA_CONTEXT_ROLE_SNSSAI1_ID = 11,
+    DATA_CONTEXT_ROLE_SNSSAI2_ID = 12,
+    DATA_CONTEXT_ROLE_SNSSAI3_ID = 13,
+    DATA_CONTEXT_ROLE_SNSSAI4_ID = 14,
+    DATA_CONTEXT_ROLE_SNSSAI5_ID = 15,
+    DATA_CONTEXT_ROLE_SNSSAI6_ID = 16
 };
 
 enum class DataContextPriority : int32_t { PRIORITY_NONE, PRIORITY_LOW, PRIORITY_NORMAL, PRIORITY_HIGH };
@@ -175,7 +181,13 @@ enum class ApnTypes : int32_t {
     XCAP = 2048,
     INTERNAL_DEFAULT = 4096,
     BIP = 8192,
-    ALL = 16383
+    SNSSAI1 = 16384,
+    SNSSAI2 = 32768,
+    SNSSAI3 = 65536,
+    SNSSAI4 = 131072,
+    SNSSAI5 = 262144,
+    SNSSAI6 = 524288,
+    ALL = 1048575
 };
 
 enum class RetryScene : int32_t {
@@ -195,6 +207,12 @@ static constexpr const char *DATA_CONTEXT_ROLE_IA = "ia";
 static constexpr const char *DATA_CONTEXT_ROLE_EMERGENCY = "emergency";
 static constexpr const char *DATA_CONTEXT_ROLE_INTERNAL_DEFAULT = "internal_default";
 static constexpr const char *DATA_CONTEXT_ROLE_XCAP = "xcap";
+static constexpr const char *DATA_CONTEXT_ROLE_SNSSAI1 = "snssai1";
+static constexpr const char *DATA_CONTEXT_ROLE_SNSSAI2 = "snssai2";
+static constexpr const char *DATA_CONTEXT_ROLE_SNSSAI3 = "snssai3";
+static constexpr const char *DATA_CONTEXT_ROLE_SNSSAI4 = "snssai4";
+static constexpr const char *DATA_CONTEXT_ROLE_SNSSAI5 = "snssai5";
+static constexpr const char *DATA_CONTEXT_ROLE_SNSSAI6 = "snssai6";
 static const int32_t DATA_PROFILE_DEFAULT = 0;
 static const int32_t DATA_PROFILE_MMS = 1;
 static const int32_t DATA_PROFILE_INTERNAL_DEFAULT = 2;
@@ -203,6 +221,12 @@ static const int32_t DATA_PROFILE_DUN = 4;
 static const int32_t DATA_PROFILE_IA = 5;
 static const int32_t DATA_PROFILE_XCAP = 6;
 static const int32_t DATA_PROFILE_BIP = 7;
+static const int32_t DATA_PROFILE_SNSSAI1 = 8;
+static const int32_t DATA_PROFILE_SNSSAI2 = 9;
+static const int32_t DATA_PROFILE_SNSSAI3 = 10;
+static const int32_t DATA_PROFILE_SNSSAI4 = 11;
+static const int32_t DATA_PROFILE_SNSSAI5 = 12;
+static const int32_t DATA_PROFILE_SNSSAI6 = 13;
 static const int32_t CMCC_MCC_MNC = 46002;
 static const int32_t DEFAULT_AUTH_TYPE = 0;
 static const int32_t DEFAULT_MTU = 1500;

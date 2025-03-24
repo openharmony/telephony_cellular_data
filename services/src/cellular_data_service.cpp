@@ -304,6 +304,12 @@ void CellularDataService::InitModule()
     netCapabilities.push_back(NetCap::NET_CAPABILITY_IA);
     netCapabilities.push_back(NetCap::NET_CAPABILITY_XCAP);
     netCapabilities.push_back(NetCap::NET_CAPABILITY_BIP);
+    netCapabilities.push_back(NetCap::NET_CAPABILITY_SNSSAI1);
+    netCapabilities.push_back(NetCap::NET_CAPABILITY_SNSSAI2);
+    netCapabilities.push_back(NetCap::NET_CAPABILITY_SNSSAI3);
+    netCapabilities.push_back(NetCap::NET_CAPABILITY_SNSSAI4);
+    netCapabilities.push_back(NetCap::NET_CAPABILITY_SNSSAI5);
+    netCapabilities.push_back(NetCap::NET_CAPABILITY_SNSSAI6);
     int32_t simNum = CoreManagerInner::GetInstance().GetMaxSimCount();
     for (int32_t i = 0; i < simNum; ++i) {
         AddNetSupplier(i, netAgent, netCapabilities);
@@ -785,7 +791,7 @@ int32_t CellularDataService::GetCellularDataSupplierId(int32_t slotId, uint64_t 
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    if (capability < NetCap::NET_CAPABILITY_MMS || capability > NetCap::NET_CAPABILITY_INTERNAL_DEFAULT) {
+    if (capability < NetCap::NET_CAPABILITY_MMS || capability > NetCap::NET_CAPABILITY_SNSSAI6) {
         TELEPHONY_LOGE("Invalid capability = (%{public}" PRIu64 ")", capability);
         return CELLULAR_DATA_INVALID_PARAM;
     }
@@ -839,7 +845,6 @@ int32_t CellularDataService::GetIfSupportDunApn(bool &isSupportDun)
     isSupportDun = cellularDataController->IsSupportDunApn();
     return TELEPHONY_ERR_SUCCESS;
 }
-
 
 int32_t CellularDataService::GetDefaultActReportInfo(int32_t slotId, ApnActivateReportInfo &info)
 {
@@ -916,6 +921,36 @@ int32_t CellularDataService::QueryAllApnInfo(std::vector<ApnInfo> &allApnInfoLis
     }
     helper->QueryAllApnInfo(allApnInfoList);
     return 0;
+}
+
+int32_t CellularDataService::SendUrspDecodeResult(int32_t slotId, std::vector<uint8_t> buffer)
+{
+    int32_t eventid = static_cast<int32_t>(CellularDataEventCode::MSG_SEND_UEPOLICY_COMMAND_REJECT);
+    return CoreManagerInner::GetInstance().SendUrspDecodeResult(slotId, buffer, eventid);
+}
+
+int32_t CellularDataService::SendUePolicySectionIdentifier(int32_t slotId, std::vector<uint8_t> buffer)
+{
+    int32_t eventid = static_cast<int32_t>(CellularDataEventCode::MSG_SEND_UE_STATE_INDICATION);
+    return CoreManagerInner::GetInstance().SendUePolicySectionIdentifier(slotId, buffer, eventid);
+}
+
+int32_t CellularDataService::SendImsRsdList(int32_t slotId, std::vector<uint8_t> buffer)
+{
+    int32_t eventid = static_cast<int32_t>(CellularDataEventCode::MSG_SEND_IMS_RSDLIST);
+    return CoreManagerInner::GetInstance().SendImsRsdList(slotId, buffer, eventid);
+}
+
+int32_t CellularDataService::GetNetworkSliceAllowedNssai(int32_t slotId, std::vector<uint8_t> buffer)
+{
+    int32_t eventid = static_cast<int32_t>(CellularDataEventCode::MSG_SYNC_ALLOWED_NSSAI_WITH_MODEM);
+    return CoreManagerInner::GetInstance().GetNetworkSliceAllowedNssai(slotId, buffer, eventid);
+}
+
+int32_t CellularDataService::GetNetworkSliceEhplmn(int32_t slotId)
+{
+    int32_t eventid = static_cast<int32_t>(CellularDataEventCode::MSG_SYNC_EHPLMN_WITH_MODEM);
+    return CoreManagerInner::GetInstance().GetNetworkSliceEhplmn(slotId, eventid);
 }
 } // namespace Telephony
 } // namespace OHOS

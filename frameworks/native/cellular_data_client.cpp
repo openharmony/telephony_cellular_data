@@ -513,5 +513,60 @@ int32_t CellularDataClient::QueryAllApnInfo(std::vector<ApnInfo> &apnInfoList)
     TELEPHONY_LOGI("QueryAllApnInfo");
     return proxy->QueryAllApnInfo(apnInfoList);
 }
+
+int32_t CellularDataClient::SendUrspDecodeResult(int32_t slotId, std::vector<uint8_t> buffer)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = proxy->SendUrspDecodeResult(slotId, buffer);
+    return result;
+}
+ 
+int32_t CellularDataClient::SendUePolicySectionIdentifier(int32_t slotId, std::vector<uint8_t> buffer)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = proxy->SendUePolicySectionIdentifier(slotId, buffer);
+    return result;
+}
+ 
+int32_t CellularDataClient::SendImsRsdList(int32_t slotId, std::vector<uint8_t> buffer)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = proxy->SendImsRsdList(slotId, buffer);
+    return result;
+}
+ 
+int32_t CellularDataClient::GetNetworkSliceAllowedNssai(int32_t slotId, std::vector<uint8_t> buffer)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = proxy->GetNetworkSliceAllowedNssai(slotId, buffer);
+    return result;
+}
+ 
+int32_t CellularDataClient::GetNetworkSliceEhplmn(int32_t slotId)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = proxy->GetNetworkSliceEhplmn(slotId);
+    return result;
+}
 } // namespace Telephony
 } // namespace OHOS

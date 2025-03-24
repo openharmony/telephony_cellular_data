@@ -176,6 +176,16 @@ public:
     int32_t CorrectNetSupplierNoAvailable(int32_t slotId);
 
     int32_t GetSupplierRegisterState(uint32_t supplierId, int32_t &regState);
+    
+    int32_t SendUrspDecodeResult(int32_t slotId, std::vector<uint8_t> buffer);
+
+    int32_t SendUePolicySectionIdentifier(int32_t slotId, std::vector<uint8_t> buffer);
+
+    int32_t SendImsRsdList(int32_t slotId, std::vector<uint8_t> buffer);
+
+    int32_t GetNetworkSliceAllowedNssai(int32_t slotId, std::vector<uint8_t> buffer);
+
+    int32_t GetNetworkSliceEhplmn(int32_t slotId);
 
     int32_t GetIfSupportDunApn(bool &isSupportDun);
 

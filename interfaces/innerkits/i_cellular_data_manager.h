@@ -173,6 +173,16 @@ public:
 
     virtual int32_t QueryAllApnInfo(std::vector<ApnInfo> &apnInfoList) = 0;
 
+    virtual int32_t SendUrspDecodeResult(int32_t slotId, std::vector<uint8_t> buffer) = 0;
+
+    virtual int32_t SendUePolicySectionIdentifier(int32_t slotId, std::vector<uint8_t> buffer) = 0;
+
+    virtual int32_t SendImsRsdList(int32_t slotId, std::vector<uint8_t> buffer) = 0;
+
+    virtual int32_t GetNetworkSliceAllowedNssai(int32_t slotId, std::vector<uint8_t> buffer) = 0;
+
+    virtual int32_t GetNetworkSliceEhplmn(int32_t slotId) = 0;
+
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.telephony.ICellularDataManager");
 };

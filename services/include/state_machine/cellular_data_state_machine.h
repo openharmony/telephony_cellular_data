@@ -97,6 +97,8 @@ private:
     std::string GetIpType(std::vector<AddressInfo> ipInfoArray);
     bool HasMatchedIpTypeAddrs(uint8_t ipType, uint8_t ipInfoArraySize, std::vector<AddressInfo> ipInfoArray);
     int32_t GetNetScoreBySlotId(int32_t slotId);
+    void GetNetworkSlicePara(const DataConnectionParams& connectionParams, sptr<ApnItem> apn);
+    void FillRSDFromNetCap(std::map<std::string, std::string> networkSliceParas, sptr<ApnItem> apn);
 
 private:
     friend class Active;

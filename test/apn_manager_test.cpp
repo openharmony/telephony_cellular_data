@@ -229,6 +229,84 @@ HWTEST_F(ApnManagerTest, FindApnIdByCapability_009, Function | MediumTest | Leve
 }
 
 /**
+ * @tc.number   FindApnIdByCapability_009
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, FindApnIdByCapability_010, Function | MediumTest | Level1)
+{
+    uint64_t capability = NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI1;
+    int32_t expected = DATA_CONTEXT_ROLE_SNSSAI1_ID;
+    int32_t actual = apnManager->FindApnIdByCapability(capability);
+    ASSERT_EQ(actual, expected);
+}
+
+/**
+ * @tc.number   FindApnIdByCapability_009
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, FindApnIdByCapability_011, Function | MediumTest | Level1)
+{
+    uint64_t capability = NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI2;
+    int32_t expected = DATA_CONTEXT_ROLE_SNSSAI2_ID;
+    int32_t actual = apnManager->FindApnIdByCapability(capability);
+    ASSERT_EQ(actual, expected);
+}
+
+/**
+ * @tc.number   FindApnIdByCapability_009
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, FindApnIdByCapability_012, Function | MediumTest | Level1)
+{
+    uint64_t capability = NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI3;
+    int32_t expected = DATA_CONTEXT_ROLE_SNSSAI3_ID;
+    int32_t actual = apnManager->FindApnIdByCapability(capability);
+    ASSERT_EQ(actual, expected);
+}
+
+/**
+ * @tc.number   FindApnIdByCapability_009
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, FindApnIdByCapability_013, Function | MediumTest | Level1)
+{
+    uint64_t capability = NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI4;
+    int32_t expected = DATA_CONTEXT_ROLE_SNSSAI4_ID;
+    int32_t actual = apnManager->FindApnIdByCapability(capability);
+    ASSERT_EQ(actual, expected);
+}
+
+/**
+ * @tc.number   FindApnIdByCapability_009
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, FindApnIdByCapability_014, Function | MediumTest | Level1)
+{
+    uint64_t capability = NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI5;
+    int32_t expected = DATA_CONTEXT_ROLE_SNSSAI5_ID;
+    int32_t actual = apnManager->FindApnIdByCapability(capability);
+    ASSERT_EQ(actual, expected);
+}
+
+/**
+ * @tc.number   FindApnIdByCapability_009
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, FindApnIdByCapability_015, Function | MediumTest | Level1)
+{
+    uint64_t capability = NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI6;
+    int32_t expected = DATA_CONTEXT_ROLE_SNSSAI6_ID;
+    int32_t actual = apnManager->FindApnIdByCapability(capability);
+    ASSERT_EQ(actual, expected);
+}
+
+/**
  * @tc.number   FindBestCapability_001
  * @tc.name     test function branch
  * @tc.desc     Function test
