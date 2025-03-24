@@ -313,16 +313,15 @@ int32_t ApnManager::CreateAllApnItemByDatabase(int32_t slotId)
         return count;
     }
     TELEPHONY_LOGI("current slotId = %{public}d, numeric = %{public}s", slotId, numeric.c_str());
+    preferId_ = INVALID_PROFILE_ID;
+    if (!GetPreferId(slotId)) {
+        TELEPHONY_LOGE("query prefer apn fail");
+        return count;
+    }
     auto helper = CellularDataRdbHelper::GetInstance();
     if (helper == nullptr) {
         TELEPHONY_LOGE("get cellularDataRdbHelper failed");
         return count;
-    }
-    preferId_ = INVALID_PROFILE_ID;
-    std::vector<PdpProfile> preferApnVec;
-    if (helper->QueryPreferApn(slotId, preferApnVec)) {
-        preferId_ = preferApnVec[0].profileId;
-        TELEPHONY_LOGI("query preferId_ = %{public}d", preferId_);
     }
     std::string mcc = numeric.substr(0, DEFAULT_MCC_SIZE);
     std::string mnc = numeric.substr(mcc.size(), numeric.size() - mcc.size());
@@ -760,6 +759,32 @@ void ApnManager::GetBipApnItem(sptr<ApnItem> &bipApn)
             }
         }
     }
+}
+
+bool ApnManager::GetPreferId(int32_t slotId)
+{
+    int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
+    if (simId <= INVALID_SIM_ID) {
+        TELEPHONY_LOGE("Slot%{public}d: failed due to invalid sim id %{public}d", slotId, simId);
+        return false;
+    }
+    auto helper = CellularDataRdbHelper::GetInstance();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("get cellularDataRdbHelper failed");
+        return false;
+    }
+    std::vector<PdpProfile> preferApnVec;
+    if (helper->QueryPreferApn(slotId, preferApnVec)) {
+        if (preferApnVec.size() > 0) {
+            preferId_ = preferApnVec[0].profileId;
+            TELEPHONY_LOGI("query preferId_ = %{public}d", preferId_);
+        } else {
+            TELEPHONY_LOGI("query prefer apn is null");
+        }
+        return true;
+    }
+    TELEPHONY_LOGE("query prefer apn fail");
+    return false;
 }
 }  // namespace Telephony
 }  // namespace OHOS
