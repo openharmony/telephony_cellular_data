@@ -158,6 +158,7 @@ int32_t CellularDataHandler::SetCellularDataEnable(bool userDataOn)
     int32_t result = dataSwitchSettings_->QueryUserDataStatus(dataEnabled);
     if (result != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("Slot%{public}d: Query result: %{public}d", slotId_, result);
+        return result;
     }
     if (dataEnabled == userDataOn) {
         TELEPHONY_LOGI("Slot%{public}d: The status of the cellular data switch has not changed", slotId_);
