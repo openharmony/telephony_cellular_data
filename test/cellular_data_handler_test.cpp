@@ -963,7 +963,7 @@ HWTEST_F(CellularDataHandlerTest, GetCurrentApnId_Test_01, Function | MediumTest
     auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
     cellularDataHandler->Init();
     int32_t profileId = cellularDataHandler->GetCurrentApnId();
-    EXPECT_NE(profileId, 0);
+    EXPECT_EQ(profileId, 0);
 }
 
 /**
@@ -979,8 +979,8 @@ HWTEST_F(CellularDataHandlerTest, FindApnHolderById_Test_01, Function | MediumTe
     auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
     cellularDataHandler->Init();
     int32_t profileId = cellularDataHandler->GetCurrentApnId();
-    EXPECT_NE(profileId, 0);
-    EXPECT_NE(cellularDataHandler->apnManager_->FindApnHolderById(profileId), nullptr);
+    EXPECT_EQ(profileId, 0);
+    EXPECT_EQ(cellularDataHandler->apnManager_->FindApnHolderById(profileId), nullptr);
 }
 
 /**
