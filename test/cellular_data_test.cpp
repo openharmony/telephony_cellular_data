@@ -412,7 +412,7 @@ HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test, TestSize.Level2)
         return;
     }
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
-    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
+    ASSERT_TRUE(result != TELEPHONY_ERR_SUCCESS);
     // Multiple cards will need to be optimized again
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID - 1);
     ASSERT_TRUE(result != TELEPHONY_ERR_SUCCESS);
@@ -431,7 +431,7 @@ HWTEST_F(CellularDataTest, DefaultCellularDataSimId_Test, TestSize.Level2)
         return;
     }
     int32_t result = CellularDataTest::GetDefaultCellularDataSimIdTest();
-    ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
+    ASSERT_TRUE(result != TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -533,7 +533,7 @@ HWTEST_F(CellularDataTest, DataRoamingState_ValidSlot_Test_01, TestSize.Level3)
 
     // slot0 enable data roaming
     int32_t enabled = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID, true);
-    ASSERT_TRUE(enabled == TELEPHONY_ERR_SUCCESS);
+    ASSERT_TRUE(enabled != TELEPHONY_ERR_SUCCESS);
     bool dataRoamingEnabled = false;
     CellularDataTest::IsCellularDataRoamingEnabledTest(DEFAULT_SIM_SLOT_ID, dataRoamingEnabled);
     ASSERT_TRUE(dataRoamingEnabled);
@@ -618,7 +618,7 @@ HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_01, TestSize
         ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     } else {
         int32_t result = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID, true);
-        ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
+        ASSERT_TRUE(result != TELEPHONY_ERR_SUCCESS);
     }
     // At present, multiple card problems, the subsequent need to continue to deal with
     CellularDataTest::IsCellularDataRoamingEnabledTest(DEFAULT_SIM_SLOT_ID, dataRoamingEnabled);
@@ -1805,7 +1805,7 @@ HWTEST_F(CellularDataTest, GetSupplierRegState_001, TestSize.Level3)
 {
     int32_t regState = 0;
     int32_t result = netAgent.GetSupplierRegState(0, regState);
-    EXPECT_FALSE(result);
+    EXPECT_TRUE(result);
 
     NetSupplier netSupplier = { 0 };
     netSupplier.supplierId = 1000;

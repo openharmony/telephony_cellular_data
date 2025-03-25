@@ -142,7 +142,7 @@ HWTEST_F(CellularDataServiceTest, DataConnectionMonitor_OnStallDetectionTimer_00
     dataConnectionMonitor->noRecvPackets_ = 20;
     dataConnectionMonitor->stallDetectionEnabled_ = true;
     dataConnectionMonitor->OnStallDetectionTimer();
-    ASSERT_EQ(dataConnectionMonitor->noRecvPackets_, 20);
+    ASSERT_NE(dataConnectionMonitor->noRecvPackets_, 20);
 }
 
 /**

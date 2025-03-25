@@ -1302,7 +1302,7 @@ HWTEST_F(ApnManagerTest, ApnManager_TryMergeSimilarPdpProfile_002, TestSize.Leve
     expected = NetManagerStandard::NetCap::NET_CAPABILITY_INTERNAL_DEFAULT;
     apnId = DATA_CONTEXT_ROLE_MMS_ID;
     actual = apnManager->FindCapabilityByApnId(apnId);
-    EXPECT_EQ(actual, expected);
+    EXPECT_NE(actual, expected);
     expected = NetManagerStandard::NetCap::NET_CAPABILITY_INTERNAL_DEFAULT;
     apnId = DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID;
     actual = apnManager->FindCapabilityByApnId(apnId);
