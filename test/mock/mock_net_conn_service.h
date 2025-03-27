@@ -114,6 +114,8 @@ public:
     MOCK_METHOD(int32_t, GetPacUrl, (std::string &pacUrl));
     MOCK_METHOD(int32_t, SetAppIsFrozened, (uint32_t uid, bool isFrozened));
     MOCK_METHOD(int32_t, EnableAppFrozenedCallbackLimitation, (bool flag));
+    MOCK_METHOD(int32_t, UpdateSupplierScore,
+        (NetBearType bearerType, const std::string &ident, uint32_t detectionStatus, uint32_t &supplierId));
 };
 
 }  // namespace NetManagerStandard

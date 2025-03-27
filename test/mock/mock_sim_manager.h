@@ -100,6 +100,8 @@ public:
     MOCK_METHOD2(SendTerminalResponseCmd, int32_t(int32_t, const std::string &));
     MOCK_METHOD2(RegisterSimAccountCallback, int32_t(const int32_t, const sptr<SimAccountCallback> &));
     MOCK_METHOD2(UpdateImsCapFromChip, void(int32_t, const ImsCapFromChip &));
+    MOCK_METHOD2(GetSpdiPlmns, int32_t(int32_t, std::set<std::string> &));
+    MOCK_METHOD2(GetEhPlmns, int32_t(int32_t, std::set<std::string> &));
     MOCK_METHOD3(GetLockState, int32_t(int32_t, LockType, LockState &));
     MOCK_METHOD3(GetSimAccountInfo, int32_t(int32_t, bool, IccAccountInfo &));
     MOCK_METHOD3(ObtainSpnCondition, int(int32_t, bool, std::string));
