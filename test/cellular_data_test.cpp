@@ -536,7 +536,7 @@ HWTEST_F(CellularDataTest, DataRoamingState_ValidSlot_Test_01, TestSize.Level3)
     ASSERT_TRUE(enabled != TELEPHONY_ERR_SUCCESS);
     bool dataRoamingEnabled = false;
     CellularDataTest::IsCellularDataRoamingEnabledTest(DEFAULT_SIM_SLOT_ID, dataRoamingEnabled);
-    ASSERT_TRUE(dataRoamingEnabled);
+    ASSERT_FALSE(dataRoamingEnabled);
     // slot0 close
     int32_t enable = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID, false);
     ASSERT_TRUE(enable == TELEPHONY_ERR_SUCCESS);
