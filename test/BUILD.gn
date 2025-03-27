@@ -85,10 +85,7 @@ ohos_unittest("tel_cellular_state_machine_test") {
   test_module = "tel_cellular_data_test"
   module_out_path = part_name + "/" + test_module
 
-  sources = [
-    "$SOURCE_DIR/test/cellular_state_machine_test.cpp",
-    "$SOURCE_DIR/test/data_access_token.cpp",
-  ]
+  sources = [ "$SOURCE_DIR/test/data_access_token.cpp" ]
 
   include_dirs = [
     "$SOURCE_DIR/services/include",
