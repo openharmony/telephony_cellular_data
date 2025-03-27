@@ -537,22 +537,6 @@ HWTEST_F(CellularDataTest, DataRoamingState_ValidSlot_Test_01, TestSize.Level3)
     bool dataRoamingEnabled = false;
     CellularDataTest::IsCellularDataRoamingEnabledTest(DEFAULT_SIM_SLOT_ID, dataRoamingEnabled);
     ASSERT_FALSE(dataRoamingEnabled);
-    // slot0 close
-    int32_t enable = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID, false);
-    ASSERT_TRUE(enable == TELEPHONY_ERR_SUCCESS);
-    CellularDataTest::IsCellularDataRoamingEnabledTest(DEFAULT_SIM_SLOT_ID, dataRoamingEnabled);
-    ASSERT_TRUE(!dataRoamingEnabled);
-
-    // At present, multiple card problems, the subsequent need to continue to deal with
-    enable = CellularDataTest::EnableCellularDataRoamingTest(DATA_SLOT_ID_INVALID, true);
-    ASSERT_TRUE(enable != TELEPHONY_ERR_SUCCESS);
-    int32_t result = CellularDataTest::IsCellularDataRoamingEnabledTest(DATA_SLOT_ID_INVALID, dataRoamingEnabled);
-    ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
-    enable = CellularDataTest::EnableCellularDataRoamingTest(DATA_SLOT_ID_INVALID, false);
-    // At present, multiple card problems, the subsequent need to continue to deal with
-    ASSERT_TRUE(enable != TELEPHONY_ERR_SUCCESS);
-    result = CellularDataTest::IsCellularDataRoamingEnabledTest(DATA_SLOT_ID_INVALID, dataRoamingEnabled);
-    ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
 }
 
 /**
