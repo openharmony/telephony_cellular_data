@@ -64,6 +64,7 @@ private:
     void GetCTOperator(int32_t slotId, std::string &numeric);
     void TryMergeSimilarPdpProfile(std::vector<PdpProfile> &apnVec);
     void MergePdpProfile(PdpProfile &newProfile, PdpProfile &oldProfile);
+    bool GetPreferId(int32_t slotId);
 
 private:
     static const std::map<std::string, int32_t> apnIdApnNameMap_;
