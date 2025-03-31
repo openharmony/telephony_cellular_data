@@ -169,12 +169,12 @@ bool CellularDataRdbHelper::QueryPreferApn(int32_t slotId, std::vector<PdpProfil
     ReadApnResult(result, apnVec);
     result->Close();
     dataShareHelper->Release();
-    if (apnVec.size() > 0) {
-        return true;
+    if (apnVec.size() <= 0) {
+        TELEPHONY_LOGI("simid no set prefer apn");
+        CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId, SWITCH_ON,
+            CellularDataErrorCode::DATA_ERROR_APN_FOUND_EMPTY, "Apn list is empty");
     }
-    CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId, SWITCH_ON,
-        CellularDataErrorCode::DATA_ERROR_APN_FOUND_EMPTY, "Apn list is empty");
-    return false;
+    return true;
 }
 
 void CellularDataRdbHelper::ReadApnResult(
