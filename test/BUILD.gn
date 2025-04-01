@@ -16,8 +16,9 @@ SOURCE_DIR = ".."
 ohos_unittest("tel_cellular_data_test") {
   subsystem_name = "telephony"
   part_name = "cellular_data"
-  test_module = "tel_cellular_data_test"
-  module_out_path = part_name + "/" + test_module
+  test_module = "cellular_data"
+  test_suite = "tel_cellular_data_test"
+  module_out_path = part_name + "/" + test_module + "/" + test_suite
 
   sources = [
     "$SOURCE_DIR/test/apn_manager_test.cpp",
@@ -82,8 +83,9 @@ ohos_unittest("tel_cellular_data_test") {
 ohos_unittest("tel_cellular_state_machine_test") {
   subsystem_name = "telephony"
   part_name = "cellular_data"
-  test_module = "tel_cellular_data_test"
-  module_out_path = part_name + "/" + test_module
+  test_module = "cellular_data"
+  test_suite = "tel_cellular_state_machine_test"
+  module_out_path = part_name + "/" + test_module + "/" + test_suite
 
   sources = [
     "$SOURCE_DIR/test/cellular_state_machine_test.cpp",
@@ -145,8 +147,9 @@ ohos_unittest("tel_cellular_state_machine_test") {
 ohos_unittest("tel_cellular_state_branch_test") {
   subsystem_name = "telephony"
   part_name = "cellular_data"
-  test_module = "tel_cellular_data_test"
-  module_out_path = part_name + "/" + test_module
+  test_module = "cellular_data"
+  test_suite = "tel_cellular_state_branch_test"
+  module_out_path = part_name + "/" + test_module + "/" + test_suite
 
   sources = [
     "$SOURCE_DIR/test/cellualr_data_branch_test.cpp",
@@ -207,8 +210,9 @@ ohos_unittest("tel_cellular_state_branch_test") {
 ohos_unittest("tel_cellular_data_client_test") {
   subsystem_name = "telephony"
   part_name = "cellular_data"
-  test_module = "tel_cellular_data_test"
-  module_out_path = part_name + "/" + test_module
+  test_module = "cellular_data"
+  test_suite = "tel_cellular_data_client_test"
+  module_out_path = part_name + "/" + test_module + "/" + test_suite
 
   sources = [
     "$SOURCE_DIR/test/cellular_data_client_test.cpp",
@@ -270,8 +274,9 @@ ohos_unittest("tel_cellular_data_client_test") {
 ohos_unittest("tel_cellular_data_traffic_test") {
   subsystem_name = "telephony"
   part_name = "cellular_data"
-  test_module = "tel_cellular_data_test"
-  module_out_path = part_name + "/" + test_module
+  test_module = "cellular_data"
+  test_suite = "tel_cellular_data_traffic_test"
+  module_out_path = part_name + "/" + test_module + "/" + test_suite
 
   sources = [
     "$SOURCE_DIR/test/cellular_data_dump_helper_test.cpp",
