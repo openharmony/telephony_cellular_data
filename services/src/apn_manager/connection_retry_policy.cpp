@@ -85,7 +85,7 @@ void ConnectionRetryPolicy::SetMatchedApns(std::vector<sptr<ApnItem>> &apns)
         TELEPHONY_LOGI("reset currentApnIndex");
         currentApnIndex_ = 0;
     } else {
-        for (int32_t i = 0; i < apns.size(); i++) {
+        for (int32_t i = 0; i < static_cast<int32_t>(apns.size()); i++) {
             if (apns[i]->attr_.profileId_ != matchedApns_[i]->attr_.profileId_) {
                 TELEPHONY_LOGI("reset currentApnIndex");
                 currentApnIndex_ = 0;
