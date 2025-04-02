@@ -53,7 +53,7 @@ void CellularDataServiceTest::TearDown() {}
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(CellularDataServiceTest, CellularDataService_001, TestSize.Level0)
+HWTEST_F(CellularDataServiceTest, CellularDataService_001, TestSize.Level1)
 {
     DataAccessToken token;
     service->OnStart();
