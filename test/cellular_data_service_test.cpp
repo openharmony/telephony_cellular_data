@@ -85,7 +85,7 @@ HWTEST_F(CellularDataServiceTest, CellularDataService_001, TestSize.Level1)
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(CellularDataServiceTest, CellularDataService_002, TestSize.Level0)
+HWTEST_F(CellularDataServiceTest, CellularDataService_002, TestSize.Level1)
 {
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->GetCellularDataFlowType());
     ASSERT_EQ("default slotId: -1", service->GetStateMachineCurrentStatusDump());
@@ -143,7 +143,7 @@ HWTEST_F(CellularDataServiceTest, DataConnectionMonitor_HandleScreenStateChanged
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(CellularDataServiceTest, DataConnectionMonitor_OnStallDetectionTimer_001, TestSize.Level0)
+HWTEST_F(CellularDataServiceTest, DataConnectionMonitor_OnStallDetectionTimer_001, TestSize.Level1)
 {
     std::shared_ptr<DataConnectionMonitor> dataConnectionMonitor = std::make_shared<DataConnectionMonitor>(0);
     dataConnectionMonitor->noRecvPackets_ = 20;
