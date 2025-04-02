@@ -1371,7 +1371,7 @@ HWTEST_F(ApnManagerTest, ApnManager_TryMergeSimilarPdpProfile_001, TestSize.Leve
  * @tc.name  : ApnManager_TryMergeSimilarPdpProfile_002
  * @tc.number: ApnManagerTest_005
  */
-HWTEST_F(ApnManagerTest, ApnManager_TryMergeSimilarPdpProfile_002, TestSize.Level0)
+HWTEST_F(ApnManagerTest, ApnManager_TryMergeSimilarPdpProfile_002, TestSize.Level1)
 {
     uint64_t expected = NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET;
     int32_t apnId = DATA_CONTEXT_ROLE_DEFAULT_ID;
