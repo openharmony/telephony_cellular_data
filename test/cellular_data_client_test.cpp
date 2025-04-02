@@ -287,7 +287,7 @@ HWTEST_F(CellularDataClientTest, GetInternalActReportInfo_001, TestSize.Level0)
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(CellularDataClientTest, SendUrspDecodeResult_001, TestSize.Level0)
+HWTEST_F(CellularDataClientTest, SendUrspDecodeResult_001, TestSize.Level1)
 {
     std::vector<uint8_t> buffer = {};
     int32_t result = CellularDataClient::GetInstance().SendUrspDecodeResult(0, buffer);
@@ -299,7 +299,7 @@ HWTEST_F(CellularDataClientTest, SendUrspDecodeResult_001, TestSize.Level0)
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(CellularDataClientTest, SendUePolicySectionIdentifier_001, TestSize.Level0)
+HWTEST_F(CellularDataClientTest, SendUePolicySectionIdentifier_001, TestSize.Level1)
 {
     std::vector<uint8_t> buffer = {};
     int32_t result = CellularDataClient::GetInstance().SendUePolicySectionIdentifier(0, buffer);
@@ -311,7 +311,7 @@ HWTEST_F(CellularDataClientTest, SendUePolicySectionIdentifier_001, TestSize.Lev
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(CellularDataClientTest, SendImsRsdList_001, TestSize.Level0)
+HWTEST_F(CellularDataClientTest, SendImsRsdList_001, TestSize.Level1)
 {
     std::vector<uint8_t> buffer = {};
     int32_t result = CellularDataClient::GetInstance().SendImsRsdList(0, buffer);
@@ -323,7 +323,7 @@ HWTEST_F(CellularDataClientTest, SendImsRsdList_001, TestSize.Level0)
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
-HWTEST_F(CellularDataClientTest, GetNetworkSliceAllowedNssai_001, TestSize.Level0)
+HWTEST_F(CellularDataClientTest, GetNetworkSliceAllowedNssai_001, TestSize.Level1)
 {
     std::vector<uint8_t> buffer = {};
     int32_t result = CellularDataClient::GetInstance().GetNetworkSliceAllowedNssai(0, buffer);
