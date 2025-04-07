@@ -231,10 +231,16 @@ void CellularDataRdbHelper::MakePdpProfile(
     result->GetString(index, apnBean.mnc);
     result->GetColumnIndex(PdpProfileData::APN, index);
     result->GetString(index, apnBean.apn);
-    result->GetColumnIndex(PdpProfileData::AUTH_TYPE, index);
-    result->GetInt(index, apnBean.authType);
     result->GetColumnIndex(PdpProfileData::AUTH_USER, index);
     result->GetString(index, apnBean.authUser);
+    int32_t authType;
+    result->GetColumnIndex(PdpProfileData::AUTH_TYPE, index);
+    result->GetInt(index, authType);
+    if (authType == -1) {
+        apnBean.authType = (apnBean.authUser.empty()) ? SETUP_DATA_AUTH_NONE : SETUP_DATA_AUTH_PAP_CHAP;
+    } else {
+        apnBean.authType = authType;
+    }
     result->GetColumnIndex(PdpProfileData::AUTH_PWD, index);
     result->GetString(index, apnBean.authPwd);
     result->GetColumnIndex(PdpProfileData::APN_TYPES, index);
