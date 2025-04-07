@@ -100,7 +100,7 @@ bool CellularDataRdbHelper::QueryApns(
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(PdpProfileData::MCCMNC, mcc + mnc);
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
-    Uri cellularDataUri(std::string(CELLULAR_DATA_RDB_SELECTION) + "?Proxy=true&simId=" + std::to_string(simId));
+    Uri cellularDataUri(std::string(CELLULAR_DATA_RDB_SELECTION) + "?simId=" + std::to_string(simId));
     std::shared_ptr<DataShare::DataShareResultSet> result =
         dataShareHelper->Query(cellularDataUri, predicates, columns);
     if (result == nullptr) {
@@ -132,7 +132,7 @@ bool CellularDataRdbHelper::QueryMvnoApnsByType(const std::string &mcc, const st
     predicates.EqualTo(PdpProfileData::MVNO_TYPE, mvnoType)
         ->EqualTo(PdpProfileData::MCCMNC, mcc + mnc);
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
-    Uri cellularDataUri(std::string(CELLULAR_DATA_RDB_SELECTION) + "?Proxy=true&simId=" + std::to_string(simId));
+    Uri cellularDataUri(std::string(CELLULAR_DATA_RDB_SELECTION) + "?simId=" + std::to_string(simId));
     std::shared_ptr<DataShare::DataShareResultSet> result =
         dataShareHelper->Query(cellularDataUri, predicates, columns);
     if (result == nullptr) {
@@ -158,7 +158,7 @@ bool CellularDataRdbHelper::QueryPreferApn(int32_t slotId, std::vector<PdpProfil
     std::vector<std::string> columns;
     DataShare::DataSharePredicates predicates;
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
-    Uri preferApnUri(std::string(CELLULAR_DATA_RDB_PREFER) + "?Proxy=true&simId=" + std::to_string(simId));
+    Uri preferApnUri(std::string(CELLULAR_DATA_RDB_PREFER) + "?simId=" + std::to_string(simId));
     std::shared_ptr<DataShare::DataShareResultSet> result = dataShareHelper->Query(preferApnUri, predicates, columns);
     if (result == nullptr) {
         TELEPHONY_LOGE("query prefer apns error");
@@ -371,7 +371,7 @@ void CellularDataRdbHelper::QueryApnIds(const ApnInfo &apnInfo, std::vector<uint
     }
     std::string opkey = GetOpKey(CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId());
     predicates.EqualTo(Telephony::PdpProfileData::OPKEY, opkey);
-    Uri cellularDataUri(std::string(CELLULAR_DATA_RDB_SELECTION) + "?Proxy=true&simId=" + std::to_string(GetSimId()));
+    Uri cellularDataUri(std::string(CELLULAR_DATA_RDB_SELECTION) + "?simId=" + std::to_string(GetSimId()));
     std::shared_ptr<DataShare::DataShareResultSet> rst = dataShareHelper->Query(cellularDataUri, predicates, columns);
     if (rst == nullptr) {
         TELEPHONY_LOGE("QueryApnIds: query apns error");
@@ -477,7 +477,7 @@ void CellularDataRdbHelper::QueryAllApnInfo(std::vector<ApnInfo> &apnInfoList)
     DataShare::DataSharePredicates predicates;
     std::string opkey = GetOpKey(CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId());
     predicates.EqualTo(Telephony::PdpProfileData::OPKEY, opkey);
-    Uri cellularDataUri(std::string(CELLULAR_DATA_RDB_SELECTION) + "?Proxy=true&simId=" + std::to_string(GetSimId()));
+    Uri cellularDataUri(std::string(CELLULAR_DATA_RDB_SELECTION) + "?simId=" + std::to_string(GetSimId()));
     std::shared_ptr<DataShare::DataShareResultSet> result =
         dataShareHelper->Query(cellularDataUri, predicates, columns);
     if (result == nullptr) {

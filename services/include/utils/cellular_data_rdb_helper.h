@@ -35,6 +35,8 @@
 
 namespace OHOS {
 namespace Telephony {
+static constexpr int SETUP_DATA_AUTH_NONE = 0;
+static constexpr int SETUP_DATA_AUTH_PAP_CHAP = 3;
 class CellularDataRdbHelper : public DelayedSingleton<CellularDataRdbHelper> {
     DECLARE_DELAYED_SINGLETON(CellularDataRdbHelper);
 

@@ -907,7 +907,7 @@ std::shared_ptr<DataShare::DataShareHelper> CellularDataHandler::CreatorDataShar
 bool CellularDataHandler::GetCurrentDataShareApnInfo(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,
     const int32_t simId, int32_t &profileIdValue)
 {
-    Uri preferApnUri(std::string(CELLULAR_DATA_RDB_PREFER) + "?Proxy=true&simId=" + std::to_string(simId));
+    Uri preferApnUri(std::string(CELLULAR_DATA_RDB_PREFER) + "?simId=" + std::to_string(simId));
     DataShare::DataSharePredicates predicates;
     std::vector<std::string> columns;
     std::shared_ptr<DataShare::DataShareResultSet> resultSet =
