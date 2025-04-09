@@ -698,6 +698,9 @@ void ApnManager::TryMergeSimilarPdpProfile(std::vector<PdpProfile> &apnVec)
 
 void ApnManager::MergePdpProfile(PdpProfile &newProfile, PdpProfile &oldProfile)
 {
+    if (oldProfile.apnTypes.find(DATA_CONTEXT_ROLE_DEFAULT) != std::string::npos) {
+        newProfile.authType = oldProfile.authType;
+    }
     newProfile.apnTypes = newProfile.apnTypes + ',' + oldProfile.apnTypes;
     newProfile.pdpProtocol = (newProfile.pdpProtocol == PROTOCOL_IPV4V6) ?
         newProfile.pdpProtocol : oldProfile.pdpProtocol;

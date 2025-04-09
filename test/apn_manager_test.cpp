@@ -1308,6 +1308,12 @@ HWTEST_F(ApnManagerTest, ApnItem_IsSimilarPdpProfile_001, TestSize.Level0)
     p1.authType = 1;
     p2.authType = 2;
     EXPECT_FALSE(ApnItem::IsSimilarPdpProfile(p1, p2));
+    p1.authType = 0;
+    p2.authType = 1;
+    EXPECT_TRUE(ApnItem::IsSimilarPdpProfile(p1, p2));
+    p1.authType = 1;
+    p2.authType = 0;
+    EXPECT_TRUE(ApnItem::IsSimilarPdpProfile(p1, p2));
     p1.authType = 1;
     p2.authType = 1;
     p1.authUser = "1";
@@ -1363,6 +1369,11 @@ HWTEST_F(ApnManagerTest, ApnManager_TryMergeSimilarPdpProfile_001, TestSize.Leve
     EXPECT_EQ(apnVec.size(), 1);
     PdpProfile pdpProfile2 = pdpProfile;
     apnVec.push_back(pdpProfile2);
+    apnManager->TryMergeSimilarPdpProfile(apnVec);
+    EXPECT_EQ(apnVec.size(), 1);
+    PdpProfile pdpProfile3 = pdpProfile;
+    pdpProfile3.apnTypes = "default";
+    apnVec.push_back(pdpProfile3);
     apnManager->TryMergeSimilarPdpProfile(apnVec);
     EXPECT_EQ(apnVec.size(), 1);
 }
