@@ -17,6 +17,7 @@
 #define CELLULAR_DATA_TYPES_H
 
 #include <cstdint>
+#include <parcel.h>
 
 namespace OHOS {
 namespace Telephony {
@@ -85,6 +86,68 @@ enum class DataConnectState : int32_t {
      * Indicates that a cellular data link is suspended.
      */
     DATA_STATE_SUSPENDED = 3
+};
+
+struct ApnInfo : public Parcelable {
+    std::u16string apnName = u"";
+    std::u16string apn = u"";
+    std::u16string mcc = u"";
+    std::u16string mnc = u"";
+    std::u16string user = u"";
+    std::u16string type = u"";
+    std::u16string proxy = u"";
+    std::u16string mmsproxy = u"";
+
+    bool Marshalling(Parcel &parcel) const
+    {
+        if (!parcel.WriteString16(apnName)) {
+            return false;
+        }
+        if (!parcel.WriteString16(apn)) {
+            return false;
+        }
+        if (!parcel.WriteString16(mcc)) {
+            return false;
+        }
+        if (!parcel.WriteString16(mnc)) {
+            return false;
+        }
+        if (!parcel.WriteString16(user)) {
+            return false;
+        }
+        if (!parcel.WriteString16(type)) {
+            return false;
+        }
+        if (!parcel.WriteString16(proxy)) {
+            return false;
+        }
+        if (!parcel.WriteString16(mmsproxy)) {
+            return false;
+        }
+        return true;
+    };
+
+    std::shared_ptr<ApnInfo> UnMarshalling(Parcel &parcel)
+    {
+        std::shared_ptr<ApnInfo> param = std::make_shared<ApnInfo>();
+        if (param == nullptr || !param->ReadFromParcel(parcel)) {
+            param = nullptr;
+        }
+        return param;
+    };
+
+    bool ReadFromParcel(Parcel &parcel)
+    {
+        parcel.ReadString16(apnName);
+        parcel.ReadString16(apn);
+        parcel.ReadString16(mcc);
+        parcel.ReadString16(mnc);
+        parcel.ReadString16(user);
+        parcel.ReadString16(type);
+        parcel.ReadString16(proxy);
+        parcel.ReadString16(mmsproxy);
+        return true;
+    };
 };
 } // namespace Telephony
 } // namespace OHOS

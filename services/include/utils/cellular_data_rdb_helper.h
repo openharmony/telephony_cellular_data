@@ -21,6 +21,7 @@
 #include <singleton.h>
 #include <utility>
 
+#include "cellular_data_types.h"
 #include "datashare_helper.h"
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
@@ -28,6 +29,7 @@
 #include "iservice_registry.h"
 #include "pdp_profile_data.h"
 #include "refbase.h"
+#include "string_ex.h"
 #include "system_ability_definition.h"
 #include "uri.h"
 
@@ -44,6 +46,9 @@ public:
     void RegisterObserver(const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
     void UnRegisterObserver(const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
     bool ResetApns(int32_t slotId);
+    void QueryApnIds(const ApnInfo &apnInfo, std::vector<uint32_t> &apnIdList);
+    int32_t SetPreferApn(int32_t apnId);
+    void QueryAllApnInfo(std::vector<ApnInfo> &apnInfoList);
 
 private:
     std::shared_ptr<DataShare::DataShareHelper> CreateDataAbilityHelper();
@@ -54,6 +59,9 @@ private:
         const std::string &mvnoDataFromSim, std::vector<PdpProfile> &apnVec);
     bool IsMvnoDataMatched(const std::string &mvnoDataFromSim, const PdpProfile &apnBean);
     void MakePdpProfile(const std::shared_ptr<DataShare::DataShareResultSet> &result, int i, PdpProfile &apnBean);
+    int32_t GetSimId();
+    void GetApnInfo(ApnInfo &apnInfo, int rowIndex, std::shared_ptr<DataShare::DataShareResultSet> result);
+    std::string GetOpKey(int slotId);
 
 private:
     Uri cellularDataUri_;

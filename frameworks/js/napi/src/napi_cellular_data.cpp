@@ -24,6 +24,7 @@
 #include "js_native_api.h"
 #include "js_native_api_types.h"
 #include "napi/native_common.h"
+#include "napi_parameter_util.h"
 #include "napi_util.h"
 #include "node_api.h"
 #include "string"
@@ -35,6 +36,15 @@ namespace Telephony {
 static constexpr int32_t DEFAULT_REF_COUNT = 1;
 static constexpr const char *SET_TELEPHONY_STATE = "ohos.permission.SET_TELEPHONY_STATE";
 static constexpr const char *GET_NETWORK_INFO = "ohos.permission.GET_NETWORK_INFO";
+static constexpr const char *MANAGE_APN_SETTING = "ohos.permission.MANAGE_APN_SETTING";
+
+struct AsyncPara {
+    std::string funcName = "";
+    napi_env env = nullptr;
+    napi_callback_info info = nullptr;
+    napi_async_execute_callback execute = nullptr;
+    napi_async_complete_callback complete = nullptr;
+};
 
 static bool IsCellularDataManagerInited()
 {
@@ -999,6 +1009,399 @@ static napi_value GetIntelligenceSwitchState(napi_env env, napi_callback_info in
     return value;
 }
 
+template<typename T>
+void NapiAsyncBaseCompleteCallback(
+    napi_env env, const AsyncContext1<T> &asyncContext, JsError error, bool funcIgnoreReturnVal = false)
+{
+    const BaseContext &context = asyncContext.context;
+    if (context.deferred != nullptr && !context.resolved) {
+        napi_value errorMessage = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
+        NAPI_CALL_RETURN_VOID(env, napi_reject_deferred(env, context.deferred, errorMessage));
+        NAPI_CALL_RETURN_VOID(env, napi_delete_async_work(env, context.work));
+        TELEPHONY_LOGE("NapiAsyncBaseCompleteCallback deferred error and resolved is false");
+        return;
+    }
+
+    if (context.deferred != nullptr && context.resolved) {
+        napi_value res =
+            (funcIgnoreReturnVal ? NapiUtil::CreateUndefined(env) : GetNapiValue(env, asyncContext.callbackVal));
+        NAPI_CALL_RETURN_VOID(env, napi_resolve_deferred(env, context.deferred, res));
+        NAPI_CALL_RETURN_VOID(env, napi_delete_async_work(env, context.work));
+        TELEPHONY_LOGE("NapiAsyncBaseCompleteCallback deferred error and resolved is true");
+        return;
+    }
+
+    napi_value res =
+        (funcIgnoreReturnVal ? NapiUtil::CreateUndefined(env) : GetNapiValue(env, asyncContext.callbackVal));
+    napi_value callbackValue[] { NapiUtil::CreateUndefined(env), res };
+    if (!context.resolved) {
+        callbackValue[0] = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
+        callbackValue[1] = NapiUtil::CreateUndefined(env);
+    }
+    napi_value undefined = nullptr;
+    napi_value callback = nullptr;
+    napi_value result = nullptr;
+    NAPI_CALL_RETURN_VOID(env, napi_get_undefined(env, &undefined));
+    NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, context.callbackRef, &callback));
+    NAPI_CALL_RETURN_VOID(
+        env, napi_call_function(env, undefined, callback, std::size(callbackValue), callbackValue, &result));
+    NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, context.callbackRef));
+    NAPI_CALL_RETURN_VOID(env, napi_delete_async_work(env, context.work));
+}
+
+template<typename T>
+void NapiAsyncPermissionCompleteCallback(napi_env env, napi_status status, const AsyncContext1<T> &asyncContext,
+    bool funcIgnoreReturnVal, PermissionPara permissionPara)
+{
+    if (status != napi_ok) {
+        napi_throw_type_error(env, nullptr, "excute failed");
+        return;
+    }
+
+    JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+        asyncContext.context.errorCode, permissionPara.func, permissionPara.permission);
+    NapiAsyncBaseCompleteCallback(env, asyncContext, error, funcIgnoreReturnVal);
+}
+
+void ApnInfoAnalyzeExt(napi_env env, napi_value arg, ApnInfo &queryApnPara)
+{
+    napi_value proxy = NapiUtil::GetNamedProperty(env, arg, "proxy");
+    if (proxy) {
+        std::array<char, ARRAY_SIZE> proxyStr = {0};
+        NapiValueToCppValue(env, proxy, napi_string, std::data(proxyStr));
+        queryApnPara.proxy = NapiUtil::ToUtf16(proxyStr.data());
+    } else {
+        queryApnPara.proxy = NapiUtil::ToUtf16(NOT_FILLED_IN);
+    }
+    napi_value mmsproxy = NapiUtil::GetNamedProperty(env, arg, "mmsproxy");
+    if (mmsproxy) {
+        std::array<char, ARRAY_SIZE> mmsproxyStr = {0};
+        NapiValueToCppValue(env, mmsproxy, napi_string, std::data(mmsproxyStr));
+        queryApnPara.mmsproxy = NapiUtil::ToUtf16(mmsproxyStr.data());
+    } else {
+        queryApnPara.mmsproxy = NapiUtil::ToUtf16(NOT_FILLED_IN);
+    }
+}
+
+void ApnInfoAnalyze(napi_env env, napi_value arg, ApnInfo &queryApnPara)
+{
+    napi_value apnName = NapiUtil::GetNamedProperty(env, arg, "apnName");
+    if (apnName) {
+        std::array<char, ARRAY_SIZE> apnNameStr = {0};
+        NapiValueToCppValue(env, apnName, napi_string, std::data(apnNameStr));
+        queryApnPara.apnName = NapiUtil::ToUtf16(apnNameStr.data());
+    }
+    napi_value apn = NapiUtil::GetNamedProperty(env, arg, "apn");
+    if (apn) {
+        std::array<char, ARRAY_SIZE> apnStr = {0};
+        NapiValueToCppValue(env, apn, napi_string, std::data(apnStr));
+        queryApnPara.apn = NapiUtil::ToUtf16(apnStr.data());
+    }
+    napi_value mcc = NapiUtil::GetNamedProperty(env, arg, "mcc");
+    if (mcc) {
+        std::array<char, ARRAY_SIZE> mccStr = {0};
+        NapiValueToCppValue(env, mcc, napi_string, std::data(mccStr));
+        queryApnPara.mcc = NapiUtil::ToUtf16(mccStr.data());
+    }
+    napi_value mnc = NapiUtil::GetNamedProperty(env, arg, "mnc");
+    if (mnc) {
+        std::array<char, ARRAY_SIZE> mncStr = {0};
+        NapiValueToCppValue(env, mnc, napi_string, std::data(mncStr));
+        queryApnPara.mnc = NapiUtil::ToUtf16(mncStr.data());
+    }
+    napi_value user = NapiUtil::GetNamedProperty(env, arg, "user");
+    if (user) {
+        std::array<char, ARRAY_SIZE> userStr = {0};
+        NapiValueToCppValue(env, user, napi_string, std::data(userStr));
+        queryApnPara.user = NapiUtil::ToUtf16(userStr.data());
+    } else {
+        queryApnPara.user = NapiUtil::ToUtf16(NOT_FILLED_IN);
+    }
+    napi_value type = NapiUtil::GetNamedProperty(env, arg, "type");
+    if (type) {
+        std::array<char, ARRAY_SIZE> typeStr = {0};
+        NapiValueToCppValue(env, type, napi_string, std::data(typeStr));
+        queryApnPara.type = NapiUtil::ToUtf16(typeStr.data());
+    } else {
+        queryApnPara.type = NapiUtil::ToUtf16(NOT_FILLED_IN);
+    }
+    ApnInfoAnalyzeExt(env, arg, queryApnPara);
+}
+
+template<typename AsyncContextType, typename... Ts>
+napi_value NapiCreateAsyncWork2(const AsyncPara &para, AsyncContextType *asyncContext, std::tuple<Ts...> &theTuple)
+{
+    if (asyncContext == nullptr) {
+        return nullptr;
+    }
+
+    napi_env env = para.env;
+    BaseContext &context = asyncContext->asyncContext.context;
+
+    size_t argc = sizeof...(Ts);
+    napi_value argv[sizeof...(Ts)]{nullptr};
+    NAPI_CALL(env, napi_get_cb_info(env, para.info, &argc, argv, nullptr, nullptr));
+
+    std::optional<NapiError> errCode = MatchParameters(env, argv, argc, theTuple);
+    if (errCode.has_value()) {
+        JsError error = NapiUtil::ConverErrorMessageForJs(errCode.value());
+        NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
+        delete asyncContext;
+        asyncContext = nullptr;
+        return nullptr;
+    }
+
+    napi_value result = nullptr;
+    if (context.callbackRef == nullptr) {
+        NAPI_CALL(env, napi_create_promise(env, &context.deferred, &result));
+    } else {
+        NAPI_CALL(env, napi_get_undefined(env, &result));
+    }
+
+    napi_value resourceName = nullptr;
+    NAPI_CALL(env, napi_create_string_utf8(env, para.funcName.c_str(), para.funcName.length(), &resourceName));
+    NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, para.execute, para.complete,
+        static_cast<void *>(asyncContext), &context.work));
+    return result;
+}
+
+ void NativeQueryApnIds(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        return;
+    }
+    auto queryApnInfoContext = static_cast<AsyncQueryApnInfo *>(data);
+    ApnInfo apnInfoStru;
+    if (queryApnInfoContext->queryApnPara.apn.length() == 0) {
+        TELEPHONY_LOGE("NativeQueryApnIds apn is null.");
+    }
+    apnInfoStru.apnName = queryApnInfoContext->queryApnPara.apnName;
+    apnInfoStru.apn = queryApnInfoContext->queryApnPara.apn;
+    apnInfoStru.mcc = queryApnInfoContext->queryApnPara.mcc;
+    apnInfoStru.mnc = queryApnInfoContext->queryApnPara.mnc;
+    apnInfoStru.user = queryApnInfoContext->queryApnPara.user;
+    apnInfoStru.type = queryApnInfoContext->queryApnPara.type;
+    apnInfoStru.proxy = queryApnInfoContext->queryApnPara.proxy;
+    apnInfoStru.mmsproxy = queryApnInfoContext->queryApnPara.mmsproxy;
+    std::vector<uint32_t> apnIdList;
+    std::unique_lock<std::mutex> callbackLock(queryApnInfoContext->asyncContext.callbackMutex);
+    int32_t errorCode = CellularDataClient::GetInstance().QueryApnIds(apnInfoStru, apnIdList);
+    if (errorCode == TELEPHONY_SUCCESS) {
+        queryApnInfoContext->apnIdList.swap(apnIdList);
+        queryApnInfoContext->asyncContext.context.resolved = true;
+    } else {
+        TELEPHONY_LOGE("NAPI NativeQueryApnIds %{public}d", errorCode);
+        queryApnInfoContext->asyncContext.context.resolved = false;
+    }
+    queryApnInfoContext->asyncContext.context.errorCode = errorCode;
+}
+
+void QueryApnIdsCallback(napi_env env, napi_status status, void *data)
+{
+    NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
+    std::unique_ptr<AsyncQueryApnInfo> info(static_cast<AsyncQueryApnInfo *>(data));
+    AsyncContext1<napi_value> &asyncContext = info->asyncContext;
+    asyncContext.callbackVal = nullptr;
+    napi_create_array(env, &asyncContext.callbackVal);
+    TELEPHONY_LOGI("QueryApnCallback info->apnIdList.size = %{public}zu", info->apnIdList.size());
+    for (size_t i = 0; i < info->apnIdList.size(); i++) {
+        napi_value val;
+        napi_create_int32(env, info->apnIdList.at(i), &val);
+        TELEPHONY_LOGI("QueryApnCallback info->apnIdList.size = %{public}d", info->apnIdList.at(i));
+        napi_set_element(env, asyncContext.callbackVal, i, val);
+    }
+    NapiAsyncPermissionCompleteCallback(
+        env, status, asyncContext, false, { "QueryApnIds", MANAGE_APN_SETTING });
+}
+
+static napi_value QueryApnIds(napi_env env, napi_callback_info info)
+{
+    TELEPHONY_LOGI("QueryApnIds enter!");
+    auto queryApnInfo = std::make_unique<AsyncQueryApnInfo>();
+    if (queryApnInfo == nullptr) {
+        return nullptr;
+    }
+    BaseContext &context = queryApnInfo->asyncContext.context;
+
+    napi_value object = NapiUtil::CreateUndefined(env);
+    auto initPara = std::make_tuple(&object, &context.callbackRef);
+    AsyncPara para {
+        .funcName = "QueryApnIds",
+        .env = env,
+        .info = info,
+        .execute = NativeQueryApnIds,
+        .complete = QueryApnIdsCallback,
+    };
+    napi_value result = NapiCreateAsyncWork2<AsyncQueryApnInfo>(para, queryApnInfo.get(), initPara);
+    if (result == nullptr) {
+        TELEPHONY_LOGE("creat asyncwork failed!");
+        return nullptr;
+    }
+    ApnInfoAnalyze(env, object, queryApnInfo->queryApnPara);
+    if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
+        queryApnInfo.release();
+    }
+    return result;
+}
+
+static void NativeSetPreferApn(napi_env env, void *data)
+{
+    auto asyncContext = static_cast<AsyncSetPreferApnContext *>(data);
+    if (asyncContext == nullptr) {
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    int32_t errcode = CellularDataClient::GetInstance().SetPreferApn(asyncContext->apnId);
+    TELEPHONY_LOGI("NAPI NativeSetPreferApn apnId:%{public}d, error::%{public}d", asyncContext->apnId, errcode);
+    asyncContext->errorCode = errcode;
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = true;
+        asyncContext->result = true;
+    } else if (asyncContext->errorCode == -1) {
+        asyncContext->resolved = true;
+        asyncContext->result = false;
+    } else {
+        asyncContext->resolved = false;
+        asyncContext->result = false;
+    }
+}
+
+static void SetPreferApnCallback(napi_env env, napi_status status, void *data)
+{
+    auto context = static_cast<AsyncSetPreferApnContext *>(data);
+    if (context == nullptr) {
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+
+    std::unique_ptr<AsyncSetPreferApnContext> asyncContext(context);
+    napi_value callbackValue = nullptr;
+    if (asyncContext->resolved) {
+        napi_status status = napi_get_boolean(env, asyncContext->result, &callbackValue);
+        NAPI_CALL_RETURN_VOID(env, status);
+    } else {
+        JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+            asyncContext->errorCode, "SetPreferredApn", MANAGE_APN_SETTING);
+        callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
+    }
+    NapiUtil::Handle2ValueCallback(env, asyncContext.release(), callbackValue);
+}
+
+static napi_value SetPreferredApn(napi_env env, napi_callback_info info)
+{
+    TELEPHONY_LOGI("SetPreferredApn enter!");
+    const size_t paramLimitTwo = 2;
+    size_t parameterCount = paramLimitTwo;
+    napi_value parameters[] = { nullptr, nullptr };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
+
+    if (!NapiUtil::MatchParameters(env, parameters, {napi_number})) {
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<AsyncSetPreferApnContext>();
+    if (asyncContext == nullptr) {
+        TELEPHONY_LOGE("SetPreferredApn asyncContext is nullptr.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    napi_get_value_int32(env, parameters[0], &asyncContext->apnId);
+    return NapiUtil::HandleAsyncWork(env, asyncContext.release(), "SetPreferredApn",
+        NativeSetPreferApn, SetPreferApnCallback);
+}
+
+napi_value ApnInfoConversion(napi_env env, const ApnInfo &asyncQueryApnPara)
+{
+    napi_value val = nullptr;
+    napi_create_object(env, &val);
+    SetPropertyToNapiObject(env, val, "apnName", NapiUtil::ToUtf8(asyncQueryApnPara.apnName));
+    SetPropertyToNapiObject(env, val, "apn", NapiUtil::ToUtf8(asyncQueryApnPara.apn));
+    SetPropertyToNapiObject(env, val, "mcc", NapiUtil::ToUtf8(asyncQueryApnPara.mcc));
+    SetPropertyToNapiObject(env, val, "mnc", NapiUtil::ToUtf8(asyncQueryApnPara.mnc));
+    SetPropertyToNapiObject(env, val, "user", NapiUtil::ToUtf8(asyncQueryApnPara.user));
+    SetPropertyToNapiObject(env, val, "type", NapiUtil::ToUtf8(asyncQueryApnPara.type));
+    SetPropertyToNapiObject(env, val, "proxy", NapiUtil::ToUtf8(asyncQueryApnPara.proxy));
+    SetPropertyToNapiObject(env, val, "mmsproxy", NapiUtil::ToUtf8(asyncQueryApnPara.mmsproxy));
+    return val;
+}
+
+void NativeQueryAllApn(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        return;
+    }
+    auto queryAllApnInfoContext = static_cast<AsyncQueryAllApnInfo *>(data);
+
+    std::vector<ApnInfo> allApnInfoList;
+    std::unique_lock<std::mutex> callbackLock(queryAllApnInfoContext->asyncContext.callbackMutex);
+    int32_t errorCode = CellularDataClient::GetInstance().QueryAllApnInfo(allApnInfoList);
+    TELEPHONY_LOGI("NAPI NativeQueryAllApn %{public}d", errorCode);
+    if (errorCode == TELEPHONY_SUCCESS) {
+        queryAllApnInfoContext->allApnInfoList.swap(allApnInfoList);
+        queryAllApnInfoContext->asyncContext.context.resolved = true;
+    } else {
+        queryAllApnInfoContext->asyncContext.context.resolved = false;
+    }
+    queryAllApnInfoContext->asyncContext.context.errorCode = errorCode;
+}
+
+void QueryAllApnCallback(napi_env env, napi_status status, void *data)
+{
+    NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
+    std::unique_ptr<AsyncQueryAllApnInfo> info(static_cast<AsyncQueryAllApnInfo *>(data));
+    AsyncContext1<napi_value> &asyncContext = info->asyncContext;
+    asyncContext.callbackVal = nullptr;
+    napi_create_array(env, &asyncContext.callbackVal);
+    TELEPHONY_LOGI("QueryAllApnCallback info->allApnInfoList.size = %{public}zu", info->allApnInfoList.size());
+    for (size_t i = 0; i < info->allApnInfoList.size(); i++) {
+        napi_value val = ApnInfoConversion(env, info->allApnInfoList.at(i));
+        napi_set_element(env, asyncContext.callbackVal, i, val);
+    }
+    NapiAsyncPermissionCompleteCallback(
+        env, status, asyncContext, false, { "QueryAllApns", MANAGE_APN_SETTING });
+}
+
+static napi_value QueryAllApns(napi_env env, napi_callback_info info)
+{
+    TELEPHONY_LOGI("QueryAllApns enter!");
+    size_t parameterCount = 1;
+    napi_value parameters[] = { nullptr };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
+
+    if (parameterCount != 0) {
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+
+    auto queryAllApnInfo = std::make_unique<AsyncQueryAllApnInfo>();
+    if (queryAllApnInfo == nullptr) {
+        return nullptr;
+    }
+    BaseContext &context = queryAllApnInfo->asyncContext.context;
+
+    auto initPara = std::make_tuple(&context.callbackRef);
+    AsyncPara para {
+        .funcName = "QueryAllApns",
+        .env = env,
+        .info = info,
+        .execute = NativeQueryAllApn,
+        .complete = QueryAllApnCallback,
+    };
+    napi_value result = NapiCreateAsyncWork2<AsyncQueryAllApnInfo>(para, queryAllApnInfo.get(), initPara);
+    if (result == nullptr) {
+        TELEPHONY_LOGE("creat asyncwork failed!");
+        return nullptr;
+    }
+    if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
+        queryAllApnInfo.release();
+    }
+    return result;
+}
+
 EXTERN_C_START
 napi_value RegistCellularData(napi_env env, napi_value exports)
 {
@@ -1020,6 +1423,9 @@ napi_value RegistCellularData(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getCellularDataFlowType", GetCellularDataFlowType),
         DECLARE_NAPI_FUNCTION("enableIntelligenceSwitch", EnableIntelligenceSwitch),
         DECLARE_NAPI_FUNCTION("getIntelligenceSwitchState", GetIntelligenceSwitchState),
+        DECLARE_NAPI_FUNCTION("queryApnIds", QueryApnIds),
+        DECLARE_NAPI_FUNCTION("setPreferredApn", SetPreferredApn),
+        DECLARE_NAPI_FUNCTION("queryAllApns", QueryAllApns),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     CreateDataConnectState(env, exports);
