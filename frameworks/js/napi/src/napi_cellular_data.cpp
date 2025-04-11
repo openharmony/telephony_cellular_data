@@ -255,6 +255,9 @@ static napi_value IsCellularDataEnabledSync(napi_env env, napi_callback_info inf
     if (IsCellularDataManagerInited()) {
         auto errorCode = CellularDataClient::GetInstance().IsCellularDataEnabled(isEnabled);
         if (errorCode != TELEPHONY_SUCCESS) {
+            JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+                errorCode, "isCellularDataEnabledSync", GET_NETWORK_INFO);
+            NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
             return value;
         }
     } else {
@@ -622,12 +625,16 @@ static napi_value IsCellularDataRoamingEnabledSync(napi_env env, napi_callback_i
     napi_get_value_int32(env, parameters[0], &slotId);
     if (!IsValidSlotId(slotId)) {
         TELEPHONY_LOGE("IsCellularDataRoamingEnabledSync slotId is invalid");
+        NapiUtil::ThrowParameterError(env);
         return value;
     }
     if (IsCellularDataManagerInited()) {
         auto &dataManager = CellularDataClient::GetInstance();
         auto errorCode = dataManager.IsCellularDataRoamingEnabled(slotId, dataRoamingEnabled);
         if (errorCode != TELEPHONY_SUCCESS) {
+            JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+                errorCode, "isCellularDataRoamingEnabledSync", GET_NETWORK_INFO);
+            NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
             return value;
         }
     } else {
