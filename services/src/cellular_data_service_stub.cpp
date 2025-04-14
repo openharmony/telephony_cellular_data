@@ -512,5 +512,71 @@ int32_t CellularDataServiceStub::OnGetInternalActReportInfo(MessageParcel &data,
     reply.WriteInt32(info.actSuccTimes);
     return result;
 }
+
+int32_t CellularDataServiceStub::OnQueryApnInfo(MessageParcel &data, MessageParcel &reply)
+{
+    ApnInfo info;
+    info.apnName = data.ReadString16();
+    info.apn = data.ReadString16();
+    info.mcc = data.ReadString16();
+    info.mnc = data.ReadString16();
+    info.user = data.ReadString16();
+    info.type = data.ReadString16();
+    info.proxy = data.ReadString16();
+    info.mmsproxy = data.ReadString16();
+    std::vector<uint32_t> apnIdList;
+    int32_t result = QueryApnIds(info, apnIdList);
+    int32_t size = static_cast<int32_t>(apnIdList.size());
+    bool ret = reply.WriteInt32(result);
+    ret = (ret && reply.WriteInt32(size));
+    if (!ret) {
+        TELEPHONY_LOGE("OnQueryApnInfo write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    std::vector<uint32_t>::iterator it = apnIdList.begin();
+    while (it != apnIdList.end()) {
+        TELEPHONY_LOGI("OnQueryApnInfo slotIndex = %{public}d", (*it));
+        if (!reply.WriteInt32(*it)) {
+            TELEPHONY_LOGE("OnQueryApnInfo reply Marshalling is false");
+            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        }
+        ++it;
+    }
+    return 0;
+}
+
+int32_t CellularDataServiceStub::OnSetPreferApn(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t apnId = data.ReadInt32();
+    int32_t result = SetPreferApn(apnId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CellularDataServiceStub::OnQueryAllApnInfo(MessageParcel &data, MessageParcel &reply)
+{
+    std::vector<ApnInfo> allApnInfoList;
+    int32_t result = QueryAllApnInfo(allApnInfoList);
+    int32_t size = static_cast<int32_t>(allApnInfoList.size());
+    bool ret = reply.WriteInt32(result);
+    ret = (ret && reply.WriteInt32(size));
+    if (!ret) {
+        TELEPHONY_LOGE("OnQueryAllApnInfo write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    std::vector<ApnInfo>::iterator it = allApnInfoList.begin();
+    while (it != allApnInfoList.end()) {
+        TELEPHONY_LOGI("OnQueryAllApnInfo apn = %{public}s", Str16ToStr8((*it).apn).c_str());
+        if (!(*it).Marshalling(reply)) {
+            TELEPHONY_LOGE("OnQueryAllApnInfo ApnInfo reply Marshalling is false");
+            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        }
+        ++it;
+    }
+    return 0;
+}
 } // namespace Telephony
 } // namespace OHOS

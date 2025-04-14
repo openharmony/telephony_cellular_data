@@ -167,6 +167,12 @@ public:
 
     virtual int32_t GetInternalActReportInfo(int32_t slotId, ApnActivateReportInfo &info) = 0;
 
+    virtual int32_t QueryApnIds(ApnInfo apnInfo, std::vector<uint32_t> &apnIdList) = 0;
+
+    virtual int32_t SetPreferApn(int32_t apnId) = 0;
+
+    virtual int32_t QueryAllApnInfo(std::vector<ApnInfo> &apnInfoList) = 0;
+
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.telephony.ICellularDataManager");
 };

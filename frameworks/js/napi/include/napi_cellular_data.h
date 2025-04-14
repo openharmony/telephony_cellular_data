@@ -19,6 +19,7 @@
 #include <stdint.h>
 
 #include "base_context.h"
+#include "cellular_data_types.h"
 #include "telephony_napi_common_error.h"
 #include "telephony_types.h"
 
@@ -27,6 +28,38 @@ namespace Telephony {
 struct AsyncContext : BaseContext {
     int32_t slotId = 0;
     int32_t result = ERROR_SERVICE_UNAVAILABLE;
+};
+
+struct AsyncSetPreferApnContext : BaseContext {
+    int32_t apnId = 0;
+    int32_t result = ERROR_SERVICE_UNAVAILABLE;
+};
+
+struct PermissionPara {
+    std::string func = "";
+    std::string permission = "";
+};
+
+template<typename T>
+struct AsyncContext1 {
+    BaseContext context;
+    int32_t slotId = ERROR_DEFAULT;
+    T callbackVal;
+    std::mutex callbackMutex;
+    std::condition_variable cv;
+    bool isCallbackEnd = false;
+    bool isSendRequest = false;
+};
+
+struct AsyncQueryApnInfo {
+    AsyncContext1<napi_value> asyncContext;
+    ApnInfo queryApnPara;
+    std::vector<uint32_t> apnIdList {};
+};
+
+struct AsyncQueryAllApnInfo {
+    AsyncContext1<napi_value> asyncContext;
+    std::vector<ApnInfo> allApnInfoList {};
 };
 } // namespace Telephony
 } // namespace OHOS

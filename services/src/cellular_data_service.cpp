@@ -17,7 +17,9 @@
 
 #include <cinttypes>
 
+#include "apn_manager.h"
 #include "cellular_data_dump_helper.h"
+#include "cellular_data_rdb_helper.h"
 #include "cellular_data_error.h"
 #include "cellular_data_hisysevent.h"
 #include "cellular_data_net_agent.h"
@@ -867,6 +869,53 @@ int32_t CellularDataService::GetInternalActReportInfo(int32_t slotId, ApnActivat
     }
     bool result = cellularDataController->GetInternalActReportInfo(info);
     return result ? TELEPHONY_ERR_SUCCESS : TELEPHONY_ERR_FAIL;
+}
+
+int32_t CellularDataService::QueryApnIds(ApnInfo apnInfo, std::vector<uint32_t> &apnIdList)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::MANAGE_APN_SETTING)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    TELEPHONY_LOGI("QueryApnIds, info.type=%{public}s", Str16ToStr8(apnInfo.type).c_str());
+    auto helper = CellularDataRdbHelper::GetInstance();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("get cellularDataRdbHelper failed");
+        return TELEPHONY_ERR_FAIL;
+    }
+    helper->QueryApnIds(apnInfo, apnIdList);
+    return 0;
+}
+
+int32_t CellularDataService::SetPreferApn(int32_t apnId)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::MANAGE_APN_SETTING)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    TELEPHONY_LOGI("SetPreferApn, apnId=%{public}d", apnId);
+    auto helper = CellularDataRdbHelper::GetInstance();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("get cellularDataRdbHelper failed");
+        return TELEPHONY_ERR_FAIL;
+    }
+    return helper->SetPreferApn(apnId);
+}
+
+int32_t CellularDataService::QueryAllApnInfo(std::vector<ApnInfo> &allApnInfoList)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::MANAGE_APN_SETTING)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    TELEPHONY_LOGI("QueryAllApnInfo");
+    auto helper = CellularDataRdbHelper::GetInstance();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("get cellularDataRdbHelper failed");
+        return TELEPHONY_ERR_FAIL;
+    }
+    helper->QueryAllApnInfo(allApnInfoList);
+    return 0;
 }
 } // namespace Telephony
 } // namespace OHOS

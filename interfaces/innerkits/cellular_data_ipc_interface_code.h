@@ -51,6 +51,9 @@ enum class CellularDataInterfaceCode {
     GET_IF_SUPPORT_DUN_APN,
     GET_DEFAULT_ACT_REPORT_INFO,
     GET_INTERNAL_ACT_REPORT_INFO,
+    QUERY_APN_INFO,
+    SET_PREFER_APN,
+    QUERY_ALL_APN_INFO,
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -271,6 +271,31 @@ public:
      */
     int32_t GetInternalActReportInfo(int32_t slotId, ApnActivateReportInfo &info);
 
+    /**
+     * @brief Query APN ids that meet apn info.
+     *
+     * @param apnInfo apnInfo needed to be queried.
+     * @param apnIdList ALL apn ids that meet apn info.
+     * @return 0 query success, others query fail.
+     */
+    int32_t QueryApnIds(ApnInfo apnInfo, std::vector<uint32_t> &apnIdList);
+
+    /**
+     * @brief Set prefer Apn.
+     *
+     * @param apnId ApnId needed to be set.
+     * @return 0 set success, others set fail.
+     */
+    int32_t SetPreferApn(int32_t apnId);
+
+    /**
+     * @brief Query all apn info of default cellular data slotId.
+     *
+     * @param apnInfoList All apn info of default cellular data slotId.
+     * @return 0 query success, others query fail.
+     */
+    int32_t QueryAllApnInfo(std::vector<ApnInfo> &apnInfoList);
+
 private:
     class CellularDataDeathRecipient : public IRemoteObject::DeathRecipient {
     public:

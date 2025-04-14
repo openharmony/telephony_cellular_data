@@ -23,6 +23,7 @@ ohos_shared_library("data") {
     "//third_party/node/src",
     "$SUBSYSTEM_DIR/cellular_data/include/utils",
     "$SUBSYSTEM_DIR/cellular_data/frameworks/js/napi/include",
+    "$SUBSYSTEM_DIR/cellular_data/interfaces/innerkits",
   ]
 
   sources = [ "$SUBSYSTEM_DIR/cellular_data/frameworks/js/napi/src/napi_cellular_data.cpp" ]
