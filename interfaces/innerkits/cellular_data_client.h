@@ -281,7 +281,7 @@ public:
     int32_t QueryApnIds(ApnInfo apnInfo, std::vector<uint32_t> &apnIdList);
 
     /**
-     * @brief Get last 30 internal_default apn activate info
+     * @brief Set prefer Apn
      *
      * @param apnId ApnId needed to be set.
      * @return 0 set success, others set fail.
@@ -289,7 +289,7 @@ public:
     int32_t SetPreferApn(int32_t apnId);
 
     /**
-     * @brief Query all apn info of defaulat cellular data slotId.
+     * @brief Query all apn info of default cellular data slotId.
      *
      * @param apnInfoList All apn info of defaulat cellular data slotId.
      * @return 0 query success, others query fail.
