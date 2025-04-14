@@ -537,7 +537,7 @@ int32_t CellularDataServiceStub::OnQueryApnInfo(MessageParcel &data, MessageParc
     while (it != apnIdList.end()) {
         TELEPHONY_LOGI("OnQueryApnInfo slotIndex = %{public}d", (*it));
         if (!reply.WriteInt32(*it)) {
-            TELEPHONY_LOGE("OnQueryApnInfo IccAccountInfo reply Marshalling is false");
+            TELEPHONY_LOGE("OnQueryApnInfo reply Marshalling is false");
             return TELEPHONY_ERR_WRITE_REPLY_FAIL;
         }
         ++it;
