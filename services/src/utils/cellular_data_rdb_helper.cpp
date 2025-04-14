@@ -100,7 +100,7 @@ bool CellularDataRdbHelper::QueryApns(
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(PdpProfileData::MCCMNC, mcc + mnc);
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
-    Uri cellularDataUri(std::string(CELLULAR_DATA_RDB_SELECTION) + "?Proxy=true&simId=" + std::to_string(simId));
+    Uri cellularDataUri(std::string(CELLULAR_DATA_RDB_SELECTION) + "?simId=" + std::to_string(simId));
     std::shared_ptr<DataShare::DataShareResultSet> result =
         dataShareHelper->Query(cellularDataUri, predicates, columns);
     if (result == nullptr) {
@@ -132,7 +132,7 @@ bool CellularDataRdbHelper::QueryMvnoApnsByType(const std::string &mcc, const st
     predicates.EqualTo(PdpProfileData::MVNO_TYPE, mvnoType)
         ->EqualTo(PdpProfileData::MCCMNC, mcc + mnc);
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
-    Uri cellularDataUri(std::string(CELLULAR_DATA_RDB_SELECTION) + "?Proxy=true&simId=" + std::to_string(simId));
+    Uri cellularDataUri(std::string(CELLULAR_DATA_RDB_SELECTION) + "?simId=" + std::to_string(simId));
     std::shared_ptr<DataShare::DataShareResultSet> result =
         dataShareHelper->Query(cellularDataUri, predicates, columns);
     if (result == nullptr) {
@@ -158,7 +158,7 @@ bool CellularDataRdbHelper::QueryPreferApn(int32_t slotId, std::vector<PdpProfil
     std::vector<std::string> columns;
     DataShare::DataSharePredicates predicates;
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
-    Uri preferApnUri(std::string(CELLULAR_DATA_RDB_PREFER) + "?Proxy=true&simId=" + std::to_string(simId));
+    Uri preferApnUri(std::string(CELLULAR_DATA_RDB_PREFER) + "?simId=" + std::to_string(simId));
     std::shared_ptr<DataShare::DataShareResultSet> result = dataShareHelper->Query(preferApnUri, predicates, columns);
     if (result == nullptr) {
         TELEPHONY_LOGE("query prefer apns error");
@@ -231,10 +231,16 @@ void CellularDataRdbHelper::MakePdpProfile(
     result->GetString(index, apnBean.mnc);
     result->GetColumnIndex(PdpProfileData::APN, index);
     result->GetString(index, apnBean.apn);
-    result->GetColumnIndex(PdpProfileData::AUTH_TYPE, index);
-    result->GetInt(index, apnBean.authType);
     result->GetColumnIndex(PdpProfileData::AUTH_USER, index);
     result->GetString(index, apnBean.authUser);
+    int32_t authType;
+    result->GetColumnIndex(PdpProfileData::AUTH_TYPE, index);
+    result->GetInt(index, authType);
+    if (authType == -1) {
+        apnBean.authType = (apnBean.authUser.empty()) ? SETUP_DATA_AUTH_NONE : SETUP_DATA_AUTH_PAP_CHAP;
+    } else {
+        apnBean.authType = authType;
+    }
     result->GetColumnIndex(PdpProfileData::AUTH_PWD, index);
     result->GetString(index, apnBean.authPwd);
     result->GetColumnIndex(PdpProfileData::APN_TYPES, index);
