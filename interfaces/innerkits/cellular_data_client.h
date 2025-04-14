@@ -291,7 +291,7 @@ public:
     /**
      * @brief Query all apn info of default cellular data slotId.
      *
-     * @param apnInfoList All apn info of defaulat cellular data slotId.
+     * @param apnInfoList All apn info of default cellular data slotId.
      * @return 0 query success, others query fail.
      */
     int32_t QueryAllApnInfo(std::vector<ApnInfo> &apnInfoList);
