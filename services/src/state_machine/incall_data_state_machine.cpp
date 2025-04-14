@@ -172,6 +172,21 @@ bool IncallDataStateMachine::IsSecondaryActiveState() const
     return currentState_ == activatingSecondaryState_ || currentState_ == activatedSecondaryState_;
 }
 
+void IncallDataStateMachine::DeInit()
+{
+    idleState_ = nullptr;
+    secondaryActiveState_ = nullptr;
+    activatingSecondaryState_ = nullptr;
+    activatedSecondaryState_ = nullptr;
+    deactivatingSecondaryState_ = nullptr;
+    currentState_ = nullptr;
+    cellularDataHandler_.reset();
+    apnManager_ = nullptr;
+
+    slotId_ = INVALID_SLOT_ID;
+    callState_ = static_cast<int32_t>(TelCallStatus::CALL_STATUS_IDLE);
+}
+
 void IdleState::StateBegin()
 {
     TELEPHONY_LOGI("Enter Idle State");
