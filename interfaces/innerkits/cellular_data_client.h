@@ -281,7 +281,7 @@ public:
     int32_t QueryApnIds(ApnInfo apnInfo, std::vector<uint32_t> &apnIdList);
 
     /**
-     * @brief Set prefer Apn
+     * @brief Set prefer Apn.
      *
      * @param apnId ApnId needed to be set.
      * @return 0 set success, others set fail.
