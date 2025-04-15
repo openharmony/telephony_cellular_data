@@ -98,10 +98,10 @@ public:
     int32_t QueryApnIds(ApnInfo apnInfo, std::vector<uint32_t> &apnIdList) override;
     int32_t SetPreferApn(int32_t apnId) override;
     int32_t QueryAllApnInfo(std::vector<ApnInfo> &apnInfoList) override;
-    int32_t SendUrspDecodeResult(int32_t slotId, std::vector<uint8_t> buffer) override;
-    int32_t SendUePolicySectionIdentifier(int32_t slotId, std::vector<uint8_t> buffer) override;
-    int32_t SendImsRsdList(int32_t slotId, std::vector<uint8_t> buffer) override;
-    int32_t GetNetworkSliceAllowedNssai(int32_t slotId, std::vector<uint8_t> buffer) override;
+    int32_t SendUrspDecodeResult(int32_t slotId, const std::vector<uint8_t>& buffer) override;
+    int32_t SendUePolicySectionIdentifier(int32_t slotId, const std::vector<uint8_t>& buffer) override;
+    int32_t SendImsRsdList(int32_t slotId, const std::vector<uint8_t>& buffer) override;
+    int32_t GetNetworkSliceAllowedNssai(int32_t slotId, const std::vector<uint8_t>& buffer) override;
     int32_t GetNetworkSliceEhplmn(int32_t slotId) override;
 
 private:
