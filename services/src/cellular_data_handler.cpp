@@ -1373,7 +1373,7 @@ void CellularDataHandler::IncallDataComplete(const InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("Slot%{public}d: MSG_INCALL_DATA_COMPLETE", slotId_);
     if (incallDataStateMachine_ != nullptr) {
-        incallDataStateMachine_ = nullptr;
+        incallDataStateMachine_->DeInit();
     }
 }
 
@@ -1407,6 +1407,10 @@ void CellularDataHandler::HandleImsCallChanged(int32_t state)
     if (state == TelCallStatus::CALL_STATUS_DIALING || state == TelCallStatus::CALL_STATUS_INCOMING) {
         if (incallDataStateMachine_ == nullptr) {
             incallDataStateMachine_ = CreateIncallDataStateMachine(state);
+        } else {
+            if (incallDataStateMachine_->GetCurrentState() == nullptr) {
+                incallDataStateMachine_->Init(state);
+            }
         }
     }
     if (incallDataStateMachine_ == nullptr) {

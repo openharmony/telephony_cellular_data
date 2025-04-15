@@ -43,6 +43,7 @@ public:
     void UpdateCallState(int32_t state);
     void Init(int32_t callState);
     bool IsSecondaryActiveState() const;
+    void DeInit();
 
 protected:
     sptr<State> idleState_;
