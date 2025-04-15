@@ -812,6 +812,7 @@ bool CellularDataHandler::HandleCompatibleDataConnection(
     TELEPHONY_LOGI("Enter HandleCompatibleDataConnection");
     int32_t oldApnId = ApnManager::FindApnIdByCapability(stateMachine->GetCapability());
     int32_t newApnId = ApnManager::FindApnIdByCapability(apnHolder->GetCapability());
+    apnHolder->ReleaseAllCellularData();
     if (stateMachine->IsActiveState()) {
         TELEPHONY_LOGI("set reuse apnId[%{public}d] for apnId[%{public}d]", newApnId, oldApnId);
         stateMachine->SetReuseApnCap(apnHolder->GetCapability());

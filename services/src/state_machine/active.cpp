@@ -118,6 +118,10 @@ bool Active::ProcessDisconnectAllDone(const AppExecFwk::InnerEvent::Pointer &eve
         TELEPHONY_LOGE("object is null");
         return false;
     }
+    if (stateMachine->GetReuseApnCap() != NetManagerStandard::NetCap::NET_CAPABILITY_END) {
+        stateMachine->SetIfReuseSupplierId(false);
+        stateMachine->SetReuseApnCap(NetManagerStandard::NetCap::NET_CAPABILITY_END);
+    }
     DisConnectionReason reason = object->GetReason();
     Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
     if (inActive == nullptr) {
@@ -146,6 +150,10 @@ bool Active::ProcessLostConnection(const AppExecFwk::InnerEvent::Pointer &event)
     if (stateMachine == nullptr) {
         TELEPHONY_LOGE("stateMachine is null");
         return false;
+    }
+    if (stateMachine->GetReuseApnCap() != NetManagerStandard::NetCap::NET_CAPABILITY_END) {
+        stateMachine->SetIfReuseSupplierId(false);
+        stateMachine->SetReuseApnCap(NetManagerStandard::NetCap::NET_CAPABILITY_END);
     }
     CellularDataHiSysEvent::WriteDataDeactiveBehaviorEvent(stateMachine->GetSlotId(),
         DataDisconnectCause::LOST_CONNECTION, ApnManager::FindApnNameByApnId(stateMachine->apnId_));

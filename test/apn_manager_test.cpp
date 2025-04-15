@@ -1305,24 +1305,54 @@ HWTEST_F(ApnManagerTest, ApnItem_IsSimilarPdpProfile_001, TestSize.Level0)
     EXPECT_FALSE(ApnItem::IsSimilarPdpProfile(p1, p2));
     p1.apn = "";
     p2.apn = "";
-    p1.authType = 1;
-    p2.authType = 2;
-    EXPECT_FALSE(ApnItem::IsSimilarPdpProfile(p1, p2));
-    p1.authType = 0;
-    p2.authType = 1;
+    p1.proxyIpAddress = "1";
+    p2.proxyIpAddress = "";
     EXPECT_TRUE(ApnItem::IsSimilarPdpProfile(p1, p2));
-    p1.authType = 1;
-    p2.authType = 0;
+    p1.proxyIpAddress = "";
+    p2.proxyIpAddress = "1";
     EXPECT_TRUE(ApnItem::IsSimilarPdpProfile(p1, p2));
-    p1.authType = 1;
-    p2.authType = 1;
-    p1.authUser = "1";
-    p2.authUser = "2";
+    p1.proxyIpAddress = "1";
+    p2.proxyIpAddress = "2";
     EXPECT_FALSE(ApnItem::IsSimilarPdpProfile(p1, p2));
-    p1.authUser = "1";
-    p2.authUser = "1";
-    p1.authPwd = "1";
-    p2.authPwd = "2";
+    p1.proxyIpAddress = "";
+    p2.proxyIpAddress = "";
+    p1.mvnoType = "1";
+    p2.mvnoType = "";
+    EXPECT_FALSE(ApnItem::IsSimilarPdpProfile(p1, p2));
+}
+
+/**
+ * @tc.name  : ApnItem_IsSimilarPdpProfile_002
+ * @tc.number: ApnItemTest_007
+ */
+HWTEST_F(ApnManagerTest, ApnItem_IsSimilarPdpProfile_002, TestSize.Level0)
+{
+    PdpProfile p1;
+    PdpProfile p2;
+    p1.mvnoMatchData = "1";
+    p2.mvnoMatchData = "";
+    EXPECT_FALSE(ApnItem::IsSimilarPdpProfile(p1, p2));
+    p1.mvnoMatchData = "";
+    p2.mvnoMatchData = "";
+    p1.homeUrl = "1";
+    p2.homeUrl = "";
+    EXPECT_TRUE(ApnItem::IsSimilarPdpProfile(p1, p2));
+    p1.homeUrl = "";
+    p2.homeUrl = "1";
+    EXPECT_TRUE(ApnItem::IsSimilarPdpProfile(p1, p2));
+    p1.homeUrl = "1";
+    p2.homeUrl = "2";
+    EXPECT_FALSE(ApnItem::IsSimilarPdpProfile(p1, p2));
+    p1.homeUrl = "";
+    p2.homeUrl = "";
+    p1.mmsIpAddress = "1";
+    p2.mmsIpAddress = "";
+    EXPECT_TRUE(ApnItem::IsSimilarPdpProfile(p1, p2));
+    p1.mmsIpAddress = "";
+    p2.mmsIpAddress = "1";
+    EXPECT_TRUE(ApnItem::IsSimilarPdpProfile(p1, p2));
+    p1.mmsIpAddress = "1";
+    p2.mmsIpAddress = "2";
     EXPECT_FALSE(ApnItem::IsSimilarPdpProfile(p1, p2));
 }
 

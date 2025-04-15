@@ -233,13 +233,10 @@ void CellularDataRdbHelper::MakePdpProfile(
     result->GetString(index, apnBean.apn);
     result->GetColumnIndex(PdpProfileData::AUTH_USER, index);
     result->GetString(index, apnBean.authUser);
-    int32_t authType;
     result->GetColumnIndex(PdpProfileData::AUTH_TYPE, index);
-    result->GetInt(index, authType);
-    if (authType == -1) {
+    result->GetInt(index, apnBean.authType);
+    if (apnBean.authType == -1) {
         apnBean.authType = (apnBean.authUser.empty()) ? SETUP_DATA_AUTH_NONE : SETUP_DATA_AUTH_PAP_CHAP;
-    } else {
-        apnBean.authType = authType;
     }
     result->GetColumnIndex(PdpProfileData::AUTH_PWD, index);
     result->GetString(index, apnBean.authPwd);
@@ -263,6 +260,12 @@ void CellularDataRdbHelper::MakePdpProfile(
     if (apnBean.roamPdpProtocol.empty()) {
         apnBean.roamPdpProtocol = "IP";
     }
+    result->GetColumnIndex(PdpProfileData::HOME_URL, index);
+    result->GetString(index, apnBean.homeUrl);
+    result->GetColumnIndex(PdpProfileData::MMS_IP_ADDRESS, index);
+    result->GetString(index, apnBean.mmsIpAddress);
+    result->GetColumnIndex(PdpProfileData::SERVER, index);
+    result->GetString(index, apnBean.server);
 }
 
 bool CellularDataRdbHelper::IsMvnoDataMatched(const std::string &mvnoDataFromSim, const PdpProfile &apnBean)

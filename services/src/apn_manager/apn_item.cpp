@@ -159,16 +159,13 @@ sptr<ApnItem> ApnItem::BuildOtherApnAttributes(sptr<ApnItem> &apnItem, const Pdp
 bool ApnItem::IsSimilarPdpProfile(const PdpProfile &newPdpProfile, const PdpProfile &oldPdpProfile)
 {
     return (newPdpProfile.apn == oldPdpProfile.apn) &&
-        (newPdpProfile.authUser == oldPdpProfile.authUser) && (newPdpProfile.authPwd == oldPdpProfile.authPwd) &&
-        (newPdpProfile.proxyIpAddress == oldPdpProfile.proxyIpAddress) &&
-        (newPdpProfile.mmsIpAddress == oldPdpProfile.mmsIpAddress) &&
+        IsSimilarProperty(newPdpProfile.proxyIpAddress, oldPdpProfile.proxyIpAddress) &&
         IsSimilarProtocol(newPdpProfile.pdpProtocol, oldPdpProfile.pdpProtocol) &&
         IsSimilarProtocol(newPdpProfile.roamPdpProtocol, oldPdpProfile.roamPdpProtocol) &&
+        (newPdpProfile.mvnoType == oldPdpProfile.mvnoType) &&
+        (newPdpProfile.mvnoMatchData == oldPdpProfile.mvnoMatchData) &&
         IsSimilarProperty(newPdpProfile.homeUrl, oldPdpProfile.homeUrl) &&
-        IsSimilarProperty(newPdpProfile.mmsIpAddress, oldPdpProfile.mmsIpAddress) &&
-        (newPdpProfile.authType == oldPdpProfile.authType ||
-        newPdpProfile.authType == static_cast<int32_t>(ApnAuthType::NONE) ||
-        oldPdpProfile.authType == static_cast<int32_t>(ApnAuthType::NONE));
+        IsSimilarProperty(newPdpProfile.mmsIpAddress, oldPdpProfile.mmsIpAddress);
 }
 
 bool ApnItem::IsSimilarProtocol(const std::string &newProtocol, const std::string &oldProtocol)
