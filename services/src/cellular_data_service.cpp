@@ -894,7 +894,7 @@ int32_t CellularDataService::GetInternalActReportInfo(int32_t slotId, ApnActivat
     return result ? TELEPHONY_ERR_SUCCESS : TELEPHONY_ERR_FAIL;
 }
 
-int32_t CellularDataService::QueryApnIds(ApnInfo apnInfo, std::vector<uint32_t> &apnIdList)
+int32_t CellularDataService::QueryApnIds(const ApnInfo& apnInfo, std::vector<uint32_t> &apnIdList)
 {
     if (!TelephonyPermission::CheckPermission(Permission::MANAGE_APN_SETTING)) {
         TELEPHONY_LOGE("Permission denied!");
