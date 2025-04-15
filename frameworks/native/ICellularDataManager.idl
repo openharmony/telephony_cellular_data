@@ -15,6 +15,7 @@
 
 sequenceable ApnAttribute..OHOS.Telephony.ApnAttribute;
 sequenceable ApnActivateReportInfo..OHOS.Telephony.ApnActivateReportInfoIpc;
+sequenceable CellularDataTypes..OHOS.Telephony.ApnInfo;
 interface OHOS.Telephony.SimAccountCallback;
 interface OHOS.Telephony.ICellularDataManager {
     void IsCellularDataEnabled([out] boolean dataEnabled);
@@ -48,12 +49,12 @@ interface OHOS.Telephony.ICellularDataManager {
     void GetDefaultActReportInfo([in] int slotId, [out] ApnActivateReportInfoIpc info);
     void GetInternalActReportInfo([in] int slotId, [out] ApnActivateReportInfoIpc info);
     void GetIntelligenceSwitchState([out] boolean switchState);
-    void QueryApnIds(ApnInfo apnInfo, [out] List<unsigned int> apnIdList);
-    void SetPreferApn(int apnId);
+    void QueryApnIds([in] ApnInfo apnInfo, [out] List<unsigned int> apnIdList);
+    void SetPreferApn([in] int apnId);
     void QueryAllApnInfo([out] List<ApnInfo> apnInfoList);
-    void SendUrspDecodeResult(int slotId, List<uint8_t> buffer);
-    void SendUePolicySectionIdentifier(int slotId, List<uint8_t> buffer);
-    void SendImsRsdList(int slotId, List<uint8_t> buffer);
-    void GetNetworkSliceAllowedNssai(int slotId, List<uint8_t> buffer);
-    void GetNetworkSliceEhplmn(int slotId);
+    void SendUrspDecodeResult([in] int slotId, [in] List<unsigned char> buffer);
+    void SendUePolicySectionIdentifier([in] int slotId, [in] List<unsigned char> buffer);
+    void SendImsRsdList([in] int slotId, [in] List<unsigned char> buffer);
+    void GetNetworkSliceAllowedNssai([in] int slotId, [in] List<unsigned char> buffer);
+    void GetNetworkSliceEhplmn([in] int slotId);
 };
