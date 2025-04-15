@@ -127,9 +127,9 @@ struct ApnInfo : public Parcelable {
         return true;
     };
 
-    std::shared_ptr<ApnInfo> UnMarshalling(Parcel &parcel)
+    static ApnInfo* Unmarshalling(Parcel &parcel)
     {
-        std::shared_ptr<ApnInfo> param = std::make_shared<ApnInfo>();
+        ApnInfo* param = new ApnInfo();
         if (param == nullptr || !param->ReadFromParcel(parcel)) {
             param = nullptr;
         }

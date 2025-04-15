@@ -106,7 +106,8 @@ int32_t CellularDataService::GetIntelligenceSwitchState(bool &switchState)
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
     if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
-        int32_t slotId = CellularDataService::GetDefaultCellularDataSlotId();
+        int32_t slotId;
+        CellularDataService::GetDefaultCellularDataSlotId(slotId);
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(
             slotId, switchState, CellularDataErrorCode::DATA_ERROR_PERMISSION_ERROR, Permission::SET_TELEPHONY_STATE);
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -168,7 +169,8 @@ int32_t CellularDataService::EnableCellularData(bool enable)
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
-        int32_t slotId = CellularDataService::GetDefaultCellularDataSlotId();
+        int32_t slotId;
+        CellularDataService::GetDefaultCellularDataSlotId(slotId);
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(
             slotId, enable, CellularDataErrorCode::DATA_ERROR_PERMISSION_ERROR, Permission::SET_TELEPHONY_STATE);
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -188,7 +190,8 @@ int32_t CellularDataService::EnableIntelligenceSwitch(bool enable)
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
-        int32_t slotId = CellularDataService::GetDefaultCellularDataSlotId();
+        int32_t slotId;
+        CellularDataService::GetDefaultCellularDataSlotId(slotId);
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(
             slotId, enable, CellularDataErrorCode::DATA_ERROR_PERMISSION_ERROR, Permission::SET_TELEPHONY_STATE);
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -201,9 +204,10 @@ int32_t CellularDataService::EnableIntelligenceSwitch(bool enable)
     return cellularDataController->SetIntelligenceSwitchEnable(enable);
 }
 
-int32_t CellularDataService::GetCellularDataState()
+int32_t CellularDataService::GetCellularDataState(int32_t &state)
 {
-    int32_t slotId = CellularDataService::GetDefaultCellularDataSlotId();
+    int32_t slotId;
+    CellularDataService::GetDefaultCellularDataSlotId(slotId);
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     if (TELEPHONY_EXT_WRAPPER.isVSimEnabled_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_()) {
         TELEPHONY_LOGI("VSimEnabled slotId: %{public}d => %{public}d", slotId, CELLULAR_DATA_VSIM_SLOT_ID);
@@ -221,23 +225,23 @@ int32_t CellularDataService::GetCellularDataState()
     if (reason == DisConnectionReason::REASON_GSM_AND_CALLING_ONLY && cellularDataController->IsRestrictedMode()) {
         dataState = static_cast<int32_t>(DataConnectionStatus::DATA_STATE_SUSPENDED);
     }
-    return dataState;
+    state = dataState;
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t CellularDataService::GetApnState(int32_t slotId, const std::string &apnType)
+int32_t CellularDataService::GetApnState(int32_t slotId, const std::string &apnType, int &state)
 {
     std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
     if (cellularDataController == nullptr) {
         TELEPHONY_LOGE("cellularDataControllers is null, slotId=%{public}d", slotId);
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    int32_t apnState = static_cast<int32_t>(cellularDataController->GetCellularDataState(apnType));
-    return apnState;
+    state = static_cast<int32_t>(cellularDataController->GetCellularDataState(apnType));
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t CellularDataService::GetDataRecoveryState()
+int32_t CellularDataService::GetDataRecoveryState(int32_t &state)
 {
-    int32_t state = 0;
     std::lock_guard<std::mutex> guard(mapLock_);
     for (const auto &controller : cellularDataControllers_) {
         auto cellularDataController = controller.second;
@@ -247,7 +251,7 @@ int32_t CellularDataService::GetDataRecoveryState()
         int32_t curState = cellularDataController->GetDataRecoveryState();
         state = (curState > state) ? curState : state;
     }
-    return state;
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CellularDataService::IsCellularDataRoamingEnabled(const int32_t slotId, bool &dataRoamingEnabled)
@@ -483,9 +487,10 @@ int32_t CellularDataService::HandleApnChanged(const int32_t slotId)
                   : static_cast<int32_t>(DataRespondCode::SET_FAILED);
 }
 
-int32_t CellularDataService::GetDefaultCellularDataSlotId()
+int32_t CellularDataService::GetDefaultCellularDataSlotId(int32_t &slotId)
 {
-    return CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
+    slotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CellularDataService::GetDefaultCellularDataSimId(int32_t &simId)
@@ -512,7 +517,8 @@ int32_t CellularDataService::SetDefaultCellularDataSlotId(const int32_t slotId)
         TELEPHONY_LOGE("sim is not active!");
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
-    int32_t formerSlotId = GetDefaultCellularDataSlotId();
+    int32_t formerSlotId;
+    GetDefaultCellularDataSlotId(formerSlotId);
     if (formerSlotId < 0) {
         TELEPHONY_LOGI("No old card slot id.");
     }
@@ -524,9 +530,10 @@ int32_t CellularDataService::SetDefaultCellularDataSlotId(const int32_t slotId)
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t CellularDataService::GetCellularDataFlowType()
+int32_t CellularDataService::GetCellularDataFlowType(int32_t &type)
 {
-    int32_t slotId = CellularDataService::GetDefaultCellularDataSlotId();
+    int32_t slotId;
+    CellularDataService::GetDefaultCellularDataSlotId(slotId);
     std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
     if (cellularDataController == nullptr) {
         TELEPHONY_LOGE("cellularDataControllers is null, slotId=%{public}d", slotId);
@@ -559,14 +566,17 @@ std::string CellularDataService::GetEndTime()
 std::string CellularDataService::GetCellularDataSlotIdDump()
 {
     std::ostringstream oss;
-    oss << "slotId:" << GetDefaultCellularDataSlotId();
+    int32_t slotId;
+    GetDefaultCellularDataSlotId(slotId);
+    oss << "slotId:" << slotId;
     return oss.str();
 }
 
 std::string CellularDataService::GetStateMachineCurrentStatusDump()
 {
     std::ostringstream oss;
-    int32_t slotId = GetDefaultCellularDataSlotId();
+    int32_t slotId;
+    GetDefaultCellularDataSlotId(slotId);
     std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
     if (cellularDataController == nullptr) {
         oss << "default slotId: " << slotId;
@@ -582,7 +592,8 @@ std::string CellularDataService::GetStateMachineCurrentStatusDump()
 std::string CellularDataService::GetFlowDataInfoDump()
 {
     std::ostringstream oss;
-    int32_t slotId = GetDefaultCellularDataSlotId();
+    int32_t slotId;
+    GetDefaultCellularDataSlotId(slotId);
     std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
     if (cellularDataController == nullptr) {
         oss << "default slotId: " << slotId;
@@ -607,7 +618,7 @@ int32_t CellularDataService::StrategySwitch(int32_t slotId, bool enable)
     return result;
 }
 
-int32_t CellularDataService::HasInternetCapability(const int32_t slotId, const int32_t cid)
+int32_t CellularDataService::HasInternetCapability(const int32_t slotId, const int32_t cid, int32_t &capability)
 {
     std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
     if (cellularDataController == nullptr) {
@@ -615,8 +626,9 @@ int32_t CellularDataService::HasInternetCapability(const int32_t slotId, const i
         return CELLULAR_DATA_INVALID_PARAM;
     }
     bool result = cellularDataController->HasInternetCapability(cid);
-    return result ? static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)
-                  : static_cast<int32_t>(RequestNetCode::REQUEST_FAILED);
+    capability = result ? static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)
+            : static_cast<int32_t>(RequestNetCode::REQUEST_FAILED);
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CellularDataService::ClearCellularDataConnections(const int32_t slotId)
@@ -625,10 +637,10 @@ int32_t CellularDataService::ClearCellularDataConnections(const int32_t slotId)
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    return ClearAllConnections(slotId, DisConnectionReason::REASON_CLEAR_CONNECTION);
+    return ClearAllConnections(slotId, (int32_t) DisConnectionReason::REASON_CLEAR_CONNECTION);
 }
 
-int32_t CellularDataService::ClearAllConnections(const int32_t slotId, DisConnectionReason reason)
+int32_t CellularDataService::ClearAllConnections(const int32_t slotId, const int32_t reason)
 {
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
@@ -639,7 +651,7 @@ int32_t CellularDataService::ClearAllConnections(const int32_t slotId, DisConnec
         TELEPHONY_LOGE("cellularDataControllers is null, slotId=%{public}d", slotId);
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    bool result = cellularDataController->ClearAllConnections(reason);
+    bool result = cellularDataController->ClearAllConnections((DisConnectionReason) reason);
     return result ? static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)
                   : static_cast<int32_t>(RequestNetCode::REQUEST_FAILED);
 }
@@ -676,7 +688,7 @@ int32_t CellularDataService::UnregisterSimAccountCallback(const sptr<SimAccountC
     return CoreManagerInner::GetInstance().UnregisterSimAccountCallback(callback);
 }
 
-int32_t CellularDataService::GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr)
+int32_t CellularDataService::GetDataConnApnAttr(int32_t slotId, ApnAttribute &apnAttr)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
@@ -687,7 +699,9 @@ int32_t CellularDataService::GetDataConnApnAttr(int32_t slotId, ApnItem::Attribu
         TELEPHONY_LOGE("cellularDataControllers is null, slotId=%{public}d", slotId);
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    cellularDataController->GetDataConnApnAttr(apnAttr);
+    ApnItem::Attribute apn;
+    cellularDataController->GetDataConnApnAttr(apn);
+    ApnAttribute::TransferApnAttributeBeforeIpc(apn, apnAttr);
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -836,7 +850,8 @@ int32_t CellularDataService::GetIfSupportDunApn(bool &isSupportDun)
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    int32_t slotId = CellularDataService::GetDefaultCellularDataSlotId();
+    int32_t slotId;
+    CellularDataService::GetDefaultCellularDataSlotId(slotId);
     auto cellularDataController = GetCellularDataController(slotId);
     if (cellularDataController == nullptr) {
         TELEPHONY_LOGE("cellularDataControllers is null, slotId=%{public}d", slotId);
@@ -846,8 +861,9 @@ int32_t CellularDataService::GetIfSupportDunApn(bool &isSupportDun)
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t CellularDataService::GetDefaultActReportInfo(int32_t slotId, ApnActivateReportInfo &info)
+int32_t CellularDataService::GetDefaultActReportInfo(int32_t slotId, ApnActivateReportInfoIpc &infoIpc)
 {
+    ApnActivateReportInfo info;
     if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -858,11 +874,13 @@ int32_t CellularDataService::GetDefaultActReportInfo(int32_t slotId, ApnActivate
         return CELLULAR_DATA_INVALID_PARAM;
     }
     bool result = cellularDataController->GetDefaultActReportInfo(info);
+    infoIpc = info;
     return result ? TELEPHONY_ERR_SUCCESS : TELEPHONY_ERR_FAIL;
 }
 
-int32_t CellularDataService::GetInternalActReportInfo(int32_t slotId, ApnActivateReportInfo &info)
+int32_t CellularDataService::GetInternalActReportInfo(int32_t slotId, ApnActivateReportInfoIpc &infoIpc)
 {
+    ApnActivateReportInfo info;
     if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -876,7 +894,7 @@ int32_t CellularDataService::GetInternalActReportInfo(int32_t slotId, ApnActivat
     return result ? TELEPHONY_ERR_SUCCESS : TELEPHONY_ERR_FAIL;
 }
 
-int32_t CellularDataService::QueryApnIds(ApnInfo apnInfo, std::vector<uint32_t> &apnIdList)
+int32_t CellularDataService::QueryApnIds(const ApnInfo& apnInfo, std::vector<uint32_t> &apnIdList)
 {
     if (!TelephonyPermission::CheckPermission(Permission::MANAGE_APN_SETTING)) {
         TELEPHONY_LOGE("Permission denied!");
@@ -923,25 +941,25 @@ int32_t CellularDataService::QueryAllApnInfo(std::vector<ApnInfo> &allApnInfoLis
     return 0;
 }
 
-int32_t CellularDataService::SendUrspDecodeResult(int32_t slotId, std::vector<uint8_t> buffer)
+int32_t CellularDataService::SendUrspDecodeResult(int32_t slotId, const std::vector<uint8_t>& buffer)
 {
     int32_t eventid = static_cast<int32_t>(CellularDataEventCode::MSG_SEND_UEPOLICY_COMMAND_REJECT);
     return CoreManagerInner::GetInstance().SendUrspDecodeResult(slotId, buffer, eventid);
 }
 
-int32_t CellularDataService::SendUePolicySectionIdentifier(int32_t slotId, std::vector<uint8_t> buffer)
+int32_t CellularDataService::SendUePolicySectionIdentifier(int32_t slotId, const std::vector<uint8_t>& buffer)
 {
     int32_t eventid = static_cast<int32_t>(CellularDataEventCode::MSG_SEND_UE_STATE_INDICATION);
     return CoreManagerInner::GetInstance().SendUePolicySectionIdentifier(slotId, buffer, eventid);
 }
 
-int32_t CellularDataService::SendImsRsdList(int32_t slotId, std::vector<uint8_t> buffer)
+int32_t CellularDataService::SendImsRsdList(int32_t slotId, const std::vector<uint8_t>& buffer)
 {
     int32_t eventid = static_cast<int32_t>(CellularDataEventCode::MSG_SEND_IMS_RSDLIST);
     return CoreManagerInner::GetInstance().SendImsRsdList(slotId, buffer, eventid);
 }
 
-int32_t CellularDataService::GetNetworkSliceAllowedNssai(int32_t slotId, std::vector<uint8_t> buffer)
+int32_t CellularDataService::GetNetworkSliceAllowedNssai(int32_t slotId, const std::vector<uint8_t>& buffer)
 {
     int32_t eventid = static_cast<int32_t>(CellularDataEventCode::MSG_SYNC_ALLOWED_NSSAI_WITH_MODEM);
     return CoreManagerInner::GetInstance().GetNetworkSliceAllowedNssai(slotId, buffer, eventid);

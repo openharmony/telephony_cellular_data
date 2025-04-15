@@ -10,6 +10,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//build/config/components/idl_tool/idl.gni")
 import("//build/ohos.gni")
 
 SUBSYSTEM_DIR = "../.."
@@ -17,6 +18,7 @@ TELEPHONY_DATA_DIR = "../../../telephony_data"
 config("cellular_data_util_config") {
   # header file path
   include_dirs = [
+    "${target_gen_dir}",
     "$SUBSYSTEM_DIR/interfaces/innerkits",
     "$SUBSYSTEM_DIR/services/include/apn_manager",
     "$SUBSYSTEM_DIR/services/include/common",
@@ -38,6 +40,48 @@ config("cellular_data_util_config") {
   }
 }
 
+config("cellulardata_interface_config") {
+  include_dirs = [
+    "${target_gen_dir}",
+    "${target_gen_dir}/callback",
+    "${target_gen_dir}/type",
+    "$SUBSYSTEM_DIR/interfaces/innerkits",
+    "$SUBSYSTEM_DIR/services/include",
+    "$SUBSYSTEM_DIR/services/include/apn_manager",
+    "$SUBSYSTEM_DIR/services/include/common",
+    "$SUBSYSTEM_DIR/services/include/state_machine",
+    "$SUBSYSTEM_DIR/services/include/utils",
+  ]
+}
+
+idl_gen_interface("cellulardata_interface") {
+  sources = [ "ICellularDataManager.idl" ]
+  log_domainid = "0xD001F03"
+  log_tag = "CellularDataApi"
+}
+
+ohos_source_set("cellulardata_interface_stub") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  public_configs = [ ":cellulardata_interface_config" ]
+  output_values = get_target_outputs(":cellulardata_interface")
+  sources = []
+  sources += filter_include(output_values, [ "*_stub.cpp" ])
+  deps = [ ":cellulardata_interface" ]
+  external_deps = [
+    "core_service:libtel_common",
+    "core_service:tel_core_service_api",
+    "hilog:libhilog",
+    "samgr:samgr_proxy",
+    "telephony_data:tel_telephony_data",
+  ]
+  part_name = "cellular_data"
+  subsystem_name = "telephony"
+}
+
 ohos_shared_library("tel_cellular_data_api") {
   sanitize = {
     cfi = true
@@ -46,15 +90,19 @@ ohos_shared_library("tel_cellular_data_api") {
   }
   branch_protector_ret = "pac_ret"
   sources = [
+    "$SUBSYSTEM_DIR/frameworks/native/apn_activate_report_info.cpp",
+    "$SUBSYSTEM_DIR/frameworks/native/apn_attribute.cpp",
     "$SUBSYSTEM_DIR/frameworks/native/cellular_data_client.cpp",
-    "$SUBSYSTEM_DIR/frameworks/native/cellular_data_service_proxy.cpp",
-    "$SUBSYSTEM_DIR/frameworks/native/data_sim_account_call_back.cpp",
+    "$SUBSYSTEM_DIR/frameworks/native/data_sim_account_callback.cpp",
     "$SUBSYSTEM_DIR/frameworks/native/sim_account_callback_stub.cpp",
   ]
-
+  output_values = get_target_outputs(":cellulardata_interface")
+  sources += filter_include(output_values, [ "*_proxy.cpp" ])
   version_script = "$SUBSYSTEM_DIR/interfaces/innerkits/libtel_cellular_data_api.versionscript"
 
   public_configs = [ ":cellular_data_util_config" ]
+
+  deps = [ ":cellulardata_interface" ]
 
   external_deps = [
     "c_utils:utils",
