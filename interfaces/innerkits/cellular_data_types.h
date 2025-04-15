@@ -127,7 +127,7 @@ struct ApnInfo : public Parcelable {
         return true;
     };
 
-    ApnInfo* Unmarshalling(Parcel &parcel)
+    static ApnInfo* Unmarshalling(Parcel &parcel)
     {
         ApnInfo* param = new ApnInfo();
         if (param == nullptr || !param->ReadFromParcel(parcel)) {
