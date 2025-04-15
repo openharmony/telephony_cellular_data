@@ -95,7 +95,7 @@ public:
     int32_t GetIfSupportDunApn(bool &isSupportDun) override;
     int32_t GetDefaultActReportInfo(int32_t slotId, ApnActivateReportInfoIpc &info) override;
     int32_t GetInternalActReportInfo(int32_t slotId, ApnActivateReportInfoIpc &info) override;
-    int32_t QueryApnIds(ApnInfo apnInfo, std::vector<uint32_t> &apnIdList) override;
+    int32_t QueryApnIds(const ApnInfo& apnInfo, std::vector<uint32_t> &apnIdList) override;
     int32_t SetPreferApn(int32_t apnId) override;
     int32_t QueryAllApnInfo(std::vector<ApnInfo> &apnInfoList) override;
     int32_t SendUrspDecodeResult(int32_t slotId, const std::vector<uint8_t>& buffer) override;
