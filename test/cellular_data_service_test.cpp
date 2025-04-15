@@ -22,6 +22,7 @@
 #include "gtest/gtest.h"
 #include "tel_ril_network_parcel.h"
 #include "traffic_management.h"
+#include "apn_attribute.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -60,14 +61,14 @@ HWTEST_F(CellularDataServiceTest, CellularDataService_001, TestSize.Level1)
     service->isInitSuccess_ = true;
     bool dataEnabled = false;
     bool dataRoamingEnabled = false;
+    int32_t state;
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->IsCellularDataEnabled(dataEnabled));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->EnableCellularData(false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->EnableCellularData(true));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->EnableIntelligenceSwitch(false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->EnableIntelligenceSwitch(true));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->GetCellularDataState());
-    ASSERT_EQ(static_cast<int32_t>(DisConnectionReason::REASON_CHANGE_CONNECTION),
-        service->GetApnState(DEFAULT_SIM_SLOT_ID, std::string()));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->GetCellularDataState(state));
+    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->GetApnState(DEFAULT_SIM_SLOT_ID, std::string(), state));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->IsCellularDataRoamingEnabled(DEFAULT_SIM_SLOT_ID, dataRoamingEnabled));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->EnableCellularDataRoaming(DEFAULT_SIM_SLOT_ID, true));
     NetRequest request;
@@ -87,16 +88,18 @@ HWTEST_F(CellularDataServiceTest, CellularDataService_001, TestSize.Level1)
  */
 HWTEST_F(CellularDataServiceTest, CellularDataService_002, TestSize.Level1)
 {
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->GetCellularDataFlowType());
+    int32_t type;
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->GetCellularDataFlowType(type));
     ASSERT_EQ("default slotId: -1", service->GetStateMachineCurrentStatusDump());
     service->GetFlowDataInfoDump();
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->StrategySwitch(DEFAULT_SIM_SLOT_ID, false));
-    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->HasInternetCapability(DEFAULT_SIM_SLOT_ID, 0));
-    DisConnectionReason reason = DisConnectionReason::REASON_NORMAL;
+    int32_t capability;
+    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->HasInternetCapability(DEFAULT_SIM_SLOT_ID, 0, capability));
+    int32_t reason = static_cast<int32_t>(DisConnectionReason::REASON_NORMAL);
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->ClearAllConnections(DEFAULT_SIM_SLOT_ID, reason));
     ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->ChangeConnectionForDsds(DEFAULT_SIM_SLOT_ID, false));
     ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->ChangeConnectionForDsds(DEFAULT_SIM_SLOT_ID, true));
-    ApnItem::Attribute apnAttr;
+    ApnAttribute apnAttr;
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->GetDataConnApnAttr(DEFAULT_SIM_SLOT_ID, apnAttr));
     std::string ipType;
     ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->GetDataConnIpType(DEFAULT_SIM_SLOT_ID, ipType));

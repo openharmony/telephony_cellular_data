@@ -21,10 +21,12 @@
 #include "singleton.h"
 #include "system_ability.h"
 
-#include "cellular_data_service_stub.h"
+#include "cellular_data_manager_stub.h"
 #include "cellular_data_constant.h"
 #include "cellular_data_controller.h"
 #include "traffic_management.h"
+#include "apn_activate_report_info.h"
+#include "apn_attribute.h"
 #include "apn_item.h"
 
 namespace OHOS {
@@ -34,7 +36,7 @@ enum class ServiceRunningState {
     STATE_RUNNING,
 };
 
-class CellularDataService : public SystemAbility, public CellularDataServiceStub {
+class CellularDataService : public SystemAbility, public CellularDataManagerStub {
     DECLARE_DELAYED_REF_SINGLETON(CellularDataService)
     DECLARE_SYSTEM_ABILITY(CellularDataService)
 
@@ -55,18 +57,18 @@ public:
     std::string GetFlowDataInfoDump();
     int32_t IsCellularDataEnabled(bool &dataEnabled) override;
     int32_t EnableCellularData(bool enable) override;
-    int32_t GetCellularDataState() override;
+    int32_t GetCellularDataState(int32_t &state) override;
     int32_t IsCellularDataRoamingEnabled(const int32_t slotId, bool &dataRoamingEnabled) override;
     int32_t EnableCellularDataRoaming(const int32_t slotId, bool enable) override;
     int32_t HandleApnChanged(const int32_t slotId) override;
-    int32_t GetDefaultCellularDataSlotId() override;
+    int32_t GetDefaultCellularDataSlotId(int32_t &slotId) override;
     int32_t GetDefaultCellularDataSimId(int32_t &simId) override;
     int32_t SetDefaultCellularDataSlotId(const int32_t slotId) override;
-    int32_t GetCellularDataFlowType() override;
+    int32_t GetCellularDataFlowType(int32_t &type) override;
     void DispatchEvent(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
-    int32_t HasInternetCapability(const int32_t slotId, const int32_t cid) override;
+    int32_t HasInternetCapability(const int32_t slotId, const int32_t cid, int32_t &capability) override;
     int32_t ClearCellularDataConnections(const int32_t slotId) override;
-    int32_t ClearAllConnections(const int32_t slotId, DisConnectionReason reason) override;
+    int32_t ClearAllConnections(const int32_t slotId, const int32_t reason) override;
     int32_t ChangeConnectionForDsds(const int32_t slotId, bool enable);
     int32_t StrategySwitch(int32_t slotId, bool enable);
     int32_t RequestNet(const NetRequest &request);
@@ -75,11 +77,11 @@ public:
     int32_t RemoveUid(const NetRequest &request);
     int32_t GetServiceRunningState();
     int64_t GetSpendTime();
-    int32_t GetApnState(int32_t slotId, const std::string &apnType) override;
-    int32_t GetDataRecoveryState() override;
+    int32_t GetApnState(int32_t slotId, const std::string &apnType, int &state) override;
+    int32_t GetDataRecoveryState(int32_t &state) override;
     int32_t RegisterSimAccountCallback(const sptr<SimAccountCallback> &callback) override;
     int32_t UnregisterSimAccountCallback(const sptr<SimAccountCallback> &callback) override;
-    int32_t GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr) override;
+    int32_t GetDataConnApnAttr(int32_t slotId, ApnAttribute &apnAttr) override;
     int32_t GetDataConnIpType(int32_t slotId, std::string &ipType) override;
     int32_t IsNeedDoRecovery(int32_t slotId, bool needDoRecovery) override;
     int32_t EnableIntelligenceSwitch(bool enable) override;
@@ -91,8 +93,8 @@ public:
     int32_t CorrectNetSupplierNoAvailable(int32_t slotId) override;
     int32_t GetSupplierRegisterState(uint32_t supplierId, int32_t &regState) override;
     int32_t GetIfSupportDunApn(bool &isSupportDun) override;
-    int32_t GetDefaultActReportInfo(int32_t slotId, ApnActivateReportInfo &info) override;
-    int32_t GetInternalActReportInfo(int32_t slotId, ApnActivateReportInfo &info) override;
+    int32_t GetDefaultActReportInfo(int32_t slotId, ApnActivateReportInfoIpc &info) override;
+    int32_t GetInternalActReportInfo(int32_t slotId, ApnActivateReportInfoIpc &info) override;
     int32_t QueryApnIds(ApnInfo apnInfo, std::vector<uint32_t> &apnIdList) override;
     int32_t SetPreferApn(int32_t apnId) override;
     int32_t QueryAllApnInfo(std::vector<ApnInfo> &apnInfoList) override;

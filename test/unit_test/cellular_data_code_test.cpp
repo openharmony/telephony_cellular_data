@@ -288,9 +288,10 @@ public:
     static void GetDefaultSlotId()
     {
         sptr<ICellularDataManager> proxy = CellularDataClient::GetInstance().GetProxy();
+        int32_t slotId;
         if (proxy != nullptr) {
-            int32_t result = proxy->GetDefaultCellularDataSlotId();
-            std::cout << "get default slot id is := " << result << std::endl;
+            int32_t result = proxy->GetDefaultCellularDataSlotId(slotId);
+            std::cout << "get default slot id is := " << slotId << std::endl;
         } else {
             std::cout << "get default slot id fail" << std::endl;
         }
@@ -313,10 +314,11 @@ public:
 
     static void GetDataFlowType()
     {
+        int32_t type;
         sptr<ICellularDataManager> proxy = CellularDataClient::GetInstance().GetProxy();
         if (proxy != nullptr) {
-            int32_t result = proxy->GetCellularDataFlowType();
-            std::cout << "get CellDataFlowType is := " << result << std::endl;
+            int32_t result = proxy->GetCellularDataFlowType(type);
+            std::cout << "get CellDataFlowType is := " << type << std::endl;
         } else {
             std::cout << "get CellDataFlowType is fail" << std::endl;
         }

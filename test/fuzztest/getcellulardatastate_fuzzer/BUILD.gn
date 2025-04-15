@@ -33,6 +33,7 @@ ohos_fuzztest("GetCellularDataStateFuzzTest") {
 
   deps = [
     "$SOURCE_DIR:tel_cellular_data",
+    "$SOURCE_DIR/frameworks/native:cellulardata_interface_stub",
     "$SOURCE_DIR/frameworks/native:tel_cellular_data_api",
   ]
 

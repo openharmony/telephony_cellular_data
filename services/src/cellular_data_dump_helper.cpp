@@ -108,7 +108,9 @@ void CellularDataDumpHelper::ShowCellularDataInfo(std::string &result) const
     result.append(GetBoolValue(dataEnabled));
     result.append("\n");
     result.append("CellularDataState            : ");
-    result.append(GetCellularDataConnectionState(dataService.GetCellularDataState()));
+    int32_t cellularDataState;
+    dataService.GetCellularDataState(cellularDataState);
+    result.append(GetCellularDataConnectionState(cellularDataState));
     result.append("\n");
 }
 } // namespace Telephony

@@ -29,7 +29,7 @@
 #include "cellular_data_rdb_observer.h"
 #include "cellular_data_roaming_observer.h"
 #include "cellular_data_service.h"
-#include "cellular_data_service_stub.h"
+#include "cellular_data_manager_stub.h"
 #include "cellular_data_setting_observer.h"
 #include "cellular_data_settings_rdb_helper.h"
 #include "cellular_data_state_machine.h"
@@ -54,6 +54,8 @@
 #include "telephony_hisysevent.h"
 #include "telephony_log_wrapper.h"
 #include "uri.h"
+#include "apn_attribute.h"
+#include "icellular_data_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -669,25 +671,29 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_001, Function | MediumTest | 
     service.InitModule();
     bool dataEnabled = false;
     bool dataRoamingEnabled = false;
+    int32_t cellularDataState;
+    int32_t slotId;
+    int32_t capability;
+    int32_t type;
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.IsCellularDataEnabled(dataEnabled));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(true));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetCellularDataState());
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetCellularDataState(cellularDataState));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.IsCellularDataRoamingEnabled(INVALID_SLOTID, dataRoamingEnabled));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularDataRoaming(INVALID_SLOTID, false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.IsCellularDataRoamingEnabled(DEFAULT_SIM_SLOT_ID, dataRoamingEnabled));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularDataRoaming(DEFAULT_SIM_SLOT_ID, true));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HandleApnChanged(INVALID_SLOTID));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HandleApnChanged(DEFAULT_SIM_SLOT_ID));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDefaultCellularDataSlotId());
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDefaultCellularDataSlotId(slotId));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.SetDefaultCellularDataSlotId(INVALID_SLOTID));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.SetDefaultCellularDataSlotId(DEFAULT_SIM_SLOT_ID));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetCellularDataFlowType());
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HasInternetCapability(INVALID_SLOTID, 0));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HasInternetCapability(DEFAULT_SIM_SLOT_ID, 0));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetCellularDataFlowType(type));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HasInternetCapability(INVALID_SLOTID, 0, capability));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HasInternetCapability(DEFAULT_SIM_SLOT_ID, 0, capability));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearCellularDataConnections(INVALID_SLOTID));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearCellularDataConnections(DEFAULT_SIM_SLOT_ID));
-    DisConnectionReason reason = DisConnectionReason::REASON_NORMAL;
+    int32_t reason = static_cast<int32_t>(DisConnectionReason::REASON_NORMAL);
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearAllConnections(INVALID_SLOTID, reason));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearAllConnections(DEFAULT_SIM_SLOT_ID, reason));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ChangeConnectionForDsds(INVALID_SLOTID, false));
@@ -720,28 +726,33 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_002, Function | MediumTest | 
     service.InitModule();
     bool dataEnabled = false;
     bool dataRoamingEnabled = false;
+    int32_t cellularDataState;
+    int32_t state;
+    int32_t slotId;
+    int32_t capability;
+    int32_t type;
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.IsCellularDataEnabled(dataEnabled));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableIntelligenceSwitch(false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableIntelligenceSwitch(true));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(false));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetCellularDataState());
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetCellularDataState(cellularDataState));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.IsCellularDataRoamingEnabled(INVALID_SLOTID, dataRoamingEnabled));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularDataRoaming(INVALID_SLOTID, false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HandleApnChanged(INVALID_SLOTID));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDefaultCellularDataSlotId());
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDefaultCellularDataSlotId(slotId));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.SetDefaultCellularDataSlotId(INVALID_SLOTID));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetCellularDataFlowType());
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HasInternetCapability(INVALID_SLOTID, 0));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetCellularDataFlowType(type));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HasInternetCapability(INVALID_SLOTID, 0, capability));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearCellularDataConnections(INVALID_SLOTID));
-    DisConnectionReason reason = DisConnectionReason::REASON_NORMAL;
+    int32_t reason = static_cast<int32_t>(DisConnectionReason::REASON_NORMAL);
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearAllConnections(INVALID_SLOTID, reason));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ChangeConnectionForDsds(INVALID_SLOTID, false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.StrategySwitch(INVALID_SLOTID, false));
     ASSERT_FALSE(service.GetCellularDataController(INVALID_SLOTID) != nullptr);
     ASSERT_FALSE(service.GetCellularDataController(INVALID_SLOTID_TWO) != nullptr);
-    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(DEFAULT_SIM_SLOT_ID, std::string()));
-    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(INVALID_SLOTID, std::string()));
-    ASSERT_EQ(service.GetDataRecoveryState(), 0);
+    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(DEFAULT_SIM_SLOT_ID, std::string(), state));
+    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(INVALID_SLOTID, std::string(), state));
+    ASSERT_EQ(service.GetDataRecoveryState(state), 0);
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.InitCellularDataController(2));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.InitCellularDataController(INVALID_SLOTID));
     service.GetFlowDataInfoDump();
@@ -765,27 +776,31 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_003, Function | MediumTest | 
     service.cellularDataControllers_.clear();
     bool dataEnabled = false;
     bool dataRoamingEnabled = false;
+    int32_t cellularDataState;
+    int32_t slotId;
+    int32_t capability;
+    int32_t type;
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.IsCellularDataEnabled(dataEnabled));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(true));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularDataRoaming(INVALID_SLOTID, false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.IsCellularDataRoamingEnabled(DEFAULT_SIM_SLOT_ID, dataRoamingEnabled));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularDataRoaming(DEFAULT_SIM_SLOT_ID, true));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetCellularDataState());
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetCellularDataState(cellularDataState));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.IsCellularDataRoamingEnabled(INVALID_SLOTID, dataRoamingEnabled));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HandleApnChanged(INVALID_SLOTID));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HandleApnChanged(DEFAULT_SIM_SLOT_ID));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.SetDefaultCellularDataSlotId(INVALID_SLOTID));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.SetDefaultCellularDataSlotId(DEFAULT_SIM_SLOT_ID));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetCellularDataFlowType());
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HasInternetCapability(INVALID_SLOTID, 0));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HasInternetCapability(DEFAULT_SIM_SLOT_ID, 0));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDefaultCellularDataSlotId());
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetCellularDataFlowType(type));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HasInternetCapability(INVALID_SLOTID, 0, capability));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HasInternetCapability(DEFAULT_SIM_SLOT_ID, 0, capability));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDefaultCellularDataSlotId(slotId));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.StrategySwitch(INVALID_SLOTID, false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.StrategySwitch(DEFAULT_SIM_SLOT_ID, false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearCellularDataConnections(INVALID_SLOTID));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearCellularDataConnections(DEFAULT_SIM_SLOT_ID));
-    DisConnectionReason reason = DisConnectionReason::REASON_NORMAL;
+    int32_t reason = static_cast<int32_t>(DisConnectionReason::REASON_NORMAL);
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearAllConnections(INVALID_SLOTID, reason));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearAllConnections(DEFAULT_SIM_SLOT_ID, reason));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ChangeConnectionForDsds(INVALID_SLOTID, false));
@@ -811,6 +826,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_004, Function | MediumTest | 
     DataAccessToken token;
     CellularDataService service;
     std::vector<std::u16string> strV;
+    int32_t state;
     ASSERT_EQ(TELEPHONY_ERR_FAIL, service.Dump(INVALID_FD, strV));
     service.state_ = ServiceRunningState::STATE_RUNNING;
     service.OnStart();
@@ -818,12 +834,12 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_004, Function | MediumTest | 
     service.GetFlowDataInfoDump();
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableIntelligenceSwitch(false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableIntelligenceSwitch(true));
-    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(DEFAULT_SIM_SLOT_ID, std::string()));
-    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(INVALID_SLOTID, std::string()));
-    ASSERT_EQ(service.GetDataRecoveryState(), 0);
+    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(DEFAULT_SIM_SLOT_ID, std::string(), state));
+    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(INVALID_SLOTID, std::string(), state));
+    ASSERT_EQ(service.GetDataRecoveryState(state), 0);
     ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.InitCellularDataController(2));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.InitCellularDataController(INVALID_SLOTID));
-    ApnItem::Attribute apnAttr;
+    ApnAttribute apnAttr;
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDataConnApnAttr(INVALID_SLOTID, apnAttr));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDataConnApnAttr(DEFAULT_SIM_SLOT_ID, apnAttr));
     std::string ipType;
@@ -843,6 +859,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_005, Function | MediumTest | 
     DataAccessToken token;
     CellularDataService service;
     std::vector<std::u16string> strV;
+    int32_t state;
     ASSERT_EQ(TELEPHONY_ERR_FAIL, service.Dump(INVALID_FD, strV));
     service.state_ = ServiceRunningState::STATE_RUNNING;
     service.OnStart();
@@ -850,13 +867,13 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_005, Function | MediumTest | 
     service.cellularDataControllers_.clear();
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableIntelligenceSwitch(false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableIntelligenceSwitch(true));
-    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(DEFAULT_SIM_SLOT_ID, std::string()));
-    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(INVALID_SLOTID, std::string()));
-    ASSERT_EQ(service.GetDataRecoveryState(), 0);
+    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(DEFAULT_SIM_SLOT_ID, std::string(), state));
+    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(INVALID_SLOTID, std::string(), state));
+    ASSERT_EQ(service.GetDataRecoveryState(state), 0);
     ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.InitCellularDataController(2));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.InitCellularDataController(INVALID_SLOTID));
     service.GetFlowDataInfoDump();
-    ApnItem::Attribute apnAttr;
+    ApnAttribute apnAttr;
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDataConnApnAttr(INVALID_SLOTID, apnAttr));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDataConnApnAttr(DEFAULT_SIM_SLOT_ID, apnAttr));
     std::string ipType;
@@ -1817,36 +1834,81 @@ HWTEST_F(BranchTest, CellularDataUtils_Test_01, Function | MediumTest | Level3)
     dataConnectionMonitor->GetDataFlowType();
     dataConnectionMonitor->IsNeedDoRecovery(true);
     dataConnectionMonitor->IsNeedDoRecovery(false);
+}
+
+/**
+ * @tc.number   CellularDataUtils_Test_02
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, CellularDataUtils_Test_02, Function | MediumTest | Level3)
+{
     auto cellularDataService = DelayedSingleton<CellularDataService>::GetInstance();
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_GE(cellularDataService->OnIsCellularDataEnabled(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnEnableCellularData(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnGetCellularDataState(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnIsCellularDataRoamingEnabled(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnEnableCellularDataRoaming(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnHandleApnChanged(data, reply), 0);
-    cellularDataService->OnGetDefaultCellularDataSlotId(data, reply);
-    EXPECT_GE(cellularDataService->OnGetDefaultCellularDataSimId(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnSetDefaultCellularDataSlotId(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnGetCellularDataFlowType(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnHasInternetCapability(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnClearCellularDataConnections(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnRegisterSimAccountCallback(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnUnregisterSimAccountCallback(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnEnableIntelligenceSwitch(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnGetDataConnApnAttr(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnGetDataConnIpType(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnGetApnState(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnGetRecoveryState(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnIsNeedDoRecovery(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnIsNeedDoRecovery(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnClearAllConnections(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnGetCellularDataSupplierId(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnCorrectNetSupplierNoAvailable(data, reply), 0);
-    EXPECT_GE(cellularDataService->OnGetSupplierRegisterState(data, reply), 0);
+    MessageOption option(MessageOption::TF_SYNC);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_IS_CELLULAR_DATA_ENABLED), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_ENABLE_CELLULAR_DATA), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_ENABLE_INTELLIGENCE_SWITCH), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_GET_CELLULAR_DATA_STATE), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_IS_CELLULAR_DATA_ROAMING_ENABLED), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_ENABLE_CELLULAR_DATA_ROAMING), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_HANDLE_APN_CHANGED), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_GET_DEFAULT_CELLULAR_DATA_SLOT_ID), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_GET_DEFAULT_CELLULAR_DATA_SIM_ID), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_SET_DEFAULT_CELLULAR_DATA_SLOT_ID), data, reply, option), 0);
 }
 
+/**
+ * @tc.number   CellularDataUtils_Test_03
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, CellularDataUtils_Test_03, Function | MediumTest | Level3)
+{
+    auto cellularDataService = DelayedSingleton<CellularDataService>::GetInstance();
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+        EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_GET_CELLULAR_DATA_FLOW_TYPE), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_HAS_INTERNET_CAPABILITY), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_CLEAR_CELLULAR_DATA_CONNECTIONS), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_CLEAR_ALL_CONNECTIONS), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_GET_DATA_CONN_APN_ATTR), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_GET_DATA_CONN_IP_TYPE), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_GET_APN_STATE), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_GET_DATA_RECOVERY_STATE), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_IS_NEED_DO_RECOVERY), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_INIT_CELLULAR_DATA_CONTROLLER), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_ESTABLISH_ALL_APNS_IF_CONNECTABLE), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_RELEASE_CELLULAR_DATA_CONNECTION), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_GET_CELLULAR_DATA_SUPPLIER_ID), data, reply, option), 0);
+    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
+        ICellularDataManagerIpcCode::COMMAND_CORRECT_NET_SUPPLIER_NO_AVAILABLE), data, reply, option), 0);
+}
 /**
  * @tc.number   CellularDataSettingsRdbHelper_Test_01
  * @tc.name     test error branch

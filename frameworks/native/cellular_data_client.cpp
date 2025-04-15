@@ -16,8 +16,10 @@
 #include "cellular_data_client.h"
 
 #include "__mutex_base"
+#include "apn_activate_report_info.h"
+#include "cellular_data_manager_proxy.h"
 #include "cellular_data_types.h"
-#include "i_cellular_data_manager.h"
+#include "icellular_data_manager.h"
 #include "if_system_ability_manager.h"
 #include "iremote_broker.h"
 #include "iremote_object.h"
@@ -149,7 +151,13 @@ int32_t CellularDataClient::GetDefaultCellularDataSlotId()
         TELEPHONY_LOGE("proxy is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    defaultCellularDataSlotId_ = proxy->GetDefaultCellularDataSlotId();
+    int32_t slotId;
+    int32_t ret = proxy->GetDefaultCellularDataSlotId(slotId);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("GetDefaultCellularDataSlotId IPC error, %{public}d", ret);
+        return ret;
+    }
+    defaultCellularDataSlotId_ = slotId;
     return defaultCellularDataSlotId_;
 }
 
@@ -201,7 +209,7 @@ int32_t CellularDataClient::UpdateDefaultCellularDataSlotId()
         TELEPHONY_LOGE("proxy is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    defaultCellularDataSlotId_ = proxy->GetDefaultCellularDataSlotId();
+    proxy->GetDefaultCellularDataSlotId(defaultCellularDataSlotId_);
     proxy->GetDefaultCellularDataSimId(defaultCellularDataSimId_);
     return defaultCellularDataSlotId_;
 }
@@ -243,7 +251,12 @@ int32_t CellularDataClient::GetCellularDataState()
         TELEPHONY_LOGE("proxy is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetCellularDataState();
+    int32_t state;
+    int32_t ret = proxy->GetCellularDataState(state);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        return ret;
+    }
+    return state;
 }
 
 int32_t CellularDataClient::GetApnState(int32_t slotId, const std::string &apnType)
@@ -253,7 +266,12 @@ int32_t CellularDataClient::GetApnState(int32_t slotId, const std::string &apnTy
         TELEPHONY_LOGE("proxy is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetApnState(slotId, apnType);
+    int32_t state;
+    int32_t ret = proxy->GetApnState(slotId, apnType, state);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        return ret;
+    }
+    return state;
 }
 
 int32_t CellularDataClient::GetDataRecoveryState()
@@ -263,7 +281,12 @@ int32_t CellularDataClient::GetDataRecoveryState()
         TELEPHONY_LOGE("proxy is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetDataRecoveryState();
+    int32_t state;
+    int32_t ret = proxy->GetDataRecoveryState(state);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        return ret;
+    }
+    return state;
 }
 
 int32_t CellularDataClient::IsCellularDataRoamingEnabled(int32_t slotId, bool &dataRoamingEnabled)
@@ -293,7 +316,12 @@ int32_t CellularDataClient::GetCellularDataFlowType()
         TELEPHONY_LOGE("proxy is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetCellularDataFlowType();
+    int32_t type;
+    int32_t ret = proxy->GetCellularDataFlowType(type);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        return ret;
+    }
+    return type;
 }
 
 int32_t CellularDataClient::HasInternetCapability(int32_t slotId, int32_t cid)
@@ -303,7 +331,12 @@ int32_t CellularDataClient::HasInternetCapability(int32_t slotId, int32_t cid)
         TELEPHONY_LOGE("proxy is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->HasInternetCapability(slotId, cid);
+    int32_t capability;
+    int32_t ret = proxy->HasInternetCapability(slotId, cid, capability);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        return ret;
+    }
+    return capability;
 }
 
 int32_t CellularDataClient::ClearCellularDataConnections(int32_t slotId)
@@ -323,7 +356,11 @@ int32_t CellularDataClient::GetDataConnApnAttr(int32_t slotId, ApnItem::Attribut
         TELEPHONY_LOGE("proxy is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetDataConnApnAttr(slotId, apnAttr);
+    ApnAttribute apnAfterTrans;
+    ApnAttribute::TransferApnAttributeBeforeIpc(apnAttr, apnAfterTrans);
+    int32_t ret = proxy->GetDataConnApnAttr(slotId, apnAfterTrans);
+    ApnAttribute::TransferApnAttributeAfterIpc(apnAttr, apnAfterTrans);
+    return ret;
 }
 
 int32_t CellularDataClient::GetDataConnIpType(int32_t slotId, std::string &ipType)
@@ -343,7 +380,8 @@ int32_t CellularDataClient::ClearAllConnections(int32_t slotId, DisConnectionRea
         TELEPHONY_LOGE("proxy is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->ClearAllConnections(slotId, reason);
+    int32_t reasonIpc = static_cast<int32_t> (reason);
+    return proxy->ClearAllConnections(slotId, reasonIpc);
 }
 
 int32_t CellularDataClient::HandleApnChanged(int32_t slotId)
@@ -468,7 +506,10 @@ int32_t CellularDataClient::GetDefaultActReportInfo(int32_t slotId, ApnActivateR
         TELEPHONY_LOGE("proxy is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetDefaultActReportInfo(slotId, info);
+    ApnActivateReportInfoIpc infoIpc = info;
+    int32_t ret = proxy->GetDefaultActReportInfo(slotId, infoIpc);
+    ApnActivateReportInfoIpc::transferToReportInfo(infoIpc, info);
+    return ret;
 }
 
 int32_t CellularDataClient::GetInternalActReportInfo(int32_t slotId, ApnActivateReportInfo &info)
@@ -478,7 +519,10 @@ int32_t CellularDataClient::GetInternalActReportInfo(int32_t slotId, ApnActivate
         TELEPHONY_LOGE("proxy is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetInternalActReportInfo(slotId, info);
+    ApnActivateReportInfoIpc infoIpc = info;
+    int32_t ret = proxy->GetInternalActReportInfo(slotId, infoIpc);
+    ApnActivateReportInfoIpc::transferToReportInfo(infoIpc, info);
+    return ret;
 }
 
 int32_t CellularDataClient::QueryApnIds(ApnInfo apnInfo, std::vector<uint32_t> &apnIdList)

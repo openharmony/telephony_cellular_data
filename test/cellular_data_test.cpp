@@ -32,7 +32,7 @@
 #include "gtest/gtest_pred_impl.h"
 #include "gtest/hwext/gtest-tag.h"
 #include "hap_token_info.h"
-#include "i_cellular_data_manager.h"
+#include "icellular_data_manager.h"
 #include "iosfwd"
 #include "iostream"
 #include "net_conn_callback_stub.h"

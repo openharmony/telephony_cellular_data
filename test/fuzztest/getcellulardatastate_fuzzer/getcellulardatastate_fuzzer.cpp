@@ -21,9 +21,10 @@
 #include "adddatatoken_fuzzer.h"
 #include "cellular_data_ipc_interface_code.h"
 #include "cellular_data_service.h"
-#include "cellular_data_service_stub.h"
+#include "cellular_data_manager_stub.h"
 #include "system_ability_definition.h"
 #include <fuzzer/FuzzedDataProvider.h>
+#include "icellular_data_manager.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -42,26 +43,6 @@ bool IsServiceInited()
     return g_isInited;
 }
 
-void OnRemoteRequest(const uint8_t *data, size_t size)
-{
-    if (!IsServiceInited()) {
-        return;
-    }
-
-    MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
-        return;
-    }
-    dataMessageParcel.WriteBuffer(data, size);
-    dataMessageParcel.RewindRead(0);
-    FuzzedDataProvider fdp(data, size);
-    uint32_t code = fdp.ConsumeIntegralInRange<uint32_t>(0,
-        static_cast<uint32_t>(CellularDataInterfaceCode::GET_SUPPLIER_REGISTER_STATE) + 1);
-    MessageParcel reply;
-    MessageOption option;
-    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
-}
-
 void EnableCellularData(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -71,8 +52,10 @@ void EnableCellularData(const uint8_t *data, size_t size)
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_ENABLE_CELLULAR_DATA);
     MessageParcel reply;
-    DelayedSingleton<CellularDataService>::GetInstance()->OnEnableCellularData(dataMessageParcel, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
 }
 
 void GetCellularDataState(const uint8_t *data, size_t size)
@@ -84,8 +67,10 @@ void GetCellularDataState(const uint8_t *data, size_t size)
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_GET_CELLULAR_DATA_STATE);
     MessageParcel reply;
-    DelayedSingleton<CellularDataService>::GetInstance()->OnGetCellularDataState(dataMessageParcel, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
 }
 
 void IsCellularDataEnabled(const uint8_t *data, size_t size)
@@ -97,8 +82,10 @@ void IsCellularDataEnabled(const uint8_t *data, size_t size)
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_IS_CELLULAR_DATA_ENABLED);
     MessageParcel reply;
-    DelayedSingleton<CellularDataService>::GetInstance()->OnIsCellularDataEnabled(dataMessageParcel, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
 }
 
 void IsCellularDataRoamingEnabled(const uint8_t *data, size_t size)
@@ -112,8 +99,10 @@ void IsCellularDataRoamingEnabled(const uint8_t *data, size_t size)
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_IS_CELLULAR_DATA_ROAMING_ENABLED);
     MessageParcel reply;
-    DelayedSingleton<CellularDataService>::GetInstance()->OnIsCellularDataRoamingEnabled(dataMessageParcel, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
 }
 
 void GetDefaultCellularDataSlotId(const uint8_t *data, size_t size)
@@ -125,8 +114,10 @@ void GetDefaultCellularDataSlotId(const uint8_t *data, size_t size)
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_IS_CELLULAR_DATA_ROAMING_ENABLED);
     MessageParcel reply;
-    DelayedSingleton<CellularDataService>::GetInstance()->OnGetDefaultCellularDataSlotId(dataMessageParcel, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
 }
 
 void EnableCellularDataRoaming(const uint8_t *data, size_t size)
@@ -141,8 +132,10 @@ void EnableCellularDataRoaming(const uint8_t *data, size_t size)
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_ENABLE_CELLULAR_DATA_ROAMING);
     MessageParcel reply;
-    DelayedSingleton<CellularDataService>::GetInstance()->OnEnableCellularDataRoaming(dataMessageParcel, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
 }
 
 void SetDefaultCellularDataSlotId(const uint8_t *data, size_t size)
@@ -157,8 +150,10 @@ void SetDefaultCellularDataSlotId(const uint8_t *data, size_t size)
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_SET_DEFAULT_CELLULAR_DATA_SLOT_ID);
     MessageParcel reply;
-    DelayedSingleton<CellularDataService>::GetInstance()->OnSetDefaultCellularDataSlotId(dataMessageParcel, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
 }
 
 void HasInternetCapability(const uint8_t *data, size_t size)
@@ -173,8 +168,10 @@ void HasInternetCapability(const uint8_t *data, size_t size)
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_HAS_INTERNET_CAPABILITY);
     MessageParcel reply;
-    DelayedSingleton<CellularDataService>::GetInstance()->OnHasInternetCapability(dataMessageParcel, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
 }
 
 void ClearCellularDataConnections(const uint8_t *data, size_t size)
@@ -189,8 +186,10 @@ void ClearCellularDataConnections(const uint8_t *data, size_t size)
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_CLEAR_CELLULAR_DATA_CONNECTIONS);
     MessageParcel reply;
-    DelayedSingleton<CellularDataService>::GetInstance()->OnClearCellularDataConnections(dataMessageParcel, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
 }
 
 void GetCellularDataFlowType(const uint8_t *data, size_t size)
@@ -202,8 +201,10 @@ void GetCellularDataFlowType(const uint8_t *data, size_t size)
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_GET_CELLULAR_DATA_FLOW_TYPE);
     MessageParcel reply;
-    DelayedSingleton<CellularDataService>::GetInstance()->OnGetCellularDataFlowType(dataMessageParcel, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
 }
 
 void RegisterSimAccountCallback(const uint8_t *data, size_t size)
@@ -214,8 +215,10 @@ void RegisterSimAccountCallback(const uint8_t *data, size_t size)
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_REGISTER_SIM_ACCOUNT_CALLBACK);
     MessageParcel reply;
-    DelayedSingleton<CellularDataService>::GetInstance()->OnRegisterSimAccountCallback(dataMessageParcel, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
 }
 
 void UnregisterSimAccountCallback(const uint8_t *data, size_t size)
@@ -226,8 +229,10 @@ void UnregisterSimAccountCallback(const uint8_t *data, size_t size)
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_UNREGISTER_SIM_ACCOUNT_CALLBACK);
     MessageParcel reply;
-    DelayedSingleton<CellularDataService>::GetInstance()->OnUnregisterSimAccountCallback(dataMessageParcel, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
 }
 
 void GetDefaultActReportInfo(const uint8_t *data, size_t size)
@@ -238,8 +243,10 @@ void GetDefaultActReportInfo(const uint8_t *data, size_t size)
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_GET_DEFAULT_ACT_REPORT_INFO);
     MessageParcel reply;
-    DelayedSingleton<CellularDataService>::GetInstance()->OnGetDefaultActReportInfo(dataMessageParcel, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
 }
 
 void GetInternalActReportInfo(const uint8_t *data, size_t size)
@@ -250,8 +257,10 @@ void GetInternalActReportInfo(const uint8_t *data, size_t size)
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_GET_INTERNAL_ACT_REPORT_INFO);
     MessageParcel reply;
-    DelayedSingleton<CellularDataService>::GetInstance()->OnGetInternalActReportInfo(dataMessageParcel, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
@@ -260,7 +269,6 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    OnRemoteRequest(data, size);
     EnableCellularData(data, size);
     GetCellularDataState(data, size);
     IsCellularDataEnabled(data, size);

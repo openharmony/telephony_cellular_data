@@ -27,6 +27,8 @@ ohos_shared_library("tel_cellular_data") {
   sources = [
     "$DATA_SERVICE_EXT_WRAPPER_ROOT/src/data_service_ext_wrapper.cpp",
     "$TELEPHONY_EXT_WRAPPER_ROOT/src/telephony_ext_wrapper.cpp",
+    "frameworks/native/apn_activate_report_info.cpp",
+    "frameworks/native/apn_attribute.cpp",
     "services/src/apn_manager/apn_holder.cpp",
     "services/src/apn_manager/apn_item.cpp",
     "services/src/apn_manager/apn_manager.cpp",
@@ -39,7 +41,6 @@ ohos_shared_library("tel_cellular_data") {
     "services/src/cellular_data_rdb_observer.cpp",
     "services/src/cellular_data_roaming_observer.cpp",
     "services/src/cellular_data_service.cpp",
-    "services/src/cellular_data_service_stub.cpp",
     "services/src/cellular_data_setting_observer.cpp",
     "services/src/data_connection_manager.cpp",
     "services/src/data_connection_monitor.cpp",
@@ -74,6 +75,8 @@ ohos_shared_library("tel_cellular_data") {
     "services/include/apn_manager",
     "interfaces/innerkits",
   ]
+
+  deps = [ "frameworks/native:cellulardata_interface_stub" ]
 
   external_deps = [
     "ability_base:want",
@@ -144,6 +147,8 @@ ohos_static_library("tel_cellular_data_static") {
   sources = [
     "$DATA_SERVICE_EXT_WRAPPER_ROOT/src/data_service_ext_wrapper.cpp",
     "$TELEPHONY_EXT_WRAPPER_ROOT/src/telephony_ext_wrapper.cpp",
+    "frameworks/native/apn_activate_report_info.cpp",
+    "frameworks/native/apn_attribute.cpp",
     "services/src/apn_manager/apn_holder.cpp",
     "services/src/apn_manager/apn_item.cpp",
     "services/src/apn_manager/apn_manager.cpp",
@@ -156,7 +161,6 @@ ohos_static_library("tel_cellular_data_static") {
     "services/src/cellular_data_rdb_observer.cpp",
     "services/src/cellular_data_roaming_observer.cpp",
     "services/src/cellular_data_service.cpp",
-    "services/src/cellular_data_service_stub.cpp",
     "services/src/cellular_data_setting_observer.cpp",
     "services/src/data_connection_manager.cpp",
     "services/src/data_connection_monitor.cpp",
@@ -191,6 +195,8 @@ ohos_static_library("tel_cellular_data_static") {
     "services/include/apn_manager",
     "interfaces/innerkits",
   ]
+
+  deps = [ "frameworks/native:cellulardata_interface_stub" ]
 
   external_deps = [
     "ability_base:want",
