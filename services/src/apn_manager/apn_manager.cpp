@@ -700,6 +700,9 @@ void ApnManager::MergePdpProfile(PdpProfile &newProfile, PdpProfile &oldProfile)
 {
     if (oldProfile.apnTypes.find(DATA_CONTEXT_ROLE_DEFAULT) != std::string::npos) {
         newProfile.authType = oldProfile.authType;
+        newProfile.authUser = oldProfile.authUser;
+        newProfile.authPwd = oldProfile.authPwd;
+        newProfile.server = oldProfile.server;
     }
     newProfile.apnTypes = newProfile.apnTypes + ',' + oldProfile.apnTypes;
     newProfile.pdpProtocol = (newProfile.pdpProtocol == PROTOCOL_IPV4V6) ?
@@ -708,6 +711,8 @@ void ApnManager::MergePdpProfile(PdpProfile &newProfile, PdpProfile &oldProfile)
         newProfile.roamPdpProtocol : oldProfile.roamPdpProtocol;
     newProfile.homeUrl = newProfile.homeUrl.empty() ? oldProfile.homeUrl : newProfile.homeUrl;
     newProfile.mmsIpAddress = newProfile.mmsIpAddress.empty() ? oldProfile.mmsIpAddress : newProfile.mmsIpAddress;
+    newProfile.proxyIpAddress = newProfile.proxyIpAddress.empty() ?
+        oldProfile.proxyIpAddress : newProfile.proxyIpAddress;
     if (preferId_ == oldProfile.profileId) {
         TELEPHONY_LOGI("preferId change from %{public}d to %{public}d", oldProfile.profileId, newProfile.profileId);
         preferId_ = newProfile.profileId;
