@@ -947,6 +947,8 @@ void CellularDataHandler::UpdateApnInfo(const int32_t profileId)
     int32_t profileIdValue = 0;
     if (!GetCurrentDataShareApnInfo(dataShareHelper, simId, profileIdValue)) {
         TELEPHONY_LOGE("GetCurrentDataShareApnInfo fail.");
+        dataShareHelper->Release();
+        return;
     }
     if (profileIdValue != profileId) {
         DataShare::DataSharePredicates predicates;
