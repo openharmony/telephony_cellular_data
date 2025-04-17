@@ -62,6 +62,18 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCellularData()
     InitConvertPdpError();
     InitRestartRadioIfRequired();
     InitSendApnNeedRetryInfo();
+    InitJudgeOtherRequestHolding();
+}
+
+void TelephonyExtWrapper::InitJudgeOtherRequestHolding()
+{
+    judgeOtherRequestHolding_ =
+        (JUDGE_OTHER_REQUEST_HOLDING)dlsym(telephonyExtWrapperHandle_, "JudgeOtherRequestHolding");
+    if (judgeOtherRequestHolding_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol JudgeOtherRequestHolding failed, error: %{public}s", dlerror());
+        return;
+    }
+    TELEPHONY_LOGD("telephony ext wrapper init JudgeOtherRequestHolding success");
 }
 
 void TelephonyExtWrapper::InitDataEndSelfCure()

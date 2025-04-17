@@ -1014,5 +1014,57 @@ HWTEST_F(CellularDataHandlerTest, Telephony_CellularDataHandler_002, Function | 
     controller.cellularDataHandler_ = nullptr;
     EXPECT_FALSE(controller.RemoveUid(request));
 }
+
+/**
+ * @tc.number   Telephony_MsgRequest
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, Telephony_MsgRequest, Function | MediumTest | Level1)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    cellularDataHandler->Init();
+    NetRequest request1;
+    request1.capability = NetManagerStandard::NET_CAPABILITY_INTERNET;
+    request1.registerType = REGISTER;
+
+    EXPECT_TRUE(cellularDataHandler->RequestNet(request1));
+    NetRequest request2;
+    request2.capability = NetManagerStandard::NET_CAPABILITY_INTERNET;
+    request2.registerType = REQUEST;
+    EXPECT_TRUE(cellularDataHandler->RequestNet(request2));
+    auto apnHolder =
+        cellularDataHandler->apnManager_->FindApnHolderById(ApnManager::FindApnIdByCapability(request1.capability));
+
+    sleep(2);
+}
+/**
+ * @tc.number   Telephony_ConnectIfNeed
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, Telephony_ConnectIfNeed, Function | MediumTest | Level1)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    cellularDataHandler->Init();
+
+    NetRequest request1;
+    request1.capability = NetManagerStandard::NET_CAPABILITY_INTERNET;
+    request1.registerType = REQUEST;
+    EXPECT_TRUE(cellularDataHandler->RequestNet(request1));
+    auto event1 = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_REQUEST_NETWORK, TYPE_REQUEST_NET);
+    auto apnHolder =
+        cellularDataHandler->apnManager_->FindApnHolderById(ApnManager::FindApnIdByCapability(request1.capability));
+    cellularDataHandler->ConnectIfNeed(event1, apnHolder, request1);
+    auto event2 = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_REQUEST_NETWORK, TYPE_RELEASE_NET);
+    cellularDataHandler->ConnectIfNeed(event2, apnHolder, request1);
+    cellularDataHandler->ConnectIfNeed(event2, nullptr, request1);
+}
 } // namespace Telephony
 } // namespace OHOS

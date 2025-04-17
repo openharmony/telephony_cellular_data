@@ -68,6 +68,7 @@ public:
     void RemoveUid(uint32_t uid);
     HasSystemUse GetUidStatus() const;
     void SetApnBadState(bool isBad);
+    bool IsReqUidsEmpty();
 
 private:
     ApnHolder(ApnHolder &apnHolder) = default;

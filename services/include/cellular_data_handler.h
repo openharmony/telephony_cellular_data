@@ -84,6 +84,9 @@ public:
     void ReleaseCellularDataConnection();
     bool UpdateNetworkInfo();
     bool IsSupportDunApn();
+    void ConnectIfNeed(
+        const AppExecFwk::InnerEvent::Pointer &event, sptr<ApnHolder> apnHolder, const NetRequest &request);
+
     ApnActivateReportInfo GetDefaultActReportInfo();
     ApnActivateReportInfo GetInternalActReportInfo();
 
