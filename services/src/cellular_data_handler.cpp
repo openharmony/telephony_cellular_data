@@ -1242,7 +1242,7 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
         } else {
             if (apnHolder->IsReqUidsEmpty()) {
                 apnHolder->ReleaseAllCellularData();
-             }
+            }
         }
     } else {
         if (event->GetParam() == TYPE_REQUEST_NET) {
