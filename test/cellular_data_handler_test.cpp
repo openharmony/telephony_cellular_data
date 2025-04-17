@@ -1036,9 +1036,6 @@ HWTEST_F(CellularDataHandlerTest, Telephony_MsgRequest, Function | MediumTest | 
     request2.capability = NetManagerStandard::NET_CAPABILITY_INTERNET;
     request2.registerType = REQUEST;
     EXPECT_TRUE(cellularDataHandler->RequestNet(request2));
-    auto apnHolder =
-        cellularDataHandler->apnManager_->FindApnHolderById(ApnManager::FindApnIdByCapability(request1.capability));
-
     sleep(2);
 }
 /**
