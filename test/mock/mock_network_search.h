@@ -58,7 +58,7 @@ public:
     MOCK_METHOD1(GetPsRegState, int32_t(int32_t slotId));
     MOCK_METHOD1(GetCsRegState, int32_t(int32_t slotId));
     MOCK_METHOD1(GetPsRoamingState, int32_t(int32_t slotId));
-    MOCK_METHOD2(GetImei, int32_t(int32_t slotId, const sptr<IRawParcelCallback> &callback));
+    MOCK_METHOD2(GetImei, int32_t(int32_t slotId, std::u16string &imei));
     MOCK_METHOD2(GetImeiSv, int32_t(int32_t slotId, std::u16string &imeiSv));
     MOCK_METHOD3(GetImsRegStatus, int32_t(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info));
     MOCK_METHOD2(GetCellInfoList, int32_t(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo));
