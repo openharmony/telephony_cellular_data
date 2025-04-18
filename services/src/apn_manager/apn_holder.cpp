@@ -70,11 +70,13 @@ sptr<ApnItem> ApnHolder::GetCurrentApn() const
 {
     return apnItem_;
 }
+
 bool ApnHolder::IsReqUidsEmpty()
 {
     std::shared_lock<std::shared_mutex> lock(reqUidsMutex_);
     return reqUids_.empty();
 }
+
 void ApnHolder::AddUid(uint32_t uid)
 {
     std::unique_lock<std::shared_mutex> lock(reqUidsMutex_);

@@ -1038,6 +1038,7 @@ HWTEST_F(CellularDataHandlerTest, Telephony_MsgRequest, Function | MediumTest | 
     EXPECT_TRUE(cellularDataHandler->RequestNet(request2));
     sleep(2);
 }
+
 /**
  * @tc.number   Telephony_ConnectIfNeed
  * @tc.name     test error branch

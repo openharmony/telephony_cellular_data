@@ -1182,6 +1182,7 @@ void CellularDataHandler::SendEstablishDataConnectionEvent(int32_t id)
         TELEPHONY_LOGE("Slot%{public}d: send data connection event failed", slotId_);
     }
 }
+
 void CellularDataHandler::ConnectIfNeed(
     const InnerEvent::Pointer &event, sptr<ApnHolder> apnHolder, const NetRequest &request)
 {
@@ -1193,10 +1194,9 @@ void CellularDataHandler::ConnectIfNeed(
         apnHolder->RequestCellularData(request);
         int32_t id = ApnManager::FindApnIdByCapability(request.capability);
         SendEstablishDataConnectionEvent(id);
-        return;
     }
-    return;
 }
+
 void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
 {
     if (apnManager_ == nullptr || event == nullptr) {
