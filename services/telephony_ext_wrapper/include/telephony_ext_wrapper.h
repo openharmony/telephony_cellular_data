@@ -51,6 +51,8 @@ public:
     typedef void (*RESTART_RADIO_IF_RQUIRED)(int32_t, int32_t);
     typedef bool (*GET_USER_DATA_ROAMING_EXPEND)(int32_t, bool);
     typedef void (*SEND_APN_NEED_RETRY_INFO)(int32_t);
+    typedef bool (*JUDGE_OTHER_REQUEST_HOLDING)(const NetRequest &, const HasSystemUse hasSystemUse);
+
     DATA_EDN_SELF_CURE dataEndSelfCure_ = nullptr;
     IS_APN_ALLOWED_ACTIVE isApnAllowedActive_ = nullptr;
     GET_VSIM_SLOT_ID getVSimSlotId_ = nullptr;
@@ -66,6 +68,8 @@ public:
     HANDLE_DEND_FAILCAUSE handleDendFailcause_ = nullptr;
     CONVERT_PDP_ERROR convertPdpError_ = nullptr;
     RESTART_RADIO_IF_RQUIRED restartRadioIfRequired_ = nullptr;
+    JUDGE_OTHER_REQUEST_HOLDING judgeOtherRequestHolding_ = nullptr;
+
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
     void* telephonyVSimWrapperHandle_ = nullptr;
@@ -81,6 +85,7 @@ private:
     void InitConvertPdpError();
     void InitRestartRadioIfRequired();
     void InitSendApnNeedRetryInfo();
+    void InitJudgeOtherRequestHolding();
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()

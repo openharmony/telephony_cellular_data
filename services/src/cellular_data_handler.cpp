@@ -1183,6 +1183,20 @@ void CellularDataHandler::SendEstablishDataConnectionEvent(int32_t id)
     }
 }
 
+void CellularDataHandler::ConnectIfNeed(
+    const InnerEvent::Pointer &event, sptr<ApnHolder> apnHolder, const NetRequest &request)
+{
+    if (event == nullptr || apnHolder == nullptr) {
+        return;
+    }
+    if (event->GetParam() == TYPE_REQUEST_NET) {
+        TELEPHONY_LOGI("try to activate Cellular");
+        apnHolder->RequestCellularData(request);
+        int32_t id = ApnManager::FindApnIdByCapability(request.capability);
+        SendEstablishDataConnectionEvent(id);
+    }
+}
+
 void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
 {
     if (apnManager_ == nullptr || event == nullptr) {
@@ -1202,8 +1216,13 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
         TELEPHONY_LOGE("Slot%{public}d: apnHolder is null.", slotId_);
         return;
     }
-
+    WriteEventCellularRequest(request, event->GetParam());
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (TELEPHONY_EXT_WRAPPER.judgeOtherRequestHolding_ &&
+        TELEPHONY_EXT_WRAPPER.judgeOtherRequestHolding_(request, apnHolder->GetUidStatus())) {
+        ConnectIfNeed(event, apnHolder, request);
+        return;
+    }
     if (IsSimRequestNetOnVSimEnabled(event->GetParam(), apnHolder->IsMmsType())) {
         return;
     }
@@ -1216,14 +1235,13 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
             TELEPHONY_EXT_WRAPPER.isAllCellularDataAllowed_(request, apnHolder->GetUidStatus());
     }
 #endif
-    WriteEventCellularRequest(request, event->GetParam());
     if (isAllCellularDataAllowed) {
         TELEPHONY_LOGD("allow cellular data");
         if (event->GetParam() == TYPE_REQUEST_NET) {
             apnHolder->RequestCellularData(request);
         } else {
-            if (!apnHolder->ReleaseCellularData(request)) {
-                return;
+            if (apnHolder->IsReqUidsEmpty()) {
+                apnHolder->ReleaseAllCellularData();
             }
         }
     } else {
