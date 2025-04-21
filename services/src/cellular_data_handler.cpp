@@ -1029,10 +1029,9 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
         NotifyReqCellularData(false);
     }
     DisconnectDataCompletely(apnHolder, reason)
-    
 }
 
-static void DisconnectDataCompletely(std::shared_ptr<ApnHolder> apnHolder, DisConnectionReason reason)
+void DisconnectDataCompletely(std::shared_ptr<ApnHolder> apnHolder, DisConnectionReason reason)
 {
     if (!apnManager_->HasAnyConnectedState()) {
         connectionManager_->StopStallDetectionTimer();
