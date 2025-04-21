@@ -209,7 +209,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForDynamicLoad()
         TELEPHONY_LOGE("[DynamicLoad] telephony ext wrapper symbol failed, error: %{public}s", dlerror());
         return;
     }
-    dynamicLoadNotifyReqCellularDataStatus_ = 
+    dynamicLoadNotifyReqCellularDataStatus_ =
         (NotifyReqCellularData)dlsym(telephonyDynamicLoadWrapperHandle_, "InformReqCellularDataStatus");
     if (dynamicLoadNotifyReqCellularDataStatus_ == nullptr) {
         TELEPHONY_LOGE("[DynamicLoad] telephony ext wrapper dynamicLoadNotifyReqCellularDataStatus_ symbol failed,\
