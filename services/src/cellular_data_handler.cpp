@@ -1030,11 +1030,6 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
         NotifyReqCellularData(false);
 #endif
     }
-    DisconnectDataCompletely(apnHolder, reason)
-}
-
-void DisconnectDataCompletely(std::shared_ptr<ApnHolder> apnHolder, DisConnectionReason reason)
-{
     if (!apnManager_->HasAnyConnectedState()) {
         connectionManager_->StopStallDetectionTimer();
         connectionManager_->EndNetStatistics();
@@ -1043,6 +1038,11 @@ void DisconnectDataCompletely(std::shared_ptr<ApnHolder> apnHolder, DisConnectio
             incallDataStateMachine_->SendEvent(incallEvent);
         }
     }
+    DisconnectDataCompletely(apnHolder, reason);
+}
+
+void DisconnectDataCompletely(std::shared_ptr<ApnHolder> apnHolder, DisConnectionReason reason)
+{
     if (reason == DisConnectionReason::REASON_CHANGE_CONNECTION) {
         HandleSortConnection();
     }
