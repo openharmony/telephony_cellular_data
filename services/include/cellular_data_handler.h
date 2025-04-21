@@ -162,6 +162,7 @@ private:
     void HandleEstablishAllApnsIfConnectable(const AppExecFwk::InnerEvent::Pointer &event);
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     bool IsSimRequestNetOnVSimEnabled(int32_t reqType, bool isMmsType) const;
+    bool NotifyReqCellularData(bool isCellularDataRequested);
 #endif
     void SetNetRequest(NetRequest &request, const std::unique_ptr<NetRequest> &netRequest);
     void SendEstablishDataConnectionEvent(int32_t id);
