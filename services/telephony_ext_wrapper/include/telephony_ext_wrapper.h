@@ -73,6 +73,7 @@ public:
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
     void* telephonyVSimWrapperHandle_ = nullptr;
+    void* telephonyDynamicLoadWrapperHandle_ = nullptr;
 
     void InitTelephonyExtWrapperForCellularData();
     void InitDataEndSelfCure();
