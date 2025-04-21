@@ -1041,7 +1041,7 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
     DisconnectDataCompletely(apnHolder, reason);
 }
 
-void DisconnectDataCompletely(std::shared_ptr<ApnHolder> apnHolder, DisConnectionReason reason)
+void DisconnectDataCompletely(const sptr<ApnHolder> &apnHolder, DisConnectionReason reason)
 {
     if (reason == DisConnectionReason::REASON_CHANGE_CONNECTION) {
         HandleSortConnection();
