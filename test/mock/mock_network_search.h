@@ -68,6 +68,7 @@ public:
     MOCK_METHOD2(GetMeid, int32_t(int32_t slotId, std::u16string &meid));
     MOCK_METHOD2(GetUniqueDeviceId, int32_t(int32_t slotId, std::u16string &deviceId));
     MOCK_METHOD1(GetPhoneType, PhoneType(int32_t slotId));
+    MOCK_METHOD2(SetNrOptionMode, int32_t(int32_t slotId, int32_t mode));
     MOCK_METHOD3(SetNrOptionMode, int32_t(int32_t slotId, int32_t mode, NSCALLBACK &callback));
     MOCK_METHOD2(GetNrOptionMode, int32_t(int32_t slotId, NrMode &mode));
     MOCK_METHOD2(GetNrOptionMode, int32_t(int32_t slotId, NSCALLBACK &callback));
