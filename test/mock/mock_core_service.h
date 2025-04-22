@@ -41,8 +41,8 @@ public:
     MOCK_METHOD(
         int32_t, SetRadioState, (int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback), (override));
     MOCK_METHOD(int32_t, GetRadioState, (int32_t slotId, const sptr<INetworkSearchCallback> &callback), (override));
-    MOCK_METHOD(int32_t, GetImei, (int32_t slotId, std::u16string &imei), (override));
-    MOCK_METHOD(int32_t, GetImeiSv, (int32_t slotId,  const sptr<IRawParcelCallback> &callback), (override));
+    MOCK_METHOD(int32_t, GetImei, (int32_t slotId, const sptr<IRawParcelCallback> &callback), (override));
+    MOCK_METHOD(int32_t, GetImeiSv, (int32_t slotId, const sptr<IRawParcelCallback> &callback), (override));
     MOCK_METHOD(int32_t, GetMeid, (int32_t slotId, std::u16string &meid), (override));
     MOCK_METHOD(int32_t, GetUniqueDeviceId, (int32_t slotId, std::u16string &deviceId), (override));
     MOCK_METHOD(bool, IsNrSupported, (int32_t slotId), (override));
