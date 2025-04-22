@@ -221,7 +221,7 @@ HWTEST_F(CellularDataHandlerBranchTest, DisconnectDataComplete_002, Function | M
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared(subscriberInfo, 2);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 2);
     cellularDataHandler->Init();
 
     std::shared_ptr<SetupDataCallResultInfo> resultInfo = std::make_shared<SetupDataCallResultInfo>();
