@@ -30,10 +30,10 @@ using namespace OHOS::Telephony;
 namespace OHOS {
 static bool g_isInited = false;
 constexpr int32_t SLOT_NUM_MAX = 3;
-static constexpr const char16_t *descriptor = u"OHOS.Telephony.ICellularDataManager";
+static constexpr const char16_t *DESCRIPTOR = u"OHOS.Telephony.ICellularDataManager";
 static inline const std::u16string GetDescriptor()
 {
-    return descriptor;
+    return DESCRIPTOR;
 }
 bool IsServiceInited()
 {
