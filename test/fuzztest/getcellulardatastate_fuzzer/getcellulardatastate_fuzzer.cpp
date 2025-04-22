@@ -30,7 +30,11 @@ using namespace OHOS::Telephony;
 namespace OHOS {
 static bool g_isInited = false;
 constexpr int32_t SLOT_NUM_MAX = 3;
-
+static constexpr const char16_t *descriptor = u"OHOS.Telephony.ICellularDataManager";
+static inline const std::u16string GetDescriptor()
+{
+    return descriptor;
+}
 bool IsServiceInited()
 {
     if (!g_isInited) {
@@ -50,7 +54,7 @@ void EnableCellularData(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
         return;
     }
     dataMessageParcel.WriteBuffer(data, size);
@@ -68,7 +72,7 @@ void GetCellularDataState(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
         return;
     }
     dataMessageParcel.WriteBuffer(data, size);
@@ -86,7 +90,7 @@ void IsCellularDataEnabled(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
         return;
     }
     dataMessageParcel.WriteBuffer(data, size);
@@ -105,7 +109,7 @@ void IsCellularDataRoamingEnabled(const uint8_t *data, size_t size)
     FuzzedDataProvider fdp(data, size);
     int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
     MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
         return;
     }
     dataMessageParcel.WriteInt32(slotId);
@@ -124,7 +128,7 @@ void GetDefaultCellularDataSlotId(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
         return;
     }
     dataMessageParcel.WriteBuffer(data, size);
@@ -144,7 +148,7 @@ void EnableCellularDataRoaming(const uint8_t *data, size_t size)
     FuzzedDataProvider fdp(data, size);
     int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
     MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
         return;
     }
     dataMessageParcel.WriteInt32(slotId);
@@ -165,7 +169,7 @@ void SetDefaultCellularDataSlotId(const uint8_t *data, size_t size)
     FuzzedDataProvider fdp(data, size);
     int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
     MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
         return;
     }
     dataMessageParcel.WriteInt32(slotId);
@@ -186,7 +190,7 @@ void HasInternetCapability(const uint8_t *data, size_t size)
     FuzzedDataProvider fdp(data, size);
     int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
     MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
         return;
     }
     dataMessageParcel.WriteInt32(slotId);
@@ -207,7 +211,7 @@ void ClearCellularDataConnections(const uint8_t *data, size_t size)
     FuzzedDataProvider fdp(data, size);
     int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
     MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
         return;
     }
     dataMessageParcel.WriteInt32(slotId);
@@ -226,7 +230,7 @@ void GetCellularDataFlowType(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
         return;
     }
     dataMessageParcel.WriteBuffer(data, size);
@@ -243,7 +247,7 @@ void RegisterSimAccountCallback(const uint8_t *data, size_t size)
         return;
     }
     MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
         return;
     }
     dataMessageParcel.WriteBuffer(data, size);
@@ -260,7 +264,7 @@ void UnregisterSimAccountCallback(const uint8_t *data, size_t size)
         return;
     }
     MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
         return;
     }
     dataMessageParcel.WriteBuffer(data, size);
@@ -277,7 +281,7 @@ void GetDefaultActReportInfo(const uint8_t *data, size_t size)
         return;
     }
     MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
         return;
     }
     dataMessageParcel.WriteBuffer(data, size);
@@ -294,7 +298,7 @@ void GetInternalActReportInfo(const uint8_t *data, size_t size)
         return;
     }
     MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
         return;
     }
     dataMessageParcel.WriteBuffer(data, size);
