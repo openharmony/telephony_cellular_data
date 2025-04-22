@@ -50,6 +50,9 @@ void EnableCellularData(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+        return;
+    }
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_ENABLE_CELLULAR_DATA);
@@ -65,6 +68,9 @@ void GetCellularDataState(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+        return;
+    }
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_GET_CELLULAR_DATA_STATE);
@@ -80,6 +86,9 @@ void IsCellularDataEnabled(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+        return;
+    }
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_IS_CELLULAR_DATA_ENABLED);
@@ -96,6 +105,9 @@ void IsCellularDataRoamingEnabled(const uint8_t *data, size_t size)
     FuzzedDataProvider fdp(data, size);
     int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
     MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+        return;
+    }
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
@@ -112,6 +124,9 @@ void GetDefaultCellularDataSlotId(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+        return;
+    }
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_IS_CELLULAR_DATA_ROAMING_ENABLED);
@@ -129,6 +144,9 @@ void EnableCellularDataRoaming(const uint8_t *data, size_t size)
     FuzzedDataProvider fdp(data, size);
     int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
     MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+        return;
+    }
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
@@ -147,6 +165,9 @@ void SetDefaultCellularDataSlotId(const uint8_t *data, size_t size)
     FuzzedDataProvider fdp(data, size);
     int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
     MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+        return;
+    }
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
@@ -165,6 +186,9 @@ void HasInternetCapability(const uint8_t *data, size_t size)
     FuzzedDataProvider fdp(data, size);
     int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
     MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+        return;
+    }
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
@@ -183,6 +207,9 @@ void ClearCellularDataConnections(const uint8_t *data, size_t size)
     FuzzedDataProvider fdp(data, size);
     int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
     MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+        return;
+    }
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
@@ -199,6 +226,9 @@ void GetCellularDataFlowType(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+        return;
+    }
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_GET_CELLULAR_DATA_FLOW_TYPE);
@@ -213,6 +243,9 @@ void RegisterSimAccountCallback(const uint8_t *data, size_t size)
         return;
     }
     MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+        return;
+    }
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_REGISTER_SIM_ACCOUNT_CALLBACK);
@@ -227,6 +260,9 @@ void UnregisterSimAccountCallback(const uint8_t *data, size_t size)
         return;
     }
     MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+        return;
+    }
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_UNREGISTER_SIM_ACCOUNT_CALLBACK);
@@ -241,6 +277,9 @@ void GetDefaultActReportInfo(const uint8_t *data, size_t size)
         return;
     }
     MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+        return;
+    }
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_GET_DEFAULT_ACT_REPORT_INFO);
@@ -255,6 +294,9 @@ void GetInternalActReportInfo(const uint8_t *data, size_t size)
         return;
     }
     MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(CellularDataServiceStub::GetDescriptor())) {
+        return;
+    }
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_GET_INTERNAL_ACT_REPORT_INFO);
