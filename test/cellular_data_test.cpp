@@ -18,6 +18,8 @@
 
 #define private public
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
+#include <dlfcn.h>
 
 #include "cellular_data_client.h"
 #include "cellular_data_controller.h"
@@ -55,8 +57,10 @@
 
 namespace OHOS {
 namespace Telephony {
+using namespace testing;
 using namespace testing::ext;
 using namespace OHOS::NetManagerStandard;
+using ::testing::NiceMock;
 
 static const int32_t SLEEP_TIME = 1;
 static const int32_t SIM_SLOT_ID_1 = DEFAULT_SIM_SLOT_ID + 1;
@@ -116,6 +120,34 @@ class TestCallback : public NetManagerStandard::NetConnCallbackStub {
 public:
     bool isCallback_ = false;
 };
+
+class MockDlsym {
+public:
+    MOCK_METHOD(void *, dlopen, (const char *fileName, int flag));
+    MOCK_METHOD(void *, dlsym, (void *handle, const char *symbol));
+};
+
+NiceMock<MockDlsym> *mockDlsym;
+
+extern "c" {
+// mock dlopen
+void *dlopen(const char *fileName, int flag)
+{
+    if (mockDlsym == nullptr) {
+        mockDlsym = new NiceMock<MockDlsym>();
+    }
+    return mockDlsym->dlopen(fileName, flag);
+}
+
+// mock dlsym
+void *dlsym(void *handle, const char *symbol)
+{
+    if (mockDlsym == nullptr) {
+        mockDlsym = new NiceMock<MockDlsym>();
+    }
+    return mockDlsym->dlsym(handle, symbol);
+}
+}
 
 class CellularDataTest : public testing::Test {
 public:
@@ -1072,6 +1104,84 @@ HWTEST_F(CellularDataTest, Telephony_Cellulardata_InitTelephonyExtService_0100, 
         TELEPHONY_LOGI("telephonyExtWrapperHandle_ not null");
         EXPECT_EQ(TELEPHONY_EXT_WRAPPER.dataEndSelfCure_ != nullptr, true);
     }
+}
+
+
+/**
+ * @tc.number   Telephony_Cellulardata_InitTelephonyExtService_0101
+ * @tc.name     Init Telephony Ext Service.
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, Telephony_Cellulardata_InitTelephonyExtService_0101, Function | MediumTest | Level1)
+{
+    mockDlsym = new NiceMock<MockDlsym>();
+    EXPECT_CALL(*mockDlsym, dlopen(_, _))
+        .WillRepeatedly(Return(nullptr));
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapperForDynamicLoad();
+    EXPECT_EQ(TELEPHONY_EXT_WRAPPER.telephonyDynamicLoadWrapperHandle_, nullptr);
+    delete mockDlsym;
+    mockDlsym = nullptr;
+}
+
+/**
+ * @tc.number   Telephony_Cellulardata_InitTelephonyExtService_0102
+ * @tc.name     Init Telephony Ext Service.
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, Telephony_Cellulardata_InitTelephonyExtService_0102, Function | MediumTest | Level1)
+{
+    mockDlsym = new NiceMock<MockDlsym>();
+    EXPECT_CALL(*mockDlsym, dlsym(_, _))
+        .WillRepeatedly(Return(nullptr));
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapperForDynamicLoad();
+    EXPECT_EQ(TELEPHONY_EXT_WRAPPER.telephonyDynamicLoadWrapperHandle_ != nullptr, true);
+    EXPECT_EQ(TELEPHONY_EXT_WRAPPER.dynamicLoadInit_, nullptr);
+    delete mockDlsym;
+    mockDlsym = nullptr;
+}
+
+/**
+ * @tc.number   Telephony_Cellulardata_InitTelephonyExtService_0103
+ * @tc.name     Init Telephony Ext Service.
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, Telephony_Cellulardata_InitTelephonyExtService_0103, Function | MediumTest | Level1)
+{
+    mockDlsym = new NiceMock<MockDlsym>();
+    EXPECT_CALL(*mockDlsym, dlsym(_, _))
+        .WillOnce(Return(reinterpret_cast<void *>(0x1234)))
+        .WillOnce(Return(nullptr));
+    auto controller = std::make_shared<CellularDataController>(DEFAULT_SIM_SLOT_ID);
+    controller->Init();
+    ASSERT_TRUE(controller->cellularDataHandler_ != nullptr);
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapperForDynamicLoad();
+    EXPECT_EQ(TELEPHONY_EXT_WRAPPER.telephonyDynamicLoadWrapperHandle_ != nullptr, true);
+    EXPECT_EQ(TELEPHONY_EXT_WRAPPER.dynamicLoadInit_ != nullptr, true);
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    controller->cellularDataHandler_->NotifyReqCellularData(false);
+#endif
+    EXPECT_EQ(TELEPHONY_EXT_WRAPPER.dynamicLoadNotifyReqCellularDataStatus_, nullptr);
+    delete mockDlsym;
+    mockDlsym = nullptr;
+}
+
+/**
+ * @tc.number   Telephony_Cellulardata_InitTelephonyExtService_0104
+ * @tc.name     Init Telephony Ext Service.
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, Telephony_Cellulardata_InitTelephonyExtService_0104, Function | MediumTest | Level1)
+{
+    auto controller = std::make_shared<CellularDataController>(DEFAULT_SIM_SLOT_ID);
+    controller->Init();
+    ASSERT_TRUE(controller->cellularDataHandler_ != nullptr);
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapperForDynamicLoad();
+    EXPECT_EQ(TELEPHONY_EXT_WRAPPER.telephonyDynamicLoadWrapperHandle_ != nullptr, true);
+    EXPECT_EQ(TELEPHONY_EXT_WRAPPER.dynamicLoadInit_ != nullptr, true);
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    controller->cellularDataHandler_->NotifyReqCellularData(true);
+#endif
+    EXPECT_EQ(TELEPHONY_EXT_WRAPPER.dynamicLoadNotifyReqCellularDataStatus_ != nullptr, true);
 }
 
 /**
