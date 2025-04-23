@@ -1106,7 +1106,6 @@ HWTEST_F(CellularDataTest, Telephony_Cellulardata_InitTelephonyExtService_0100, 
     }
 }
 
-
 /**
  * @tc.number   Telephony_Cellulardata_InitTelephonyExtService_0101
  * @tc.name     Init Telephony Ext Service.
