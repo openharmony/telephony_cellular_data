@@ -1038,14 +1038,14 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
             incallDataStateMachine_->SendEvent(incallEvent);
         }
     }
-    DisconnectDataCompletely(apnHolder, reason);
-}
-
-void CellularDataHandler::DisconnectDataCompletely(sptr<ApnHolder> &apnHolder, DisConnectionReason reason)
-{
     if (reason == DisConnectionReason::REASON_CHANGE_CONNECTION) {
         HandleSortConnection();
     }
+    HandleDisconnectDataCompleteForMmsType(apnHolder);
+}
+
+void CellularDataHandler::HandleDisconnectDataCompleteForMmsType(sptr<ApnHolder> &apnHolder)
+{
     if (apnHolder->IsMmsType()) {
         SetDataPermittedForMms(false);
         RemoveEvent(CellularDataEventCode::MSG_RESUME_DATA_PERMITTED_TIMEOUT);
