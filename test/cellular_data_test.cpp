@@ -129,7 +129,7 @@ public:
 
 NiceMock<MockDlsym> *mockDlsym;
 
-extern "c" {
+extern "C" {
 // mock dlopen
 void *dlopen(const char *fileName, int flag)
 {
