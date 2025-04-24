@@ -22,6 +22,7 @@
 #include "cellular_data_ipc_interface_code.h"
 #include "cellular_data_service.h"
 #include "cellular_data_manager_stub.h"
+#include "data_sim_account_callback.h"
 #include "system_ability_definition.h"
 #include <fuzzer/FuzzedDataProvider.h>
 #include "icellular_data_manager.h"
@@ -250,7 +251,7 @@ void RegisterSimAccountCallback(const uint8_t *data, size_t size)
     if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
         return;
     }
-    sptr<SimAccountCallback> callback = new (std::nothrow) SimAccountCallback();
+    sptr<SimAccountCallback> callback = new (std::nothrow) DataSimAccountCallback();
     if (callback == nullptr) {
         return;
     }
@@ -270,7 +271,7 @@ void UnregisterSimAccountCallback(const uint8_t *data, size_t size)
     if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
         return;
     }
-    sptr<SimAccountCallback> callback = new (std::nothrow) SimAccountCallback();
+    sptr<SimAccountCallback> callback = new (std::nothrow) DataSimAccountCallback();
     if (callback == nullptr) {
         return;
     }
