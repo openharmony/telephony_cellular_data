@@ -22,6 +22,7 @@
 #include "cellular_data_ipc_interface_code.h"
 #include "cellular_data_service.h"
 #include "cellular_data_manager_stub.h"
+#include "data_sim_account_callback.h"
 #include "system_ability_definition.h"
 #include <fuzzer/FuzzedDataProvider.h>
 #include "icellular_data_manager.h"
@@ -250,8 +251,11 @@ void RegisterSimAccountCallback(const uint8_t *data, size_t size)
     if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
         return;
     }
-    dataMessageParcel.WriteBuffer(data, size);
-    dataMessageParcel.RewindRead(0);
+    sptr<SimAccountCallback> callback = new (std::nothrow) DataSimAccountCallback();
+    if (callback == nullptr) {
+        return;
+    }
+    dataMessageParcel.WriteRemoteObject(callback->AsObject());
     uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_REGISTER_SIM_ACCOUNT_CALLBACK);
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
@@ -267,8 +271,11 @@ void UnregisterSimAccountCallback(const uint8_t *data, size_t size)
     if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
         return;
     }
-    dataMessageParcel.WriteBuffer(data, size);
-    dataMessageParcel.RewindRead(0);
+    sptr<SimAccountCallback> callback = new (std::nothrow) DataSimAccountCallback();
+    if (callback == nullptr) {
+        return;
+    }
+    dataMessageParcel.WriteRemoteObject(callback->AsObject());
     uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_UNREGISTER_SIM_ACCOUNT_CALLBACK);
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
