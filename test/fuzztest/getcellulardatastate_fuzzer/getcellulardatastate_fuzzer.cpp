@@ -255,8 +255,6 @@ void RegisterSimAccountCallback(const uint8_t *data, size_t size)
         return;
     }
     dataParcel.WriteRemoteObject(callback->AsObject());
-    dataMessageParcel.WriteBuffer(data, size);
-    dataMessageParcel.RewindRead(0);
     uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_REGISTER_SIM_ACCOUNT_CALLBACK);
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
@@ -277,8 +275,6 @@ void UnregisterSimAccountCallback(const uint8_t *data, size_t size)
         return;
     }
     dataParcel.WriteRemoteObject(callback->AsObject());
-    dataMessageParcel.WriteBuffer(data, size);
-    dataMessageParcel.RewindRead(0);
     uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_UNREGISTER_SIM_ACCOUNT_CALLBACK);
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
