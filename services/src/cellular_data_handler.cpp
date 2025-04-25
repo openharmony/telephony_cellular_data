@@ -2007,7 +2007,7 @@ void CellularDataHandler::GetDefaultDataEnableConfig()
     bool dataEnbaled = true;
     int32_t ret = dataSwitchSettings_->QueryUserDataStatus(dataEnbaled);
     const int32_t defSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
-    if (ret == TELEPHONY_ERR_SUCESS || defSlotId == slotId_) {
+    if (ret == TELEPHONY_ERR_SUCCESS || defSlotId == slotId_) {
         return;
     }
     OperatorConfig config;
