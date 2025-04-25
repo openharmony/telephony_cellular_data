@@ -106,6 +106,7 @@ private:
     void PsRadioEmergencyStateClose(const AppExecFwk::InnerEvent::Pointer &event);
     void EstablishDataConnectionComplete(const AppExecFwk::InnerEvent::Pointer &event);
     void DisconnectDataComplete(const AppExecFwk::InnerEvent::Pointer &event);
+    void HandleDisconnectDataCompleteForMmsType(sptr<ApnHolder> &apnHolder);
     void MsgEstablishDataConnection(const AppExecFwk::InnerEvent::Pointer &event);
     void MsgRequestNetwork(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleSettingSwitchChanged(const AppExecFwk::InnerEvent::Pointer &event);
@@ -162,6 +163,7 @@ private:
     void HandleEstablishAllApnsIfConnectable(const AppExecFwk::InnerEvent::Pointer &event);
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     bool IsSimRequestNetOnVSimEnabled(int32_t reqType, bool isMmsType) const;
+    bool NotifyReqCellularData(bool isCellularDataRequested);
 #endif
     void SetNetRequest(NetRequest &request, const std::unique_ptr<NetRequest> &netRequest);
     void SendEstablishDataConnectionEvent(int32_t id);

@@ -1025,6 +1025,10 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
     UpdatePhysicalConnectionState(connectionManager_->isNoActiveConnection());
     if (apnHolder->IsDataCallEnabled()) {
         RetryOrClearConnection(apnHolder, reason, netInfo);
+    } else {
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+        NotifyReqCellularData(false);
+#endif
     }
     if (!apnManager_->HasAnyConnectedState()) {
         connectionManager_->StopStallDetectionTimer();
@@ -1037,6 +1041,11 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
     if (reason == DisConnectionReason::REASON_CHANGE_CONNECTION) {
         HandleSortConnection();
     }
+    HandleDisconnectDataCompleteForMmsType(apnHolder);
+}
+
+void CellularDataHandler::HandleDisconnectDataCompleteForMmsType(sptr<ApnHolder> &apnHolder)
+{
     if (apnHolder->IsMmsType()) {
         SetDataPermittedForMms(false);
         RemoveEvent(CellularDataEventCode::MSG_RESUME_DATA_PERMITTED_TIMEOUT);
@@ -1053,6 +1062,9 @@ void CellularDataHandler::RetryOrClearConnection(const sptr<ApnHolder> &apnHolde
     if (reason == DisConnectionReason::REASON_CLEAR_CONNECTION) {
         TELEPHONY_LOGI("clear connection");
         ClearConnection(apnHolder, reason);
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+        NotifyReqCellularData(false);
+#endif
     } else if (reason == DisConnectionReason::REASON_PERMANENT_REJECT) {
         TELEPHONY_LOGI("permannent reject, mark bad and clear connection");
         apnHolder->SetApnBadState(true);
@@ -1164,6 +1176,16 @@ bool CellularDataHandler::IsSimRequestNetOnVSimEnabled(int32_t reqType, bool isM
     }
     return false;
 }
+
+bool CellularDataHandler::NotifyReqCellularData(bool isCellularDataRequested)
+{
+    if (TELEPHONY_EXT_WRAPPER.dynamicLoadNotifyReqCellularDataStatus_) {
+        TELEPHONY_EXT_WRAPPER.dynamicLoadNotifyReqCellularDataStatus_(isCellularDataRequested);
+        TELEPHONY_LOGE("NotifyReqCellularData isCellularDataRequested %{public}d", isCellularDataRequested);
+        return true;
+    }
+    return false;
+}
 #endif
 
 void CellularDataHandler::SetNetRequest(NetRequest &request, const std::unique_ptr<NetRequest> &netRequest)
@@ -1239,10 +1261,16 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
         TELEPHONY_LOGD("allow cellular data");
         if (event->GetParam() == TYPE_REQUEST_NET) {
             apnHolder->RequestCellularData(request);
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+            NotifyReqCellularData(true);
+#endif
         } else {
             if (apnHolder->IsReqUidsEmpty()) {
                 apnHolder->ReleaseAllCellularData();
             }
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+            NotifyReqCellularData(false);
+#endif
         }
     } else {
         if (event->GetParam() == TYPE_REQUEST_NET) {
@@ -2571,6 +2599,9 @@ void CellularDataHandler::ReleaseCellularDataConnection()
         return;
     }
     ClearConnection(apnHolder, DisConnectionReason::REASON_CLEAR_CONNECTION);
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    NotifyReqCellularData(false);
+#endif
 }
 
 bool CellularDataHandler::UpdateNetworkInfo()

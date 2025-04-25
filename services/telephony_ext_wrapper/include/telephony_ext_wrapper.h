@@ -52,6 +52,8 @@ public:
     typedef bool (*GET_USER_DATA_ROAMING_EXPEND)(int32_t, bool);
     typedef void (*SEND_APN_NEED_RETRY_INFO)(int32_t);
     typedef bool (*JUDGE_OTHER_REQUEST_HOLDING)(const NetRequest &, const HasSystemUse hasSystemUse);
+    typedef void (*DynamicLoadInit)(void);
+    typedef void (*NotifyReqCellularData)(bool isReqCellularData);
 
     DATA_EDN_SELF_CURE dataEndSelfCure_ = nullptr;
     IS_APN_ALLOWED_ACTIVE isApnAllowedActive_ = nullptr;
@@ -69,10 +71,13 @@ public:
     CONVERT_PDP_ERROR convertPdpError_ = nullptr;
     RESTART_RADIO_IF_RQUIRED restartRadioIfRequired_ = nullptr;
     JUDGE_OTHER_REQUEST_HOLDING judgeOtherRequestHolding_ = nullptr;
+    DynamicLoadInit dynamicLoadInit_ = nullptr;
+    NotifyReqCellularData dynamicLoadNotifyReqCellularDataStatus_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
     void* telephonyVSimWrapperHandle_ = nullptr;
+    void* telephonyDynamicLoadWrapperHandle_ = nullptr;
 
     void InitTelephonyExtWrapperForCellularData();
     void InitDataEndSelfCure();
@@ -86,6 +91,7 @@ private:
     void InitRestartRadioIfRequired();
     void InitSendApnNeedRetryInfo();
     void InitJudgeOtherRequestHolding();
+    void InitTelephonyExtWrapperForDynamicLoad();
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()

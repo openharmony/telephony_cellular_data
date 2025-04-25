@@ -216,6 +216,30 @@ HWTEST_F(CellularDataHandlerBranchTest, DisconnectDataComplete_001, Function | M
     ASSERT_EQ(event->GetSharedObject<SetupDataCallResultInfo>(), nullptr);
 }
 
+HWTEST_F(CellularDataHandlerBranchTest, DisconnectDataComplete_002, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 2);
+    cellularDataHandler->Init();
+
+    std::shared_ptr<SetupDataCallResultInfo> resultInfo = std::make_shared<SetupDataCallResultInfo>();
+    resultInfo->flag = 2;
+    auto event = AppExecFwk::InnerEvent::Get(0, resultInfo);
+    sptr<ApnHolder> apnHolder = cellularDataHandler->apnManager_->FindApnHolderById(2);
+    sptr<DataConnectionManager> connectionManager = std::make_unique<DataConnectionManager>(0).release();
+    if (connectionManager == nullptr) {
+        return;
+    }
+    connectionManager->Init();
+    std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine =
+        std::make_shared<CellularDataStateMachine>(connectionManager, cellularDataHandler);
+    apnHolder->SetCellularDataStateMachine(cellularDataStateMachine);
+    cellularDataHandler->DisconnectDataComplete(event);
+    ASSERT_EQ(event->GetSharedObject<SetupDataCallResultInfo>(), resultInfo);
+}
+
 HWTEST_F(CellularDataHandlerBranchTest, UpdatePhysicalConnectionState_001, Function | MediumTest | Level3)
 {
     EventFwk::MatchingSkills matchingSkills;

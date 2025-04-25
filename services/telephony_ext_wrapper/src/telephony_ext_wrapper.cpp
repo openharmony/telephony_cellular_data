@@ -22,6 +22,7 @@ namespace Telephony {
 namespace {
 const std::string TELEPHONY_EXT_WRAPPER_PATH = "libtelephony_ext_service.z.so";
 const std::string TELEPHONY_VSIM_WRAPPER_PATH = "libtel_vsim_symbol.z.so";
+const std::string TELEPHONY_DYNAMIC_LOAD_WRAPPER_PATH = "libtel_dynamic_load_service.z.so";
 } // namespace
 
 TelephonyExtWrapper::TelephonyExtWrapper() {}
@@ -36,10 +37,15 @@ TelephonyExtWrapper::~TelephonyExtWrapper()
         dlclose(telephonyVSimWrapperHandle_);
         telephonyVSimWrapperHandle_ = nullptr;
     }
+    if (telephonyDynamicLoadWrapperHandle_ != nullptr) {
+        dlclose(telephonyDynamicLoadWrapperHandle_);
+        telephonyDynamicLoadWrapperHandle_ = nullptr;
+    }
 }
 
 void TelephonyExtWrapper::InitTelephonyExtWrapper()
 {
+    InitTelephonyExtWrapperForDynamicLoad();
     TELEPHONY_LOGD("TelephonyExtWrapper::InitTelephonyExtWrapper() start");
     InitTelephonyExtWrapperForCellularData();
     InitTelephonyExtWrapperForVSim();
@@ -190,5 +196,27 @@ void TelephonyExtWrapper::InitSendApnNeedRetryInfo()
     TELEPHONY_LOGD("telephony ext wrapper init SendApnNeedRetryInfo success");
 }
 
+void TelephonyExtWrapper::InitTelephonyExtWrapperForDynamicLoad()
+{
+    TELEPHONY_LOGI("[DynamicLoad]telephony ext wrapper dynamic load init begin");
+    telephonyDynamicLoadWrapperHandle_ = dlopen(TELEPHONY_DYNAMIC_LOAD_WRAPPER_PATH.c_str(), RTLD_NOW);
+    if (telephonyDynamicLoadWrapperHandle_ == nullptr) {
+        TELEPHONY_LOGE("[DynamicLoad] libtel_dynamic_load_service.z.so was not loaded, error: %{public}s", dlerror());
+        return;
+    }
+    dynamicLoadInit_ = (DynamicLoadInit)dlsym(telephonyDynamicLoadWrapperHandle_, "InitDynamicLoadHandle");
+    if (dynamicLoadInit_ == nullptr) {
+        TELEPHONY_LOGE("[DynamicLoad] telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+        return;
+    }
+    dynamicLoadNotifyReqCellularDataStatus_ =
+        (NotifyReqCellularData)dlsym(telephonyDynamicLoadWrapperHandle_, "InformReqCellularDataStatus");
+    if (dynamicLoadNotifyReqCellularDataStatus_ == nullptr) {
+        TELEPHONY_LOGE("[DynamicLoad] telephony ext wrapper dynamicLoadNotifyReqCellularDataStatus_ symbol failed,\
+            error: %{public}s", dlerror());
+        return;
+    }
+    TELEPHONY_LOGI("[DynamicLoad]telephony ext wrapper dynamic load init success");
+}
 } // namespace Telephony
 } // namespace OHOS

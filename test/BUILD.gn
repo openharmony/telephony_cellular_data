@@ -59,6 +59,7 @@ ohos_unittest("tel_cellular_data_test") {
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
+    "googletest:gmock_main",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "init:libbegetutil",
