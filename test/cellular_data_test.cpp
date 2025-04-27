@@ -1130,6 +1130,8 @@ HWTEST_F(CellularDataTest, Telephony_Cellulardata_InitTelephonyExtService_0101, 
 HWTEST_F(CellularDataTest, Telephony_Cellulardata_InitTelephonyExtService_0102, Function | MediumTest | Level1)
 {
     mockDlsym = new NiceMock<MockDlsym>();
+    EXPECT_CALL(*mockDlsym, dlopen(_, _))
+        .WillRepeatedly(Return(reinterpret_cast<void *>(0x1234)));
     EXPECT_CALL(*mockDlsym, dlsym(_, _))
         .WillRepeatedly(Return(nullptr));
     TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapperForDynamicLoad();
@@ -1147,6 +1149,8 @@ HWTEST_F(CellularDataTest, Telephony_Cellulardata_InitTelephonyExtService_0102, 
 HWTEST_F(CellularDataTest, Telephony_Cellulardata_InitTelephonyExtService_0103, Function | MediumTest | Level1)
 {
     mockDlsym = new NiceMock<MockDlsym>();
+    EXPECT_CALL(*mockDlsym, dlopen(_, _))
+        .WillRepeatedly(Return(reinterpret_cast<void *>(0x1234)));
     EXPECT_CALL(*mockDlsym, dlsym(_, _))
         .WillOnce(Return(reinterpret_cast<void *>(0x1234)))
         .WillOnce(Return(nullptr));
@@ -1171,6 +1175,11 @@ HWTEST_F(CellularDataTest, Telephony_Cellulardata_InitTelephonyExtService_0103, 
  */
 HWTEST_F(CellularDataTest, Telephony_Cellulardata_InitTelephonyExtService_0104, Function | MediumTest | Level1)
 {
+    mockDlsym = new NiceMock<MockDlsym>();
+    EXPECT_CALL(*mockDlsym, dlopen(_, _))
+        .WillRepeatedly(Return(reinterpret_cast<void *>(0x1234)));
+    EXPECT_CALL(*mockDlsym, dlsym(_, _))
+        .WillRepeatedly(Return(reinterpret_cast<void *>(0x12345)));
     auto controller = std::make_shared<CellularDataController>(DEFAULT_SIM_SLOT_ID);
     controller->Init();
     ASSERT_TRUE(controller->cellularDataHandler_ != nullptr);
