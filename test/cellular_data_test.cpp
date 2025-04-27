@@ -1152,7 +1152,7 @@ HWTEST_F(CellularDataTest, Telephony_Cellulardata_InitTelephonyExtService_0103, 
     EXPECT_CALL(*mockDlsym, dlopen(_, _))
         .WillRepeatedly(Return(reinterpret_cast<void *>(0x1234)));
     EXPECT_CALL(*mockDlsym, dlsym(_, _))
-        .WillOnce(Return(reinterpret_cast<void *>(0x1234)))
+        .WillOnce(Return(reinterpret_cast<void *>(0x12345)))
         .WillOnce(Return(nullptr));
     auto controller = std::make_shared<CellularDataController>(DEFAULT_SIM_SLOT_ID);
     controller->Init();
