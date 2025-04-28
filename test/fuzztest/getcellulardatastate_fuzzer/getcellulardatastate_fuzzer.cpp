@@ -316,6 +316,216 @@ void GetInternalActReportInfo(const uint8_t *data, size_t size)
     DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
 }
 
+void HandleApnChanged(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
+    MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
+        return;
+    }
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_HANDLE_APN_CHANGED);
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
+}
+
+void GetDefaultCellularDataSimId(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
+        return;
+    }
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_GET_DEFAULT_CELLULAR_DATA_SIM_ID);
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
+}
+
+void ClearAllConnections(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
+    int32_t reason = fdp.ConsumeIntegralInRange<int32_t>(
+        0, static_cast<int32_t>(DisConnectionReason::REASON_PERMANENT_REJECT));
+    MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
+        return;
+    }
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteInt32(reason);
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_CLEAR_ALL_CONNECTIONS);
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
+}
+
+void GetDataConnApnAttr(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
+    MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
+        return;
+    }
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_GET_DATA_CONN_APN_ATTR);
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
+}
+
+void GetDataConnIpType(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
+    MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
+        return;
+    }
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_GET_DATA_CONN_IP_TYPE);
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
+}
+
+void IsNeedDoRecovery(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
+    MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
+        return;
+    }
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_IS_NEED_DO_RECOVERY);
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
+}
+
+void InitCellularDataController(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
+    MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
+        return;
+    }
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_INIT_CELLULAR_DATA_CONTROLLER);
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
+}
+
+void EstablishAllApnsIfConnectable(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
+    MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
+        return;
+    }
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_ESTABLISH_ALL_APNS_IF_CONNECTABLE);
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
+}
+
+void ReleaseCellularDataConnection(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
+    MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
+        return;
+    }
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_RELEASE_CELLULAR_DATA_CONNECTION);
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
+}
+
+void GetSupplierRegisterState(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
+    MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
+        return;
+    }
+    dataMessageParcel.WriteInt32(slotId);
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_GET_SUPPLIER_REGISTER_STATE);
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -336,6 +546,16 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     UnregisterSimAccountCallback(data, size);
     GetDefaultActReportInfo(data, size);
     GetInternalActReportInfo(data, size);
+    HandleApnChanged(data, size);
+    GetDefaultCellularDataSimId(data, size);
+    ClearAllConnections(data, size);
+    GetDataConnApnAttr(data, size);
+    GetDataConnIpType(data, size);
+    IsNeedDoRecovery(data, size);
+    InitCellularDataController(data, size);
+    EstablishAllApnsIfConnectable(data, size);
+    ReleaseCellularDataConnection(data, size);
+    GetSupplierRegisterState(data, size);
 }
 } // namespace OHOS
 
