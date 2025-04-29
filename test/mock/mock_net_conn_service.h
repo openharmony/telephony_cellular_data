@@ -96,8 +96,8 @@ public:
     MOCK_METHOD(int32_t, RegisterPreAirplaneCallback, (const sptr<IPreAirplaneCallback> callback));
     MOCK_METHOD(int32_t, UnregisterPreAirplaneCallback, (const sptr<IPreAirplaneCallback> callback));
     MOCK_METHOD(
-        int32_t, DecreaseSupplierScore, (NetBearType bearerType, const std::string &ident, uint32_t &supplierId));
-    MOCK_METHOD(int32_t, IncreaseSupplierScore, (uint32_t supplierId));
+        int32_t, GetDefaultSupplierId, (NetBearType bearerType, const std::string &ident, uint32_t &supplierId));
+    MOCK_METHOD(int32_t, UpdateSupplierScore, (uint32_t supplierId, uint32_t detectionStatus));
     MOCK_METHOD(int32_t, EnableVnicNetwork, (const sptr<NetLinkInfo> &netLinkInfo, const std::set<int32_t> &uids));
     MOCK_METHOD(int32_t, DisableVnicNetwork, ());
     MOCK_METHOD(int32_t, EnableDistributedClientNet, (const std::string &virnicAddr, const std::string &iif));
