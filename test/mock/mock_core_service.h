@@ -95,7 +95,7 @@ public:
     MOCK_METHOD(int32_t, GetSimAccountInfo, (int32_t slotId, IccAccountInfo &info), (override));
     MOCK_METHOD(int32_t, SetDefaultVoiceSlotId, (int32_t slotId), (override));
     MOCK_METHOD(int32_t, GetDefaultVoiceSlotId, (), (override));
-    MOCK_METHOD(int32_t, GetDefaultVoiceSimId, (int32_t & simId), (override));
+    MOCK_METHOD(int32_t, GetDefaultVoiceSimId, (const sptr<IRawParcelCallback> &callback), (override));
     MOCK_METHOD(int32_t, SetPrimarySlotId, (int32_t slotId), (override));
     MOCK_METHOD(int32_t, GetPrimarySlotId, (int32_t & slotId), (override));
     MOCK_METHOD(int32_t, SetShowNumber,
