@@ -53,25 +53,22 @@ public:
     MOCK_METHOD(int32_t, GetSimState, (int32_t slotId, SimState &simState), (override));
     MOCK_METHOD(int32_t, GetDsdsMode, (int32_t & dsdsMode), (override));
     MOCK_METHOD(int32_t, GetCardType, (int32_t slotId, CardType &cardType), (override));
-    MOCK_METHOD(
-        int32_t, UnlockPin, (int32_t slotId, const std::u16string &pin, const sptr<IRawParcelCallback> &callback), (override));
-    MOCK_METHOD(int32_t, UnlockPuk,
-        (int32_t slotId, const std::u16string &newPin, const std::u16string &puk, const sptr<IRawParcelCallback> &callback),
-        (override));
-    MOCK_METHOD(int32_t, AlterPin,
-        (int32_t slotId, const std::u16string &newPin, const std::u16string &oldPin, const sptr<IRawParcelCallback> &callback),
-        (override));
-    MOCK_METHOD(
-        int32_t, UnlockPin2, (int32_t slotId, const std::u16string &pin2, const sptr<IRawParcelCallback> &callback), (override));
-    MOCK_METHOD(int32_t, UnlockPuk2,
-        (int32_t slotId, const std::u16string &newPin2, const std::u16string &puk2, const sptr<IRawParcelCallback> &callback),
-        (override));
-    MOCK_METHOD(int32_t, AlterPin2,
-        (int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2, const sptr<IRawParcelCallback> &callback),
-        (override));
-    MOCK_METHOD(
-        int32_t, SetLockState, (int32_t slotId, const LockInfo &options, const sptr<IRawParcelCallback> &callback), (override));
-    MOCK_METHOD(int32_t, GetLockState, (int32_t slotId, LockType lockType, const sptr<IRawParcelCallback> &callback), (override));
+    MOCK_METHOD(int32_t, UnlockPin,
+        (int32_t slotId, const std::u16string &pin, const sptr<IRawParcelCallback> &callback), (override));
+    MOCK_METHOD(int32_t, UnlockPuk, (int32_t slotId, const std::u16string &newPin,
+        const std::u16string &puk, const sptr<IRawParcelCallback> &callback), (override));
+    MOCK_METHOD(int32_t, AlterPin, (int32_t slotId, const std::u16string &newPin,
+        const std::u16string &oldPin, const sptr<IRawParcelCallback> &callback), (override));
+    MOCK_METHOD(int32_t, UnlockPin2,
+        (int32_t slotId, const std::u16string &pin2, const sptr<IRawParcelCallback> &callback), (override));
+    MOCK_METHOD(int32_t, UnlockPuk2, (int32_t slotId, const std::u16string &newPin2,
+        const std::u16string &puk2, const sptr<IRawParcelCallback> &callback), (override));
+    MOCK_METHOD(int32_t, AlterPin2, (int32_t slotId, const std::u16string &newPin2,
+        const std::u16string &oldPin2, const sptr<IRawParcelCallback> &callback), (override));
+    MOCK_METHOD(int32_t, SetLockState,
+        (int32_t slotId, const LockInfo &options, const sptr<IRawParcelCallback> &callback), (override));
+    MOCK_METHOD(int32_t, GetLockState,
+        (int32_t slotId, LockType lockType, const sptr<IRawParcelCallback> &callback), (override));
     MOCK_METHOD(int32_t, GetSimOperatorNumeric, (int32_t slotId, std::u16string &operatorNumeric), (override));
     MOCK_METHOD(int32_t, GetISOCountryCodeForSim, (int32_t slotId, std::u16string &countryCode), (override));
     MOCK_METHOD(int32_t, GetSimSpn, (int32_t slotId, std::u16string &spn), (override));
@@ -101,9 +98,11 @@ public:
     MOCK_METHOD(int32_t, GetDefaultVoiceSimId, (int32_t & simId), (override));
     MOCK_METHOD(int32_t, SetPrimarySlotId, (int32_t slotId), (override));
     MOCK_METHOD(int32_t, GetPrimarySlotId, (int32_t & slotId), (override));
-    MOCK_METHOD(int32_t, SetShowNumber, (int32_t slotId, const std::u16string &number, const sptr<IRawParcelCallback> &callback), (override));
+    MOCK_METHOD(int32_t, SetShowNumber,
+        (int32_t slotId, const std::u16string &number, const sptr<IRawParcelCallback> &callback), (override));
     MOCK_METHOD(int32_t, GetShowNumber, (int32_t slotId,  const sptr<IRawParcelCallback> &callback), (override));
-    MOCK_METHOD(int32_t, SetShowName, (int32_t slotId, const std::u16string &name, const sptr<IRawParcelCallback> &callback), (override));
+    MOCK_METHOD(int32_t, SetShowName,
+        (int32_t slotId, const std::u16string &name, const sptr<IRawParcelCallback> &callback), (override));
     MOCK_METHOD(int32_t, GetShowName, (int32_t slotId,  const sptr<IRawParcelCallback> &callback), (override));
     MOCK_METHOD(int32_t, GetActiveSimAccountInfoList, (std::vector<IccAccountInfo> & iccAccountInfoList), (override));
     MOCK_METHOD(int32_t, GetOperatorConfigs, (int32_t slotId, OperatorConfig &poc), (override));
@@ -149,7 +148,8 @@ public:
     MOCK_METHOD(int32_t, GetNeighboringCellInfoList, (int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo),
         (override));
     MOCK_METHOD(int32_t, SendUpdateCellLocationRequest, (int32_t slotId), (override));
-    MOCK_METHOD(int32_t, HasOperatorPrivileges, (const int32_t slotId, const sptr<IRawParcelCallback> &callback), (override));
+    MOCK_METHOD(int32_t, HasOperatorPrivileges,
+        (const int32_t slotId, const sptr<IRawParcelCallback> &callback), (override));
     MOCK_METHOD(int32_t, SimAuthentication,
         (int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response),
         (override));
