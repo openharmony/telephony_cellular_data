@@ -728,6 +728,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     CorrectNetSupplierNoAvailable(data, size);
     GetIfSupportDunApn(data, size);
     QueryApnIds(data, size);
+    SetPreferApn(data, size);
 }
 } // namespace OHOS
 
