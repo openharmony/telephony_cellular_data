@@ -499,7 +499,7 @@ void GetCellularDataSupplierId(const uint8_t *data, size_t size)
     int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
     dataMessageParcel.WriteInt32(slotId);
     uint64_t capability = fdp.ConsumeIntegralInRange<uint64_t>(0, NET_CAPABILITY_MAX);
-    dataMessageParcel.WriteUint64(slotId);
+    dataMessageParcel.WriteUint64(capability);
     dataMessageParcel.RewindRead(0);
     uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_GET_CELLULAR_DATA_SUPPLIER_ID);
     MessageParcel reply;
@@ -581,7 +581,7 @@ void QueryApnIds(const uint8_t *data, size_t size)
     dataMessageParcel.WriteParcelable(&apnInfo);
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
-    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_QUERY_APN_ID);
+    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_QUERY_APN_IDS);
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
     DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
