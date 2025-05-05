@@ -2019,7 +2019,7 @@ void CellularDataHandler::GetDefaultDataEnableConfig()
             TELEPHONY_LOGI("Slot%{public}d: OperatorConfig dataEnable_ = %{public}d", slotId_, dataEnbaled);
             dataSwitchSettings_->SetUserDataOn(dataEnbaled);
         }
-        dataSwitchSettings_->SetAnySimDetected(static_cast<int32_t>DataSimDetectedCode::SIM_DETECTED_ENABLED);
+        dataSwitchSettings_->SetAnySimDetected(static_cast<int32_t>(DataSimDetectedCode::SIM_DETECTED_ENABLED));
     }
 }
 
