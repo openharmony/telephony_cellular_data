@@ -233,6 +233,8 @@ static constexpr const char *CELLULAR_DATA_SETTING_URI =
 static constexpr const char *CELLULAR_DATA_SETTING_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
 static constexpr const char *CELLULAR_DATA_SETTING_DATA_ENABLE_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=cellular_data_enable";
+static constexpr const char *CELLULAR_DATA_SETTING_ANY_SIM_DETECTED_URI =
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=any_sim_detected";
 static constexpr const char *CELLULAR_DATA_SETTING_DATA_ROAMING_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=cellular_data_roaming_enable";
 static constexpr const char *CELLULAR_DATA_SETTING_DATA_INCALL_URI =
@@ -300,6 +302,7 @@ static const int32_t VALID_VECTOR_SIZE = 2;
 static const int32_t DELAY_SET_RIL_BANDWIDTH_MS = 3000;
 static const int32_t DELAY_SET_RIL_UP_DOWN_BANDWIDTH_MS = 50;
 static constexpr const char *CELLULAR_DATA_COLUMN_ENABLE = "cellular_data_enable";
+static constexpr const char *SIM_DETECTED_COLUMN_ENABLE = "any_sim_detected";
 static constexpr const char *CELLULAR_DATA_COLUMN_ROAMING = "cellular_data_roaming_enable";
 static constexpr const char *CELLULAR_DATA_COLUMN_INCALL = "cellular_data_incall_enable";
 static constexpr const char *INTELLIGENCE_SWITCH_COLUMN_ENABLE = "intelligence_card_switch_enable";

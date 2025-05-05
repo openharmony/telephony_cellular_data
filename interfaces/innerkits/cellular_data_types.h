@@ -40,6 +40,12 @@ enum class DataSwitchCode : int32_t {
     CELLULAR_DATA_ENABLED = 1
 };
 
+//
+enum class DataSwitchCode : int32_t {
+    CELLULAR_DATA_DISABLED = 0,
+    CELLULAR_DATA_ENABLED = 1
+};
+
 enum class IntelligenceSwitchCode : int32_t {
     INTELLIGENCE_SWITCH_DISABLED = 0,
     INTELLIGENCE_SWITCH_ENABLED = 1

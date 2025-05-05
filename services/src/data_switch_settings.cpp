@@ -69,6 +69,19 @@ int32_t DataSwitchSettings::SetUserDataOn(bool userDataOn)
     return result;
 }
 
+int32_t DataSwitchSettings::SetAnySimDetected(int32_t simDetected)
+{
+    std::shared_ptr<CellularDataSettingsRdbHelper> settingsRdbHelper = CellularDataSettingsRdbHelper::GetInstance();
+    if (settingsRdbHelper == nullptr) {
+        TELEPHONY_LOGE("settingsRdbHelper == nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    Uri anySimDetectedUri(CELLULAR_DATA_SETTING_ANY_SIM_DETECTED_URI);
+    int32_t result = settingsRdbHelper->PutValue(anySimDetectedUri, SIM_DETECTED_COLUMN_ENABLE, simDetected);
+    TELEPHONY_LOGI("DataSwitchSettings::SetAnySimDetected result:%{public}d", result);
+    return result;
+}
+
 int32_t DataSwitchSettings::SetIntelliSwitchOn(bool userSwitchOn)
 {
     std::shared_ptr<CellularDataSettingsRdbHelper> settingsRdbHelper = CellularDataSettingsRdbHelper::GetInstance();
@@ -110,6 +123,19 @@ int32_t DataSwitchSettings::QueryUserDataStatus(bool &dataEnabled)
     userDataOn_ = (userDataEnable == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED));
     dataEnabled = userDataOn_;
     return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t DataSwitchSettings::QueryAnySimDetected(int32_t simDetected)
+{
+    std::shared_ptr<CellularDataSettingsRdbHelper> settingsRdbHelper = CellularDataSettingsRdbHelper::GetInstance();
+    if (settingsRdbHelper == nullptr) {
+        TELEPHONY_LOGE("settingsRdbHelper is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    Uri anySimDetectedUri(CELLULAR_DATA_SETTING_ANY_SIM_DETECTED_URI);
+    int32_t ret = settingsRdbHelper->GetValue(anySimDetectedUri, SIM_DETECTED_COLUMN_ENABLE, simDetected);
+    TELEPHONY_LOGI("DataSwitchSettings::QueryAnySimDetected ret:%{public}d", ret);
+    return ret;
 }
 
 int32_t DataSwitchSettings::QueryIntelligenceSwitchStatus(bool &switchEnabled)
