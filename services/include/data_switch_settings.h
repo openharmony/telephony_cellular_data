@@ -36,10 +36,12 @@ public:
     bool IsUserDataRoamingOn();
     void UpdateUserDataRoamingOn(bool dataRoaming);
     int32_t SetUserDataOn(bool userDataOn);
+    int32_t SetAnySimDetected(int32_t simDetected);
     int32_t SetIntelliSwitchOn(bool userSwitchOn);
     int32_t SetUserDataRoamingOn(bool dataRoamingEnabled);
     int32_t QueryIntelligenceSwitchStatus(bool &switchEnabled);
     int32_t QueryUserDataStatus(bool &dataEnabled);
+    int32_t QueryAnySimDetectedStatus(int32_t simDetected);
     int32_t QueryUserDataRoamingStatus(bool &dataRoamingEnabled);
 
 private:
