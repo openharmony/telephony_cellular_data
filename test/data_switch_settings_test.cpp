@@ -115,5 +115,27 @@ HWTEST_F(DataSwitchSettingTest, DataSwitchSetting_05, Function | MediumTest | Le
     ASSERT_TRUE(sets.IsAllowActiveData());
 }
 
+HWTEST_F(DataSwitchSettingTest, DataSwitchSetting_06, Function | MediumTest | Level1)
+{
+    DataSwitchSettings sets(2);
+    std::cout << "DataSwitchSetting_06 slotId: " << sets.slotId_ << std::endl;
+    int32_t simDetected = 1;
+    ASSERT_TRUE(sets.SetAnySimDetected(simDetected) == TELEPHONY_ERR_SUCCESS);
+    
+    DataSwitchSettings sets1(0);
+    ASSERT_TRUE(sets1.SetAnySimDetected(simDetected) == TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(DataSwitchSettingTest, DataSwitchSetting_07, Function | MediumTest | Level1)
+{
+    DataSwitchSettings sets(2);
+    std::cout << "DataSwitchSetting_07 slotId: " << sets.slotId_ << std::endl;
+    int32_t simDetected = 0;
+    ASSERT_TRUE(sets.QueryAnySimDetectedStatus(simDetected) == TELEPHONY_ERR_SUCCESS);
+    
+    DataSwitchSettings sets1(0);
+    ASSERT_TRUE(sets1.QueryAnySimDetectedStatus(simDetected) == TELEPHONY_ERR_SUCCESS);
+}
+
 }  // namespace Telephony
 }  // namespace OHOS
