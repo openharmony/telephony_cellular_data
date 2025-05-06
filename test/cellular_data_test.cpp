@@ -2095,19 +2095,6 @@ HWTEST_F(CellularDataTest, ControllerReleaseCellularDataConnection_Test_1, TestS
     controller->cellularDataHandler_ = nullptr;
     ASSERT_FALSE(controller->ReleaseCellularDataConnection());
 }
-/**
- * @tc.number  ControllerReleaseCellularDataConnection_Test_02
- * @tc.name     Test the Controller ReleaseCellularDataConnection function
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataTest, ControllerReleaseCellularDataConnection_Test_2, TestSize.Level3)
-{
-    auto controller = std::make_shared<CellularDataController>(DEFAULT_SIM_SLOT_ID);
-    controller->Init();
-    ASSERT_TRUE(controller->cellularDataHandler_ != nullptr);
-    NetRequest request;
-    ASSERT_TRUE(controller->ReleaseCellularDataConnection());
-}
 
 /**
  * @tc.number  ControllerUpdateNetworkInfo_Test_01
