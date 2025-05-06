@@ -120,10 +120,10 @@ HWTEST_F(DataSwitchSettingTest, DataSwitchSetting_06, Function | MediumTest | Le
     DataSwitchSettings sets(2);
     std::cout << "DataSwitchSetting_06 slotId: " << sets.slotId_ << std::endl;
     int32_t simDetected = 1;
-    ASSERT_TRUE(sets.SetAnySimDetected(true) == TELEPHONY_ERR_SUCCESS);
+    ASSERT_TRUE(sets.SetAnySimDetected(simDetected) == TELEPHONY_ERR_SUCCESS);
     
     DataSwitchSettings sets1(0);
-    ASSERT_TRUE(sets.SetAnySimDetected(true) == TELEPHONY_ERR_SUCCESS);
+    ASSERT_TRUE(sets.SetAnySimDetected(simDetected) == TELEPHONY_ERR_SUCCESS);
 }
 
 HWTEST_F(DataSwitchSettingTest, DataSwitchSetting_07, Function | MediumTest | Level1)
