@@ -123,7 +123,7 @@ HWTEST_F(DataSwitchSettingTest, DataSwitchSetting_06, Function | MediumTest | Le
     ASSERT_TRUE(sets.SetAnySimDetected(simDetected) == TELEPHONY_ERR_SUCCESS);
     
     DataSwitchSettings sets1(0);
-    ASSERT_TRUE(sets.SetAnySimDetected(simDetected) == TELEPHONY_ERR_SUCCESS);
+    ASSERT_TRUE(sets1.SetAnySimDetected(simDetected) == TELEPHONY_ERR_SUCCESS);
 }
 
 HWTEST_F(DataSwitchSettingTest, DataSwitchSetting_07, Function | MediumTest | Level1)
