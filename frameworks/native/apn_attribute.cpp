@@ -101,7 +101,7 @@ static bool UnmarshallingExt(Parcel &parcel, ApnAttribute* attribute)
 
 ApnAttribute* ApnAttribute::Unmarshalling(Parcel &parcel)
 {
-    ApnAttribute* attribute = new (std::nothrow) ApnAttribute();
+    std::unique_ptr<ApnAttribute> attribute = std::make_unique<ApnAttribute>();
     if (attribute == nullptr) {
         return nullptr;
     }
@@ -126,10 +126,10 @@ ApnAttribute* ApnAttribute::Unmarshalling(Parcel &parcel)
     if (!parcel.ReadString(attribute->apn_)) {
         return nullptr;
     }
-    if (!UnmarshallingExt(parcel, attribute)) {
+    if (!UnmarshallingExt(parcel, attribute.get())) {
         return nullptr;
     }
-    return attribute;
+    return attribute.release();
 }
 
 void ApnAttribute::TransferApnAttributeBeforeIpc(ApnItem::Attribute &apnAttr, ApnAttribute &apnAfterTrans)
@@ -170,4 +170,4 @@ void ApnAttribute::TransferApnAttributeAfterIpc(ApnItem::Attribute &apnAttr, Apn
     apnAttr.isEdited_ = apnAfterTrans.isEdited_;
 }
 }
-}
+}
