@@ -25,7 +25,8 @@
 #include "cellular_data_types.h"
 #include "cellular_data_constant.h"
 #include "data_service_ext_wrapper.h"
- 
+#include "telephony_ext_wrapper.h"
+
 #ifdef ABILITY_POWER_SUPPORT
 #include "power_mgr_client.h"
 #endif
@@ -47,8 +48,26 @@ void DataConnectionMonitor::HandleScreenStateChanged(bool isScreenOn)
         return;
     }
     isScreenOn_ = isScreenOn;
+    const int32_t defSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
+    if (slotId_ != defSlotId && !IsVsimEnabled()) {
+        return;
+    }
     StopStallDetectionTimer();
     StartStallDetectionTimer();
+}
+
+bool DataConnectionMonitor::IsVsimEnabled()
+{
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (TELEPHONY_EXT_WRAPPER.getVSimSlotId_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_) {
+        int vSimSlotId = INVALID_SLOT_ID;
+        TELEPHONY_EXT_WRAPPER.getVSimSlotId_(vSimSlotId);
+        if (vSimSlotId == slotId_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_()) {
+            return true;
+        }
+    }
+#endif
+    return false;
 }
 
 bool DataConnectionMonitor::IsAggressiveRecovery()

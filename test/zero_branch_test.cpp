@@ -1222,6 +1222,32 @@ HWTEST_F(BranchTest, Telephony_DataConnectionMonitor_002, Function | MediumTest 
 }
 
 /**
+
+@tc.number DataConnectionMonitor_003
+@tc.name test error branch
+@tc.desc Function test
+*/
+HWTEST_F(BranchTest, Telephony_DataConnectionMonitor_003, Function | MediumTest | Level3)
+{
+    std::shared_ptr<DataConnectionMonitor> dataConnectionMonitor = std::make_shared<DataConnectionMonitor>(0);
+    ASSERT_FALSE(dataConnectionMonitor == nullptr);
+    dataConnectionMonitor->HandleScreenStateChanged(false);
+    dataConnectionMonitor->HandleScreenStateChanged(true);
+    ASSERT_FALSE(dataConnectionMonitor->IsVsimEnabled());
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    auto getVSimSlotId = TELEPHONY_EXT_WRAPPER.getVSimSlotId_;
+    auto isVSimEnabled = TELEPHONY_EXT_WRAPPER.isVSimEnabled_;
+    TELEPHONY_EXT_WRAPPER.getVSimSlotId_ = nullptr;
+    ASSERT_FALSE(dataConnectionMonitor->IsVsimEnabled());
+    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = nullptr;
+    ASSERT_FALSE(dataConnectionMonitor->IsVsimEnabled());
+    TELEPHONY_EXT_WRAPPER.getVSimSlotId_ = getVSimSlotId;
+    ASSERT_FALSE(dataConnectionMonitor->IsVsimEnabled());
+    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = isVSimEnabled;
+#endif
+}
+
+/**
  * @tc.number  CellularDataUtils_001
  * @tc.name     test error branch
  * @tc.desc     Function test
