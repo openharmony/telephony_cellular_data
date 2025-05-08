@@ -1312,7 +1312,6 @@ void CellularDataHandler::OnReceiveEvent(const EventFwk::CommonEventData &data)
 {
     const AAFwk::Want &want = data.GetWant();
     std::string action = want.GetAction();
-    const int32_t defSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
     int32_t slotId = want.GetIntParam("slotId", 0);
     TELEPHONY_LOGI("[slot%{public}d] action=%{public}s code=%{public}d", slotId_, action.c_str(), data.GetCode());
     if (EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED == action) {
@@ -1333,14 +1332,8 @@ void CellularDataHandler::OnReceiveEvent(const EventFwk::CommonEventData &data)
         }
         GetConfigurationFor5G();
     } else if (action == CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
-        if (slotId_ != defSlotId) {
-            return;
-        }
         HandleScreenStateChanged(true);
     } else if (action == CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
-        if (slotId_ != defSlotId) {
-            return;
-        }
         HandleScreenStateChanged(false);
     } else if (action == CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
         RegisterDataSettingObserver();

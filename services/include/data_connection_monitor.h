@@ -114,6 +114,7 @@ private:
     bool IsAggressiveRecovery();
     int32_t GetStallDetectionPeriod();
     bool IsScreenOn();
+    bool IsVsimEnabled();
 
     std::unique_ptr<TrafficManagement> trafficManager_;
     std::unique_ptr<TrafficManagement> stallDetectionTrafficManager_;
