@@ -36,7 +36,7 @@ bool ApnActivateReportInfoIpc::Marshalling(Parcel &parcel) const
 
 ApnActivateReportInfoIpc* ApnActivateReportInfoIpc::Unmarshalling(Parcel &parcel)
 {
-    ApnActivateReportInfoIpc* info = new (std::nothrow) ApnActivateReportInfoIpc();
+    std::unique_ptr<ApnActivateReportInfoIpc> info = std::make_unique<ApnActivateReportInfoIpc>();
     if (info == nullptr) {
         return nullptr;
     }
@@ -52,7 +52,7 @@ ApnActivateReportInfoIpc* ApnActivateReportInfoIpc::Unmarshalling(Parcel &parcel
     if (!parcel.ReadUint32(info->actSuccTimes)) {
         return nullptr;
     }
-    return info;
+    return info.release();
 }
 
 void ApnActivateReportInfoIpc::transferToReportInfo(ApnActivateReportInfoIpc infoIpc, ApnActivateReportInfo &info)
@@ -63,4 +63,4 @@ void ApnActivateReportInfoIpc::transferToReportInfo(ApnActivateReportInfoIpc inf
     info.actSuccTimes = infoIpc.actSuccTimes;
 }
 }
-}
+}
