@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 #include <string_ex.h>
+#include <charconv>
 
 #include "activating.h"
 #include "active.h"
@@ -519,7 +520,7 @@ void CellularDataStateMachine::GetNetworkSlicePara(const DataConnectionParams& c
         apnType.c_str(), dnn.c_str());
     if (apnType.find("snssai") != std::string::npos) {
         int32_t apnId = ApnManager::FindApnIdByApnName(apnType);
-        int32_t netcap = ApnManager::FindCapabilityByApnId(apnId);
+        int32_t netcap = static_cast<int32_t>(ApnManager::FindCapabilityByApnId(apnId));
         std::map<std::string, std::string> networkSliceParas;
         DelayedSingleton<NetManagerStandard::NetworkSliceClient>::GetInstance()->GetRSDByNetCap(
             netcap, networkSliceParas);
@@ -544,7 +545,10 @@ void CellularDataStateMachine::FillRSDFromNetCap(
     std::map<std::string, std::string> networkSliceParas, sptr<ApnItem> apn)
 {
     if (networkSliceParas["sscmode"] != "0") {
-        apn->attr_.sscMode_ = std::stoi(networkSliceParas["sscmode"]);
+        int sscMode = 0;
+        std::from_chars(networkSliceParas["sscmode"].data(), networkSliceParas["sscmode"].data() +
+            networkSliceParas["sscmode"].size(), sscMode);
+        apn->attr_.sscMode_ = sscMode;
     }
     if (networkSliceParas["snssai"] != "") {
         std::string snssai = networkSliceParas["snssai"];
