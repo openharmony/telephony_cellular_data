@@ -1190,6 +1190,11 @@ HWTEST_F(CellularDataTest, Telephony_Cellulardata_InitTelephonyExtService_0104, 
     controller->cellularDataHandler_->NotifyReqCellularData(true);
 #endif
     EXPECT_EQ(TELEPHONY_EXT_WRAPPER.dynamicLoadNotifyReqCellularDataStatus_ != nullptr, true);
+    delete mockDlsym;
+    mockDlsym = nullptr;
+    TELEPHONY_EXT_WRAPPER.telephonyDynamicLoadWrapperHandle_ = nullptr;
+    TELEPHONY_EXT_WRAPPER.dynamicLoadInit_ = nullptr;
+    TELEPHONY_EXT_WRAPPER.dynamicLoadNotifyReqCellularDataStatus_ = nullptr;
 }
 
 /**
