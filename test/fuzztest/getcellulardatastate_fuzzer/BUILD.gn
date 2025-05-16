@@ -59,6 +59,7 @@ ohos_fuzztest("GetCellularDataStateFuzzTest") {
     "netmanager_base:net_stats_manager_if",
     "preferences:native_preferences",
     "relational_store:native_rdb",
+    "safwk:system_ability_fwk",
     "telephony_data:tel_telephony_data",
   ]
 
