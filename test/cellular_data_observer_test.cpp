@@ -167,6 +167,8 @@ HWTEST_F(CellularDataObserverTest, CellularDataAirplaneObserver_05, Function | M
     EXPECT_TRUE(settingHelper->PutValue(uri, CELLULAR_DATA_COLUMN_AIRPLANE, 0) == TELEPHONY_ERR_SUCCESS);
     cellularDataAirplaneObserver->OnChange();
     EXPECT_FALSE(cellularDataAirplaneObserver->IsAirplaneModeOn());
+
+    settingHelper->NotifyChange(uri);
 }
 
 }  // namespace Telephony
