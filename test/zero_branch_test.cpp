@@ -2388,7 +2388,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataConnectionManager_003, Function | Med
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(BranchTest, Telephony_DataConnectionMonitor_003, Function | MediumTest | Level3)
+HWTEST_F(BranchTest, Telephony_DataConnectionMonitor_004, Function | MediumTest | Level3)
 {
     DataConnectionManager con { 0 };
     ASSERT_FALSE(con.connectionMonitor_ == nullptr);
@@ -2422,7 +2422,7 @@ HWTEST_F(BranchTest, Telephony_DataConnectionMonitor_003, Function | MediumTest 
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(BranchTest, Telephony_DataConnectionMonitor_004, Function | MediumTest | Level3)
+HWTEST_F(BranchTest, Telephony_DataConnectionMonitor_005, Function | MediumTest | Level3)
 {
     DataConnectionManager con { 0 };
     ASSERT_FALSE(con.connectionMonitor_ == nullptr);
