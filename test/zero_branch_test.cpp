@@ -2329,5 +2329,126 @@ HWTEST_F(BranchTest, IsSupportDunApn_001, Function | MediumTest | Level1)
     EXPECT_FALSE(controller.IsSupportDunApn());
 }
 
+/**
+ * @tc.number  CellularDataConnectionManager_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataConnectionManager_003, Function | MediumTest | Level3)
+{
+    DataConnectionManager con { 0 };
+    con.Init();
+    std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> stateMachine = machine->CreateCellularDataConnect(0);
+    con.AddConnectionStateMachine(stateMachine);
+    con.RemoveConnectionStateMachine(stateMachine);
+    con.AddActiveConnectionByCid(stateMachine);
+    con.GetActiveConnectionByCid(1);
+    con.GetAllConnectionMachine();
+    con.StartStallDetectionTimer();
+    con.StopStallDetectionTimer();
+    con.RegisterRadioObserver();
+    con.UnRegisterRadioObserver();
+    con.uplinkUseLte_ = true;
+    con.UpdateBandWidthsUseLte();
+    con.GetActiveConnection();
+    con.IsBandwidthSourceModem();
+    ASSERT_NE(-1, con.GetDataRecoveryState());
+    con.IsNeedDoRecovery(true);
+    con.GetActiveConnectionByCid(0);
+    con.isNoActiveConnection();
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    CcmDefaultState ccmDefaultState { con, "CcmDefaultState" };
+    ASSERT_FALSE(ccmDefaultState.StateProcess(event));
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_NETWORKSLICE_URSP_RPT);
+    ASSERT_TRUE(ccmDefaultState.StateProcess(event));
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_NETWORKSLICE_ALLOWEDNSSAI_RPT);
+    ASSERT_TRUE(ccmDefaultState.StateProcess(event));
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_NETWORKSLICE_EHPLMN_RPT);
+    ASSERT_TRUE(ccmDefaultState.StateProcess(event));
+    event = AppExecFwk::InnerEvent::Get(0);
+    ASSERT_FALSE(ccmDefaultState.StateProcess(event));
+    ccmDefaultState.RadioDataCallListChanged(event);
+    ccmDefaultState.UpdateNetworkInfo(event);
+    ccmDefaultState.RadioLinkCapabilityChanged(event);
+    ccmDefaultState.RadioNetworkSliceUrspRpt(event);
+    ccmDefaultState.RadioNetworkSliceAllowedNssaiRpt(event);
+    ccmDefaultState.RadioNetworkSliceEhplmnRpt(event);
+    con.GetDataFlowType();
+    con.GetDefaultBandWidthsConfig();
+    con.GetDefaultTcpBufferConfig();
+    con.SetDataFlowType(CellDataFlowType::DATA_FLOW_TYPE_NONE);
+    con.UpdateCallState(0);
+    ASSERT_EQ("", con.GetTcpBufferByRadioTech(0));
+    ASSERT_TRUE(con.GetBandwidthsByRadioTech(0).upBandwidth == DEFAULT_BANDWIDTH);
+}
+
+/**
+ * @tc.number  DataConnectionMonitor_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_DataConnectionMonitor_004, Function | MediumTest | Level3)
+{
+    DataConnectionManager con { 0 };
+    ASSERT_FALSE(con.connectionMonitor_ == nullptr);
+    con.connectionMonitor_->UpdateFlowInfo();
+    con.connectionMonitor_->UpdateCallState(0);
+    con.connectionMonitor_->OnStallDetectionTimer();
+    con.connectionMonitor_->StopStallDetectionTimer();
+    con.connectionMonitor_->dataRecoveryState_ = RecoveryState::STATE_REQUEST_CONTEXT_LIST;
+    con.connectionMonitor_->HandleRecovery();
+    con.connectionMonitor_->dataRecoveryState_ = RecoveryState::STATE_CLEANUP_CONNECTIONS;
+    con.connectionMonitor_->HandleRecovery();
+    con.connectionMonitor_->dataRecoveryState_ = RecoveryState::STATE_REREGISTER_NETWORK;
+    con.connectionMonitor_->HandleRecovery();
+    con.connectionMonitor_->dataRecoveryState_ = RecoveryState::STATE_RADIO_STATUS_RESTART;
+    con.connectionMonitor_->HandleRecovery();
+    con.connectionMonitor_->BeginNetStatistics();
+    con.connectionMonitor_->EndNetStatistics();
+    con.connectionMonitor_->HandleScreenStateChanged(true);
+    con.connectionMonitor_->UpdateNetTrafficState();
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    con.connectionMonitor_->SetPreferredNetworkPara(event);
+    con.connectionMonitor_->UpdateDataFlowType();
+    con.connectionMonitor_->ProcessEvent(event);
+    event = nullptr;
+    con.connectionMonitor_->ProcessEvent(event);
+    ASSERT_EQ(CellDataFlowType::DATA_FLOW_TYPE_NONE, con.connectionMonitor_->GetDataFlowType());
+}
+
+/**
+ * @tc.number  DataConnectionMonitor_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_DataConnectionMonitor_005, Function | MediumTest | Level3)
+{
+    DataConnectionManager con { 0 };
+    ASSERT_FALSE(con.connectionMonitor_ == nullptr);
+    con.connectionMonitor_->UpdateFlowInfo();
+    con.connectionMonitor_->UpdateCallState(0);
+    con.connectionMonitor_->OnStallDetectionTimer();
+    con.connectionMonitor_->StopStallDetectionTimer();
+    con.connectionMonitor_->dataRecoveryState_ = RecoveryState::STATE_REQUEST_CONTEXT_LIST;
+    con.connectionMonitor_->HandleRecovery();
+    con.connectionMonitor_->dataRecoveryState_ = RecoveryState::STATE_CLEANUP_CONNECTIONS;
+    con.connectionMonitor_->HandleRecovery();
+    con.connectionMonitor_->dataRecoveryState_ = RecoveryState::STATE_REREGISTER_NETWORK;
+    con.connectionMonitor_->HandleRecovery();
+    con.connectionMonitor_->dataRecoveryState_ = RecoveryState::STATE_RADIO_STATUS_RESTART;
+    con.connectionMonitor_->HandleRecovery();
+    con.connectionMonitor_->BeginNetStatistics();
+    con.connectionMonitor_->BeginNetStatistics();
+    con.connectionMonitor_->HandleScreenStateChanged(true);
+    con.connectionMonitor_->UpdateNetTrafficState();
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    con.connectionMonitor_->SetPreferredNetworkPara(event);
+    con.connectionMonitor_->UpdateDataFlowType();
+    con.connectionMonitor_->ProcessEvent(event);
+    event = nullptr;
+    con.connectionMonitor_->ProcessEvent(event);
+    ASSERT_EQ(CellDataFlowType::DATA_FLOW_TYPE_NONE, con.connectionMonitor_->GetDataFlowType());
+}
 } // namespace Telephony
 } // namespace OHOS

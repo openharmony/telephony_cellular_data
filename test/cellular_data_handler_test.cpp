@@ -1064,5 +1064,57 @@ HWTEST_F(CellularDataHandlerTest, Telephony_ConnectIfNeed, Function | MediumTest
     cellularDataHandler->ConnectIfNeed(event2, apnHolder, request1);
     cellularDataHandler->ConnectIfNeed(event2, nullptr, request1);
 }
+
+HWTEST_F(CellularDataHandlerTest, Telephony_CellularDataHandler_003, Function | MediumTest | Level1)
+{
+    CellularDataController controller {0};
+    controller.Init();
+    ApnActivateReportInfo info1;
+    ApnActivateReportInfo info2;
+    EXPECT_TRUE(controller.GetDefaultActReportInfo(info1));
+    EXPECT_TRUE(controller.GetInternalActReportInfo(info2));
+    controller.cellularDataHandler_ = nullptr;
+    EXPECT_FALSE(controller.GetDefaultActReportInfo(info1));
+    EXPECT_FALSE(controller.GetInternalActReportInfo(info2));
+}
+
+HWTEST_F(CellularDataHandlerTest, DataConnCompleteUpdateStateTest001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, slotId);
+    std::string apnType = DATA_CONTEXT_ROLE_MMS;
+    sptr<ApnHolder> apnHolder = new ApnHolder(apnType, slotId);
+    apnHolder->cellularDataStateMachine_ = nullptr;
+    auto resultInfo = std::make_shared<SetupDataCallResultInfo>();
+    cellularDataHandler->connectionManager_ = nullptr;
+    cellularDataHandler->physicalConnectionActiveState_ = true;
+    cellularDataHandler->incallDataStateMachine_ = nullptr;
+    cellularDataHandler->DataConnCompleteUpdateState(apnHolder, resultInfo);
+    EXPECT_FALSE(cellularDataHandler->isRilApnAttached_);
+
+    sptr<DataConnectionManager> cdConnectionManager = nullptr;
+    std::shared_ptr<TelEventHandler> telEventHandler = nullptr;
+    apnHolder->cellularDataStateMachine_ = std::make_shared<CellularDataStateMachine>
+        (cdConnectionManager, std::move(telEventHandler));
+    apnHolder->cellularDataStateMachine_->netLinkInfo_ = new NetLinkInfo();
+    apnHolder->cellularDataStateMachine_->netSupplierInfo_ = nullptr;
+    cellularDataHandler->apnManager_ = std::make_unique<ApnManager>().release();
+    cellularDataHandler->apnManager_->allApnItem_.clear();
+    cellularDataHandler->connectionManager_ = std::make_unique<DataConnectionManager>(slotId).release();
+    cellularDataHandler->physicalConnectionActiveState_ = false;
+    cellularDataHandler->incallDataStateMachine_ =
+        cellularDataHandler->CreateIncallDataStateMachine(TelCallStatus::CALL_STATUS_DIALING);
+    apnHolder->apnType_ = DATA_CONTEXT_ROLE_DEFAULT;
+    apnHolder->apnItem_ = new ApnItem();
+    cellularDataHandler->DataConnCompleteUpdateState(apnHolder, resultInfo);
+
+    cellularDataHandler->apnManager_->preferId_ = 1;
+    cellularDataHandler->apnManager_->allApnItem_.push_back(new ApnItem());
+    cellularDataHandler->DataConnCompleteUpdateState(apnHolder, resultInfo);
+    EXPECT_FALSE(cellularDataHandler->isRilApnAttached_);
+}
 } // namespace Telephony
 } // namespace OHOS

@@ -401,5 +401,33 @@ HWTEST_F(CellularDataServiceTest, EstablishAllApnsIfConnectableTest001, TestSize
     EXPECT_EQ(service->ReleaseCellularDataConnection(slotId), TELEPHONY_ERR_PERMISSION_ERR);
 }
 
+/**
+ * @tc.number   GetActReportInfoTest001
+ * @tc.name     test GetDefaultActReportInfo and GetInternalActReportInfo
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, GetActReportInfoTest001, TestSize.Level0)
+{
+    ApnActivateReportInfoIpc infoIpc;
+    int32_t slotId = -1;
+    EXPECT_EQ(service->GetDefaultActReportInfo(slotId, infoIpc), TELEPHONY_ERR_PERMISSION_ERR);
+    EXPECT_EQ(service->GetInternalActReportInfo(slotId, infoIpc), TELEPHONY_ERR_PERMISSION_ERR);
+}
+
+/**
+ * @tc.number   ApnInfoTest001
+ * @tc.name     test QueryApnIds, SetPreferApn and QueryAllApnInfo
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, ApnInfoTest001, TestSize.Level0)
+{
+    ApnInfo apnInfo;
+    std::vector<uint32_t> apnIdList;
+    std::vector<ApnInfo> allApnInfoList;
+    int32_t apnId = 1;
+    EXPECT_EQ(service->QueryApnIds(apnInfo, apnIdList), TELEPHONY_ERR_PERMISSION_ERR);
+    EXPECT_EQ(service->SetPreferApn(apnId), TELEPHONY_ERR_PERMISSION_ERR);
+    EXPECT_EQ(service->QueryAllApnInfo(allApnInfoList), TELEPHONY_ERR_PERMISSION_ERR);
+}
 } // namespace Telephony
 } // namespace OHOS
