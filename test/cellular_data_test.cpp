@@ -2131,5 +2131,27 @@ HWTEST_F(CellularDataTest, ControllerUpdateNetworkInfo_Test_02, TestSize.Level3)
     ASSERT_TRUE(controller->UpdateNetworkInfo());
 }
 
+/**
+ * @tc.number   GetSimIdTest001
+ * @tc.name     Test the function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, GetSimIdTest001, TestSize.Level3)
+{
+    CellularDataRdbHelper cellularDataRdbHelper;
+    int32_t result = cellularDataRdbHelper.GetSimId();
+    ASSERT_EQ(result, -1);
+    
+    ApnInfo apnInfo;
+    std::vector<uint32_t> apnIdList;
+    cellularDataRdbHelper.QueryApnIds(apnInfo, apnIdList);
+
+    int32_t apnId = -1;
+    result = cellularDataRdbHelper.SetPreferApn(apnId);
+    ASSERT_EQ(result, -1);
+
+    std::vector<ApnInfo> apnInfoList;
+    cellularDataRdbHelper.QueryAllApnInfo(apnInfoList);
+}
 } // namespace Telephony
 } // namespace OHOS
