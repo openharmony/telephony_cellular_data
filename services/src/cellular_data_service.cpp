@@ -206,6 +206,11 @@ int32_t CellularDataService::EnableIntelligenceSwitch(bool enable)
 
 int32_t CellularDataService::GetCellularDataState(int32_t &state)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
+        TELEPHONY_LOGE("permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+
     int32_t slotId;
     CellularDataService::GetDefaultCellularDataSlotId(slotId);
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
@@ -489,12 +494,22 @@ int32_t CellularDataService::HandleApnChanged(const int32_t slotId)
 
 int32_t CellularDataService::GetDefaultCellularDataSlotId(int32_t &slotId)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
+        TELEPHONY_LOGE("permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+
     slotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
     return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CellularDataService::GetDefaultCellularDataSimId(int32_t &simId)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
+        TELEPHONY_LOGE("permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+
     return CoreManagerInner::GetInstance().GetDefaultCellularDataSimId(simId);
 }
 
@@ -532,6 +547,11 @@ int32_t CellularDataService::SetDefaultCellularDataSlotId(const int32_t slotId)
 
 int32_t CellularDataService::GetCellularDataFlowType(int32_t &type)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
+        TELEPHONY_LOGE("permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    
     int32_t slotId;
     CellularDataService::GetDefaultCellularDataSlotId(slotId);
     std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
