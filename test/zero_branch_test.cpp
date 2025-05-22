@@ -36,6 +36,7 @@
 #include "cellular_data_utils.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
+#include "core_service_client.h"
 #include "data_access_token.h"
 #include "data_connection_manager.h"
 #include "data_connection_monitor.h"
@@ -656,6 +657,25 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_013, Function | MediumTest | 
 }
 
 /**
+ * @tc.number   Telephony_CellularDataHandler_014
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataHandler_014, Function | MediumTest | Level1)
+{
+    CellularDataController controller { 0 };
+    controller.Init();
+    ASSERT_FALSE(controller.cellularDataHandler_ == nullptr);
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    system::SetParameter("persist.edm.mobile_data_policy", "force_open");
+    controller.cellularDataHandler_->HandleDBSettingEnableChanged(event);
+    controller.cellularDataHandler_->UnRegisterDataSettingObserver();
+    controller.cellularDataHandler_->RemoveAllEvents();
+    system::SetParameter("persist.edm.mobile_data_policy", "none");
+    sleep(SLEEP_TIME_SECONDS);
+}
+
+/**
  * @tc.number   Telephony_CellularDataService_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -912,6 +932,30 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_006, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_ERR_FAIL, service.CorrectNetSupplierNoAvailable(INVALID_SLOTID));
     int32_t regState;
     ASSERT_NE(TELEPHONY_ERR_FAIL, service.GetSupplierRegisterState(0, regState));
+}
+
+/**
+ * @tc.number   Telephony_CellularDataService_007
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataService_007, Function | MediumTest | Level3)
+{
+    CellularDataService service;
+    std::vector<std::u16string> strV;
+    ASSERT_EQ(TELEPHONY_ERR_FAIL, service.Dump(INVALID_FD, strV));
+    service.state_ = ServiceRunningState::STATE_RUNNING;
+    service.OnStart();
+    service.InitModule();
+    system::SetParameter("persist.edm.mobile_data_policy", "none");
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(false));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(true));
+    system::SetParameter("persist.edm.mobile_data_policy", "force_open");
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(false));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(true));
+    service.GetFlowDataInfoDump();
+    service.OnStop();
+    system::SetParameter("persist.edm.mobile_data_policy", "none");
 }
 
 /**

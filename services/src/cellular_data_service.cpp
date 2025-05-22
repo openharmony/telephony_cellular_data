@@ -38,6 +38,8 @@ namespace OHOS {
 namespace Telephony {
 using namespace NetManagerStandard;
 
+constexpr const char *PERSIST_EDM_MOBILE_DATA_POLICY = "persist.edm.mobile_data_policy";
+constexpr const char *MOBILE_DATA_POLICY_FORCE_OPEN = "force_open";
 bool g_registerResult = SystemAbility::MakeAndRegisterAbility(&DelayedRefSingleton<CellularDataService>::GetInstance());
 CellularDataService::CellularDataService()
     : SystemAbility(TELEPHONY_CELLULAR_DATA_SYS_ABILITY_ID, true), registerToService_(false),
@@ -179,6 +181,11 @@ int32_t CellularDataService::EnableCellularData(bool enable)
     if (cellularDataController == nullptr) {
         TELEPHONY_LOGE("cellularDataControllers is null, slotId=%{public}d", DEFAULT_SIM_SLOT_ID);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::string dataPolicy = system::GetParameter(PERSIST_EDM_MOBILE_DATA_POLICY, "");
+    if (dataPolicy == MOBILE_DATA_POLICY_FORCE_OPEN && !enable) {
+        TELEPHONY_LOGE("cellular data policy is force_open");
+        return TELEPHONY_ERR_POLICY_DISABLED;
     }
     return cellularDataController->SetCellularDataEnable(enable);
 }
