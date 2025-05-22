@@ -2305,6 +2305,8 @@ void CellularDataHandler::HandleDBSettingRoamingChanged(const AppExecFwk::InnerE
     if (CoreManagerInner::GetInstance().GetPsRoamingState(slotId_) > 0) {
         roamingState = true;
     }
+    TELEPHONY_LOGI("Slot%{public}d: roamingState%{public}d, dataRoamingEnabled%{public}d.",
+        slotId_, roamingState, dataRoamingEnabled);
     if (roamingState) {
         if (dataRoamingEnabled) {
             EstablishAllApnsIfConnectable();
