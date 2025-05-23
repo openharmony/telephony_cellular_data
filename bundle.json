@@ -52,6 +52,7 @@
                 "safwk",
                 "samgr",
                 "telephony_data",
+                "runtime_core",
                 "power_manager"
             ]
         },
@@ -62,7 +63,8 @@
                 ],
                 "fwk_group": [
                     "//base/telephony/cellular_data/frameworks/js:data",
-                    "//base/telephony/cellular_data/frameworks/native:tel_cellular_data_api"
+                    "//base/telephony/cellular_data/frameworks/native:tel_cellular_data_api",
+                    "//base/telephony/cellular_data/frameworks/ets/ani:cellular_data_ani_group"
                 ],
                 "service_group": [
                     "//base/telephony/cellular_data:tel_cellular_data",
