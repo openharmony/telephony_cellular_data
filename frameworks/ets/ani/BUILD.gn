@@ -1,0 +1,106 @@
+# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/config/components/ets_frontend/ets2abc_config.gni")
+import("//build/ohos.gni")
+SUBSYSTEM_DIR = "../../../.."
+
+rust_cxx("cellular_data_ani_cxx_gen") {
+  sources = [
+    "src/wrapper.rs"
+  ]
+}
+
+ohos_static_library("cellular_data_ani_cxx") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  include_dirs = [
+    "include",
+    "$SUBSYSTEM_DIR/cellular_data/interfaces/innerkits",
+    "${target_gen_dir}/src",
+  ]
+
+  sources = [
+    "src/cxx/ani_cellular_data.cpp",
+  ]
+  sources += get_target_outputs(":cellular_data_ani_cxx_gen")
+  deps = [
+    ":cellular_data_ani_cxx_gen",
+    "$SUBSYSTEM_DIR/cellular_data/frameworks/native:tel_cellular_data_api",
+    "//third_party/rust/crates/cxx:cxx_cppdeps",
+  ]
+  external_deps = [
+    "c_utils:utils",
+    "core_service:libtel_common",
+    "core_service:tel_core_service_api",
+    "hilog:libhilog",
+    "napi:ace_napi",
+  ]
+  part_name = "cellular_data"
+  subsystem_name = "telephony"
+}
+
+ohos_rust_shared_library("cellular_data_ani") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    boundary_sanitize = true
+    all_ubsan = true
+    debug = false
+  }
+
+  sources = [ "src/lib.rs" ]
+  
+  external_deps = [
+    "runtime_core:ani",
+    "netmanager_base:ani_rs",
+  ]
+  deps = [
+    ":cellular_data_ani_cxx",
+    "//third_party/rust/crates/serde/serde:lib",
+    "//third_party/rust/crates/cxx:lib",
+  ]
+
+  clippy_lints = "none"
+
+  part_name = "cellular_data"
+  subsystem_name = "telephony"
+  output_extension = "so"
+}
+
+generate_static_abc("cellular_data_abc") {
+  base_url = "ets"
+  files = [ "ets/@ohos.telephony.data.ets" ]
+  dst_file = "$target_out_dir/telephony_data.abc"
+  out_puts = [ "$target_out_dir/telephony_data.abc" ]
+  is_boot_abc = "True"
+  device_dst_file = "/system/framework/telephony_data.abc"
+}
+
+ohos_prebuilt_etc("cellular_data_etc") {
+  source = "$target_out_dir/telephony_data.abc"
+  module_install_dir = "framework"
+  part_name = "cellular_data"
+  subsystem_name = "telephony"
+  deps = [ ":cellular_data_abc" ]
+}
+
+group("cellular_data_ani_group") {
+  deps = [
+    ":cellular_data_ani",
+    ":cellular_data_etc",
+  ]
+}
