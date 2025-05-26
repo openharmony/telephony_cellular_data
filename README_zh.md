@@ -57,7 +57,7 @@ base/telephony/cellular_data/
 | 接口名称                                                     | 接口描述                                                     | 所需权限                         |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | -------------------------------- |
 | function isCellularDataEnabled(callback: AsyncCallback\<boolean>): void; | 获取蜂窝数据开关是否打开                                     | ohos.permission.GET_NETWORK_INFO |
-| function getCellularDataState(callback: AsyncCallback\<DataConnectState>): void; | 获取蜂窝数据状态                                             | ohos.permission.GET_NETWORK_INFO |
+| function getCellularDataState(callback: AsyncCallback\<DataConnectState>): void; | 获取蜂窝数据状态                                             | 无 |
 | function isCellularDataEnabledSync(): boolean;               | 获取蜂窝移动数据服务是否启用                                 | ohos.permission.GET_NETWORK_INFO |
 | function isCellularDataRoamingEnabledSync(slotId: number): boolean; | 获取蜂窝数据漫游服务是否启用（参数slotId为SIM卡id，0表示卡一，1表示卡二） | ohos.permission.GET_NETWORK_INFO |
 
