@@ -66,7 +66,7 @@ base/telephony/cellular_data/
 | API                                                          | Description                                                  | Required Permission              |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | -------------------------------- |
 | function isCellularDataEnabled(callback: AsyncCallback\<boolean>): void; | Checks whether the cellular data is enabled                  | ohos.permission.GET_NETWORK_INFO |
-| function getCellularDataState(callback: AsyncCallback\<DataConnectState>): void; | Obtains the cellular data status.                            | void; |
+| function getCellularDataState(callback: AsyncCallback\<DataConnectState>): void; | Obtains the cellular data status.                            | void |
 | function isCellularDataEnabledSync(): boolean;               | Checks if cellular mobile data service is enabled.           | ohos.permission.GET_NETWORK_INFO |
 | function isCellularDataRoamingEnabledSync(slotId: number): boolean; | Checks if cellular data roaming is enabled（The parameter slotId is the SIM card id, 0 represents card one, and 1 represents card two）. | ohos.permission.GET_NETWORK_INFO |
 
