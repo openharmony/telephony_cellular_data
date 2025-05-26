@@ -46,6 +46,7 @@ static const int32_t ESM_FLAG_INVALID = -1;
 const std::string DEFAULT_DATA_ROAMING = "persist.telephony.defaultdataroaming";
 constexpr const char *PERSIST_EDM_MOBILE_DATA_POLICY = "persist.edm.mobile_data_policy";
 constexpr const char *MOBILE_DATA_POLICY_FORCE_OPEN = "force_open";
+constexpr const char *MOBILE_DATA_POLICY_DISALLOW = "disallow";
 CellularDataHandler::CellularDataHandler(const EventFwk::CommonEventSubscribeInfo &sp, int32_t slotId)
     : TelEventHandler("CellularDataHandler"), CommonEventSubscriber(sp), slotId_(slotId)
 {}
@@ -2284,6 +2285,10 @@ void CellularDataHandler::HandleDBSettingEnableChanged(const AppExecFwk::InnerEv
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     std::string dataPolicy = system::GetParameter(PERSIST_EDM_MOBILE_DATA_POLICY, "");
     if (dataEnabled && defSlotId == slotId_) {
+        if (dataPolicy == MOBILE_DATA_POLICY_DISALLOW) {
+            TELEPHONY_LOGE("Slot%{public}d: policy is disallow, not allow establish all apns", slotId_);
+            return;
+        }
         EstablishAllApnsIfConnectable();
     } else {
         if (dataPolicy == MOBILE_DATA_POLICY_FORCE_OPEN) {
