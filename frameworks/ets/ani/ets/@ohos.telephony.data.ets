@@ -28,7 +28,7 @@ export default namespace data {
   export native function nativeGetDefaultCellularDataSlotIdSync(): int;
 
   export native function nativeGetCellularDataState(): DataConnectState;
-  
+
   export function getDefaultCellularDataSlotIdSync(): int {
     return nativeGetDefaultCellularDataSlotIdSync()
   }
@@ -58,8 +58,8 @@ export default namespace data {
     let p1 = taskpool.execute(nativeIsCellularDataEnabled)
     p1.then((content: NullishType) => {
         callback(new BusinessError(), content as boolean);
-    }, (err: BusinessError): void => {
-        callback(err, false);
+    }, (err: Error): void => {
+        callback(err as BusinessError, false);
     });
   }
 
@@ -79,8 +79,8 @@ export default namespace data {
     let p1 = taskpool.execute(nativeEnableCellularData)
     p1.then(() => {
         callback(new BusinessError(), undefined);
-    }, (err: BusinessError): void => {
-        callback(err, undefined);
+    }, (err: Error): void => {
+        callback(err as BusinessError, undefined);
     });
   }
 
@@ -99,8 +99,8 @@ export default namespace data {
     let p1 = taskpool.execute(nativeDisableCellularData)
     p1.then(() => {
         callback(new BusinessError(), undefined);
-    }, (err: BusinessError): void => {
-        callback(err, undefined);
+    }, (err: Error): void => {
+        callback(err as BusinessError, undefined);
     });
   }
 
