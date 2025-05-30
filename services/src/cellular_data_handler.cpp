@@ -2274,6 +2274,7 @@ void CellularDataHandler::SetRilLinkBandwidths()
 
 void CellularDataHandler::HandleDBSettingEnableChanged(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    TELEPHONY_LOGI("Slot%{public}d: HandleDBSettingEnableChanged enter.", slotId_);
     if (dataSwitchSettings_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ is null.", slotId_);
         return;
