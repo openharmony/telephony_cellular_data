@@ -14,7 +14,7 @@
 use ani_rs::business_error::BusinessError;
 use ffi::ArktsError;
 
-pub const TELEPHONY_SUCCESS: i32 = 0;
+pub const TELEPHONY_SUCCESS: i32 = 8300000;
 
 #[cxx::bridge(namespace = "OHOS::CellularDataAni")]
 pub mod ffi {
