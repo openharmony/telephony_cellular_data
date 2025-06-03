@@ -49,8 +49,8 @@ public:
     MOCK_METHOD(int32_t, SetNrOptionMode,
         (int32_t slotId, int32_t mode, const sptr<INetworkSearchCallback> &callback), (override));
     MOCK_METHOD(int32_t, GetNrOptionMode, (int32_t slotId, const sptr<INetworkSearchCallback> &callback), (override));
-    MOCK_METHOD(int32_t, HasSimCard, (int32_t slotId, bool &hasSimCard), (override));
-    MOCK_METHOD(int32_t, GetSimState, (int32_t slotId, SimState &simState), (override));
+    MOCK_METHOD(int32_t, HasSimCard, (int32_t slotId, const sptr<IRawParcelCallback> &callback), (override));
+    MOCK_METHOD(int32_t, GetSimState, (int32_t slotId, const sptr<IRawParcelCallback> &callback), (override));
     MOCK_METHOD(int32_t, GetDsdsMode, (int32_t & dsdsMode), (override));
     MOCK_METHOD(int32_t, GetCardType, (int32_t slotId, CardType &cardType), (override));
     MOCK_METHOD(int32_t, UnlockPin,
