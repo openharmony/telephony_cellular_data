@@ -22,6 +22,7 @@
 #include "core_service_client.h"
 #include "mock/mock_core_service.h"
 #include "telephony_types.h"
+#include "raw_parcel_callback_stub.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -36,19 +37,21 @@ class CellularDataDumpHelperTest : public testing::Test {
 public:
     CellularDataDumpHelperTest()
     {
-        mockCoreService = new MockCoreService();
-        sptr<ICoreService> mockCoreServicePtr(mockCoreService);
-        DelayedRefSingleton<CoreServiceClient>::GetInstance().proxy_ = mockCoreServicePtr;
     }
     ~CellularDataDumpHelperTest() = default;
     static void TearDownTestCase()
     {
-        if (DelayedRefSingleton<CoreServiceClient>::GetInstance().proxy_ != nullptr) {
-            DelayedRefSingleton<CoreServiceClient>::GetInstance().proxy_ = nullptr;
-            std::cout << "CellularDataDumpHelperTest set proxy_ nullptr" << std::endl;
-        }
     }
-    MockCoreService *mockCoreService;
+    void SetUp()
+    {
+        mockCoreService = sptr<MockCoreService>::MakeSptr();
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().proxy_ = mockCoreService;
+    }
+    void TearDown()
+    {
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().proxy_ = nullptr;
+    }
+    sptr<MockCoreService> mockCoreService;
 };
 
 HWTEST_F(CellularDataDumpHelperTest, CellularDataDumpHelper_01, Function | MediumTest | Level1)
@@ -68,8 +71,18 @@ HWTEST_F(CellularDataDumpHelperTest, CellularDataDumpHelper_02, Function | Mediu
     std::vector<std::string> args = {"cellular_data", "help"};
     std::string result = "";
     EXPECT_CALL(*mockCoreService, HasSimCard(_, _))
-        .Times(AtLeast(0))
-        .WillRepeatedly(DoAll(SetArgReferee<1>(false), Return(0)));
+        .WillRepeatedly(testing::Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
+            MessageParcel data;
+            MessageParcel reply;
+            MessageOption option;
+            data.WriteInterfaceToken(u"OHOS.Telephony.IRawParcelCallback");
+            data.WriteInt32(0);
+            data.WriteBool(false); // hasSimCard = false
+            cb->OnRemoteRequest(0, data, reply, option);
+            return 0;
+        }));
+
     help.Dump(args, result);
     std::cout << "CellularDataDumpHelper_02 result: " << result << std::endl;
     ASSERT_FALSE(result.find("Ohos cellular data service") == std::string::npos);
@@ -82,8 +95,17 @@ HWTEST_F(CellularDataDumpHelperTest, CellularDataDumpHelper_03, Function | Mediu
     std::vector<std::string> args = {"cellular_data_1", "--help"};
     std::string result = "";
     EXPECT_CALL(*mockCoreService, HasSimCard(_, _))
-        .Times(AtLeast(0))
-        .WillRepeatedly(DoAll(SetArgReferee<1>(false), Return(0)));
+        .WillRepeatedly(testing::Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
+            MessageParcel data;
+            MessageParcel reply;
+            MessageOption option;
+            data.WriteInterfaceToken(u"OHOS.Telephony.IRawParcelCallback");
+            data.WriteInt32(0);
+            data.WriteBool(false); // hasSimCard = false
+            cb->OnRemoteRequest(0, data, reply, option);
+            return 0;
+        }));
     help.Dump(args, result);
     std::cout << "CellularDataDumpHelper_03 result: " << result << std::endl;
     ASSERT_FALSE(result.find("Ohos cellular data service") == std::string::npos);
@@ -93,8 +115,30 @@ HWTEST_F(CellularDataDumpHelperTest, CellularDataDumpHelper_03, Function | Mediu
 HWTEST_F(CellularDataDumpHelperTest, CellularDataDumpHelper_04, Function | MediumTest | Level1)
 {
     maxSlotCount_ = 2;
-    EXPECT_CALL(*mockCoreService, HasSimCard(0, _)).WillOnce(DoAll(SetArgReferee<1>(true), Return(0)));
-    EXPECT_CALL(*mockCoreService, HasSimCard(1, _)).WillOnce(DoAll(SetArgReferee<1>(false), Return(0)));
+    EXPECT_CALL(*mockCoreService, HasSimCard(_, _))
+        .WillOnce(testing::Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
+            MessageParcel data;
+            MessageParcel reply;
+            MessageOption option;
+            data.WriteInterfaceToken(u"OHOS.Telephony.IRawParcelCallback");
+            data.WriteInt32(0);
+            data.WriteBool(true); // hasSimCard = false
+            cb->OnRemoteRequest(0, data, reply, option);
+            return 0;
+        }))
+        
+        .WillOnce(testing::Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
+            MessageParcel data;
+            MessageParcel reply;
+            MessageOption option;
+            data.WriteInterfaceToken(u"OHOS.Telephony.IRawParcelCallback");
+            data.WriteInt32(0);
+            data.WriteBool(false); // hasSimCard = false
+            cb->OnRemoteRequest(0, data, reply, option);
+            return 0;
+        }));
     CellularDataDumpHelper help;
     std::vector<std::string> args = {"cellular_data_1", "help"};
     std::string result = "";
