@@ -54,6 +54,7 @@ public:
     typedef bool (*JUDGE_OTHER_REQUEST_HOLDING)(const NetRequest &, const HasSystemUse hasSystemUse);
     typedef void (*DynamicLoadInit)(void);
     typedef void (*NotifyReqCellularData)(bool isReqCellularData);
+    typedef bool (*CREATE_DC_APN_ITEM_EXT)(int32_t slotId, sptr<ApnItem> &apnItem);
 
     DATA_EDN_SELF_CURE dataEndSelfCure_ = nullptr;
     IS_APN_ALLOWED_ACTIVE isApnAllowedActive_ = nullptr;
@@ -73,6 +74,7 @@ public:
     JUDGE_OTHER_REQUEST_HOLDING judgeOtherRequestHolding_ = nullptr;
     DynamicLoadInit dynamicLoadInit_ = nullptr;
     NotifyReqCellularData dynamicLoadNotifyReqCellularDataStatus_ = nullptr;
+    CREATE_DC_APN_ITEM_EXT createDcApnItemExt_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
@@ -92,6 +94,7 @@ private:
     void InitSendApnNeedRetryInfo();
     void InitJudgeOtherRequestHolding();
     void InitTelephonyExtWrapperForDynamicLoad();
+    void InitCreateDcApnItemExt();
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()

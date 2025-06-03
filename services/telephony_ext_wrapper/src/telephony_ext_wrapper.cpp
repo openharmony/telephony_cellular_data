@@ -69,6 +69,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCellularData()
     InitRestartRadioIfRequired();
     InitSendApnNeedRetryInfo();
     InitJudgeOtherRequestHolding();
+    InitCreateDcApnItemExt();
 }
 
 void TelephonyExtWrapper::InitJudgeOtherRequestHolding()
@@ -217,6 +218,17 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForDynamicLoad()
         return;
     }
     TELEPHONY_LOGI("[DynamicLoad]telephony ext wrapper dynamic load init success");
+}
+
+void TelephonyExtWrapper::InitCreateDcApnItemExt()
+{
+    createDcApnItemExt_ =
+        (CREATE_DC_APN_ITEM_EXT)dlsym(telephonyExtWrapperHandle_, "CreateDcApnItemExt");
+    if (createDcApnItemExt_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol CreateDcApnItemExt failed, error: %{public}s", dlerror());
+        return;
+    }
+    TELEPHONY_LOGI("telephony ext wrapper init CreateDcApnItemExt success");
 }
 } // namespace Telephony
 } // namespace OHOS
