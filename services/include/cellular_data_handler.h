@@ -223,6 +223,7 @@ private:
     std::vector<ApnActivateInfo> apnActivateChrList_;
     uint64_t defaultApnActTime_ = 0;
     uint64_t internalApnActTime_ = 0;
+    int32_t retryCreateApnTimes_ = 0;
 
     using Fun = std::function<void(const AppExecFwk::InnerEvent::Pointer &event)>;
     std::map<uint32_t, Fun> eventIdMap_ {
@@ -290,6 +291,8 @@ private:
             [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleEstablishAllApnsIfConnectable(event); } },
         { CellularDataEventCode::MSG_RESUME_DATA_PERMITTED_TIMEOUT,
             [this](const AppExecFwk::InnerEvent::Pointer &event) { ResumeDataPermittedTimerOut(event); } },
+        { CellularDataEventCode::MSG_RETRY_TO_CREATE_APN,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleApnChanged(event); } },
     };
 };
 } // namespace Telephony

@@ -1116,5 +1116,30 @@ HWTEST_F(CellularDataHandlerTest, DataConnCompleteUpdateStateTest001, Function |
     cellularDataHandler->DataConnCompleteUpdateState(apnHolder, resultInfo);
     EXPECT_FALSE(cellularDataHandler->isRilApnAttached_);
 }
+
+/**
+
+@tc.number Telephony_CreateApnItem
+
+@tc.name CreateApnItem
+
+@tc.desc Function test
+*/
+HWTEST_F(CellularDataHandlerTest, CreateApnItemTest001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    EventFwk::MatchingSkills matchingSkills;
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, slotId);
+    cellularDataHandler->apnManager_ = nullptr;
+    cellularDataHandler->CreateApnItem();
+
+    cellularDataHandler->Init();
+    EXPECT_FALSE(cellularDataHandler->apnManager_ == nullptr);
+    cellularDataHandler->CreateApnItem();
+    cellularDataHandler->SendEvent(CellularDataEventCode::MSG_RETRY_TO_CREATE_APN, 0, RETRY_DELAY_TIME);
+    cellularDataHandler->CreateApnItem();
+    EXPECT_TRUE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_CREATE_APN));
+}
 } // namespace Telephony
 } // namespace OHOS

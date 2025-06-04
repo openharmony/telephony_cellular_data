@@ -77,6 +77,7 @@ public:
     static const uint32_t MSG_SEND_IMS_RSDLIST = BASE + 50;
     static const uint32_t MSG_SYNC_ALLOWED_NSSAI_WITH_MODEM = BASE + 51;
     static const uint32_t MSG_SYNC_EHPLMN_WITH_MODEM = BASE + 52;
+    static const uint32_t MSG_RETRY_TO_CREATE_APN = BASE + 53;
 };
 } // namespace Telephony
 } // namespace OHOS
