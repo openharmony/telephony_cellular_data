@@ -1661,11 +1661,20 @@ void CellularDataHandler::CreateApnItem()
             break;
         }
     }
-#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
-    if (TELEPHONY_EXT_WRAPPER.sendApnNeedRetryInfo_) {
-        TELEPHONY_EXT_WRAPPER.sendApnNeedRetryInfo_(result);
+    if (result == 0 && !HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_CREATE_APN)) {
+        if (retryCreateApnTimes_ < APN_CREATE_RETRY_TIMES) {
+            retryCreateApnTimes_++;
+            auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_RETRY_TO_CREATE_APN);
+            SendEvent(event, RETRY_DELAY_TIME);
+        } else {
+            retryCreateApnTimes_ = 0;
+        }
+    } else if (result != 0) {
+        retryCreateApnTimes_ = 0;
+        if (HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_CREATE_APN)) {
+            RemoveEvent(CellularDataEventCode::MSG_RETRY_TO_CREATE_APN);
+        }
     }
-#endif
 }
 
 bool CellularDataHandler::HandleApnChanged()
