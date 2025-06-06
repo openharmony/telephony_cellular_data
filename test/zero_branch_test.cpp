@@ -676,6 +676,25 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_014, Function | MediumTest | 
 }
 
 /**
+ * @tc.number   Telephony_CellularDataHandler_015
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataHandler_015, Function | MediumTest | Level1)
+{
+    CellularDataController controller { 0 };
+    controller.Init();
+    ASSERT_FALSE(controller.cellularDataHandler_ == nullptr);
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    system::SetParameter("persist.edm.mobile_data_policy", "disallow");
+    controller.cellularDataHandler_->HandleDBSettingEnableChanged(event);
+    controller.cellularDataHandler_->UnRegisterDataSettingObserver();
+    controller.cellularDataHandler_->RemoveAllEvents();
+    system::SetParameter("persist.edm.mobile_data_policy", "none");
+    sleep(SLEEP_TIME_SECONDS);
+}
+
+/**
  * @tc.number   Telephony_CellularDataService_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -951,6 +970,30 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_007, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(true));
     system::SetParameter("persist.edm.mobile_data_policy", "force_open");
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(false));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(true));
+    service.GetFlowDataInfoDump();
+    service.OnStop();
+    system::SetParameter("persist.edm.mobile_data_policy", "none");
+}
+
+/**
+ * @tc.number   Telephony_CellularDataService_008
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataService_008, Function | MediumTest | Level3)
+{
+    CellularDataService service;
+    std::vector<std::u16string> strV;
+    ASSERT_EQ(TELEPHONY_ERR_FAIL, service.Dump(INVALID_FD, strV));
+    service.state_ = ServiceRunningState::STATE_RUNNING;
+    service.OnStart();
+    service.InitModule();
+    system::SetParameter("persist.edm.mobile_data_policy", "none");
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(false));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(true));
+    system::SetParameter("persist.edm.mobile_data_policy", "disallow");
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(true));
     service.GetFlowDataInfoDump();
