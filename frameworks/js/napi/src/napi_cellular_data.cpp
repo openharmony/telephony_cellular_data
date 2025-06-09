@@ -1409,7 +1409,7 @@ void NativeGetActiveApnName(napi_env env, void *data)
     }
     auto getActiveApnNameContext = static_cast<AsyncGetActiveApnName *>(data);
 
-    std::string apnName = "123";
+    std::string apnName;
     std::unique_lock<std::mutex> callbackLock(getActiveApnNameContext->asyncContext.callbackMutex);
     int32_t errorCode = CellularDataClient::GetInstance().GetActiveApnName(apnName);
     TELEPHONY_LOGI("NAPI NativeGetActiveApnName %{public}d", errorCode);
@@ -1429,7 +1429,7 @@ void GetActiveApnNameCallback(napi_env env, napi_status status, void *data)
     AsyncContext1<napi_value> &asyncContext = info->asyncContext;
     asyncContext.callbackVal = nullptr;
 
-    std:: string apnName = info->apnName;
+    std::string apnName = info->apnName;
     napi_create_string_utf8(env, apnName.c_str(), apnName.length(), &asyncContext.callbackVal);
     TELEPHONY_LOGI("GetActiveApnNameCallback apnName = %{public}s", apnName.c_str());
     NapiAsyncPermissionCompleteCallback(
