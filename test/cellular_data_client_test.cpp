@@ -341,5 +341,17 @@ HWTEST_F(CellularDataClientTest, GetNetworkSliceEhplmn_001, TestSize.Level0)
     EXPECT_EQ(result, 0);
 }
 
+/**
+ * @tc.number   GetActiveApnName_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataClientTest, GetActiveApnName_001, TestSize.Level0)
+{
+    std::string apnName;
+    int32_t result = CellularDataClient::GetInstance().GetActiveApnName(apnName);
+    EXPECT_EQ(result, 0);
+}
+
 } // namespace Telephony
 } // namespace OHOS
