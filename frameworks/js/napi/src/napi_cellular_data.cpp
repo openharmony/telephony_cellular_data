@@ -1402,6 +1402,79 @@ static napi_value QueryAllApns(napi_env env, napi_callback_info info)
     return result;
 }
 
+void NativeGetActiveApnName(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        return;
+    }
+    auto getActiveApnNameContext = static_cast<AsyncGetActiveApnName *>(data);
+
+    std::string apnName = "123";
+    std::unique_lock<std::mutex> callbackLock(getActiveApnNameContext->asyncContext.callbackMutex);
+    int32_t errorCode = CellularDataClient::GetInstance().GetActiveApnName(apnName);
+    TELEPHONY_LOGI("NAPI NativeGetActiveApnName %{public}d", errorCode);
+    if (errorCode == TELEPHONY_SUCCESS) {
+        getActiveApnNameContext->apnName = apnName;
+        getActiveApnNameContext->asyncContext.context.resolved = true;
+    } else {
+        getActiveApnNameContext->asyncContext.context.resolved = false;
+    }
+    getActiveApnNameContext->asyncContext.context.errorCode = errorCode;
+}
+
+void GetActiveApnNameCallback(napi_env env, napi_status status, void *data)
+{
+    NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
+    std::unique_ptr<AsyncGetActiveApnName> info(static_cast<AsyncGetActiveApnName *>(data));
+    AsyncContext1<napi_value> &asyncContext = info->asyncContext;
+    asyncContext.callbackVal = nullptr;
+
+    std:: string apnName = info->apnName;
+    napi_create_string_utf8(env, apnName.c_str(), apnName.length(), &asyncContext.callbackVal);
+    TELEPHONY_LOGI("GetActiveApnNameCallback apnName = %{public}s", apnName.c_str());
+    NapiAsyncPermissionCompleteCallback(
+        env, status, asyncContext, false, { "GetActiveApnName", GET_NETWORK_INFO });
+}
+
+static napi_value GetActiveApnName(napi_env env, napi_callback_info info)
+{
+    TELEPHONY_LOGI("GetActiveApnName enter!");
+    size_t parameterCount = 1;
+    napi_value parameters[] = { nullptr };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
+
+    if (parameterCount != 0) {
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+
+    auto asyncGetActiveApnName = std::make_unique<AsyncGetActiveApnName>();
+    if (asyncGetActiveApnName == nullptr) {
+        return nullptr;
+    }
+    BaseContext &context = asyncGetActiveApnName->asyncContext.context;
+
+    auto initPara = std::make_tuple(&context.callbackRef);
+    AsyncPara para {
+        .funcName = "GetActiveApnName",
+        .env = env,
+        .info = info,
+        .execute = NativeGetActiveApnName,
+        .complete = GetActiveApnNameCallback,
+    };
+    napi_value result = NapiCreateAsyncWork2<AsyncGetActiveApnName>(para, asyncGetActiveApnName.get(), initPara);
+    if (result == nullptr) {
+        TELEPHONY_LOGE("creat asyncwork failed!");
+        return nullptr;
+    }
+    if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
+        asyncGetActiveApnName.release();
+    }
+    return result;
+}
+
 EXTERN_C_START
 napi_value RegistCellularData(napi_env env, napi_value exports)
 {
@@ -1426,6 +1499,7 @@ napi_value RegistCellularData(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("queryApnIds", QueryApnIds),
         DECLARE_NAPI_FUNCTION("setPreferredApn", SetPreferredApn),
         DECLARE_NAPI_FUNCTION("queryAllApns", QueryAllApns),
+        DECLARE_NAPI_FUNCTION("getActiveApnName", GetActiveApnName),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     CreateDataConnectState(env, exports);

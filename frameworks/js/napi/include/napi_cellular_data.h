@@ -61,6 +61,11 @@ struct AsyncQueryAllApnInfo {
     AsyncContext1<napi_value> asyncContext;
     std::vector<ApnInfo> allApnInfoList {};
 };
+
+struct AsyncGetActiveApnName {
+    AsyncContext1<napi_value> asyncContext;
+    std::string apnName;
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // NAPI_CELLULAR_DATA_H
