@@ -612,5 +612,16 @@ int32_t CellularDataClient::GetNetworkSliceEhplmn(int32_t slotId)
     int32_t result = proxy->GetNetworkSliceEhplmn(slotId);
     return result;
 }
+
+int32_t CellularDataClient::GetActiveApnName(std::string &apnName)
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    apnName = "3gnet";
+    return 0;
+}
 } // namespace Telephony
 } // namespace OHOS

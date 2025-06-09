@@ -341,6 +341,14 @@ public:
      */
     int32_t GetNetworkSliceEhplmn(int32_t slotId);
 
+    /**
+     * @brief Get active apn name
+     *
+     * @param apnName Actived apn name.
+     * @return 0 set success, others set fail
+     */
+    int32_t GetActiveApnName(std::string &apnName);
+
 private:
     class CellularDataDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
