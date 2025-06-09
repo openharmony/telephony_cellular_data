@@ -16,7 +16,7 @@
 #include "cellular_data_dump_helper.h"
 
 #include "cellular_data_service.h"
-#include "core_service_client.h"
+#include "core_manager_inner.h"
 #include "enum_convert.h"
 #include "telephony_types.h"
 
@@ -40,7 +40,7 @@ bool CellularDataDumpHelper::Dump(const std::vector<std::string> &args, std::str
 bool CellularDataDumpHelper::HasSimCard(const int32_t slotId) const
 {
     bool hasSimCard = false;
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId, hasSimCard);
+    CoreManagerInner::GetInstance().HasSimCard(slotId, hasSimCard);
     return hasSimCard;
 }
 
