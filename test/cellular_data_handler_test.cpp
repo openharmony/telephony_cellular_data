@@ -1369,7 +1369,7 @@ HWTEST_F(CellularDataHandlerTest, IsSimRequestNetOnVSimEnabledTest001, Function 
     EXPECT_TRUE(ret);
 }
 
-HWTEST_F(CellularDataHandlerTest, HandleImsCallChangedTest001, Function | MediumTest | Level1)
+HWTEST_F(CellularDataHandlerTest, HandleImsCallChangedTest002, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;
     EventFwk::MatchingSkills matchingSkills;
