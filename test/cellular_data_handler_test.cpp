@@ -14,7 +14,6 @@
  */
 #define private public
 #define protected public
-#define OHOS_BUILD_ENABLE_TELEPHONY_EXT
 
 #include "gtest/gtest.h"
 #include "common_event_manager.h"
