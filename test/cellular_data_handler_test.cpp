@@ -1342,6 +1342,7 @@ HWTEST_F(CellularDataHandlerTest, RetryToSetupDatacallTest001, Function | Medium
     cellularDataHandler->RetryToSetupDatacall(event);
 }
 
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
 HWTEST_F(CellularDataHandlerTest, IsSimRequestNetOnVSimEnabledTest001, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;
@@ -1368,6 +1369,7 @@ HWTEST_F(CellularDataHandlerTest, IsSimRequestNetOnVSimEnabledTest001, Function 
     ret = cellularDataHandler->NotifyReqCellularData(true);
     EXPECT_TRUE(ret);
 }
+#endif
 
 HWTEST_F(CellularDataHandlerTest, HandleImsCallChangedTest002, Function | MediumTest | Level1)
 {
