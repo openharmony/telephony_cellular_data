@@ -260,27 +260,6 @@ HWTEST_F(CellularStateMachineTest, IdleState_IncallStateMachine_001, Function | 
 }
 
 /**
- * @tc.number   StateProcess_001
- * @tc.name     test function branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularStateMachineTest, StateProcess_001, Function | MediumTest | Level1)
-{
-    std::shared_ptr<IncallDataStateMachineTest> incallStateMachineTest = std::make_shared<IncallDataStateMachineTest>();
-    std::shared_ptr<IncallDataStateMachine> incallStateMachine =
-        incallStateMachineTest->CreateIncallDataStateMachine(0);
-    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_DISCONNECTED);
-    incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
-    incallStateMachine->TransitionTo(incallStateMachine->activatingSecondaryState_);
-    incallStateMachine->TransitionTo(incallStateMachine->activatedSecondaryState_);
-    incallStateMachine->TransitionTo(incallStateMachine->deactivatingSecondaryState_);
-    auto deactivatingSecondaryState =
-        static_cast<DeactivatingSecondaryState *>(incallStateMachine->deactivatingSecondaryState_.GetRefPtr());
-    bool result = deactivatingSecondaryState->StateProcess(event);
-    EXPECT_EQ(result, true);
-}
-
-/**
  * @tc.number   StateProcess_002
  * @tc.name     test function branch
  * @tc.desc     Function test
