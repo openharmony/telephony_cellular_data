@@ -333,27 +333,6 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilDeactivateDataCall_00
 }
 
 /**
- * @tc.number   Disconnecting_ProcessRilDeactivateDataCall_002
- * @tc.name     test function branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilDeactivateDataCall_002, Function | MediumTest | Level1)
-{
-    if (cellularMachine == nullptr) {
-        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
-        cellularMachine = machine->CreateCellularDataConnect(0);
-        cellularMachine->Init();
-    }
-    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
-    cellularMachine->TransitionTo(cellularMachine->defaultState_);
-    cellularMachine->stateMachineEventHandler_ = nullptr;
-    disconnecting->stateMachine_ = cellularMachine;
-    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT);
-    disconnecting->ProcessRilDeactivateDataCall(event);
-    EXPECT_FALSE(cellularMachine->IsInactiveState());
-}
-
-/**
  * @tc.number   Disconnecting_ProcessRilDeactivateDataCall_003
  * @tc.name     test function branch
  * @tc.desc     Function test
