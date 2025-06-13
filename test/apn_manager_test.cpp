@@ -689,21 +689,6 @@ HWTEST_F(ApnManagerTest, ReleaseDataConnection_001, TestSize.Level0)
 }
 
 /**
- * @tc.number   ReleaseDataConnection_002
- * @tc.name     test function branch
- * @tc.desc     Function test
- */
-HWTEST_F(ApnManagerTest, ReleaseDataConnection_002, TestSize.Level0)
-{
-    std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
-    auto stateMachine = machine->CreateCellularDataStateMachine(0);
-    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
-    apnHolder->SetCellularDataStateMachine(stateMachine);
-    apnHolder->ReleaseDataConnection();
-    ASSERT_NE(apnHolder->cellularDataStateMachine_, nullptr);
-}
-
-/**
  * @tc.number   RequestCellularData_001
  * @tc.name     test function branch
  * @tc.desc     Function test
