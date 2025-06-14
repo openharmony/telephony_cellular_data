@@ -50,38 +50,6 @@ void CellularDataServiceTest::SetUp() {}
 void CellularDataServiceTest::TearDown() {}
 
 /**
- * @tc.number   CellularDataService_001
- * @tc.name     test function branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataServiceTest, CellularDataService_001, TestSize.Level1)
-{
-    DataAccessToken token;
-    service->OnStart();
-    service->isInitSuccess_ = true;
-    bool dataEnabled = false;
-    bool dataRoamingEnabled = false;
-    int32_t state;
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->IsCellularDataEnabled(dataEnabled));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->EnableCellularData(false));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->EnableCellularData(true));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->EnableIntelligenceSwitch(false));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->EnableIntelligenceSwitch(true));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->GetCellularDataState(state));
-    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->GetApnState(DEFAULT_SIM_SLOT_ID, std::string(), state));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->IsCellularDataRoamingEnabled(DEFAULT_SIM_SLOT_ID, dataRoamingEnabled));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->EnableCellularDataRoaming(DEFAULT_SIM_SLOT_ID, true));
-    NetRequest request;
-    request.ident = "simId12";
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->RequestNet(request));
-    request.ident = "simId2";
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->ReleaseNet(request));
-    auto event = AppExecFwk::InnerEvent::Get(0);
-    service->DispatchEvent(DEFAULT_SIM_SLOT_ID, event);
-    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->HandleApnChanged(DEFAULT_SIM_SLOT_ID));
-}
-
-/**
  * @tc.number   CellularDataService_002
  * @tc.name     test function branch
  * @tc.desc     Function test

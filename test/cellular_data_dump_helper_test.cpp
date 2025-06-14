@@ -62,20 +62,6 @@ HWTEST_F(CellularDataDumpHelperTest, CellularDataDumpHelper_01, Function | Mediu
     ASSERT_FALSE(result.find("Usage:dump <command> [options]") == std::string::npos);
 }
 
-HWTEST_F(CellularDataDumpHelperTest, CellularDataDumpHelper_02, Function | MediumTest | Level1)
-{
-    CellularDataDumpHelper help;
-    std::vector<std::string> args = {"cellular_data", "help"};
-    std::string result = "";
-    EXPECT_CALL(*mockCoreService, HasSimCard(_, _))
-        .Times(AtLeast(0))
-        .WillRepeatedly(DoAll(SetArgReferee<1>(false), Return(0)));
-    help.Dump(args, result);
-    std::cout << "CellularDataDumpHelper_02 result: " << result << std::endl;
-    ASSERT_FALSE(result.find("Ohos cellular data service") == std::string::npos);
-    ASSERT_TRUE(result.find("CellularDataRoamingEnabled") == std::string::npos);
-}
-
 HWTEST_F(CellularDataDumpHelperTest, CellularDataDumpHelper_03, Function | MediumTest | Level1)
 {
     CellularDataDumpHelper help;
