@@ -43,7 +43,7 @@ public:
     MOCK_METHOD1(SetDefaultVoiceSlotId, int32_t(int32_t));
     MOCK_METHOD1(SetDefaultSmsSlotId, int32_t(int32_t));
     MOCK_METHOD1(SetDefaultCellularDataSlotId, int32_t(int32_t));
-    MOCK_METHOD1(SetPrimarySlotId, int32_t(int32_t));
+    MOCK_METHOD2(SetPrimarySlotId, int32_t(int32_t, bool));
     MOCK_METHOD1(GetDefaultVoiceSimId, int32_t(int32_t &));
     MOCK_METHOD1(GetDefaultSmsSimId, int32_t(int32_t &));
     MOCK_METHOD1(GetDefaultCellularDataSimId, int32_t(int32_t &));
