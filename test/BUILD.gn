@@ -153,7 +153,6 @@ ohos_unittest("tel_cellular_state_branch_test") {
   module_out_path = part_name + "/" + test_module + "/" + test_suite
 
   sources = [
-    "$SOURCE_DIR/test/cellualr_data_branch_test.cpp",
     "$SOURCE_DIR/test/data_access_token.cpp",
   ]
 
