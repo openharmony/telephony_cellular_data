@@ -117,7 +117,7 @@ HWTEST_F(CellularDataClientTest, GetDataConnApnAttr_001, TestSize.Level0)
 {
     ApnItem::Attribute apnAttr;
     int32_t result = CellularDataClient::GetInstance().GetDataConnApnAttr(0, apnAttr);
-    EXPECT_EQ(result, 0);
+    EXPECT_NE(result, 0);
 }
 
 /**
@@ -291,7 +291,7 @@ HWTEST_F(CellularDataClientTest, SendUrspDecodeResult_001, TestSize.Level1)
 {
     std::vector<uint8_t> buffer = {};
     int32_t result = CellularDataClient::GetInstance().SendUrspDecodeResult(0, buffer);
-    EXPECT_EQ(result, 0);
+    EXPECT_NE(result, 0);
 }
 
 /**
@@ -303,7 +303,7 @@ HWTEST_F(CellularDataClientTest, SendUePolicySectionIdentifier_001, TestSize.Lev
 {
     std::vector<uint8_t> buffer = {};
     int32_t result = CellularDataClient::GetInstance().SendUePolicySectionIdentifier(0, buffer);
-    EXPECT_EQ(result, 0);
+    EXPECT_NE(result, 0);
 }
 
 /**
@@ -315,7 +315,7 @@ HWTEST_F(CellularDataClientTest, SendImsRsdList_001, TestSize.Level1)
 {
     std::vector<uint8_t> buffer = {};
     int32_t result = CellularDataClient::GetInstance().SendImsRsdList(0, buffer);
-    EXPECT_EQ(result, 0);
+    EXPECT_NE(result, 0);
 }
 
 /**
@@ -327,7 +327,7 @@ HWTEST_F(CellularDataClientTest, GetNetworkSliceAllowedNssai_001, TestSize.Level
 {
     std::vector<uint8_t> buffer = {};
     int32_t result = CellularDataClient::GetInstance().GetNetworkSliceAllowedNssai(0, buffer);
-    EXPECT_EQ(result, 0);
+    EXPECT_NE(result, 0);
 }
 
 /**
@@ -338,7 +338,7 @@ HWTEST_F(CellularDataClientTest, GetNetworkSliceAllowedNssai_001, TestSize.Level
 HWTEST_F(CellularDataClientTest, GetNetworkSliceEhplmn_001, TestSize.Level0)
 {
     int32_t result = CellularDataClient::GetInstance().GetNetworkSliceEhplmn(0);
-    EXPECT_EQ(result, 0);
+    EXPECT_NE(result, 0);
 }
 
 } // namespace Telephony

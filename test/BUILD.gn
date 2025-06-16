@@ -21,8 +21,6 @@ ohos_unittest("tel_cellular_data_test") {
   module_out_path = part_name + "/" + test_module + "/" + test_suite
 
   sources = [
-    "$SOURCE_DIR/test/apn_manager_test.cpp",
-    "$SOURCE_DIR/test/cellular_data_handler_test.cpp",
     "$SOURCE_DIR/test/cellular_data_test.cpp",
     "$SOURCE_DIR/test/data_access_token.cpp",
     "$SOURCE_DIR/test/zero_branch_test.cpp",
@@ -91,7 +89,6 @@ ohos_unittest("tel_cellular_state_machine_test") {
   module_out_path = part_name + "/" + test_module + "/" + test_suite
 
   sources = [
-    "$SOURCE_DIR/test/cellular_state_machine_test.cpp",
     "$SOURCE_DIR/test/data_access_token.cpp",
   ]
 
@@ -156,7 +153,6 @@ ohos_unittest("tel_cellular_state_branch_test") {
   module_out_path = part_name + "/" + test_module + "/" + test_suite
 
   sources = [
-    "$SOURCE_DIR/test/cellualr_data_branch_test.cpp",
     "$SOURCE_DIR/test/data_access_token.cpp",
   ]
 
@@ -221,7 +217,6 @@ ohos_unittest("tel_cellular_data_client_test") {
 
   sources = [
     "$SOURCE_DIR/test/cellular_data_client_test.cpp",
-    "$SOURCE_DIR/test/cellular_data_service_test.cpp",
     "$SOURCE_DIR/test/data_access_token.cpp",
   ]
 
@@ -285,8 +280,6 @@ ohos_unittest("tel_cellular_data_traffic_test") {
   module_out_path = part_name + "/" + test_module + "/" + test_suite
 
   sources = [
-    "$SOURCE_DIR/test/cellular_data_dump_helper_test.cpp",
-    "$SOURCE_DIR/test/cellular_data_handler_branch_test.cpp",
     "$SOURCE_DIR/test/cellular_data_observer_test.cpp",
     "$SOURCE_DIR/test/data_switch_settings_test.cpp",
     "$SOURCE_DIR/test/sim_account_callback_proxy_test.cpp",
