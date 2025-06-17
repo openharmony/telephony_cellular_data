@@ -102,7 +102,7 @@ PermissionDef testPermManagerApnSettingDef = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-+PermissionStateFull testManagerApnSetting = {
+PermissionStateFull testManagerApnSetting = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
