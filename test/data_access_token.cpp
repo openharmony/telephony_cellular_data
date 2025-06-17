@@ -91,11 +91,31 @@ PermissionStateFull testGetTelephonyState = {
     .resDeviceID = { "local" },
 };
 
+PermissionDef testPermManagerApnSettingDef = {
+    .permissionName = "ohos.permission.MANAGE_APN_SETTING",
+    .bundleName = "tel_cellular_data_test",
+    .grantMode = 1, // SYSTEM_GRANT
+    .label = "label",
+    .labelId = 1,
+    .description = "Test cellular data",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+
++PermissionStateFull testManagerApnSetting = {
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.MANAGE_APN_SETTING",
+    .resDeviceID = { "local" },
+};
+
 HapPolicyParams testPolicyParams = {
     .apl = APL_SYSTEM_BASIC,
     .domain = "test.domain",
-    .permList = { testPermGetNetworkInfoDef, testPermSetTelephonyStateDef, testPermGetTelephonyStateDef },
-    .permStateList = { testGetNetworkInfoState, testSetTelephonyState, testGetTelephonyState },
+    .permList = { testPermGetNetworkInfoDef, testPermSetTelephonyStateDef,
+        testPermGetTelephonyStateDef, testPermManagerApnSettingDef },
+    .permStateList = { testGetNetworkInfoState, testSetTelephonyState, testGetTelephonyState, testManagerApnSetting },
 };
 } // namespace
 
