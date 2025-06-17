@@ -57,4 +57,5 @@ interface OHOS.Telephony.ICellularDataManager {
     void SendImsRsdList([in] int slotId, [in] List<unsigned char> buffer);
     void GetNetworkSliceAllowedNssai([in] int slotId, [in] List<unsigned char> buffer);
     void GetNetworkSliceEhplmn([in] int slotId);
+    void GetActiveApnName([out] String apnName);
 };

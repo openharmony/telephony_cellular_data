@@ -103,6 +103,7 @@ public:
     int32_t SendImsRsdList(int32_t slotId, const std::vector<uint8_t>& buffer) override;
     int32_t GetNetworkSliceAllowedNssai(int32_t slotId, const std::vector<uint8_t>& buffer) override;
     int32_t GetNetworkSliceEhplmn(int32_t slotId) override;
+    int32_t GetActiveApnName(std::string &apnName) override;
 
 private:
     bool Init();
