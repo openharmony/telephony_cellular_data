@@ -402,6 +402,19 @@ HWTEST_F(CellularDataServiceTest, EstablishAllApnsIfConnectableTest001, TestSize
 }
 
 /**
+ * @tc.number   EstablishAllApnsIfConnectableTest002
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, EstablishAllApnsIfConnectableTest002, TestSize.Level0)
+{
+    DataAccessToken token;
+    int32_t slotId = -1;
+    EXPECT_EQ(service->EstablishAllApnsIfConnectable(slotId), CELLULAR_DATA_INVALID_PARAM);
+    EXPECT_EQ(service->ReleaseCellularDataConnection(slotId), CELLULAR_DATA_INVALID_PARAM);
+}
+
+/**
  * @tc.number   GetActReportInfoTest001
  * @tc.name     test GetDefaultActReportInfo and GetInternalActReportInfo
  * @tc.desc     Function test
@@ -412,6 +425,20 @@ HWTEST_F(CellularDataServiceTest, GetActReportInfoTest001, TestSize.Level0)
     int32_t slotId = -1;
     EXPECT_EQ(service->GetDefaultActReportInfo(slotId, infoIpc), TELEPHONY_ERR_PERMISSION_ERR);
     EXPECT_EQ(service->GetInternalActReportInfo(slotId, infoIpc), TELEPHONY_ERR_PERMISSION_ERR);
+}
+
+/**
+ * @tc.number   GetActReportInfoTest002
+ * @tc.name     test GetDefaultActReportInfo and GetInternalActReportInfo
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, GetActReportInfoTest002, TestSize.Level0)
+{
+    DataAccessToken token;
+    ApnActivateReportInfoIpc infoIpc;
+    int32_t slotId = -1;
+    EXPECT_EQ(service->GetDefaultActReportInfo(slotId, infoIpc), CELLULAR_DATA_INVALID_PARAM);
+    EXPECT_EQ(service->GetInternalActReportInfo(slotId, infoIpc), CELLULAR_DATA_INVALID_PARAM);
 }
 
 /**
@@ -428,6 +455,46 @@ HWTEST_F(CellularDataServiceTest, ApnInfoTest001, TestSize.Level0)
     EXPECT_EQ(service->QueryApnIds(apnInfo, apnIdList), TELEPHONY_ERR_PERMISSION_ERR);
     EXPECT_EQ(service->SetPreferApn(apnId), TELEPHONY_ERR_PERMISSION_ERR);
     EXPECT_EQ(service->QueryAllApnInfo(allApnInfoList), TELEPHONY_ERR_PERMISSION_ERR);
+}
+
+/**
+ * @tc.number   ApnInfoTest002
+ * @tc.name     test QueryApnIds, SetPreferApn and QueryAllApnInfo
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, ApnInfoTest002, TestSize.Level0)
+{
+    DataAccessToken token;
+    ApnInfo apnInfo;
+    std::vector<uint32_t> apnIdList;
+    std::vector<ApnInfo> allApnInfoList;
+    int32_t apnId = 1;
+    EXPECT_EQ(service->QueryApnIds(apnInfo, apnIdList), 0);
+    EXPECT_EQ(service->SetPreferApn(apnId), -1);
+    EXPECT_EQ(service->QueryAllApnInfo(allApnInfoList), 0);
+}
+
+/**
+ * @tc.number   GetActiveApnName001
+ * @tc.name     test GetActiveApnName
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, GetActiveApnName001, TestSize.Level0)
+{
+    std::string apnName;
+    EXPECT_EQ(service->GetActiveApnName(apnName), TELEPHONY_ERR_PERMISSION_ERR);
+}
+
+/**
+ * @tc.number   GetActiveApnName002
+ * @tc.name     test GetActiveApnName
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, GetActiveApnName002, TestSize.Level0)
+{
+    DataAccessToken token;
+    std::string apnName;
+    EXPECT_EQ(service->GetActiveApnName(apnName), 0);
 }
 } // namespace Telephony
 } // namespace OHOS

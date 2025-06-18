@@ -982,5 +982,42 @@ int32_t CellularDataService::GetNetworkSliceEhplmn(int32_t slotId)
     int32_t eventid = static_cast<int32_t>(CellularDataEventCode::MSG_SYNC_EHPLMN_WITH_MODEM);
     return CoreManagerInner::GetInstance().GetNetworkSliceEhplmn(slotId, eventid);
 }
+
+int32_t CellularDataService::GetActiveApnName(std::string &apnName)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    apnName = "";
+    int32_t slotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
+    std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
+    if (cellularDataController == nullptr) {
+        return 0;
+    }
+    int32_t cellularDataState = static_cast<int32_t>(
+        cellularDataController->GetCellularDataState(DATA_CONTEXT_ROLE_DEFAULT));
+    if (cellularDataState != PROFILE_STATE_CONNECTED) {
+        return 0;
+    }
+    auto helper = CellularDataRdbHelper::GetInstance();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("get cellularDataRdbHelper failed");
+        return 0;
+    }
+    std::vector<PdpProfile> preferApnVec;
+    if (!helper->QueryPreferApn(slotId, preferApnVec)) {
+        TELEPHONY_LOGI("query prefer apn fail");
+        return 0;
+    }
+    if (preferApnVec.size() > 0) {
+        apnName = preferApnVec[0].apn;
+    } else {
+        ApnItem::Attribute apnAttr;
+        cellularDataController->GetDataConnApnAttr(apnAttr);
+        apnName = apnAttr.apn_;
+    }
+    return 0;
+}
 } // namespace Telephony
 } // namespace OHOS

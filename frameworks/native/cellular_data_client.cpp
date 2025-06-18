@@ -620,8 +620,7 @@ int32_t CellularDataClient::GetActiveApnName(std::string &apnName)
         TELEPHONY_LOGE("proxy is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    apnName = "3gnet";
-    return 0;
+    return proxy->GetActiveApnName(apnName);
 }
 } // namespace Telephony
 } // namespace OHOS
