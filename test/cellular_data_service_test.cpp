@@ -507,7 +507,7 @@ HWTEST_F(CellularDataServiceTest, ReleaseNet_001, TestSize.Level1)
     NetRequest request;
     request.ident = "1";
     ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service->RequestNet(request));
-    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM,service->ReleaseNet(request));
+    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service->ReleaseNet(request));
 }
 } // namespace Telephony
 } // namespace OHOS
