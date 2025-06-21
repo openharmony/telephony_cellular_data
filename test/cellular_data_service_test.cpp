@@ -496,5 +496,18 @@ HWTEST_F(CellularDataServiceTest, GetActiveApnName002, TestSize.Level0)
     std::string apnName;
     EXPECT_EQ(service->GetActiveApnName(apnName), 0);
 }
+
+/**
+ * @tc.number   ReleaseNet_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, ReleaseNet_001, TestSize.Level1)
+{
+    NetRequest request;
+    request.ident = "1";
+    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service->RequestNet(request));
+    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM,service->ReleaseNet(request));
+}
 } // namespace Telephony
 } // namespace OHOS
