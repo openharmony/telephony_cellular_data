@@ -204,7 +204,8 @@ int32_t CellularDataHandler::IsCellularDataEnabled(bool &dataEnabled) const
         TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ is null", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return dataSwitchSettings_->QueryUserDataStatus(dataEnabled);
+    dataEnabled = dataSwitchSettings_->IsUserDataOn();
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CellularDataHandler::IsCellularDataRoamingEnabled(bool &dataRoamingEnabled) const
