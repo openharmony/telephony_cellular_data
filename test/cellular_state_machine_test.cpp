@@ -2164,5 +2164,93 @@ HWTEST_F(CellularStateMachineTest, Default_ProcessUpdateNetworkInfo_001, Functio
     bool result = defaultState->ProcessUpdateNetworkInfo(event);
     EXPECT_EQ(result, true);
 }
+
+/**
+ * @tc.number   FreeConnection_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, FreeConnection_001, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    EXPECT_NE(cellularMachine, nullptr);
+    std::string apnType = "";
+    DisConnectionReason reason = DisConnectionReason::REASON_NORMAL;
+    DataDisconnectParams params(apnType, reason);
+    cellularMachine->FreeConnection(params);
+}
+
+/**
+ * @tc.number   SetIfReuseSupplierId_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, SetIfReuseSupplierId_001, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    EXPECT_EQ(cellularMachine->reuseApnCap_, NetManagerStandard::NetCap::NET_CAPABILITY_END);
+    cellularMachine->SetIfReuseSupplierId(true);
+}
+
+/**
+ * @tc.number   SetIfReuseSupplierId_002
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, SetIfReuseSupplierId_002, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    cellularMachine->reuseApnCap_ = NetManagerStandard::NetCap::NET_CAPABILITY_MMS;
+    cellularMachine->SetIfReuseSupplierId(true);
+    EXPECT_NE(cellularMachine->reuseApnCap_, NetManagerStandard::NetCap::NET_CAPABILITY_END);
+}
+
+/**
+ * @tc.number   UpdateNetworkInfoIfInActive_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, UpdateNetworkInfoIfInActive_001, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    SetupDataCallResultInfo info;
+    EXPECT_NE(cellularMachine->cellularDataHandler_, nullptr);
+    cellularMachine->cellularDataHandler_ = nullptr;
+    cellularMachine->UpdateNetworkInfoIfInActive(info);
+}
+
+/**
+ * @tc.number   FillRSDFromNetCap_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularStateMachineTest, FillRSDFromNetCap_001, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    EXPECT_NE(cellularMachine, nullptr);
+    std::map<std::string, std::string> networkSliceParas;
+    sptr<ApnItem> apn = new ApnItem();
+    cellularMachine->FillRSDFromNetCap(networkSliceParas, apn);
+}
 } // namespace Telephony
 } // namespace OHOS

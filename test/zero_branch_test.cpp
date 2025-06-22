@@ -2537,5 +2537,68 @@ HWTEST_F(BranchTest, Telephony_DataConnectionMonitor_005, Function | MediumTest 
     con.connectionMonitor_->ProcessEvent(event);
     ASSERT_EQ(CellDataFlowType::DATA_FLOW_TYPE_NONE, con.connectionMonitor_->GetDataFlowType());
 }
+
+/**
+ * @tc.number   ParseIpAddr_006
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, ParseIpAddr_006, Function | MediumTest | Level0)
+{
+    std::string address = "192.168.1.1  ";
+    std::vector<AddressInfo> ipInfoArray = CellularDataUtils::ParseIpAddr(address);
+    EXPECT_EQ(ipInfoArray.size(), 1);
+}
+
+/**
+ * @tc.number   ParseNormalIpAddrTest001
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, ParseNormalIpAddrTest001, Function | MediumTest | Level0)
+{
+    std::string address = "2001:0db8:85a3:0000:0000:8a2e:0370:7334";
+    auto result = CellularDataUtils::ParseNormalIpAddr(address);
+    EXPECT_EQ(result.size(), 1);
+}
+
+/**
+ * @tc.number   ParseRouteTest001
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, ParseRouteTest001, Function | MediumTest | Level0)
+{
+    std::string address = "2001:0db8:85a3:0000:0000:8a2e:0370:7334";
+    auto result = CellularDataUtils::ParseRoute(address);
+    EXPECT_EQ(result.size(), 1);
+}
+
+/**
+ * @tc.number   SplitTest001
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, SplitTest001, Function | MediumTest | Level0)
+{
+    std::string input = "hello_world_";
+    std::string flag = "_";
+    std::string address = "2001:0db8:85a3:0000:0000:8a2e:0370:7334";
+    auto result = CellularDataUtils::Split(input, flag);
+    EXPECT_EQ(result.size(), 2);
+}
+
+/**
+ * @tc.number   MarshallingTest001
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, MarshallingTest001, Function | MediumTest | Level0)
+{
+    ApnAttribute apnAttr;
+    Parcel parcel;
+    auto result = apnAttr.Marshalling(parcel);
+    EXPECT_TRUE(result);
+}
 } // namespace Telephony
 } // namespace OHOS

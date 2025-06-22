@@ -2153,5 +2153,46 @@ HWTEST_F(CellularDataTest, GetSimIdTest001, TestSize.Level3)
     std::vector<ApnInfo> apnInfoList;
     cellularDataRdbHelper.QueryAllApnInfo(apnInfoList);
 }
+
+HWTEST_F(CellularDataTest, RegisterNetSupplierTest001, TestSize.Level3)
+{
+    NetSupplier temp;
+    temp.slotId = 1;
+    netAgent.netSuppliers_ = {temp};
+    int32_t slotId = 0;
+    auto result = netAgent.RegisterNetSupplier(slotId);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(CellularDataTest, RegisterNetSupplierTest002, TestSize.Level3)
+{
+    NetSupplier temp;
+    temp.slotId = 1;
+    temp.capability = 25;
+    netAgent.netSuppliers_ = {temp};
+    int32_t slotId = 1;
+    auto result = netAgent.RegisterNetSupplier(slotId);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(CellularDataTest, UnregisterNetSupplierForSimUpdateTest001, TestSize.Level3)
+{
+    NetSupplier temp;
+    temp.slotId = 0;
+    temp.simId = 1;
+    netAgent.netSuppliers_ = {temp};
+    int32_t slotId = 0;
+    netAgent.UnregisterNetSupplierForSimUpdate(slotId);
+    EXPECT_EQ(temp.slotId, 0);
+}
+
+HWTEST_F(CellularDataTest, TelephonyExtWrapperTest001, TestSize.Level3)
+{
+    TelephonyExtWrapper* ptr = new TelephonyExtWrapper();
+    EXPECT_EQ(ptr->telephonyExtWrapperHandle_, nullptr);
+    EXPECT_EQ(ptr->telephonyVSimWrapperHandle_, nullptr);
+    EXPECT_EQ(ptr->telephonyDynamicLoadWrapperHandle_, nullptr);
+    delete ptr;
+}
 } // namespace Telephony
 } // namespace OHOS
