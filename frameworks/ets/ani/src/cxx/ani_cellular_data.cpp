@@ -123,15 +123,20 @@ static int32_t WrapCellularDataType(const int32_t cellularDataType)
 
 ArktsError getCellularDataState(int32_t &CellularDataState)
 {
-    ArktsError ArktsErr;
+    int32_t errorCode;
     if (IsCellularDataManagerInited()) {
         int32_t dataState = CellularDataClient::GetInstance().GetCellularDataState();
         CellularDataState = WrapCellularDataType(dataState);
-        ArktsErr.errorCode = TELEPHONY_ERR_SUCCESS;
+        errorCode = TELEPHONY_ERR_SUCCESS;
     } else {
-        ArktsErr.errorCode = ERROR_SERVICE_UNAVAILABLE;
-        ArktsErr.errorMessage = rust::string("cellular data service unavailable");
+        errorCode = ERROR_SERVICE_UNAVAILABLE;
     }
+
+    JsError error = NapiUtil::ConverErrorMessageForJs(errorCode);
+    ArktsError ArktsErr = {
+        .errorCode = error.errorCode,
+        .errorMessage = rust::string(error.errorMessage),
+    };
     return ArktsErr;
 }
 
