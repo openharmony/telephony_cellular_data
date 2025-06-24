@@ -1166,6 +1166,12 @@ HWTEST_F(ApnManagerTest, InitialRetryCountValue_001, TestSize.Level0)
     std::shared_ptr<ConnectionRetryPolicy> connectionRetryPolicy = std::make_shared<ConnectionRetryPolicy>();
     connectionRetryPolicy->InitialRetryCountValue();
     EXPECT_EQ(connectionRetryPolicy->tryCount_, 0);
+    connectionRetryPolicy->isPropOn_ = true;
+    connectionRetryPolicy->InitialRetryCountValue();
+    EXPECT_EQ(connectionRetryPolicy->tryCount_, 0);
+    connectionRetryPolicy->isPropOn_ = false;
+    connectionRetryPolicy->InitialRetryCountValue();
+    EXPECT_EQ(connectionRetryPolicy->tryCount_, 0);
 }
 
 /**

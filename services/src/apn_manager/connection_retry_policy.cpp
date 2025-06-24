@@ -140,6 +140,11 @@ int64_t ConnectionRetryPolicy::GetNextRetryDelay(std::string apnType, int32_t ca
 void ConnectionRetryPolicy::InitialRetryCountValue()
 {
     tryCount_ = 0;
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (isPropOn_ && TELEPHONY_EXT_WRAPPER.handleDendFailcause_) {
+        TELEPHONY_EXT_WRAPPER.handleDendFailcause_(0, 0);
+    }
+#endif
 }
 
 std::vector<sptr<ApnItem>> ConnectionRetryPolicy::GetMatchedApns() const
