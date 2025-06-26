@@ -128,6 +128,11 @@ public:
     MOCK_METHOD5(UpdateSmsIcc, int32_t(int32_t, int, int, std::string &, std::string &));
     MOCK_METHOD6(GetSimIO, int32_t(int32_t, int32_t, int32_t, const std::string &, const std::string &,
                                    SimAuthenticationResponse &));
+    MOCK_METHOD2(GetAllSimAccountInfoList, int32_t(bool, std::vector<IccAccountInfo> &));
+    MOCK_METHOD3(InsertEsimData, int32_t(const std::string &, int32_t, const std::string &));
+    MOCK_METHOD2(GetSimLabel, int32_t(int32_t, SimLabel &));
+    MOCK_METHOD2(SetSimLabelIndex, int32_t(const std::string &, int32_t));
+    MOCK_METHOD1(NotifySimSlotsMapping, int32_t(int32_t));
 };
 }  // namespace Telephony
 }  // namespace OHOS

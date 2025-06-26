@@ -168,6 +168,9 @@ public:
             SimAuthenticationResponse &response),
         (override));
     MOCK_METHOD(int32_t, GetOpnameVersion, (std::string & versionInfo), (override));
+    MOCK_METHOD(int32_t, GetSimLabel, (int32_t slotId, SimLabel &simLabel, const sptr<IRawParcelCallback> &callback),
+        (override));
+    MOCK_METHOD(int32_t, GetAllSimAccountInfoList, (std::vector<IccAccountInfo> & iccAccountInfoList), (override));
 };
 }  // namespace Telephony
 }  // namespace OHOS
