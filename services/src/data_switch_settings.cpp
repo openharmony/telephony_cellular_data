@@ -34,6 +34,7 @@ void DataSwitchSettings::LoadSwitchValue()
     QueryUserDataRoamingStatus(dataRoamingEnabled);
     TELEPHONY_LOGI("slotId:%{public}d userDataOn_:%{public}d userDataRoaming_:%{public}d policyDataOn_:%{public}d",
         slotId_, userDataOn_, userDataRoaming_, policyDataOn_);
+    isSwitchValueLoaded_ = true;
 }
 
 bool DataSwitchSettings::IsInternalDataOn() const
@@ -61,10 +62,12 @@ int32_t DataSwitchSettings::SetUserDataOn(bool userDataOn)
     int value = (userDataOn ? static_cast<int>(DataSwitchCode::CELLULAR_DATA_ENABLED)
                             : static_cast<int>(DataSwitchCode::CELLULAR_DATA_DISABLED));
     TELEPHONY_LOGI("value:%{public}d", value);
+    bool userDataOnTmp = userDataOn_;
+    userDataOn_ = userDataOn;
     Uri userDataEnableUri(CELLULAR_DATA_SETTING_DATA_ENABLE_URI);
     int32_t result = settingsRdbHelper->PutValue(userDataEnableUri, CELLULAR_DATA_COLUMN_ENABLE, value);
-    if (result == TELEPHONY_ERR_SUCCESS) {
-        userDataOn_ = userDataOn;
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        userDataOn_ = userDataOnTmp;
     }
     return result;
 }
@@ -251,7 +254,11 @@ bool DataSwitchSettings::IsAllowActiveData() const
 
 bool DataSwitchSettings::IsUserDataOn()
 {
-    return userDataOn_;
+    bool userDataOn = userDataOn_;
+    if (!isSwitchValueLoaded_) {
+        QueryUserDataStatus(userDataOn);
+    }
+    return userDataOn;
 }
 
 bool DataSwitchSettings::IsUserDataRoamingOn()

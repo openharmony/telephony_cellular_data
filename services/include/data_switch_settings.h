@@ -51,6 +51,7 @@ private:
     bool policyDataOn_ = true;
     bool carrierDataOn_ = false;
     bool intelliSwitchOn_ = false;
+    bool isSwitchValueLoaded_ = false;
     const int32_t slotId_;
 };
 } // namespace Telephony
