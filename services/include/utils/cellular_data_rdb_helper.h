@@ -27,7 +27,6 @@
 #include "datashare_result_set.h"
 #include "datashare_values_bucket.h"
 #include "iservice_registry.h"
-#include "pdp_profile_data.h"
 #include "refbase.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
@@ -35,6 +34,7 @@
 
 namespace OHOS {
 namespace Telephony {
+struct PdpProfile;
 static constexpr int SETUP_DATA_AUTH_NONE = 0;
 static constexpr int SETUP_DATA_AUTH_PAP_CHAP = 3;
 class CellularDataRdbHelper : public DelayedSingleton<CellularDataRdbHelper> {
