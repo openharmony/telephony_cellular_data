@@ -2180,6 +2180,7 @@ HWTEST_F(CellularStateMachineTest, FreeConnection_001, Function | MediumTest | L
     EXPECT_NE(cellularMachine, nullptr);
     std::string apnType = "";
     DisConnectionReason reason = DisConnectionReason::REASON_NORMAL;
+    
     DataDisconnectParams params(apnType, reason);
     cellularMachine->FreeConnection(params);
 }
@@ -2276,7 +2277,7 @@ HWTEST_F(CellularStateMachineTest, OnInterfaceLinkStateChanged_001, Function | M
     auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
     cellularMachine->TransitionTo(cellularMachine->inActiveState_);
     active->stateMachine_ = cellularMachine;
-    std::shared_ptr dataDisconnectParams =
+    std::shared_ptr<DataDisconnectParams> dataDisconnectParams =
     std::make_shared<DataDisconnectParams>("", DisConnectionReason::REASON_NORMAL);
     auto event = AppExecFwk::InnerEvent::Get(0, dataDisconnectParams);
     bool result = active->ProcessDisconnectAllDone(event);
@@ -2310,8 +2311,8 @@ HWTEST_F(CellularStateMachineTest, FreeConnection_001, Function | MediumTest |Le
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    std::shared_ptr dataDisconnectParams =
-    std::make_shared<DataDisconnectParams>("", DisConnectionReason::REASON_NORMAL);
+    std::shared_ptr<DataDisconnectParams> dataDisconnectParams =
+        std::make_shared<DataDisconnectParams>("", DisConnectionReason::REASON_NORMAL);
     cellularMachine->FreeConnection(*dataDisconnectParams);
     EXPECT_NE(cellularMachine->netInterfaceCallback_, nullptr);
 }
@@ -2336,7 +2337,7 @@ HWTEST_F(CellularStateMachineTest, DoConnect_001, Function | MediumTest | Level0
     bool nonTrafficUseOnly = false;
     bool roamingState = false;
     bool userDataRoaming = false;
-    std::shared_ptr dataConnectionParams = std::make_shared(apnHolder,
+    std::shared_ptr<DataConnectionParams> dataConnectionParams = std::make_shared<DataConnectionParams>(apnHolder,
     profileId, radioTechnology, nonTrafficUseOnly, roamingState, userDataRoaming);
     cellularMachine->DoConnect(*dataConnectionParams);
     EXPECT_NE(cellularMachine->netInterfaceCallback_, nullptr);
