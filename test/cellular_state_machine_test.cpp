@@ -2252,5 +2252,94 @@ HWTEST_F(CellularStateMachineTest, FillRSDFromNetCap_001, Function | MediumTest 
     sptr<ApnItem> apn = new ApnItem();
     cellularMachine->FillRSDFromNetCap(networkSliceParas, apn);
 }
+
+/**
+ * @tc.number OnInterfaceLinkStateChanged_001
+ * @tc.name test function branch
+ * @tc.desc Function test
+ */
+HWTEST_F(CellularStateMachineTest, OnInterfaceLinkStateChanged_001, Function | MediumTest | Level0)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    SetupDataCallResultInfo dataCallInfo;
+    dataCallInfo.address = "192.168.1.1";
+    dataCallInfo.dns = "192.168.1.1";
+    dataCallInfo.dnsSec = "192.168.1.1";
+    dataCallInfo.gateway = "192.168.1.1";
+    dataCallInfo.reason = 1;
+    dataCallInfo.netPortName = "rmnet0";
+    cellularMachine->UpdateNetworkInfo(dataCallInfo);
+    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    cellularMachine->TransitionTo(cellularMachine->inActiveState_);
+    active->stateMachine_ = cellularMachine;
+    std::shared_ptr dataDisconnectParams =
+    std::make_shared<DataDisconnectParams>("", DisConnectionReason::REASON_NORMAL);
+    auto event = AppExecFwk::InnerEvent::Get(0, dataDisconnectParams);
+    bool result = active->ProcessDisconnectAllDone(event);
+    if (cellularMachine->netInterfaceCallback_ != nullptr) {
+        if (cellularMachine->stateMachineEventHandler_ != nullptr) {
+            cellularMachine->stateMachineEventHandler_->SendEvent(
+                CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK, 0, 1000);
+        }
+        cellularMachine->netInterfaceCallback_->OnInterfaceLinkStateChanged("rmnet0", false);
+    }
+    if (cellularMachine->netInterfaceCallback_ != nullptr) {
+        cellularMachine->netInterfaceCallback_->OnInterfaceLinkStateChanged("rmnet", false);
+    }
+    if (cellularMachine->netInterfaceCallback_ != nullptr) {
+        cellularMachine->stateMachineEventHandler_ = nullptr;
+        cellularMachine->OnInterfaceLinkStateChanged("rmnet0", false);
+    }
+    cellularMachine->UnregisterNetInterfaceCallback();
+    EXPECT_EQ(result, false);
+}
+
+/**
+ * @tc.number FreeConnection_001
+ * @tc.name test function branch
+ * @tc.desc Function test
+ */
+HWTEST_F(CellularStateMachineTest, FreeConnection_001, Function | MediumTest |Level0)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    std::shared_ptr dataDisconnectParams =
+    std::make_shared<DataDisconnectParams>("", DisConnectionReason::REASON_NORMAL);
+    cellularMachine->FreeConnection(*dataDisconnectParams);
+    EXPECT_NE(cellularMachine->netInterfaceCallback_, nullptr);
+}
+
+/**
+ * @tc.number FreeConnection_001
+ * @tc.name test function branch
+ * @tc.desc Function test
+ */
+HWTEST_F(CellularStateMachineTest, DoConnect_001, Function | MediumTest | Level0)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    sptr apnHolder = new ApnHolder(DATA_CONTEXT_ROLE_DEFAULT, 0);
+    sptr defaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
+    apnHolder->SetCurrentApn(defaultApnItem);
+    int32_t profileId = 0;
+    int32_t radioTechnology = 0;
+    bool nonTrafficUseOnly = false;
+    bool roamingState = false;
+    bool userDataRoaming = false;
+    std::shared_ptr dataConnectionParams = std::make_shared(apnHolder,
+    profileId, radioTechnology, nonTrafficUseOnly, roamingState, userDataRoaming);
+    cellularMachine->DoConnect(*dataConnectionParams);
+    EXPECT_NE(cellularMachine->netInterfaceCallback_, nullptr);
+}
 } // namespace Telephony
 } // namespace OHOS
