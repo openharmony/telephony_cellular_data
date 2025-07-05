@@ -43,6 +43,7 @@ public:
     int32_t QueryUserDataStatus(bool &dataEnabled);
     int32_t QueryAnySimDetectedStatus(int32_t simDetected);
     int32_t QueryUserDataRoamingStatus(bool &dataRoamingEnabled);
+    int32_t GetLastQryRet();
 
 private:
     bool internalDataOn_ = true;
@@ -51,8 +52,8 @@ private:
     bool policyDataOn_ = true;
     bool carrierDataOn_ = false;
     bool intelliSwitchOn_ = false;
-    bool isSwitchValueLoaded_ = false;
     const int32_t slotId_;
+    int32_t lastQryRet_ = -1;
 };
 } // namespace Telephony
 } // namespace OHOS

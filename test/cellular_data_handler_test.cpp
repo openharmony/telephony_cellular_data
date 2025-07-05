@@ -1118,11 +1118,8 @@ HWTEST_F(CellularDataHandlerTest, DataConnCompleteUpdateStateTest001, Function |
 }
 
 /**
-
 @tc.number Telephony_CreateApnItem
-
 @tc.name CreateApnItem
-
 @tc.desc Function test
 */
 HWTEST_F(CellularDataHandlerTest, CreateApnItemTest001, Function | MediumTest | Level1)
@@ -1142,6 +1139,25 @@ HWTEST_F(CellularDataHandlerTest, CreateApnItemTest001, Function | MediumTest | 
     EXPECT_TRUE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_CREATE_APN));
 }
 
+/**
+@tc.number Telephony_IsCellularDataEnabled
+@tc.name IsCellularDataEnabled
+@tc.desc Function test
+*/
+HWTEST_F(CellularDataHandlerTest, IsCellularDataEnabledTest001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    EventFwk::MatchingSkills matchingSkills;
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, slotId);
+    bool isDataEnabled = false;
+    EXPECT_NE(cellularDataHandler->IsCellularDataEnabled(isDataEnabled), TELEPHONY_ERR_SUCCESS);
 
+    cellularDataHandler->Init();
+    cellularDataHandler->dataSwitchSettings_->lastQryRet_ = -1;
+    EXPECT_NE(cellularDataHandler->IsCellularDataEnabled(isDataEnabled), TELEPHONY_ERR_SUCCESS);
+    cellularDataHandler->dataSwitchSettings_->lastQryRet_ = TELEPHONY_ERR_SUCCESS;
+    EXPECT_EQ(cellularDataHandler->IsCellularDataEnabled(isDataEnabled), TELEPHONY_ERR_SUCCESS);
+}
 } // namespace Telephony
 } // namespace OHOS
