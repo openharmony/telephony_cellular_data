@@ -389,7 +389,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilDeactivateDataCall_00
     auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
     disconnecting->stateMachine_ = cellularMachine;
     cellularMachine->connectId_ = 1;
-    std::shared_ptr radioResponseInfo = std::make_shared();
+    std::shared_ptr<RadioResponseInfo> radioResponseInfo = std::make_shared<RadioResponseInfo>();
     radioResponseInfo->flag = 1;
     radioResponseInfo->error = ErrType::ERR_GENERIC_FAILURE;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT, radioResponseInfo);
