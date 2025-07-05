@@ -1711,7 +1711,7 @@ HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_UpdateNetworkInfoIfI
 }
 
 /**
- * @tc.number   CellularDataStateMachine_DoConnect_001
+ * @tc.number   CellularDataStateMachine_SplitProxyIpAddress_001
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
@@ -1728,7 +1728,7 @@ HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_SplitProxyIpAddress_
 }
 
 /**
- * @tc.number   CellularDataStateMachine_DoConnect_001
+ * @tc.number   CellularDataStateMachine_SplitProxyIpAddress_002
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
@@ -1745,7 +1745,7 @@ HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_SplitProxyIpAddress_
 }
 
 /**
- * @tc.number   CellularDataStateMachine_DoConnect_001
+ * @tc.number   CellularDataStateMachine_SplitProxyIpAddress_003
  * @tc.name     test function branch
  * @tc.desc     Function test
  */
@@ -2318,7 +2318,7 @@ HWTEST_F(CellularStateMachineTest, FreeConnection_001, Function | MediumTest |Le
 }
 
 /**
- * @tc.number FreeConnection_001
+ * @tc.number DoConnect_001
  * @tc.name test function branch
  * @tc.desc Function test
  */
