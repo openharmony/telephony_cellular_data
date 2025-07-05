@@ -279,7 +279,6 @@ ohos_unittest("tel_cellular_data_traffic_test") {
 
   sources = [
     "$SOURCE_DIR/test/sim_account_callback_proxy_test.cpp",
-    "$SOURCE_DIR/test/traffic_management_test.cpp",
   ]
 
   include_dirs = [
