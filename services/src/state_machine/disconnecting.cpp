@@ -105,7 +105,7 @@ void Disconnecting::ProcessRilDeactivateDataCall(const AppExecFwk::InnerEvent::P
     std::shared_ptr<RadioResponseInfo> rilInfo = event->GetSharedObject<RadioResponseInfo>();
     if (rilInfo == nullptr) {
         TELEPHONY_LOGE("SetupDataCallResultInfo and RadioResponseInfo is null");
-        stateMachine->stateMachineEventHandler_->RemoveEvent(CellularDataEventCode::MSG_CONNECT_TIMEOUT_CHECK);
+        stateMachine->stateMachineEventHandler_->RemoveEvent(CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK);
         inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
         stateMachine->TransitionTo(stateMachine->inActiveState_);
         return;
@@ -115,7 +115,7 @@ void Disconnecting::ProcessRilDeactivateDataCall(const AppExecFwk::InnerEvent::P
         return;
     }
     TELEPHONY_LOGI("RadioResponseInfo error is %{public}d", static_cast<int32_t>(rilInfo->error));
-    stateMachine->stateMachineEventHandler_->RemoveEvent(CellularDataEventCode::MSG_CONNECT_TIMEOUT_CHECK);
+    stateMachine->stateMachineEventHandler_->RemoveEvent(CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK);
     inActive->SetDeActiveApnTypeId(stateMachine->apnId_);
     stateMachine->TransitionTo(stateMachine->inActiveState_);
     TELEPHONY_LOGI("ProcessRilDeactivateDataCall");

@@ -38,6 +38,21 @@ using namespace NetManagerStandard;
 namespace Telephony {
 static const int32_t INVALID_MTU_VALUE = -1;
 static const bool IS_SUPPORT_NR_SLICE = system::GetBoolParameter("persist.netmgr_ext.networkslice", false);
+constexpr int INTERFACE_DOWN_TIMEOUT = 2 * 1000; // 2000ms
+
+CellularDataStateMachine::~CellularDataStateMachine()
+{
+    UnregisterNetInterfaceCallback();
+}
+
+void CellularDataStateMachine::UnregisterNetInterfaceCallback()
+{
+    if (netInterfaceCallback_ != nullptr) {
+        OHOS::NetManagerStandard::NetConnClient::GetInstance().UnregisterNetInterfaceCallback(
+            netInterfaceCallback_);
+    }
+}
+
 bool CellularDataStateMachine::IsInactiveState() const
 {
     return currentState_ == inActiveState_;
@@ -156,7 +171,7 @@ void CellularDataStateMachine::DoConnect(const DataConnectionParams &connectionP
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
             .count();
     stateMachineEventHandler_->SendEvent(
-        CellularDataEventCode::MSG_CONNECT_TIMEOUT_CHECK, connectId_, CONNECTION_DISCONNECTION_TIMEOUT);
+        CellularDataEventCode::MSG_CONNECT_TIMEOUT_CHECK, connectId_, CONNECTION_TIMEOUT);
 }
 
 void CellularDataStateMachine::FreeConnection(const DataDisconnectParams &params)
@@ -181,7 +196,38 @@ void CellularDataStateMachine::FreeConnection(const DataDisconnectParams &params
         return;
     }
     stateMachineEventHandler_->SendEvent(
-        CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK, connectId_, CONNECTION_DISCONNECTION_TIMEOUT);
+        CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK, connectId_, DISCONNECTION_TIMEOUT);
+}
+
+int32_t CellularDataStateMachine::NetInterfaceCallback::OnInterfaceLinkStateChanged(const std::string &ifName, bool up)
+{
+    auto cellularDataStateMachine = cellularDataStateMachine_.lock();
+    if (cellularDataStateMachine == nullptr) {
+        TELEPHONY_LOGE("cellularDataStateMachine is nullptr");
+        return 0;
+    }
+    cellularDataStateMachine->OnInterfaceLinkStateChanged(ifName, up);
+    return 0;
+}
+
+int32_t CellularDataStateMachine::OnInterfaceLinkStateChanged(const std::string &ifName, bool up)
+{
+    if (ifName != ifName_) {
+        return 0;
+    }
+    if (!up) {
+        if (stateMachineEventHandler_ == nullptr) {
+            TELEPHONY_LOGE("stateMachineEventHandler_ is nullptr");
+            return 0;
+        }
+        if (stateMachineEventHandler_->HasInnerEvent(CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK)) {
+            TELEPHONY_LOGI("connectId_:%{public}d", connectId_);
+            stateMachineEventHandler_->RemoveEvent(CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK);
+            stateMachineEventHandler_->SendEvent(
+                CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK, connectId_, INTERFACE_DOWN_TIMEOUT);
+        }
+    }
+    return 0;
 }
 
 bool CellularDataStateMachine::operator==(const CellularDataStateMachine &stateMachine) const
@@ -213,6 +259,11 @@ void CellularDataStateMachine::Init()
     inActiveState_->SetParentState(defaultState_);
     activatingState_->SetParentState(defaultState_);
     disconnectingState_->SetParentState(defaultState_);
+    netInterfaceCallback_ =
+        sptr<NetInterfaceCallback>::MakeSptr(std::weak_ptr<CellularDataStateMachine>(shared_from_this()));
+    if (netInterfaceCallback_ != nullptr) {
+        OHOS::NetManagerStandard::NetConnClient::GetInstance().RegisterNetInterfaceCallback(netInterfaceCallback_);
+    }
     StateMachine::SetOriginalState(inActiveState_);
     StateMachine::Start();
 }
@@ -359,6 +410,7 @@ void CellularDataStateMachine::UpdateNetworkInfo(const SetupDataCallResultInfo &
     ipType_ = GetIpType(ipInfoArray);
     GetMtuSizeFromOpCfg(mtuSize, slotId);
     netLinkInfo_->ifaceName_ = dataCallInfo.netPortName;
+    ifName_ = dataCallInfo.netPortName;
     netLinkInfo_->mtu_ = mtuSize;
     netLinkInfo_->tcpBufferSizes_ = tcpBuffer_;
     ResolveIp(ipInfoArray);

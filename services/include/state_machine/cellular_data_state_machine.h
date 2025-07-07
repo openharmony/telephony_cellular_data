@@ -25,6 +25,8 @@
 #include "data_connection_params.h"
 #include "data_disconnect_params.h"
 #include "network_state.h"
+#include "net_conn_client.h"
+#include "net_interface_callback_stub.h"
 #include "state_machine.h"
 #include "tel_event_handler.h"
 
@@ -40,13 +42,22 @@ class DataConnectionManager;
 class CellularDataStateMachine : public StateMachine,
     public std::enable_shared_from_this<CellularDataStateMachine> {
 public:
+    class NetInterfaceCallback : public OHOS::NetManagerStandard::NetInterfaceStateCallbackStub {
+    public:
+        explicit NetInterfaceCallback(std::weak_ptr<CellularDataStateMachine> cellularDataStateMachine)
+            : cellularDataStateMachine_(cellularDataStateMachine) {}
+        virtual ~NetInterfaceCallback() = default;
+        int32_t OnInterfaceLinkStateChanged(const std::string &ifName, bool up) override;
+    private:
+        std::weak_ptr<CellularDataStateMachine> cellularDataStateMachine_;
+    };
     CellularDataStateMachine(
         sptr<DataConnectionManager> &cdConnectionManager, std::shared_ptr<TelEventHandler> &&cellularDataHandler)
         : StateMachine("CellularDataStateMachine"), cdConnectionManager_(cdConnectionManager),
           cellularDataHandler_(std::move(cellularDataHandler)), cid_(0), capability_(0),
           rilRat_(RadioTech::RADIO_TECHNOLOGY_UNKNOWN), apnId_(0)
     {}
-    ~CellularDataStateMachine() = default;
+    virtual ~CellularDataStateMachine();
     bool operator==(const CellularDataStateMachine &stateMachine) const;
     bool IsInactiveState() const;
     bool IsActivatingState() const;
@@ -72,6 +83,8 @@ public:
     void SetReuseApnCap(uint64_t cap);
     uint64_t GetReuseApnCap() const;
     void SetIfReuseSupplierId(bool isReused);
+    int32_t OnInterfaceLinkStateChanged(const std::string &ifName, bool up);
+    void UnregisterNetInterfaceCallback();
 
 protected:
     sptr<State> activeState_;
@@ -119,6 +132,8 @@ private:
     int32_t cause_ = 0;
     std::string ipType_ = "";
     int64_t startTimeConnectTimeoutTask_ = 0;
+    std::string ifName_ = "";
+    sptr<OHOS::NetManagerStandard::INetInterfaceStateCallback> netInterfaceCallback_ = nullptr;
     uint64_t reuseApnCap_ = NetManagerStandard::NetCap::NET_CAPABILITY_END;
 };
 } // namespace Telephony
