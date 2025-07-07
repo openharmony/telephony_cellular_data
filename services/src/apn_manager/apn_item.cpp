@@ -158,6 +158,10 @@ sptr<ApnItem> ApnItem::BuildOtherApnAttributes(sptr<ApnItem> &apnItem, const Pdp
 
 bool ApnItem::IsSimilarPdpProfile(const PdpProfile &newPdpProfile, const PdpProfile &oldPdpProfile)
 {
+    if ((newPdpProfile.apnTypes.find(DATA_CONTEXT_ROLE_DEFAULT) != std::string::npos) &&
+        (oldPdpProfile.apnTypes.find(DATA_CONTEXT_ROLE_DEFAULT) != std::string::npos)) {
+        return false;
+    }
     return (newPdpProfile.apn == oldPdpProfile.apn) &&
         IsSimilarProperty(newPdpProfile.proxyIpAddress, oldPdpProfile.proxyIpAddress) &&
         IsSimilarProtocol(newPdpProfile.pdpProtocol, oldPdpProfile.pdpProtocol) &&
