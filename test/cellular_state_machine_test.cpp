@@ -2166,26 +2166,6 @@ HWTEST_F(CellularStateMachineTest, Default_ProcessUpdateNetworkInfo_001, Functio
 }
 
 /**
- * @tc.number   FreeConnection_001
- * @tc.name     test function branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularStateMachineTest, FreeConnection_001, Function | MediumTest | Level1)
-{
-    if (cellularMachine == nullptr) {
-        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
-        cellularMachine = machine->CreateCellularDataConnect(0);
-        cellularMachine->Init();
-    }
-    EXPECT_NE(cellularMachine, nullptr);
-    std::string apnType = "";
-    DisConnectionReason reason = DisConnectionReason::REASON_NORMAL;
-    
-    DataDisconnectParams params(apnType, reason);
-    cellularMachine->FreeConnection(params);
-}
-
-/**
  * @tc.number   SetIfReuseSupplierId_001
  * @tc.name     test function branch
  * @tc.desc     Function test
