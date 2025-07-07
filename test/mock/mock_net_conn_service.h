@@ -116,6 +116,10 @@ public:
     MOCK_METHOD(int32_t, EnableAppFrozenedCallbackLimitation, (bool flag));
     MOCK_METHOD(int32_t, SetNetExtAttribute, (int32_t netId, const std::string &netExtAttribute));
     MOCK_METHOD(int32_t, GetNetExtAttribute, (int32_t netId, std::string &netExtAttribute));
+    MOCK_METHOD(int32_t, AddStaticIpv6Addr, (const std::string &ipAddr, const std::string &macAddr,
+        const std::string &ifName));
+    MOCK_METHOD(int32_t, DelStaticIpv6Addr, (const std::string &ipAddr, const std::string &macAddr,
+        const std::string &ifName));
 };
 
 }  // namespace NetManagerStandard
