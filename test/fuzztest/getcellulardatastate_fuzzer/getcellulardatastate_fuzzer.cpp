@@ -691,6 +691,108 @@ void GetSupplierRegisterState(const uint8_t *data, size_t size)
     DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
 }
 
+void ReleaseNetFuzzTest(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    OHOS::Telephony::NetRequest request;
+    request.ident = fdp.ConsumeRandomLengthString(APN_ID_MAX + 1);
+    DelayedSingleton<CellularDataService>::GetInstance()->ReleaseNet(request);
+    DelayedSingleton<CellularDataService>::GetInstance()->RemoveUid(request);
+    DelayedSingleton<CellularDataService>::GetInstance()->AddUid(request);
+    DelayedSingleton<CellularDataService>::GetInstance()->RequestNet(request);
+}
+
+void DumpFuzzTest(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    std::int32_t fd = fdp.ConsumeIntegralInRange<int32_t>(-1, NET_CAPABILITY_MAX);
+    std::vector<std::u16string> args;
+    DelayedSingleton<CellularDataService>::GetInstance()->Dump(fd, args);
+    DelayedSingleton<CellularDataService>::GetInstance()->OnStop();
+    g_isInited = false;
+}
+
+void DispatchEventFuzzTest(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
+    AppExecFwk::InnerEvent::Pointer event(nullptr, nullptr);
+    DelayedSingleton<CellularDataService>::GetInstance()->DispatchEvent(slotId, event);
+    DelayedSingleton<CellularDataService>::GetInstance()->UnRegisterAllNetSpecifier();
+}
+
+void StrategySwitchFuzzTest(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
+    bool enable = fdp.ConsumeBool();
+    DelayedSingleton<CellularDataService>::GetInstance()->GetBeginTime();
+    DelayedSingleton<CellularDataService>::GetInstance()->GetEndTime();
+    DelayedSingleton<CellularDataService>::GetInstance()->GetCellularDataSlotIdDump();
+    DelayedSingleton<CellularDataService>::GetInstance()->GetStateMachineCurrentStatusDump();
+    DelayedSingleton<CellularDataService>::GetInstance()->GetFlowDataInfoDump();
+    DelayedSingleton<CellularDataService>::GetInstance()->StrategySwitch(slotId, enable);
+}
+
+void ChangeConnectionForDsdsFuzzTest(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
+    bool enable = fdp.ConsumeBool();
+    DelayedSingleton<CellularDataService>::GetInstance()->ChangeConnectionForDsds(slotId, enable);
+    DelayedSingleton<CellularDataService>::GetInstance()->GetSpendTime();
+}
+
+void SendUrspDecodeResultFuzzTest(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
+    std::vector<ApnInfo> allApnInfoList;
+    DelayedSingleton<CellularDataService>::GetInstance()->QueryAllApnInfo(allApnInfoList);
+    std::vector<uint8_t> buffer;
+    DelayedSingleton<CellularDataService>::GetInstance()->SendUrspDecodeResult(slotId, buffer);
+    DelayedSingleton<CellularDataService>::GetInstance()->SendUePolicySectionIdentifier(slotId, buffer);
+    DelayedSingleton<CellularDataService>::GetInstance()->SendImsRsdList(slotId, buffer);
+    DelayedSingleton<CellularDataService>::GetInstance()->GetNetworkSliceAllowedNssai(slotId, buffer); 
+}
+
+void GetActiveApnNameFuzzTest(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
+    DelayedSingleton<CellularDataService>::GetInstance()->GetNetworkSliceEhplmn(slotId);
+    std::string apnName = fdp.ConsumeRandomLengthString(APN_STRING_LENGTH);
+    DelayedSingleton<CellularDataService>::GetInstance()->GetActiveApnName(apnName);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -729,6 +831,13 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     GetIfSupportDunApn(data, size);
     QueryApnIds(data, size);
     SetPreferApn(data, size);
+    ReleaseNetFuzzTest(data, size);
+    DumpFuzzTest(data, size);
+    DispatchEventFuzzTest(data, size);
+    StrategySwitchFuzzTest(data, size);
+    ChangeConnectionForDsdsFuzzTest(data, size);
+    SendUrspDecodeResultFuzzTest(data, size);
+    GetActiveApnNameFuzzTest(data, size);
 }
 } // namespace OHOS
 
