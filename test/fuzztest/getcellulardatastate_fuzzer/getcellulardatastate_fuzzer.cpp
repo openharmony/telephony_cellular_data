@@ -777,7 +777,7 @@ void SendUrspDecodeResultFuzzTest(const uint8_t *data, size_t size)
     DelayedSingleton<CellularDataService>::GetInstance()->SendUrspDecodeResult(slotId, buffer);
     DelayedSingleton<CellularDataService>::GetInstance()->SendUePolicySectionIdentifier(slotId, buffer);
     DelayedSingleton<CellularDataService>::GetInstance()->SendImsRsdList(slotId, buffer);
-    DelayedSingleton<CellularDataService>::GetInstance()->GetNetworkSliceAllowedNssai(slotId, buffer); 
+    DelayedSingleton<CellularDataService>::GetInstance()->GetNetworkSliceAllowedNssai(slotId, buffer);
 }
 
 void GetActiveApnNameFuzzTest(const uint8_t *data, size_t size)
