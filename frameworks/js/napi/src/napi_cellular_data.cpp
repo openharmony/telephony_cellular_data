@@ -650,7 +650,7 @@ static napi_value IsCellularDataRoamingEnabledSync(napi_env env, napi_callback_i
     } else {
         return value;
     }
-    NAPI_CALL(env, napi_create_int32(env, dataRoamingEnabled, &value));
+    NAPI_CALL(env, napi_get_boolean(env, dataRoamingEnabled, &value));
     return value;
 }
 
