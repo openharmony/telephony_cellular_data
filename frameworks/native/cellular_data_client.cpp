@@ -45,6 +45,19 @@ CellularDataClient::CellularDataClient()
 CellularDataClient::~CellularDataClient()
 {
     UnregisterSimAccountCallback();
+    RemoveDeathRecipient();
+}
+
+void CellularDataClient::RemoveDeathRecipient()
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    if (proxy == nullptr) {
+        return;
+    }
+    sptr<IRemoteObject> serviceRemote = proxy_->AsObject();
+    if (serviceRemote != nullptr && deathRecipient_) {
+        serviceRemote->RemoveDeathRecipient(deathRecipient_);
+    }
 }
 
 bool CellularDataClient::IsValidSlotId(int32_t slotId)
