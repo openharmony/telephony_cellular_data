@@ -366,5 +366,15 @@ HWTEST_F(CellularDataClientTest, GetActiveApnName_002, TestSize.Level0)
     EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
 }
 
+/**
+ * @tc.number   RemoveDeathRecipient
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataClientTest, RemoveDeathRecipient, TestSize.Level0)
+{
+    EXPECT_NO_THROW(CellularDataClient::GetInstance().RemoveDeathRecipient());
+}
+
 } // namespace Telephony
 } // namespace OHOS
