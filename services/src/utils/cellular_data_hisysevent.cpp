@@ -20,6 +20,7 @@
 #include "type_traits"
 #include "apn_manager.h"
 #include "cellular_data_net_agent.h"
+#include "pdp_profile_data.h"
 
 namespace OHOS {
 namespace Telephony {

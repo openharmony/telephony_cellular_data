@@ -76,7 +76,7 @@ private:
     std::map<int32_t, sptr<ApnHolder>> apnIdApnHolderMap_;
     std::vector<sptr<ApnHolder>> sortedApnHolders_;
     std::mutex mutex_;
-    int32_t preferId_ = INVALID_PROFILE_ID;
+    int32_t preferId_ = -1;
 };
 } // namespace Telephony
 } // namespace OHOS
