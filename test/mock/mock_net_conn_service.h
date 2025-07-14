@@ -120,6 +120,8 @@ public:
         const std::string &ifName));
     MOCK_METHOD(int32_t, DelStaticIpv6Addr, (const std::string &ipAddr, const std::string &macAddr,
         const std::string &ifName));
+    MOCK_METHOD(int32_t, QueryTraceRoute, (const std::string &destination, int32_t maxJumpNumber,
+        int32_t packetsType, std::string &traceRouteInfo));
 };
 
 }  // namespace NetManagerStandard
