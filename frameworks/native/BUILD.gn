@@ -14,7 +14,6 @@ import("//build/config/components/idl_tool/idl.gni")
 import("//build/ohos.gni")
 
 SUBSYSTEM_DIR = "../.."
-TELEPHONY_DATA_DIR = "../../../telephony_data"
 config("cellular_data_util_config") {
   # header file path
   include_dirs = [
@@ -22,7 +21,6 @@ config("cellular_data_util_config") {
     "$SUBSYSTEM_DIR/interfaces/innerkits",
     "$SUBSYSTEM_DIR/services/include/apn_manager",
     "$SUBSYSTEM_DIR/services/include/common",
-    "$TELEPHONY_DATA_DIR/interfaces/innerkits/include",
   ]
 
   cflags = []
