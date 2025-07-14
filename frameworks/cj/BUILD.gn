@@ -37,10 +37,8 @@ ohos_shared_library("cj_cellular_data_ffi") {
     "core_service:tel_core_service_api",
     "hilog:libhilog",
     "init:libbegetutil",
-    "ipc:ipc_single",
     "napi:ace_napi",
     "napi:cj_bind_ffi",
-    "telephony_data:tel_telephony_data"
   ]
 
   innerapi_tags = [ "platformsdk" ]

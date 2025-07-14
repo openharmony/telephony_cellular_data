@@ -19,7 +19,6 @@
 #include "core_manager_inner.h"
 #include "core_service_client.h"
 #include "telephony_log_wrapper.h"
-#include "pdp_profile_data.h"
 
 static constexpr const char *SIM_ID = "simId";
 namespace OHOS {

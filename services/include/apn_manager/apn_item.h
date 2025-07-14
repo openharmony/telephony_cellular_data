@@ -21,11 +21,12 @@
 
 #include "refbase.h"
 
+#include "pdp_profile_data.h"
+
 #include "cellular_data_constant.h"
 
 namespace OHOS {
 namespace Telephony {
-struct PdpProfile;
 struct ApnActivateInfo {
     uint64_t actSuccTime;
     uint32_t duration;

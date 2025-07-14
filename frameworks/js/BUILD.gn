@@ -20,6 +20,7 @@ ohos_shared_library("data") {
   }
   branch_protector_ret = "pac_ret"
   include_dirs = [
+    "//third_party/node/src",
     "$SUBSYSTEM_DIR/cellular_data/include/utils",
     "$SUBSYSTEM_DIR/cellular_data/frameworks/js/napi/include",
     "$SUBSYSTEM_DIR/cellular_data/interfaces/innerkits",
@@ -36,9 +37,7 @@ ohos_shared_library("data") {
     "core_service:tel_core_service_api",
     "hilog:libhilog",
     "init:libbegetutil",
-    "ipc:ipc_single",
     "napi:ace_napi",
-    "telephony_data:tel_telephony_data"
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CellularDataJsApi\"",
