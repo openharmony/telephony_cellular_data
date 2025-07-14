@@ -292,17 +292,27 @@ std::vector<sptr<ApnHolder>> ApnManager::GetSortApnHolder() const
     return sortedApnHolders_;
 }
 
+int32_t ApnManager::PushApnItem(int32_t count, sptr<ApnItem> extraApnItem)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    allApnItem_.clear();
+    allApnItem_.push_back(extraApnItem);
+    return ++count;
+}
+
 int32_t ApnManager::CreateAllApnItemByDatabase(int32_t slotId)
 {
     int32_t count = 0;
+    sptr<ApnItem> extraApnItem = ApnItem::MakeDefaultApn("default");
     if (TELEPHONY_EXT_WRAPPER.createAllApnItemExt_) {
-        sptr<ApnItem> extraApnItem = ApnItem::MakeDefaultApn("default");
         if (TELEPHONY_EXT_WRAPPER.createAllApnItemExt_(slotId, extraApnItem)) {
-            std::lock_guard<std::mutex> lock(mutex_);
-            allApnItem_.clear();
-            allApnItem_.push_back(extraApnItem);
-            return ++count;
+            return PushApnItem(count, extraApnItem);
         }
+    }
+    if (TELEPHONY_EXT_WRAPPER.createDcApnItemExt_ &&
+        TELEPHONY_EXT_WRAPPER.createDcApnItemExt_(slotId, extraApnItem)) {
+        TELEPHONY_LOGI("create extra apn item");
+        return PushApnItem(count, extraApnItem);
     }
     std::u16string operatorNumeric;
     CoreManagerInner::GetInstance().GetSimOperatorNumeric(slotId, operatorNumeric);

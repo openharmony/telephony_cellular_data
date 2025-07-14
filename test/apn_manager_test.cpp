@@ -24,6 +24,7 @@
 #include "gtest/gtest.h"
 #include "tel_event_handler.h"
 #include "pdp_profile_data.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1695,6 +1696,35 @@ HWTEST_F(ApnManagerTest, GetPreferId_001, TestSize.Level0)
     int32_t slotId = 123;
     auto result = apnManager->GetPreferId(slotId);
     EXPECT_EQ(result, false);
+}
+
+bool CreateDcApnItemExtMock(int32_t slotId, sptr<ApnItem> &apnItem)
+{
+    return true;
+}
+
+/**
+ * @tc.number   ApnItem_CreateAllApnItemByDatabaseTest_001
+ * @tc.name     test create dc apn item scene
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, ApnItem_CreateAllApnItemByDatabaseTest_001, TestSize.Level0)
+{
+    TELEPHONY_EXT_WRAPPER.createAllApnItemExt_ = nullptr;
+    TELEPHONY_EXT_WRAPPER.createAllApnItemExt_ = CreateDcApnItemExtMock;
+    int32_t result = apnManager->CreateAllApnItemByDatabase(0);
+    EXPECT_EQ(result, 1);
+}
+
+/**
+ * @tc.number   ApnItem_CreateAllApnItemByDatabaseTest_002
+ * @tc.name     test create normal apn item
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, ApnItem_CreateAllApnItemByDatabaseTest_002, TestSize.Level0)
+{
+    int32_t result = apnManager->CreateAllApnItemByDatabase(0);
+    EXPECT_EQ(result, 1);
 }
 } // namespace Telephony
 } // namespace OHOS
