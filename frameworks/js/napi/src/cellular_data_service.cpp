@@ -33,7 +33,6 @@
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
 #include "data_service_ext_wrapper.h"
-#include "pdp_profile_data.h"
 
 namespace OHOS {
 namespace Telephony {
