@@ -54,6 +54,7 @@
 #include "cellular_data_constant.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
+#include "pdp_profile_data.h"
 
 namespace OHOS {
 namespace Telephony {

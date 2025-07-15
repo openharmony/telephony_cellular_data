@@ -37,6 +37,7 @@
 #include "telephony_permission.h"
 #include "ipc_skeleton.h"
 #include "connection_retry_policy.h"
+#include "pdp_profile_data.h"
 namespace OHOS {
 namespace Telephony {
 using namespace AppExecFwk;

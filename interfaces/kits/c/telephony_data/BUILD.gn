@@ -44,6 +44,8 @@ ohos_shared_library("telephony_data") {
     "c_utils:utils",
     "core_service:libtel_common",
     "hilog:libhilog",
+    "ipc:ipc_single",
+    "telephony_data:tel_telephony_data",
   ]
 
   defines = [
