@@ -677,24 +677,8 @@ bool CellularDataHandler::CheckApnState(sptr<ApnHolder> &apnHolder)
     }
     std::vector<sptr<ApnItem>> matchedApns = apnManager_->FilterMatchedApns(apnHolder->GetApnType(), slotId_);
     if (matchedApns.empty()) {
-#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
-        sptr<ApnItem> extraApnItem = ApnItem::MakeDefaultApn("default");
-        if (TELEPHONY_EXT_WRAPPER.createDcApnItemExt_ &&
-            TELEPHONY_EXT_WRAPPER.createDcApnItemExt_(slotId_, extraApnItem)) {
-            TELEPHONY_LOGI("Slot%{public}d: create extra apn item", slotId_);
-            if (extraApnItem == nullptr) {
-                TELEPHONY_LOGE("Slot%{public}d: AttemptEstablishDataConnection:matchedApns is empty", slotId_);
-                return false;
-            }
-            matchedApns.push_back(extraApnItem);
-        } else {
-            TELEPHONY_LOGE("Slot%{public}d: AttemptEstablishDataConnection:matchedApns is empty", slotId_);
-            return false;
-        }
-#else
         TELEPHONY_LOGE("Slot%{public}d: AttemptEstablishDataConnection:matchedApns is empty", slotId_);
         return false;
-#endif
     }
     apnHolder->SetAllMatchedApns(matchedApns);
     return true;
