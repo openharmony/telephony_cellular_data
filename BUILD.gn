@@ -12,6 +12,23 @@
 # limitations under the License.
 import("//build/ohos.gni")
 
+declare_args() {
+  telephony_cellular_data_hicollie_able = true
+  if (defined(global_parts_info) &&
+      !defined(global_parts_info.hiviewdfx_hicollie)) {
+    telephony_cellular_data_hicollie_able = false
+  }
+}
+
+telephony_extra_defines = []
+
+if (defined(global_parts_info) &&
+    defined(global_parts_info.telephony_telephony_enhanced)) {
+  telephony_extra_defines += [ "OHOS_BUILD_ENABLE_TELEPHONY_EXT" ]
+  telephony_extra_defines += [ "OHOS_BUILD_ENABLE_TELEPHONY_VSIM" ]
+}
+
+
 TELEPHONY_EXT_WRAPPER_ROOT = "services/telephony_ext_wrapper"
 DATA_SERVICE_EXT_WRAPPER_ROOT = "services/data_service_ext_wrapper"
 
@@ -120,7 +137,7 @@ ohos_shared_library("tel_cellular_data") {
     defines += [ "ABILITY_POWER_SUPPORT" ]
   }
 
-  if (telephony_hicollie_able) {
+  if (telephony_cellular_data_hicollie_able) {
     external_deps += [ "hicollie:libhicollie" ]
     defines += [ "HICOLLIE_ENABLE" ]
   }
@@ -240,7 +257,7 @@ ohos_static_library("tel_cellular_data_static") {
     defines += [ "ABILITY_POWER_SUPPORT" ]
   }
 
-  if (telephony_hicollie_able) {
+  if (telephony_cellular_data_hicollie_able) {
     external_deps += [ "hicollie:libhicollie" ]
     defines += [ "HICOLLIE_ENABLE" ]
   }
