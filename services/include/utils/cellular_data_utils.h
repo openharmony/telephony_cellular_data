@@ -42,6 +42,8 @@ public:
 private:
     CellularDataUtils() = default;
     ~CellularDataUtils() = default;
+    static bool ConvertStrToInt(const std::string& str, int32_t& value);
+    static bool ConvertStrToUint(const std::string& str, uint8_t& value);
 };
 } // namespace Telephony
 } // namespace OHOS
