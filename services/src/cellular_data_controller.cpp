@@ -245,7 +245,7 @@ void CellularDataController::RegisterEvents()
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_NV_REFRESH_FINISHED, nullptr);
     
     if (slotId_ == 0) {
-        sptr<NetworkSearchCallback> networkSearchCallback = std::make_unique<NetworkSearchCallback>().release();
+        sptr<NetworkSearchCallback> networkSearchCallback = sptr<NetworkSearchCallback>::MakeSptr();
         if (networkSearchCallback != nullptr) {
             coreInner.RegisterCellularDataObject(networkSearchCallback);
         } else {
