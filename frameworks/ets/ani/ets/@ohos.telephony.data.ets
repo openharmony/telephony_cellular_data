@@ -36,7 +36,7 @@ export default namespace data {
   export function getCellularDataState(callback: AsyncCallback<DataConnectState>): void {
     let p1 = taskpool.execute(nativeGetCellularDataState)
     p1.then((content: NullishType) => {
-        callback(new BusinessError(), (content as int) as DataConnectState);
+        callback(new BusinessError(), content as DataConnectState);
     }, (err: BusinessError): void => {
         callback(err, DataConnectState.DATA_STATE_UNKNOWN);
     });
@@ -46,7 +46,7 @@ export default namespace data {
     return new Promise<DataConnectState>((resolve, reject) => {
       let p = taskpool.execute(nativeGetCellularDataState)
       p.then((e: NullishType) => {
-          let r = (e as int) as DataConnectState
+          let r = e as DataConnectState
           resolve(r)
       }).catch((e: Error): void => {
           reject(e)
