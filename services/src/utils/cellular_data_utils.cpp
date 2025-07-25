@@ -17,6 +17,7 @@
 
 #include "telephony_common_utils.h"
 #include "telephony_log_wrapper.h"
+#include <charconv>
 
 namespace OHOS {
 namespace Telephony {
@@ -43,7 +44,7 @@ std::vector<AddressInfo> CellularDataUtils::ParseIpAddr(const std::string &addre
             ipInfo.prefixLen = IPV6_BIT;
         }
         if ((ipData.size() >= VALID_IP_SIZE) && IsValidDecValue(ipData[1].c_str())) {
-            ipInfo.prefixLen = std::stoi(ipData[1].c_str());
+            ConvertStrToUint(ipData[1].c_str(), ipInfo.prefixLen);
         }
         ipInfoArray.push_back(ipInfo);
     }
@@ -120,7 +121,9 @@ int32_t CellularDataUtils::GetPrefixLen(const std::vector<std::string> &netmask,
         if (!IsValidDecValue(netmask[i].c_str())) {
             break;
         }
-        int32_t maskValue = (std::stoi(netmask[i].c_str()) & 0x00FF);
+        int32_t value = 0;
+        ConvertStrToInt(netmask[i].c_str(), value);
+        int32_t maskValue = (value & 0x00FF);
         if (maskValue == 0) {
             break;
         }
@@ -203,6 +206,32 @@ std::string CellularDataUtils::ConvertRadioTechToRadioName(const int32_t radioTe
             break;
     }
     return radioName;
+}
+
+bool CellularDataUtils::ConvertStrToInt(const std::string& str, int32_t& value)
+{
+    if (str.empty()) {
+        return false;
+    }
+    auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), value, 10);  // 10: 十进制
+    bool succ = ec == std::errc{} && ptr == str.data() + str.size();
+    if (!succ) {
+        TELEPHONY_LOGE("ConvertStrToInt failed: str: %{public}s", str.c_str());
+    }
+    return succ;
+}
+			 
+bool CellularDataUtils::ConvertStrToUint(const std::string& str, uint8_t& value)
+{
+    if (str.empty()) {
+        return false;
+    }
+    auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), value, 10);  // 10: 十进制
+    bool succ = ec == std::errc{} && ptr == str.data() + str.size();
+    if (!succ) {
+        TELEPHONY_LOGE("ConvertStrToInt failed: str: %{public}s", str.c_str());
+    }
+    return succ;
 }
 } // namespace Telephony
 } // namespace OHOS
