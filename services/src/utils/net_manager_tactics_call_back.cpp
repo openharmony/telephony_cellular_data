@@ -34,8 +34,8 @@ int32_t NetManagerTacticsCallBack::NetStrategySwitch(const std::string &simId, b
         return CELLULAR_DATA_INVALID_PARAM;
     }
     int32_t tempNetSimId = 0;
-	ConvertStrToInt(simId, tempNetSimId);
-	const int32_t netSimId = tempNetSimId;
+    ConvertStrToInt(simId, tempNetSimId);
+    const int32_t netSimId = tempNetSimId;
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     for (int32_t  i = 0; i < SIM_SLOT_COUNT; ++i) {
         IccAccountInfo accountInfo;
