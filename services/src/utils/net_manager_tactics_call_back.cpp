@@ -20,6 +20,7 @@
 #include "core_manager_inner.h"
 #include "telephony_common_utils.h"
 #include "telephony_log_wrapper.h"
+#include <charconv>
 
 namespace OHOS {
 namespace Telephony {
@@ -32,7 +33,9 @@ int32_t NetManagerTacticsCallBack::NetStrategySwitch(const std::string &simId, b
     if (!IsValidDecValue(simId)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    const int32_t netSimId = std::stoi(simId);
+    int32_t tempNetSimId = 0;
+	ConvertStrToInt(simId, tempNetSimId);
+	const int32_t netSimId = tempNetSimId;
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     for (int32_t  i = 0; i < SIM_SLOT_COUNT; ++i) {
         IccAccountInfo accountInfo;
@@ -48,6 +51,19 @@ int32_t NetManagerTacticsCallBack::NetStrategySwitch(const std::string &simId, b
     }
     TELEPHONY_LOGI("StrategySwitch fail[%{public}s, %{public}d]", simId.c_str(), enable);
     return CELLULAR_DATA_INVALID_PARAM;
+}
+
+bool NetManagerTacticsCallBack::ConvertStrToInt(const std::string& str, int32_t& value)
+{
+    if (str.empty()) {
+        return false;
+    }
+    auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), value, 10);  // 10: 十进制
+    bool succ = ec == std::errc{} && ptr == str.data() + str.size();
+    if (!succ) {
+        TELEPHONY_LOGE("ConvertStrToInt failed: str: %{public}s", str.c_str());
+    }
+    return succ;
 }
 } // Telephony
 } // OHOS
