@@ -54,6 +54,7 @@ int32_t NetManagerCallBack::ReleaseNetwork(const NetManagerStandard::NetRequest 
     for (const auto &netCap : netrequest.netCaps) {
         request.capability |= 1L << netCap;
     }
+    request.uid = netrequest.uid;
     request.ident = netrequest.ident;
     int32_t result = DelayedRefSingleton<CellularDataService>::GetInstance().RemoveUid(request);
     if (result != static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)) {
