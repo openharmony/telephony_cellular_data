@@ -51,7 +51,7 @@ int32_t NetManagerCallBack::ReleaseNetwork(const NetManagerStandard::NetRequest 
         return CELLULAR_DATA_INVALID_PARAM;
     }
     NetRequest request;
-    for (const auto &netCap : netCaps) {
+    for (const auto &netCap : netrequest.netCaps) {
         request.capability |= 1L << netCap;
     }
     request.ident = netrequest.ident;
