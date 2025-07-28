@@ -46,7 +46,7 @@ int32_t NetManagerCallBack::RequestNetwork(const std::string &ident,
 
 int32_t NetManagerCallBack::ReleaseNetwork(const NetManagerStandard::NetRequest &netrequest)
 {
-    if (netCaps.empty()) {
+    if (netrequest.netCaps.empty()) {
         TELEPHONY_LOGE("netCaps is empty[%{public}s]", netrequest.ident.c_str());
         return CELLULAR_DATA_INVALID_PARAM;
     }
