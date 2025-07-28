@@ -61,14 +61,14 @@ struct NetSupplier {
     int32_t regState = -1;
 };
 enum RegisterType {
-    UNKOWN,
+    RELEASE,
     REGISTER,
     REQUEST
 };
 struct NetRequest {
     uint64_t capability = 0;
     std::string ident = "";
-    int32_t registerType = UNKOWN;
+    int32_t registerType = RELEASE;
     uint64_t bearTypes = 0;
     uint32_t uid = 0;
 };

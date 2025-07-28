@@ -44,18 +44,23 @@ int32_t NetManagerCallBack::RequestNetwork(const std::string &ident,
     return result;
 }
 
-int32_t NetManagerCallBack::ReleaseNetwork(const std::string &ident, const std::set<NetCap> &netCaps)
+int32_t NetManagerCallBack::ReleaseNetwork(const NetManagerStandard::NetRequest &netrequest)
 {
     if (netCaps.empty()) {
-        TELEPHONY_LOGI("netCaps is empty[%{public}s]", ident.c_str());
+        TELEPHONY_LOGE("netCaps is empty[%{public}s]", netrequest.ident.c_str());
         return CELLULAR_DATA_INVALID_PARAM;
     }
     NetRequest request;
     for (const auto &netCap : netCaps) {
         request.capability |= 1L << netCap;
     }
-    request.ident = ident;
-    int32_t result = DelayedRefSingleton<CellularDataService>::GetInstance().ReleaseNet(request);
+    request.ident = netrequest.ident;
+    int32_t result = DelayedRefSingleton<CellularDataService>::GetInstance().RemoveUid(request);
+    if (result != static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)) {
+        TELEPHONY_LOGE("RemoveUid Request Fail");
+        return result;
+    }
+    result = DelayedRefSingleton<CellularDataService>::GetInstance().ReleaseNet(request);
     return result;
 }
 
@@ -68,17 +73,6 @@ int32_t NetManagerCallBack::AddRequest(const NetManagerStandard::NetRequest &net
     }
     request.uid = netrequest.uid;
     return DelayedRefSingleton<CellularDataService>::GetInstance().AddUid(request);
-}
-
-int32_t NetManagerCallBack::RemoveRequest(const NetManagerStandard::NetRequest &netrequest)
-{
-    NetRequest request;
-    request.ident = netrequest.ident;
-    for (const auto &netCap : netrequest.netCaps) {
-        request.capability |= 1L << netCap;
-    }
-    request.uid = netrequest.uid;
-    return DelayedRefSingleton<CellularDataService>::GetInstance().RemoveUid(request);
 }
 
 } // namespace Telephony
