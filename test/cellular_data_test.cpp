@@ -1868,7 +1868,7 @@ HWTEST_F(CellularDataTest, RequestNetwork_002, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, ReleaseNetwork_001, TestSize.Level3)
 {
-    NetManagerStandard::NetRequest request
+    NetManagerStandard::NetRequest request;
     request.ident = "testIdent";
     int32_t result = netAgent.callBack_->ReleaseNetwork(request);
     ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
@@ -1881,7 +1881,7 @@ HWTEST_F(CellularDataTest, ReleaseNetwork_001, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, ReleaseNetwork_002, TestSize.Level3)
 {
-    NetManagerStandard::NetRequest request
+    NetManagerStandard::NetRequest request;
     request.ident = "testIdent";
     request.netCaps = { NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET };
     int32_t result = netAgent.callBack_->ReleaseNetwork(request);
