@@ -24,6 +24,7 @@ using namespace NetManagerStandard;
 class NetManagerTacticsCallBack : public NetPolicyCallbackStub {
 private:
     int32_t NetStrategySwitch(const std::string &simId, bool enable) override;
+    bool ConvertStrToInt(const std::string& str, int32_t& value);
 };
 } // Telephony
 } // OHOS
