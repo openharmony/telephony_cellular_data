@@ -123,7 +123,7 @@ int32_t CellularDataUtils::GetPrefixLen(const std::vector<std::string> &netmask,
         }
         int32_t value = 0;
         ConvertStrToInt(netmask[i].c_str(), value);
-        int32_t maskValue = (value & 0x00FF);
+        int32_t maskValue = ((static_cast<uint32_t>(value)) & 0x00FF);
         if (maskValue == 0) {
             break;
         }
