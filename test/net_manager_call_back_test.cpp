@@ -12,9 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#define private public
-#define protected public
-
 #include "gtest/gtest.h"
 #include "cellular_data_error.h"
 #include "net_all_capabilities.h"
