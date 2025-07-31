@@ -134,23 +134,39 @@ struct ApnInfo : public Parcelable {
 
     static ApnInfo* Unmarshalling(Parcel &parcel)
     {
-        ApnInfo* param = new ApnInfo();
-        if (param == nullptr || !param->ReadFromParcel(parcel)) {
-            param = nullptr;
+        std::unique_ptr<ApnInfo> param = std::make_unique<ApnInfo>();
+        if (!param->ReadFromParcel(parcel)) {
+            return nullptr;
         }
-        return param;
+        return param.release();
     };
 
     bool ReadFromParcel(Parcel &parcel)
     {
-        parcel.ReadString16(apnName);
-        parcel.ReadString16(apn);
-        parcel.ReadString16(mcc);
-        parcel.ReadString16(mnc);
-        parcel.ReadString16(user);
-        parcel.ReadString16(type);
-        parcel.ReadString16(proxy);
-        parcel.ReadString16(mmsproxy);
+        if (!parcel.ReadString16(apnName)) {
+            return false;
+        }
+        if (!parcel.ReadString16(apn)) {
+            return false;
+        }
+        if (!parcel.ReadString16(mcc)) {
+            return false;
+        }
+        if (!parcel.ReadString16(mnc)) {
+            return false;
+        }
+        if (!parcel.ReadString16(user)) {
+            return false;
+        }
+        if (!parcel.ReadString16(type)) {
+            return false;
+        }
+        if (!parcel.ReadString16(proxy)) {
+            return false;
+        }
+        if (!parcel.ReadString16(mmsproxy)) {
+            return false;
+        }
         return true;
     };
 };
