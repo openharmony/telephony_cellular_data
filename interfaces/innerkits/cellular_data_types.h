@@ -135,9 +135,6 @@ struct ApnInfo : public Parcelable {
     static ApnInfo* Unmarshalling(Parcel &parcel)
     {
         std::unique_ptr<ApnInfo> param = std::make_unique<ApnInfo>();
-        if (param == nullptr) {
-            return nullptr;
-        }
         if (!param->ReadFromParcel(parcel)) {
             return nullptr;
         }
