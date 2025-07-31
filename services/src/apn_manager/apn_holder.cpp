@@ -98,6 +98,12 @@ void ApnHolder::RemoveUid(uint32_t uid)
     }
 }
 
+void ApnHolder::ReleaseAllUids()
+{
+    std::unique_lock<std::shared_mutex> lock(reqUidsMutex_);
+    reqUids_.clear();
+}
+
 void ApnHolder::SetApnState(ApnProfileState state)
 {
     if (apnState_ != state) {

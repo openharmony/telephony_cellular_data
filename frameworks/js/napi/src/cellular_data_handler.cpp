@@ -1538,6 +1538,7 @@ void CellularDataHandler::ReleaseAllNetworkRequest()
             continue;
         }
         apnHolder->ReleaseAllCellularData();
+        apnHolder->ReleaseAllUids();
     }
 }
 

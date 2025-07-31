@@ -66,6 +66,7 @@ public:
         bool roamingState);
     void AddUid(uint32_t uid);
     void RemoveUid(uint32_t uid);
+    void ReleaseAllUids();
     HasSystemUse GetUidStatus() const;
     void SetApnBadState(bool isBad);
     bool IsReqUidsEmpty();
