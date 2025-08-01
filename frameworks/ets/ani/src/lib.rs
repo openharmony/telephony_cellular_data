@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+mod bridge;
 mod cellulardata;
 mod wrapper;
 
@@ -24,5 +25,14 @@ ani_constructor!(
         "nativeDisableCellularData": cellulardata::disable_cellular_data_sync,
         "nativeGetDefaultCellularDataSlotIdSync": cellulardata::get_default_cellular_data_slot_id_sync,
         "nativeGetCellularDataState": cellulardata::get_cellular_data_state,
+        "nativeDisableCellularDataRoaming": cellulardata::disable_cellular_data_roaming_sync,
+        "nativeEnableCellularDataRoaming": cellulardata::enable_cellular_data_roaming_sync,
+        "nativeIsCellularDataRoamingEnabled": cellulardata::is_cellular_data_roaming_enabled_sync,
+        "nativeSetDefaultCellularDataSlotId": cellulardata::set_default_cellular_data_slot_id_sync,
+        "nativeGetCellularDataFlowType": cellulardata::get_cellular_data_flow_type_sync,
+        "nativeSetPreferredApn": cellulardata::set_preferred_apn_sync,
+        "nativeGetDefaultCellularDataSimId": cellulardata::get_default_cellular_data_sim_id_sync,
+        "nativeQueryApnIds": cellulardata::query_apn_ids_sync,
+        "nativeQueryAllApns": cellulardata::query_all_apns_sync,
     ]
 );
