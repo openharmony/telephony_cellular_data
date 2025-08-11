@@ -73,6 +73,7 @@ ohos_source_set("cellulardata_interface_stub") {
     "core_service:libtel_common",
     "core_service:tel_core_service_api",
     "hilog:libhilog",
+    "ipc:ipc_single",
     "samgr:samgr_proxy",
     "telephony_data:tel_telephony_data",
     "c_utils:utils",
