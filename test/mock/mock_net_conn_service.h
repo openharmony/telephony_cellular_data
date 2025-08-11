@@ -122,6 +122,45 @@ public:
         const std::string &ifName));
     MOCK_METHOD(int32_t, QueryTraceRoute, (const std::string &destination, int32_t maxJumpNumber,
         int32_t packetsType, std::string &traceRouteInfo));
+
+public:
+    int32_t SetPacFileUrl(const std::string &pacUrl) override
+    {
+        return 0;
+    }
+
+    int32_t SetProxyMode(const int mode) override
+    {
+        return 0;
+    }
+
+    int32_t GetProxyMode(int &mode) override
+    {
+        mode = 0;
+        return 0;
+    }
+
+    int32_t GetPacFileUrl(std::string &pacUrl) override
+    {
+        pacUrl = "";
+        return 0;
+    }
+
+    int32_t FindProxyForURL(const std::string &url, const std::string &host, std::string &proxy) override
+    {
+        proxy = "";
+        return 0;
+    }
+
+    int32_t RegisterNetPacFileUrlInterfaceCallback(const sptr<INetPacFileUrlCallback> callback) override
+    {
+        return 0;
+    }
+
+    int32_t UnregisterNetPacFileUrlInterfaceCallback(const sptr<INetPacFileUrlCallback> callback) override
+    {
+        return 0;
+    }
 };
 
 }  // namespace NetManagerStandard
