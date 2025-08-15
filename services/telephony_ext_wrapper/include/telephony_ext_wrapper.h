@@ -55,6 +55,8 @@ public:
     typedef void (*DynamicLoadInit)(void);
     typedef void (*NotifyReqCellularData)(bool isReqCellularData);
     typedef bool (*CREATE_DC_APN_ITEM_EXT)(int32_t slotId, sptr<ApnItem> &apnItem);
+    using IsVirtualModemConnectedType = bool(*)();
+    using IsDcCellularDataAllowedType = bool(*)();
 
     DATA_EDN_SELF_CURE dataEndSelfCure_ = nullptr;
     IS_APN_ALLOWED_ACTIVE isApnAllowedActive_ = nullptr;
@@ -75,6 +77,8 @@ public:
     DynamicLoadInit dynamicLoadInit_ = nullptr;
     NotifyReqCellularData dynamicLoadNotifyReqCellularDataStatus_ = nullptr;
     CREATE_DC_APN_ITEM_EXT createDcApnItemExt_ = nullptr;
+    IsVirtualModemConnectedType isVirtualModemConnected_ = nullptr;
+    IsDcCellularDataAllowedType isDcCellularDataAllowed_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
@@ -95,6 +99,8 @@ private:
     void InitJudgeOtherRequestHolding();
     void InitTelephonyExtWrapperForDynamicLoad();
     void InitCreateDcApnItemExt();
+    void InitIsVirtualModemConnected();
+    void InitIsDcCellularDataAllowed();
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()

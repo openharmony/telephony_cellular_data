@@ -2295,6 +2295,10 @@ void CellularDataHandler::HandleDBSettingEnableChanged(const AppExecFwk::InnerEv
         TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ is null.", slotId_);
         return;
     }
+    if (TELEPHONY_EXT_WRAPPER.isVirtualModemConnected_ && TELEPHONY_EXT_WRAPPER.isVirtualModemConnected_()) {
+        TELEPHONY_LOGI("dc is connected, do nothing");
+        return;
+    }
     bool dataEnabled = true;
     dataSwitchSettings_->QueryUserDataStatus(dataEnabled);
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
