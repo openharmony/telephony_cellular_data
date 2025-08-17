@@ -2526,12 +2526,6 @@ std::shared_ptr<CellularDataStateMachine> CellularDataHandler::CheckForCompatibl
     std::vector<sptr<ApnItem>> dunApnList;
     if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DUN) {
         apnManager_->FetchDunApns(dunApnList, slotId_);
-    } else if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_BIP) {
-        sptr<ApnItem> bipApn = nullptr;
-        apnManager_->GetBipApnItem(bipApn);
-        if (bipApn != nullptr) {
-            return potentialDc;
-        }
     }
     auto allDCs = connectionManager_->GetAllConnectionMachine();
     bool isRoaming = false;

@@ -55,7 +55,6 @@ public:
     static int32_t FindApnTypeByApnName(const std::string &apnName);
     void ClearAllApnBad();
     static uint64_t FindCapabilityByApnId(int32_t apnId);
-    void GetBipApnItem(sptr<ApnItem> &bipApn);
 
 private:
     void ReportApnInfo(int32_t slotId, PdpProfile &apnData);
