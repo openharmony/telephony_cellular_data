@@ -625,12 +625,6 @@ bool ApnManager::ResetApns(int32_t slotId)
 
 void ApnManager::FetchBipApns(std::vector<sptr<ApnItem>> &matchApnItemList)
 {
-    sptr<ApnItem> bipApn = nullptr;
-    GetBipApnItem(bipApn);
-    if (bipApn != nullptr) {
-        matchApnItemList.push_back(bipApn);
-        return;
-    }
     for (const sptr<ApnItem> &apnItem : allApnItem_) {
         if (apnItem->CanDealWithType(DATA_CONTEXT_ROLE_BIP)) {
             matchApnItemList.push_back(apnItem);
@@ -762,18 +756,6 @@ uint64_t ApnManager::FindCapabilityByApnId(int32_t apnId)
             return NetManagerStandard::NetCap::NET_CAPABILITY_SNSSAI6;
         default:
             return NetManagerStandard::NetCap::NET_CAPABILITY_END;
-    }
-}
-
-void ApnManager::GetBipApnItem(sptr<ApnItem> &bipApn)
-{
-    for (const sptr<ApnItem> &apnItem : allApnItem_) {
-        for (auto apnType : apnItem->GetApnTypes()) {
-            if (apnType == DATA_CONTEXT_ROLE_BIP) {
-                bipApn = apnItem;
-                return;
-            }
-        }
     }
 }
 
