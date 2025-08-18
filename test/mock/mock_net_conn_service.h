@@ -129,14 +129,14 @@ public:
         return 0;
     }
 
-    int32_t SetProxyMode(const int mode) override
+    int32_t SetProxyMode(const OHOS::NetManagerStandard::ProxyModeType mode) override
     {
         return 0;
     }
 
-    int32_t GetProxyMode(int &mode) override
+    int32_t GetProxyMode(OHOS::NetManagerStandard::ProxyModeType &mode) override
     {
-        mode = 0;
+        mode = OHOS::NetManagerStandard::ProxyModeType::PROXY_MODE_OFF;
         return 0;
     }
 
@@ -149,16 +149,6 @@ public:
     int32_t FindProxyForURL(const std::string &url, const std::string &host, std::string &proxy) override
     {
         proxy = "";
-        return 0;
-    }
-
-    int32_t RegisterNetPacFileUrlInterfaceCallback(const sptr<INetPacFileUrlCallback> callback) override
-    {
-        return 0;
-    }
-
-    int32_t UnregisterNetPacFileUrlInterfaceCallback(const sptr<INetPacFileUrlCallback> callback) override
-    {
         return 0;
     }
 };
