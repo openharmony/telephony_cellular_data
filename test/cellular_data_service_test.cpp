@@ -543,7 +543,7 @@ HWTEST_F(CellularDataServiceTest, CellularDataService_ReleaseNet_002, TestSize.L
     NetRequest request;
     std::string str = "simId" + std::to_string(1);
     request.ident = str;
-    service->slotIdSimId[0] = 1;
+    service->slotIdSimId_[0] = 1;
     ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->ReleaseNet(request));
     service->cellularDataControllers_.clear();
 }

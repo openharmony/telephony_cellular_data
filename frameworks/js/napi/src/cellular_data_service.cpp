@@ -781,7 +781,7 @@ std::shared_ptr<CellularDataController> CellularDataService::GetCellularDataCont
         }
     }
     if (slotId < 0) {
-        return;
+        return nullptr;
     }
     std::lock_guard<std::mutex> guard(mapLock_);
     std::map<int32_t, std::shared_ptr<CellularDataController>>::const_iterator item =
