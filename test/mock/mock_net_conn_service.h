@@ -122,35 +122,11 @@ public:
         const std::string &ifName));
     MOCK_METHOD(int32_t, QueryTraceRoute, (const std::string &destination, int32_t maxJumpNumber,
         int32_t packetsType, std::string &traceRouteInfo));
-
-public:
-    int32_t SetPacFileUrl(const std::string &pacUrl) override
-    {
-        return 0;
-    }
-
-    int32_t SetProxyMode(const OHOS::NetManagerStandard::ProxyModeType mode) override
-    {
-        return 0;
-    }
-
-    int32_t GetProxyMode(OHOS::NetManagerStandard::ProxyModeType &mode) override
-    {
-        mode = OHOS::NetManagerStandard::ProxyModeType::PROXY_MODE_OFF;
-        return 0;
-    }
-
-    int32_t GetPacFileUrl(std::string &pacUrl) override
-    {
-        pacUrl = "";
-        return 0;
-    }
-
-    int32_t FindProxyForURL(const std::string &url, const std::string &host, std::string &proxy) override
-    {
-        proxy = "";
-        return 0;
-    }
+        MOCK_METHOD(int32_t, SetPacFileUrl, (const std::string &pacUrl));
+    MOCK_METHOD(int32_t, SetProxyMode, (const OHOS::NetManagerStandard::ProxyModeType mode));
+    MOCK_METHOD(int32_t, GetProxyMode, (OHOS::NetManagerStandard::ProxyModeType &mode));
+    MOCK_METHOD(int32_t, GetPacFileUrl, (std::string &pacUrl));
+    MOCK_METHOD(int32_t, FindProxyForURL, (const std::string &url, const std::string &host, std::string &proxy));
 };
 
 }  // namespace NetManagerStandard
