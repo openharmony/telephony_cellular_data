@@ -70,6 +70,8 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCellularData()
     InitSendApnNeedRetryInfo();
     InitJudgeOtherRequestHolding();
     InitCreateDcApnItemExt();
+    InitIsVirtualModemConnected();
+    InitIsDcCellularDataAllowed();
 }
 
 void TelephonyExtWrapper::InitJudgeOtherRequestHolding()
@@ -229,6 +231,28 @@ void TelephonyExtWrapper::InitCreateDcApnItemExt()
         return;
     }
     TELEPHONY_LOGI("telephony ext wrapper init CreateDcApnItemExt success");
+}
+
+void TelephonyExtWrapper::InitIsVirtualModemConnected()
+{
+    isVirtualModemConnected_ =
+        (IsDcCellularDataAllowedType)dlsym(telephonyExtWrapperHandle_, "IsVirtualModemConnected");
+    if (isVirtualModemConnected_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol IsVirtualModemConnected failed, error: %{public}s", dlerror());
+        return;
+    }
+    TELEPHONY_LOGI("telephony ext wrapper init IsVirtualModemConnected success");
+}
+
+void TelephonyExtWrapper::InitIsDcCellularDataAllowed()
+{
+    isDcCellularDataAllowed_ =
+        (IsDcCellularDataAllowedType)dlsym(telephonyExtWrapperHandle_, "IsDcCellularDataAllowed");
+    if (isDcCellularDataAllowed_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol IsDcCellularDataAllowed failed, error: %{public}s", dlerror());
+        return;
+    }
+    TELEPHONY_LOGI("telephony ext wrapper init IsDcCellularDataAllowed success");
 }
 } // namespace Telephony
 } // namespace OHOS
