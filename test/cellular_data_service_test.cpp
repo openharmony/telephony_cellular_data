@@ -509,5 +509,43 @@ HWTEST_F(CellularDataServiceTest, ReleaseNet_001, TestSize.Level1)
     ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service->RequestNet(request));
     ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service->ReleaseNet(request));
 }
+
+/**
+ * @tc.number   CellularDataService_ReleaseNet_001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, CellularDataService_ReleaseNet_001, TestSize.Level1)
+{
+    DataAccessToken token;
+    service->OnStart();
+    service->isInitSuccess_ = false;
+    NetRequest request;
+    request.ident = "simId2";
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->ReleaseNet(request));
+}
+
+/**
+ * @tc.number   CellularDataService_ReleaseNet_002
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, CellularDataService_ReleaseNet_002, TestSize.Level1)
+{
+    DataAccessToken token;
+    service->OnStart();
+    service->isInitSuccess_ = true;
+    service->cellularDataControllers_.clear();
+    std::shared_ptr<CellularDataController> cellularDataController = std::make_shared<CellularDataController>(0);
+    service->cellularDataControllers_.insert(
+        std::pair<int32_t, std::shared_ptr<CellularDataController>>(0, cellularDataController));
+
+    NetRequest request;
+    std::string str = "simId" + std::to_string(1);
+    request.ident = str;
+    service->slotIdSimId[0] = 1;
+    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->ReleaseNet(request));
+    service->cellularDataControllers_.clear();
+}
 } // namespace Telephony
 } // namespace OHOS
