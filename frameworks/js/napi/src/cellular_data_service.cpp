@@ -398,6 +398,9 @@ int32_t CellularDataService::ReleaseNet(const NetRequest &request)
     int32_t slotId = CoreManagerInner::GetInstance().GetSlotId(simId);
     std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
     if (cellularDataController == nullptr) {
+        cellularDataController = GetCellularDataControllerForce(simId);
+    }
+    if (cellularDataController == nullptr) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
     bool result = cellularDataController->ReleaseNet(request);
@@ -417,6 +420,9 @@ int32_t CellularDataService::RemoveUid(const NetRequest &request)
     int32_t simId = atoi(requestIdent.c_str());
     int32_t slotId = CoreManagerInner::GetInstance().GetSlotId(simId);
     std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
+    if (cellularDataController == nullptr) {
+        cellularDataController = GetCellularDataControllerForce(simId);
+    }
     if (cellularDataController == nullptr) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
@@ -460,6 +466,9 @@ int32_t CellularDataService::RequestNet(const NetRequest &request)
         return static_cast<int32_t>(RequestNetCode::REQUEST_FAILED);
     }
     int32_t slotId = CoreManagerInner::GetInstance().GetSlotId(simId);
+    if (slotId >= 0 && slotId <= MAX_SLOT_NUM) {
+        slotIdSimId_[slotId] = simId;
+    }
     std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
     if (cellularDataController == nullptr) {
         return CELLULAR_DATA_INVALID_PARAM;
@@ -745,6 +754,33 @@ std::shared_ptr<CellularDataController> CellularDataService::GetCellularDataCont
     if (slotId < 0 || !isInitSuccess_) {
         TELEPHONY_LOGE("Invalid slotId or Init is not success. slotId=%{public}d, isInitSuccess=%{public}d",
             slotId, (int32_t)isInitSuccess_);
+        return nullptr;
+    }
+    std::lock_guard<std::mutex> guard(mapLock_);
+    std::map<int32_t, std::shared_ptr<CellularDataController>>::const_iterator item =
+        cellularDataControllers_.find(slotId);
+    if (item == cellularDataControllers_.end() || item->second == nullptr) {
+        return nullptr;
+    }
+
+    return item->second;
+}
+
+std::shared_ptr<CellularDataController> CellularDataService::GetCellularDataControllerForce(int32_t simId)
+{
+    TELEPHONY_LOGI("GetCellularDataControllerForce, enter");
+    if (!isInitSuccess_) {
+        return nullptr;
+    }
+
+    int32_t slotId = -1;
+    for (int i = 0; i <= MAX_SLOT_NUM; i++) {
+        if (slotIdSimId_[i] == simId) {
+            slotId = i;
+            break;
+        }
+    }
+    if (slotId < 0) {
         return nullptr;
     }
     std::lock_guard<std::mutex> guard(mapLock_);

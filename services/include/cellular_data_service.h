@@ -113,6 +113,7 @@ private:
     void ClearCellularDataControllers();
     void AddCellularDataControllers(int32_t slotId, std::shared_ptr<CellularDataController> cellularDataController);
     std::shared_ptr<CellularDataController> GetCellularDataController(int32_t slotId);
+    std::shared_ptr<CellularDataController> GetCellularDataControllerForce(int32_t simId);
 
 private:
     std::map<int32_t, std::shared_ptr<CellularDataController>> cellularDataControllers_;
@@ -122,6 +123,7 @@ private:
     ServiceRunningState state_;
     std::mutex mapLock_;
     bool isInitSuccess_ = false;
+    int32_t slotIdSimId_[MAX_SLOT_NUM + 1] = {-1, -1, -1};
 };
 } // namespace Telephony
 } // namespace OHOS

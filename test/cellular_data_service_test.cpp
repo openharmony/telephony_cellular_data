@@ -509,5 +509,78 @@ HWTEST_F(CellularDataServiceTest, ReleaseNet_001, TestSize.Level1)
     ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service->RequestNet(request));
     ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service->ReleaseNet(request));
 }
+
+/**
+ * @tc.number   GetCellularDataControllerForce001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, GetCellularDataControllerForce001, TestSize.Level1)
+{
+    auto dataService = std::make_shared<CellularDataService>();
+    dataService->isInitSuccess_ = false;
+    std::shared_ptr<CellularDataController> cellularDataController = dataService->GetCellularDataControllerForce(0);
+    EXPECT_EQ(cellularDataController, nullptr);
+}
+
+/**
+ * @tc.number   GetCellularDataControllerForce002
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, GetCellularDataControllerForce002, TestSize.Level1)
+{
+    auto dataService = std::make_shared<CellularDataService>();
+    dataService->isInitSuccess_ = true;
+    std::shared_ptr<CellularDataController> cellularDataController = dataService->GetCellularDataControllerForce(0);
+    EXPECT_EQ(cellularDataController, nullptr);
+}
+
+/**
+ * @tc.number   GetCellularDataControllerForce003
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, GetCellularDataControllerForce003, TestSize.Level1)
+{
+    auto dataService = std::make_shared<CellularDataService>();
+    dataService->isInitSuccess_ = true;
+    dataService->slotIdSimId_[0] = 1;
+    std::shared_ptr<CellularDataController> cellularDataController = dataService->GetCellularDataControllerForce(1);
+    EXPECT_EQ(cellularDataController, nullptr);
+}
+
+/**
+ * @tc.number   GetCellularDataControllerForce004
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, GetCellularDataControllerForce004, TestSize.Level1)
+{
+    auto dataService = std::make_shared<CellularDataService>();
+    dataService->isInitSuccess_ = true;
+    dataService->slotIdSimId_[0] = 1;
+    std::shared_ptr<CellularDataController> controller = std::make_shared<CellularDataController>(0);
+    dataService->cellularDataControllers_.insert(
+        std::pair<int32_t, std::shared_ptr<CellularDataController>>(0, controller));
+    std::shared_ptr<CellularDataController> cellularDataController = dataService->GetCellularDataControllerForce(1);
+    EXPECT_NE(cellularDataController, nullptr);
+}
+
+/**
+ * @tc.number   GetCellularDataControllerForce005
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, GetCellularDataControllerForce005, TestSize.Level1)
+{
+    auto dataService = std::make_shared<CellularDataService>();
+    dataService->isInitSuccess_ = true;
+    dataService->slotIdSimId_[0] = 1;
+    dataService->cellularDataControllers_.insert(
+        std::pair<int32_t, std::shared_ptr<CellularDataController>>(0, nullptr));
+    std::shared_ptr<CellularDataController> cellularDataController = dataService->GetCellularDataControllerForce(1);
+    EXPECT_EQ(cellularDataController, nullptr);
+}
 } // namespace Telephony
 } // namespace OHOS
