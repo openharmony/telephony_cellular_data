@@ -174,3 +174,13 @@ pub fn query_all_apns_sync() -> Result<Vec<bridge::ApnInfo>, BusinessError> {
     }
     Ok(ret.into_iter().map(Into::into).collect())
 }
+
+#[ani_rs::native]
+pub fn get_active_apn_name_sync() -> Result<String, BusinessError> {
+    let mut ret = String::new();
+    let arkts_error = wrapper::ffi::getActiveApnNameSync(&mut ret);
+    if arkts_error.is_error() {
+        return Err(BusinessError::from(arkts_error));
+    }
+    Ok(ret)
+}
