@@ -34,5 +34,6 @@ ani_constructor!(
         "nativeGetDefaultCellularDataSimId": cellulardata::get_default_cellular_data_sim_id_sync,
         "nativeQueryApnIds": cellulardata::query_apn_ids_sync,
         "nativeQueryAllApns": cellulardata::query_all_apns_sync,
+        "nativeGetActiveApnName": cellulardata::get_active_apn_name_sync,
     ]
 );

@@ -82,6 +82,7 @@ pub mod ffi {
         fn getCellularDataFlowTypeSyn() -> i32;
         fn queryApnIdsSync(info: &ApnInfo, ret: &mut Vec<u32>) -> ArktsError;
         fn queryAllApnsSync(ret: &mut Vec<ApnInfo>) -> ArktsError;
+        fn getActiveApnNameSync(ret: &mut String) -> ArktsError;
     }
 }
 
