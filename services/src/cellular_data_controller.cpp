@@ -387,7 +387,7 @@ void CellularDataController::SystemAbilityStatusChangeListener::OnAddSystemAbili
 #ifdef BASE_POWER_IMPROVEMENT
                if (system::GetBoolParameter("const.vendor.ril.power.feature_tele_power", false)) {
                     handler_->SubscribeTelePowerEvent();
-               }
+                }
 #endif
             }
             break;
