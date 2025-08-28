@@ -23,7 +23,8 @@
             "SystemCapability.Telephony.CellularData"
         ],
         "features": [
-            "cellular_data_dynamic_start"
+            "cellular_data_dynamic_start",
+            "cellular_data_feature_base_power_improvement"
         ],
         "adapted_system_type": [
             "standard"

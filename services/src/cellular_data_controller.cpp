@@ -384,6 +384,11 @@ void CellularDataController::SystemAbilityStatusChangeListener::OnAddSystemAbili
             if (handler_ != nullptr) {
                 bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(handler_);
                 TELEPHONY_LOGI("subscribeResult = %{public}d", subscribeResult);
+#ifdef BASE_POWER_IMPROVEMENT
+               if (system::GetBoolParameter("const.vendor.ril.power.feature_tele_power", false)) {
+                    handler_->SubscribeTelePowerEvent();
+                }
+#endif
             }
             break;
         case DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID:
