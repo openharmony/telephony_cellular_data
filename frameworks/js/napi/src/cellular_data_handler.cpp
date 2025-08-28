@@ -1248,11 +1248,11 @@ void CellularDataHandler::SubscribeTelePowerEvent()
         strExitSubscriber_ = CreateCommonSubscriber(EXIT_STR_TELEPHONY_NOTIFY, CommonEventPriority::THIRD_PRIORITY);
     }
 
-    if(strEnterSubscriber_ != nullptr) {
+    if (strEnterSubscriber_ != nullptr) {
         bool enterStrSubRet = EventFwk::CommonEventManager::SubscribeCommonEvent(strEnterSubscriber_);
         TELEPHONY_LOGI("subscribeResult = %{public}d", enterStrSubRet);
     }
-    if(strExitSubscriber_ != nullptr) {
+    if (strExitSubscriber_ != nullptr) {
         bool exitStrSubRet = EventFwk::CommonEventManager::SubscribeCommonEvent(strExitSubscriber_);
         TELEPHONY_LOGI("subscribeResult = %{public}d", exitStrSubRet);
     }
