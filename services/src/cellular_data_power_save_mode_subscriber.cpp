@@ -42,7 +42,7 @@ void CellularDataPowerSaveModeSubscriber::HandleEnterStrEvent(std::string &actio
         if (powerSaveModeCellularDataHandler != nullptr) {
             int32_t ret = powerSaveModeCellularDataHandler->IsCellularDataEnabled(savedCellularDataStatus_);
             TELEPHONY_LOGI("Backup cellular status = %{public}d, ret = %{public}d", savedCellularDataStatus_, ret);
-            // ensure HandleDisconnectDataCompleteForMmsType reply event only in enter str mode 
+            // ensure HandleDisconnectDataCompleteForMmsType reply event only in enter str mode
             powerSaveFlag_ = true;
             powerSaveModeCellularDataHandler->SetCellularDataEnable(false);
         }
@@ -61,7 +61,7 @@ void CellularDataPowerSaveModeSubscriber::HandleExitStrEvent(std::string &action
         auto powerSaveModeCellularDataHandler = powerSaveModeCellularDataHandler_.lock();
         if (powerSaveModeCellularDataHandler != nullptr) {
             int32_t ret = powerSaveModeCellularDataHandler->SetCellularDataEnable(savedCellularDataStatus_);
-            TELEPHONY_LOGI("Resume cellular status %{public}d, ret = %{public}d",savedCellularDataStatus_, ret);
+            TELEPHONY_LOGI("Resume cellular status %{public}d, ret = %{public}d", savedCellularDataStatus_, ret);
         }
     } else {
         TELEPHONY_LOGI("Recv same msg in succession lastMsg:%{public}s", lastMsg.c_str());
@@ -81,4 +81,4 @@ bool CellularDataPowerSaveModeSubscriber::FinishTelePowerEvent()
     return replyRet;
 }
 }  // namespace Telephony
-}  // namespace OHOS
+}  // namespace OHOS
