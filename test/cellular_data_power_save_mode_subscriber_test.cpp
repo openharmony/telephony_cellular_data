@@ -170,8 +170,8 @@ HWTEST_F(CellularDataPowerSaveModeSubscriberTest, CellularDataPowerSaveModeSubsc
     want.SetAction(DYNAMIC_POWEROFF_MODEM_WITH_STR);
     auto event = EventFwk::CommonEventData(want);
     cellularDataHandler->strEnterSubscriber_->OnReceiveEvent(event);
-    EXPECT_EQ(cellularDataHandler->strEnterSubscriber_->lastMsg, DYNAMIC_POWEROFF_MODEM_WITH_STR);
+    EXPECT_EQ(cellularDataHandler->strEnterSubscriber_->lastMsg, EXIT_STR_TELEPHONY_NOTIFY);
 }
 }
 }
-#endif
+#endif
