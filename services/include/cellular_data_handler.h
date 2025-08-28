@@ -235,6 +235,7 @@ private:
     uint64_t defaultApnActTime_ = 0;
     uint64_t internalApnActTime_ = 0;
     int32_t retryCreateApnTimes_ = 0;
+
     using Fun = std::function<void(const AppExecFwk::InnerEvent::Pointer &event)>;
     std::map<uint32_t, Fun> eventIdMap_ {
         { RadioEvent::RADIO_PS_CONNECTION_ATTACHED,
