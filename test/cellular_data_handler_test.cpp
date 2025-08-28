@@ -20,6 +20,9 @@
 #include "common_event_support.h"
 #include "cellular_data_handler.h"
 #include "cellular_data_controller.h"
+#ifdef BASE_POWER_IMPROVEMENT
+#include "cellular_data_power_save_mode_subscriber.h"
+#endif
 
 namespace OHOS {
 namespace Telephony {
@@ -1159,5 +1162,40 @@ HWTEST_F(CellularDataHandlerTest, IsCellularDataEnabledTest001, Function | Mediu
     cellularDataHandler->dataSwitchSettings_->lastQryRet_ = TELEPHONY_ERR_SUCCESS;
     EXPECT_EQ(cellularDataHandler->IsCellularDataEnabled(isDataEnabled), TELEPHONY_ERR_SUCCESS);
 }
+
+/**
+@tc.number Telephony_HandleDisconnectDataCompleteForMmsType
+@tc.name HandleDisconnectDataCompleteForMmsType
+@tc.desc Function test
+*/
+#ifdef BASE_POWER_IMPROVEMENT
+HWTEST_F(CellularDataHandlerTest, HandleDisconnectDataCompleteForMmsTypeTest001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    EventFwk::MatchingSkills matchingSkills;
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, slotId);
+    cellularDataHandler->Init();
+    cellularDataHandler->SubscribeTelePowerEvent();
+    cellularDataHandler->strEnterSubscriber_->powerSaveFlag_ = true;
+    std::string apnType = DATA_CONTEXT_ROLE_MMS;
+    sptr<ApnHolder> apnHolder = new ApnHolder(apnType, slotId);
+    cellularDataHandler->HandleDisconnectDataCompleteForMmsType(apnHolder);
+    EXPECT_EQ(cellularDataHandler->strEnterSubscriber_->powerSaveFlag_, false);
+}
+
+HWTEST_F(CellularDataHandlerTest, HandleDisconnectDataCompleteForMmsTypeTest002, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    EventFwk::MatchingSkills matchingSkills;
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, slotId);
+    cellularDataHandler->Init();
+    std::string apnType = DATA_CONTEXT_ROLE_MMS;
+    sptr<ApnHolder> apnHolder = new ApnHolder(apnType, slotId);
+    cellularDataHandler->HandleDisconnectDataCompleteForMmsType(apnHolder);
+    EXPECT_EQ(cellularDataHandler->strEnterSubscriber_, nullptr);
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

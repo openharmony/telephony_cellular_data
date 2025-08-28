@@ -32,6 +32,10 @@ if (defined(global_parts_info) &&
 TELEPHONY_EXT_WRAPPER_ROOT = "services/telephony_ext_wrapper"
 DATA_SERVICE_EXT_WRAPPER_ROOT = "services/data_service_ext_wrapper"
 
+declare_args() {
+  cellular_data_feature_base_power_improvement  = true
+}
+
 ohos_shared_library("tel_cellular_data") {
   sanitize = {
     cfi = true
@@ -80,6 +84,12 @@ ohos_shared_library("tel_cellular_data") {
     "services/src/utils/net_manager_tactics_call_back.cpp",
     "services/src/utils/network_search_callback.cpp",
   ]
+
+  if (cellular_data_feature_base_power_improvement) {
+    sources += [
+      "services/src/cellular_data_power_save_mode_subscriber.cpp",
+    ]
+  }
 
   include_dirs = [
     "$TELEPHONY_EXT_WRAPPER_ROOT/include",
@@ -140,6 +150,10 @@ ohos_shared_library("tel_cellular_data") {
   if (telephony_cellular_data_hicollie_able) {
     external_deps += [ "hicollie:libhicollie" ]
     defines += [ "HICOLLIE_ENABLE" ]
+  }
+
+  if (cellular_data_feature_base_power_improvement ) {
+    defines += [ "BASE_POWER_IMPROVEMENT" ]
   }
 
   if (defined(global_parts_info) &&
@@ -201,6 +215,12 @@ ohos_static_library("tel_cellular_data_static") {
     "services/src/utils/network_search_callback.cpp",
   ]
 
+  if (cellular_data_feature_base_power_improvement) {
+    sources += [
+      "services/src/cellular_data_power_save_mode_subscriber.cpp",
+    ]
+  }
+
   include_dirs = [
     "$TELEPHONY_EXT_WRAPPER_ROOT/include",
     "$DATA_SERVICE_EXT_WRAPPER_ROOT/include",
@@ -273,6 +293,10 @@ ohos_static_library("tel_cellular_data_static") {
   ]
 
   defines += telephony_extra_defines
+
+  if (cellular_data_feature_base_power_improvement ) {
+    defines += [ "BASE_POWER_IMPROVEMENT" ]
+  }
 
   part_name = "cellular_data"
   subsystem_name = "telephony"

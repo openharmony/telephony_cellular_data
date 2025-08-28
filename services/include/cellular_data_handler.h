@@ -38,9 +38,13 @@
 #include "tel_profile_util.h"
 #include "tel_ril_data_parcel.h"
 #include "telephony_types.h"
+
 namespace OHOS {
 namespace Telephony {
 const uint32_t KEEP_APN_ACTIVATE_PERIOD = 30 * 1000;
+#ifdef BASE_POWER_IMPROVEMENT
+class CellularDataPowerSaveModeSubscriber;
+#endif
 class CellularDataHandler : public TelEventHandler, public EventFwk::CommonEventSubscriber {
 public:
     explicit CellularDataHandler(const EventFwk::CommonEventSubscribeInfo &sp, int32_t slotId);
@@ -86,9 +90,16 @@ public:
     bool IsSupportDunApn();
     void ConnectIfNeed(
         const AppExecFwk::InnerEvent::Pointer &event, sptr<ApnHolder> apnHolder, const NetRequest &request);
+#ifdef BASE_POWER_IMPROVEMENT
+    void SubscribeTelePowerEvent();
+#endif
 
     ApnActivateReportInfo GetDefaultActReportInfo();
     ApnActivateReportInfo GetInternalActReportInfo();
+#ifdef BASE_POWER_IMPROVEMENT
+    std::shared_ptr<CellularDataPowerSaveModeSubscriber> strEnterSubscriber_ = nullptr;
+    std::shared_ptr<CellularDataPowerSaveModeSubscriber> strExitSubscriber_ = nullptr;
+#endif
 
 private:
     std::shared_ptr<CellularDataStateMachine> CreateCellularDataConnect();
@@ -224,7 +235,6 @@ private:
     uint64_t defaultApnActTime_ = 0;
     uint64_t internalApnActTime_ = 0;
     int32_t retryCreateApnTimes_ = 0;
-
     using Fun = std::function<void(const AppExecFwk::InnerEvent::Pointer &event)>;
     std::map<uint32_t, Fun> eventIdMap_ {
         { RadioEvent::RADIO_PS_CONNECTION_ATTACHED,
@@ -294,6 +304,10 @@ private:
         { CellularDataEventCode::MSG_RETRY_TO_CREATE_APN,
             [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleApnChanged(event); } },
     };
+#ifdef BASE_POWER_IMPROVEMENT
+    std::shared_ptr<CellularDataPowerSaveModeSubscriber> CreateCommonSubscriber(
+        const std::string &event, int32_t priority);
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS

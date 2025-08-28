@@ -38,6 +38,9 @@
 #include "ipc_skeleton.h"
 #include "connection_retry_policy.h"
 #include "pdp_profile_data.h"
+#ifdef BASE_POWER_IMPROVEMENT
+#include "cellular_data_power_save_mode_subscriber.h"
+#endif
 namespace OHOS {
 namespace Telephony {
 using namespace AppExecFwk;
@@ -45,6 +48,9 @@ using namespace OHOS::EventFwk;
 using namespace NetManagerStandard;
 static const int32_t ESM_FLAG_INVALID = -1;
 const std::string DEFAULT_DATA_ROAMING = "persist.telephony.defaultdataroaming";
+#ifdef BASE_POWER_IMPROVEMENT
+constexpr const char *PERMISSION_STARTUP_COMPLETED = "ohos.permission.RECEIVER_STARTUP_COMPLETED";
+#endif
 constexpr const char *PERSIST_EDM_MOBILE_DATA_POLICY = "persist.edm.mobile_data_policy";
 constexpr const char *MOBILE_DATA_POLICY_FORCE_OPEN = "force_open";
 constexpr const char *MOBILE_DATA_POLICY_DISALLOW = "disallow";
@@ -1058,6 +1064,12 @@ void CellularDataHandler::HandleDisconnectDataCompleteForMmsType(sptr<ApnHolder>
         SetDataPermittedForMms(false);
         RemoveEvent(CellularDataEventCode::MSG_RESUME_DATA_PERMITTED_TIMEOUT);
     }
+#ifdef BASE_POWER_IMPROVEMENT
+    if (strEnterSubscriber_ != nullptr && strEnterSubscriber_->powerSaveFlag_) {
+        strEnterSubscriber_->FinishTelePowerEvent();
+        strEnterSubscriber_->powerSaveFlag_ = false;
+    }
+#endif
 }
 
 void CellularDataHandler::RetryOrClearConnection(const sptr<ApnHolder> &apnHolder, DisConnectionReason reason,
@@ -1226,6 +1238,26 @@ void CellularDataHandler::ConnectIfNeed(
         SendEstablishDataConnectionEvent(id);
     }
 }
+#ifdef BASE_POWER_IMPROVEMENT
+void CellularDataHandler::SubscribeTelePowerEvent()
+{
+    if (strEnterSubscriber_ == nullptr) {
+        strEnterSubscriber_ = CreateCommonSubscriber(ENTER_STR_TELEPHONY_NOTIFY, CommonEventPriority::FIRST_PRIORITY);
+    }
+    if (strExitSubscriber_ == nullptr) {
+        strExitSubscriber_ = CreateCommonSubscriber(EXIT_STR_TELEPHONY_NOTIFY, CommonEventPriority::THIRD_PRIORITY);
+    }
+
+    if(strEnterSubscriber_ != nullptr) {
+        bool enterStrSubRet = EventFwk::CommonEventManager::SubscribeCommonEvent(strEnterSubscriber_);
+        TELEPHONY_LOGI("subscribeResult = %{public}d", enterStrSubRet);
+    }
+    if(strExitSubscriber_ != nullptr) {
+        bool exitStrSubRet = EventFwk::CommonEventManager::SubscribeCommonEvent(strExitSubscriber_);
+        TELEPHONY_LOGI("subscribeResult = %{public}d", exitStrSubRet);
+    }
+}
+#endif
 
 void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
 {
@@ -2761,5 +2793,19 @@ int64_t CellularDataHandler::GetCurTime()
     return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now()
         .time_since_epoch()).count();
 }
+#ifdef BASE_POWER_IMPROVEMENT
+std::shared_ptr<CellularDataPowerSaveModeSubscriber> CellularDataHandler::CreateCommonSubscriber(
+    const std::string &event, int32_t priority)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(event);
+    EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
+    subscribeInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
+    subscribeInfo.SetPriority(priority);
+    subscribeInfo.SetPermission(PERMISSION_STARTUP_COMPLETED);
+    std::weak_ptr<CellularDataHandler> handler = std::static_pointer_cast<CellularDataHandler>(shared_from_this());
+    return std::make_shared<CellularDataPowerSaveModeSubscriber>(subscribeInfo, handler);
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS
