@@ -385,7 +385,9 @@ void CellularDataController::SystemAbilityStatusChangeListener::OnAddSystemAbili
                 bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(handler_);
                 TELEPHONY_LOGI("subscribeResult = %{public}d", subscribeResult);
 #ifdef BASE_POWER_IMPROVEMENT
-                handler_->SubscribeTelePowerEvent();
+               if (system::GetBoolParameter("const.vendor.ril.power.feature_tele_power", false)) {
+                    handler_->SubscribeTelePowerEvent();
+               }
 #endif
             }
             break;
