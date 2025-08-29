@@ -38,7 +38,7 @@ ArktsError setPreferredApnSyn(int32_t apnId, bool &ret);
 int32_t getDefaultCellularDataSimIdSyn();
 ArktsError queryApnIdsSync(const ApnInfo &info, rust::vec<uint32_t> &ret);
 ArktsError queryAllApnsSync(rust::vec<ApnInfo> &ret);
-
+ArktsError getActiveApnNameSync(rust::String &apnName);
 } // namespace CellularDataAni
 } // namespace OHOS
 #endif
