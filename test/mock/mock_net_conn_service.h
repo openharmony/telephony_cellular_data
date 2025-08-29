@@ -122,7 +122,7 @@ public:
         const std::string &ifName));
     MOCK_METHOD(int32_t, QueryTraceRoute, (const std::string &destination, int32_t maxJumpNumber,
         int32_t packetsType, std::string &traceRouteInfo));
-        MOCK_METHOD(int32_t, SetPacFileUrl, (const std::string &pacUrl));
+    MOCK_METHOD(int32_t, SetPacFileUrl, (const std::string &pacUrl));
     MOCK_METHOD(int32_t, SetProxyMode, (const OHOS::NetManagerStandard::ProxyModeType mode));
     MOCK_METHOD(int32_t, GetProxyMode, (OHOS::NetManagerStandard::ProxyModeType &mode));
     MOCK_METHOD(int32_t, GetPacFileUrl, (std::string &pacUrl));
