@@ -61,6 +61,9 @@ int32_t NetManagerCallBack::ReleaseNetwork(const NetManagerStandard::NetRequest 
         TELEPHONY_LOGE("RemoveUid Request Fail");
         return result;
     }
+    if (netrequest.isRemoveUid != 0) {
+        return result;
+    }
     result = DelayedRefSingleton<CellularDataService>::GetInstance().ReleaseNet(request);
     return result;
 }
