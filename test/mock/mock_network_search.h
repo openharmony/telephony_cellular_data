@@ -99,6 +99,7 @@ public:
     MOCK_METHOD2(IsGsm, int32_t(int32_t slotId, bool &isGsm));
     MOCK_METHOD2(IsCdma, int32_t(int32_t slotId, bool &isCdma));
     MOCK_METHOD1(UpdateOperatorName, int32_t(int32_t slotId));
+    MOCK_METHOD3(UpdateDeviceState, void(int32_t slotId, bool isEnterStrMode, bool isNeedUpdateNetworkState));
 };
 
 }  // namespace Telephony
