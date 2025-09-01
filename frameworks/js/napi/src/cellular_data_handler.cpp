@@ -1065,9 +1065,9 @@ void CellularDataHandler::HandleDisconnectDataCompleteForMmsType(sptr<ApnHolder>
         RemoveEvent(CellularDataEventCode::MSG_RESUME_DATA_PERMITTED_TIMEOUT);
     }
 #ifdef BASE_POWER_IMPROVEMENT
-    if (strEnterSubscriber_ != nullptr && strEnterSubscriber_->powerSaveFlag_) {
-        strEnterSubscriber_->FinishTelePowerEvent();
-        strEnterSubscriber_->powerSaveFlag_ = false;
+    if (strEnterSubscriber_ != nullptr && strEnterSubscriber_->GetPowerSaveFlag()) {
+        strEnterSubscriber_->FinishTelePowerCommonEvent();
+        strEnterSubscriber_->SetPowerSaveFlag(false);
     }
 #endif
 }

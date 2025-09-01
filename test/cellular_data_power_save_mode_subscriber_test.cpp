@@ -45,7 +45,7 @@ HWTEST_F(CellularDataPowerSaveModeSubscriberTest, CellularDataPowerSaveModeSubsc
     auto subscriber = cellularDataHandler->strEnterSubscriber_;
     cellularDataHandler = nullptr;
     subscriber->HandleEnterStrEvent(action);
-    EXPECT_EQ(subscriber->powerSaveFlag_, false);
+    EXPECT_EQ(subscriber->GetPowerSaveFlag(), false);
 }
 
 HWTEST_F(CellularDataPowerSaveModeSubscriberTest, CellularDataPowerSaveModeSubscriber_02,
@@ -126,7 +126,7 @@ HWTEST_F(CellularDataPowerSaveModeSubscriberTest, CellularDataPowerSaveModeSubsc
     cellularDataHandler->strEnterSubscriber_->strAsyncCommonEvent_ =
         std::make_shared<EventFwk::AsyncCommonEventResult>(resultCode, resultData, ordered, sticky, token);
     auto want = EventFwk::Want();
-    bool ret = cellularDataHandler->strEnterSubscriber_->FinishTelePowerEvent();
+    bool ret = cellularDataHandler->strEnterSubscriber_->FinishTelePowerCommonEvent();
     EXPECT_EQ(ret, false);
 }
 
@@ -139,7 +139,7 @@ HWTEST_F(CellularDataPowerSaveModeSubscriberTest, CellularDataPowerSaveModeSubsc
     auto cellularDataHandler =  std::make_shared<CellularDataHandler>(subscriberInfo, 0);
     cellularDataHandler->SubscribeTelePowerEvent();
     cellularDataHandler->strEnterSubscriber_->strAsyncCommonEvent_ = nullptr;
-    bool ret = cellularDataHandler->strEnterSubscriber_->FinishTelePowerEvent();
+    bool ret = cellularDataHandler->strEnterSubscriber_->FinishTelePowerCommonEvent();
     EXPECT_EQ(ret, false);
 }
 

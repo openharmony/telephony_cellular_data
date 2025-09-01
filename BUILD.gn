@@ -33,7 +33,7 @@ TELEPHONY_EXT_WRAPPER_ROOT = "services/telephony_ext_wrapper"
 DATA_SERVICE_EXT_WRAPPER_ROOT = "services/data_service_ext_wrapper"
 
 declare_args() {
-  cellular_data_feature_base_power_improvement  = true
+  cellular_data_feature_base_power_improvement = false
 }
 
 ohos_shared_library("tel_cellular_data") {

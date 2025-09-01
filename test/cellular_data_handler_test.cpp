@@ -1177,11 +1177,11 @@ HWTEST_F(CellularDataHandlerTest, HandleDisconnectDataCompleteForMmsTypeTest001,
     auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, slotId);
     cellularDataHandler->Init();
     cellularDataHandler->SubscribeTelePowerEvent();
-    cellularDataHandler->strEnterSubscriber_->powerSaveFlag_ = true;
+    cellularDataHandler->strEnterSubscriber_->SetPowerSaveFlag(true);
     std::string apnType = DATA_CONTEXT_ROLE_MMS;
     sptr<ApnHolder> apnHolder = new ApnHolder(apnType, slotId);
     cellularDataHandler->HandleDisconnectDataCompleteForMmsType(apnHolder);
-    EXPECT_EQ(cellularDataHandler->strEnterSubscriber_->powerSaveFlag_, false);
+    EXPECT_EQ(cellularDataHandler->strEnterSubscriber_->GetPowerSaveFlag(), false);
 }
 
 HWTEST_F(CellularDataHandlerTest, HandleDisconnectDataCompleteForMmsTypeTest002, Function | MediumTest | Level1)
