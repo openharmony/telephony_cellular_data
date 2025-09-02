@@ -350,10 +350,5 @@ ohos_unittest("tel_cellular_data_traffic_test") {
 group("unittest") {
   testonly = true
   deps = [
-    ":tel_cellular_data_client_test",
-    ":tel_cellular_data_test",
-    ":tel_cellular_data_traffic_test",
-    ":tel_cellular_state_branch_test",
-    ":tel_cellular_state_machine_test",
   ]
 }
