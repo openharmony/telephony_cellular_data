@@ -1064,12 +1064,6 @@ void CellularDataHandler::HandleDisconnectDataCompleteForMmsType(sptr<ApnHolder>
         SetDataPermittedForMms(false);
         RemoveEvent(CellularDataEventCode::MSG_RESUME_DATA_PERMITTED_TIMEOUT);
     }
-#ifdef BASE_POWER_IMPROVEMENT
-    if (strEnterSubscriber_ != nullptr && strEnterSubscriber_->powerSaveFlag_) {
-        strEnterSubscriber_->FinishTelePowerEvent();
-        strEnterSubscriber_->powerSaveFlag_ = false;
-    }
-#endif
 }
 
 void CellularDataHandler::RetryOrClearConnection(const sptr<ApnHolder> &apnHolder, DisConnectionReason reason,

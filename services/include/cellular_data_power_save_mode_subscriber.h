@@ -28,8 +28,7 @@ public:
         : CommonEventSubscriber(info), powerSaveModeCellularDataHandler_(handler) {}
     ~CellularDataPowerSaveModeSubscriber() = default;
     void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
-    bool FinishTelePowerEvent();
-    static inline bool powerSaveFlag_ = false;
+    bool FinishTelePowerCommonEvent();
 private:
     void HandleEnterStrEvent(std::string &action);
     void HandleExitStrEvent(std::string &action);
@@ -40,4 +39,4 @@ private:
 };
 }  // namespace Telephony
 }  // namespace OHOS
-#endif
+#endif

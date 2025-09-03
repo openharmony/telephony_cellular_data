@@ -18,6 +18,7 @@ declare_args() {
       !defined(global_parts_info.hiviewdfx_hicollie)) {
     telephony_cellular_data_hicollie_able = false
   }
+  cellular_data_feature_base_power_improvement = false
 }
 
 telephony_extra_defines = []
@@ -31,10 +32,6 @@ if (defined(global_parts_info) &&
 
 TELEPHONY_EXT_WRAPPER_ROOT = "services/telephony_ext_wrapper"
 DATA_SERVICE_EXT_WRAPPER_ROOT = "services/data_service_ext_wrapper"
-
-declare_args() {
-  cellular_data_feature_base_power_improvement  = true
-}
 
 ohos_shared_library("tel_cellular_data") {
   sanitize = {
