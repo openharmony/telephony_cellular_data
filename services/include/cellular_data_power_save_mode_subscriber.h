@@ -29,8 +29,6 @@ public:
     ~CellularDataPowerSaveModeSubscriber() = default;
     void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
     bool FinishTelePowerCommonEvent();
-    static bool GetPowerSaveFlag();
-    static void SetPowerSaveFlag(bool value)；
 private:
     void HandleEnterStrEvent(std::string &action);
     void HandleExitStrEvent(std::string &action);
@@ -38,8 +36,6 @@ private:
     std::weak_ptr<CellularDataHandler> powerSaveModeCellularDataHandler_;
     static inline std::string lastMsg = "";
     static inline bool savedCellularDataStatus_ = true;
-    static inline bool powerSaveFlag_ = false;
-    static inline std::mutex powerSaveFlagMutex_;
 };
 }  // namespace Telephony
 }  // namespace OHOS
