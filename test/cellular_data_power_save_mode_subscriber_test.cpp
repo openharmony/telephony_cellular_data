@@ -59,7 +59,6 @@ HWTEST_F(CellularDataPowerSaveModeSubscriberTest, CellularDataPowerSaveModeSubsc
     auto want = EventFwk::Want();
     want.SetAction(ENTER_STR_TELEPHONY_NOTIFY);
     auto event = EventFwk::CommonEventData(want);
-    event.SetCode(1);
     cellularDataHandler->strEnterSubscriber_->OnReceiveEvent(event);
     EXPECT_EQ(cellularDataHandler->strEnterSubscriber_->lastMsg, ENTER_STR_TELEPHONY_NOTIFY);
 }
