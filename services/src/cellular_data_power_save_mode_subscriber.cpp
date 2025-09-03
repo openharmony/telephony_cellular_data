@@ -30,8 +30,13 @@ void CellularDataPowerSaveModeSubscriber::OnReceiveEvent(const EventFwk::CommonE
         HandleEnterStrEvent(action);
     } else if (action == EXIT_STR_TELEPHONY_NOTIFY) {
         TELEPHONY_LOGI("Exit str mode");
-        HandleExitStrEvent(action);
+        int32_t reason = data.GetCode();
+        // process only in user operation
+        if (reason == 1) {
+            HandleExitStrEvent(action);
+        }
     }
+    FinishTelePowerCommonEvent();
 }
 
 void CellularDataPowerSaveModeSubscriber::HandleEnterStrEvent(std::string &action)
@@ -40,27 +45,19 @@ void CellularDataPowerSaveModeSubscriber::HandleEnterStrEvent(std::string &actio
     if (action != lastMsg) {
         auto powerSaveModeCellularDataHandler = powerSaveModeCellularDataHandler_.lock();
         if (powerSaveModeCellularDataHandler != nullptr) {
+            powerSaveModeCellularDataHandler->ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
             int32_t ret = powerSaveModeCellularDataHandler->IsCellularDataEnabled(savedCellularDataStatus_);
             TELEPHONY_LOGI("Backup cellular status = %{public}d, ret = %{public}d", savedCellularDataStatus_, ret);
-            if (savedCellularDataStatus_) {
-                // ensure HandleDisconnectDataCompleteForMmsType reply event only in enter str mode
-                SetPowerSaveFlag(true);
-                powerSaveModeCellularDataHandler->SetCellularDataEnable(false);
-            } else {
-                FinishTelePowerCommonEvent();
-            }
+            powerSaveModeCellularDataHandler->SetCellularDataEnable(false);
         }
     } else {
         TELEPHONY_LOGI("Recv same msg in succession lastMsg:%{public}s", lastMsg.c_str());
-        FinishTelePowerCommonEvent();
     }
     lastMsg = ENTER_STR_TELEPHONY_NOTIFY;
 }
 
 void CellularDataPowerSaveModeSubscriber::HandleExitStrEvent(std::string &action)
 {
-    // reply common event firt due to activate cellular too slow
-    FinishTelePowerCommonEvent();
     if (action != lastMsg) {
         auto powerSaveModeCellularDataHandler = powerSaveModeCellularDataHandler_.lock();
         if (powerSaveModeCellularDataHandler != nullptr) {
@@ -83,18 +80,6 @@ bool CellularDataPowerSaveModeSubscriber::FinishTelePowerCommonEvent()
         TELEPHONY_LOGE("strAsyncCommonEvent_ is nullptr");
     }
     return replyRet;
-}
-
-bool CellularDataPowerSaveModeSubscriber::GetPowerSaveFlag()
-{
-    std::lock_guard<std::mutex> lock(powerSaveFlagMutex_);
-    return powerSaveFlag_;
-}
- 
-void CellularDataPowerSaveModeSubscriber::SetPowerSaveFlag(bool value)
-{
-    std::lock_guard<std::mutex> lock(powerSaveFlagMutex_);
-    powerSaveFlag_ = value;
 }
 }  // namespace Telephony
 }  // namespace OHOS
