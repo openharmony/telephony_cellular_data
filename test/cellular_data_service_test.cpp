@@ -19,6 +19,7 @@
 
 #include "cellular_data_error.h"
 #include "cellular_data_service.h"
+#include "core_manager_inner.h"
 #include "data_access_token.h"
 #include "data_connection_monitor.h"
 #include "gtest/gtest.h"
