@@ -84,9 +84,9 @@ public:
     void SetRadioState(const int32_t &radioState, const int32_t &eventCode);
 
     /**
-     * Get the preferred network
+     * Reregister network
      */
-    void GetPreferredNetworkPara();
+    void ReregistarNetwork();
 
     /**
      * Update data flow type

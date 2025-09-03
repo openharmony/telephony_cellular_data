@@ -15,6 +15,8 @@
 #define private public
 #define protected public
 
+#include <gmock/gmock.h>
+
 #include "cellular_data_error.h"
 #include "cellular_data_service.h"
 #include "data_access_token.h"
@@ -23,20 +25,29 @@
 #include "tel_ril_network_parcel.h"
 #include "traffic_management.h"
 #include "apn_attribute.h"
+#include "mock/mock_network_search.h"
 
 namespace OHOS {
 namespace Telephony {
+using namespace testing;
 using namespace testing::ext;
 
 static const int32_t SLEEP_TIME = 3;
 
 class CellularDataServiceTest : public testing::Test {
 public:
+    CellularDataServiceTest()
+    {
+        mockNetworkSearchManager = new MockNetworkSearchManager();
+        std::shared_ptr<MockNetworkSearchManager> mockNetworkSearchManagerPtr(mockNetworkSearchManager);
+        CoreManagerInner::GetInstance().networkSearchManager_ = mockNetworkSearchManagerPtr;
+    }
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
     std::shared_ptr<CellularDataService> service = DelayedSingleton<CellularDataService>::GetInstance();
+    MockNetworkSearchManager *mockNetworkSearchManager;
 };
 void CellularDataServiceTest::SetUpTestCase() {}
 
@@ -172,6 +183,29 @@ HWTEST_F(CellularDataServiceTest, DataConnectionMonitor_HandleRecovery_001, Test
     dataConnectionMonitor->dataRecoveryState_ = RecoveryState::STATE_RADIO_STATUS_RESTART;
     dataConnectionMonitor->HandleRecovery();
     ASSERT_EQ(dataConnectionMonitor->dataRecoveryState_, RecoveryState::STATE_REQUEST_CONTEXT_LIST);
+}
+
+/**
+ * @tc.number   DataConnectionMonitor_HandleRecovery_002
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, DataConnectionMonitor_HandleRecovery_002, TestSize.Level0)
+{
+    std::shared_ptr<DataConnectionMonitor> dataConnectionMonitor = std::make_shared<DataConnectionMonitor>(0);
+    dataConnectionMonitor->dataRecoveryState_ = RecoveryState::STATE_REREGISTER_NETWORK;
+    EXPECT_CALL(*mockNetworkSearchManager, GetPsRadioTech(_, _))
+        .WillRepeatedly([](int32_t slotId, int32_t &psRadioTech) {
+            psRadioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_NR);
+            return 0;
+        });
+    EXPECT_CALL(*mockNetworkSearchManager, IsGsm(_, _))
+        .WillRepeatedly([](int32_t slotId, bool &isGsm) {
+            isGsm = true;
+            return 0;
+        });
+    dataConnectionMonitor->HandleRecovery();
+    ASSERT_EQ(dataConnectionMonitor->dataRecoveryState_, RecoveryState::STATE_RADIO_STATUS_RESTART);
 }
 
 /**
