@@ -34,7 +34,7 @@ public:
     void InitTelephonyExtWrapper();
 
     typedef void (*DATA_EDN_SELF_CURE)(int32_t&, int32_t&);
-    typedef void (*REREGISTER_NETWORK)(int32_t, bool&);
+    typedef void (*ReRegisterNetwork)(int32_t, bool&);
     typedef bool (*IS_APN_ALLOWED_ACTIVE)(int32_t, const char*, bool);
     /* add for vsim begin */
     typedef void (*GET_VSIM_SLOT_ID)(int32_t &slotId);
@@ -60,7 +60,7 @@ public:
     using IsDcCellularDataAllowedType = bool(*)();
 
     DATA_EDN_SELF_CURE dataEndSelfCure_ = nullptr;
-    REREGISTER_NETWORK reRegisterNetwork_ = nullptr;
+    ReRegisterNetwork reRegisterNetwork_ = nullptr;
     IS_APN_ALLOWED_ACTIVE isApnAllowedActive_ = nullptr;
     GET_VSIM_SLOT_ID getVSimSlotId_ = nullptr;
     CREATE_ALL_APN_ITEM_EXT createAllApnItemExt_ = nullptr;

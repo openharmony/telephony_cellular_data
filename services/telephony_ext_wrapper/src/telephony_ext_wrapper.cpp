@@ -98,7 +98,7 @@ void TelephonyExtWrapper::InitDataEndSelfCure()
 
 void TelephonyExtWrapper::InitReregisterNetwork()
 {
-    reRegisterNetwork_ = (REREGISTER_NETWORK)dlsym(telephonyExtWrapperHandle_, "ReregisterNetwork");
+    reRegisterNetwork_ = (ReRegisterNetwork)dlsym(telephonyExtWrapperHandle_, "ReregisterNetwork");
     if (reRegisterNetwork_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol ReregisterNetwork failed, error: %{public}s", dlerror());
         return;
