@@ -86,7 +86,7 @@ public:
     /**
      * Reregister network
      */
-    void ReregistarNetwork();
+    void ReregisterNetwork();
 
     /**
      * Update data flow type
