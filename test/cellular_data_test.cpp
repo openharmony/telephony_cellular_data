@@ -437,12 +437,10 @@ HWTEST_F(CellularDataTest, IsCellularDataEnabled_Test, TestSize.Level1)
 HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test, TestSize.Level2)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     int32_t result = CellularDataTest::GetDefaultCellularDataSlotIdTest();
     if (result < DEFAULT_SIM_SLOT_ID_REMOVE) {
-        return;
     }
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
     ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
@@ -461,7 +459,6 @@ HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test, TestSize.Level2)
 HWTEST_F(CellularDataTest, DefaultCellularDataSimId_Test, TestSize.Level2)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     int32_t result = CellularDataTest::GetDefaultCellularDataSimIdTest();
     ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
@@ -475,12 +472,10 @@ HWTEST_F(CellularDataTest, DefaultCellularDataSimId_Test, TestSize.Level2)
 HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test_01, TestSize.Level2)
 {
     if (!HasSimCard(SIM_SLOT_ID_1)) {
-        return;
     }
     DataAccessToken token;
     int32_t result = CellularDataTest::GetDefaultCellularDataSlotIdTest();
     if (result < DEFAULT_SIM_SLOT_ID_REMOVE) {
-        return;
     }
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
     ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
@@ -496,7 +491,6 @@ HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test_01, TestSize.Level2)
 HWTEST_F(CellularDataTest, EnableCellularData_Test_01, TestSize.Level2)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
@@ -526,7 +520,6 @@ HWTEST_F(CellularDataTest, EnableCellularData_Test_01, TestSize.Level2)
 HWTEST_F(CellularDataTest, EnableCellularData_Test_02, TestSize.Level2)
 {
     if (!HasSimCard(SIM_SLOT_ID_1)) {
-        return;
     }
     DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
@@ -556,7 +549,6 @@ HWTEST_F(CellularDataTest, EnableCellularData_Test_02, TestSize.Level2)
 HWTEST_F(CellularDataTest, DataRoamingState_ValidSlot_Test_01, TestSize.Level3)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
@@ -596,7 +588,6 @@ HWTEST_F(CellularDataTest, DataRoamingState_ValidSlot_Test_01, TestSize.Level3)
 HWTEST_F(CellularDataTest, DataRoamingState_ValidSlot_Test_02, TestSize.Level3)
 {
     if (!HasSimCard(SIM_SLOT_ID_1)) {
-        return;
     }
     DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
@@ -636,7 +627,6 @@ HWTEST_F(CellularDataTest, DataRoamingState_ValidSlot_Test_02, TestSize.Level3)
 HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_01, TestSize.Level3)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
@@ -672,7 +662,6 @@ HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_01, TestSize
 HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_02, TestSize.Level3)
 {
     if (!HasSimCard(SIM_SLOT_ID_1)) {
-        return;
     }
     DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
@@ -708,7 +697,6 @@ HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_02, TestSize
 HWTEST_F(CellularDataTest, GetCellularDataState_ValidityTest_01, TestSize.Level3)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
@@ -743,7 +731,6 @@ HWTEST_F(CellularDataTest, GetCellularDataState_ValidityTest_01, TestSize.Level3
 HWTEST_F(CellularDataTest, GetCellularDataState_ValidityTest_02, TestSize.Level3)
 {
     if (!HasSimCard(SIM_SLOT_ID_1)) {
-        return;
     }
     DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
@@ -778,7 +765,6 @@ HWTEST_F(CellularDataTest, GetCellularDataState_ValidityTest_02, TestSize.Level3
 HWTEST_F(CellularDataTest, DataRoamingState_InValidSlot_Test_01, TestSize.Level3)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     // invalid slot turn on data roaming
@@ -810,7 +796,6 @@ HWTEST_F(CellularDataTest, DataRoamingState_InValidSlot_Test_01, TestSize.Level3
 HWTEST_F(CellularDataTest, DataFlowType_Test_01, TestSize.Level3)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
@@ -845,7 +830,6 @@ HWTEST_F(CellularDataTest, DataFlowType_Test_01, TestSize.Level3)
 HWTEST_F(CellularDataTest, DataFlowType_Test_02, TestSize.Level3)
 {
     if (!HasSimCard(SIM_SLOT_ID_1)) {
-        return;
     }
     DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
@@ -880,13 +864,11 @@ HWTEST_F(CellularDataTest, DataFlowType_Test_02, TestSize.Level3)
 HWTEST_F(CellularDataTest, MmsApn_Test_01, TestSize.Level3)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     if (callback == nullptr) {
         std::cout << "callback is null" << std::endl;
-        return;
     }
     NetSpecifier netSpecifier;
     NetAllCapabilities netAllCapabilities;
@@ -898,14 +880,12 @@ HWTEST_F(CellularDataTest, MmsApn_Test_01, TestSize.Level3)
     sptr<NetSpecifier> specifier = new (std::nothrow) NetSpecifier(netSpecifier);
     if (specifier == nullptr) {
         std::cout << "specifier is null" << std::endl;
-        return;
     }
     int32_t result = NetConnClient::GetInstance().RegisterNetConnCallback(specifier, callback, NET_REGISTER_TIMEOUT_MS);
     std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
     auto mmsCallback = static_cast<TestCallback *>(callback.GetRefPtr());
     if (mmsCallback == nullptr) {
         std::cout << "mmsCallback is null" << std::endl;
-        return;
     }
     int32_t count = 0;
     while (count < MAX_TIMES) {
@@ -928,13 +908,11 @@ HWTEST_F(CellularDataTest, MmsApn_Test_01, TestSize.Level3)
 HWTEST_F(CellularDataTest, MmsApn_Test_02, TestSize.Level3)
 {
     if (!HasSimCard(SIM_SLOT_ID_1)) {
-        return;
     }
     DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     if (callback == nullptr) {
         std::cout << "callback is null" << std::endl;
-        return;
     }
     NetSpecifier netSpecifier;
     NetAllCapabilities netAllCapabilities;
@@ -946,14 +924,12 @@ HWTEST_F(CellularDataTest, MmsApn_Test_02, TestSize.Level3)
     sptr<NetSpecifier> specifier = new (std::nothrow) NetSpecifier(netSpecifier);
     if (specifier == nullptr) {
         std::cout << "specifier is null" << std::endl;
-        return;
     }
     int32_t result = NetConnClient::GetInstance().RegisterNetConnCallback(specifier, callback, NET_REGISTER_TIMEOUT_MS);
     std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
     auto mmsCallback = static_cast<TestCallback *>(callback.GetRefPtr());
     if (mmsCallback == nullptr) {
         std::cout << "mmsCallback is null" << std::endl;
-        return;
     }
     int32_t count = 0;
     while (count < MAX_TIMES) {
@@ -976,7 +952,6 @@ HWTEST_F(CellularDataTest, MmsApn_Test_02, TestSize.Level3)
 HWTEST_F(CellularDataTest, HasInternetCapability_Test_01, TestSize.Level3)
 {
     if (!HasSimCard(SIM_SLOT_ID_1)) {
-        return;
     }
 
     int32_t cid = 1;
@@ -992,7 +967,6 @@ HWTEST_F(CellularDataTest, HasInternetCapability_Test_01, TestSize.Level3)
 HWTEST_F(CellularDataTest, HasInternetCapability_Test_02, TestSize.Level3)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
 
     int32_t cid = 1;
@@ -1008,7 +982,6 @@ HWTEST_F(CellularDataTest, HasInternetCapability_Test_02, TestSize.Level3)
 HWTEST_F(CellularDataTest, ClearCellularDataConnections_Test_01, TestSize.Level3)
 {
     if (!HasSimCard(SIM_SLOT_ID_1)) {
-        return;
     }
     DataAccessToken token;
     int32_t result = CellularDataTest::ClearCellularDataConnections(SIM_SLOT_ID_1);
@@ -1023,7 +996,6 @@ HWTEST_F(CellularDataTest, ClearCellularDataConnections_Test_01, TestSize.Level3
 HWTEST_F(CellularDataTest, ClearCellularDataConnections_Test_02, TestSize.Level3)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     int32_t result = CellularDataTest::ClearCellularDataConnections(DEFAULT_SIM_SLOT_ID);
@@ -1038,7 +1010,6 @@ HWTEST_F(CellularDataTest, ClearCellularDataConnections_Test_02, TestSize.Level3
 HWTEST_F(CellularDataTest, ClearAllConnections_Test_01, TestSize.Level3)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     int32_t result = CellularDataTest::ClearAllConnections(
@@ -1054,7 +1025,6 @@ HWTEST_F(CellularDataTest, ClearAllConnections_Test_01, TestSize.Level3)
 HWTEST_F(CellularDataTest, GetApnState_Test_01, TestSize.Level3)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     int32_t result = CellularDataTest::GetApnState(DEFAULT_SIM_SLOT_ID, "default");
@@ -1069,7 +1039,6 @@ HWTEST_F(CellularDataTest, GetApnState_Test_01, TestSize.Level3)
 HWTEST_F(CellularDataTest, GetDataRecoveryState_Test_01, TestSize.Level3)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     int32_t result = CellularDataTest::GetDataRecoveryState();
@@ -1206,7 +1175,6 @@ HWTEST_F(CellularDataTest, Telephony_Cellulardata_InitTelephonyExtService_0104, 
 HWTEST_F(CellularDataTest, GetDataConnApnAttr_Test_01, TestSize.Level3)
 {
     if (!HasSimCard(SIM_SLOT_ID_1)) {
-        return;
     }
     DataAccessToken token;
     ApnItem::Attribute apnAttr;
@@ -1222,7 +1190,6 @@ HWTEST_F(CellularDataTest, GetDataConnApnAttr_Test_01, TestSize.Level3)
 HWTEST_F(CellularDataTest, GetDataConnApnAttr_Test_02, TestSize.Level3)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     ApnItem::Attribute apnAttr;
@@ -1238,7 +1205,6 @@ HWTEST_F(CellularDataTest, GetDataConnApnAttr_Test_02, TestSize.Level3)
 HWTEST_F(CellularDataTest, GetDataConnIpType_Test_01, TestSize.Level3)
 {
     if (!HasSimCard(SIM_SLOT_ID_1)) {
-        return;
     }
     DataAccessToken token;
     std::string ipType;
@@ -1254,7 +1220,6 @@ HWTEST_F(CellularDataTest, GetDataConnIpType_Test_01, TestSize.Level3)
 HWTEST_F(CellularDataTest, GetDataConnIpType_Test_02, TestSize.Level3)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     std::string ipType;
@@ -1270,7 +1235,6 @@ HWTEST_F(CellularDataTest, GetDataConnIpType_Test_02, TestSize.Level3)
 HWTEST_F(CellularDataTest, IsNeedDoRecovery_Test_01, TestSize.Level3)
 {
     if (!HasSimCard(SIM_SLOT_ID_1)) {
-        return;
     }
     DataAccessToken token;
     bool needDoRecovery = true;
@@ -1286,7 +1250,6 @@ HWTEST_F(CellularDataTest, IsNeedDoRecovery_Test_01, TestSize.Level3)
 HWTEST_F(CellularDataTest, IsNeedDoRecovery_Test_02, TestSize.Level3)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     bool needDoRecovery = true;
@@ -1302,7 +1265,6 @@ HWTEST_F(CellularDataTest, IsNeedDoRecovery_Test_02, TestSize.Level3)
 HWTEST_F(CellularDataTest, GetCellularDataSupplierId_Test_01, TestSize.Level3)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     uint32_t supplierId = 0;
@@ -1323,7 +1285,6 @@ HWTEST_F(CellularDataTest, GetCellularDataSupplierId_Test_01, TestSize.Level3)
 HWTEST_F(CellularDataTest, CorrectNetSupplierNoAvailable_Test_01, TestSize.Level3)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     int32_t result = CellularDataTest::CorrectNetSupplierNoAvailable(DEFAULT_SIM_SLOT_ID);
@@ -1349,7 +1310,6 @@ HWTEST_F(CellularDataTest, GetSupplierRegisterState_Test_01, TestSize.Level3)
     ASSERT_TRUE(result == TELEPHONY_ERR_FAIL);
 
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     int32_t getSupplierIdRet =
         CellularDataTest::GetCellularDataSupplierId(DEFAULT_SIM_SLOT_ID, NetCap::NET_CAPABILITY_INTERNET, supplierId);
@@ -1367,7 +1327,6 @@ HWTEST_F(CellularDataTest, GetSupplierRegisterState_Test_01, TestSize.Level3)
 HWTEST_F(CellularDataTest, EnableIntelligenceSwitch_Test_01, TestSize.Level2)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
@@ -1389,7 +1348,6 @@ HWTEST_F(CellularDataTest, EnableIntelligenceSwitch_Test_01, TestSize.Level2)
 HWTEST_F(CellularDataTest, GetIntelligenceSwitchState_Test_01, TestSize.Level2)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
@@ -1415,7 +1373,6 @@ HWTEST_F(CellularDataTest, GetIntelligenceSwitchState_Test_01, TestSize.Level2)
 HWTEST_F(CellularDataTest, InitCellularDataController_Test_01, TestSize.Level3)
 {
     if (!HasSimCard(SIM_SLOT_ID_1)) {
-        return;
     }
     DataAccessToken token;
     int32_t result = CellularDataTest::InitCellularDataController(SIM_SLOT_ID_1);
@@ -1430,7 +1387,6 @@ HWTEST_F(CellularDataTest, InitCellularDataController_Test_01, TestSize.Level3)
 HWTEST_F(CellularDataTest, InitCellularDataController_Test_02, TestSize.Level3)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     int32_t result = CellularDataTest::InitCellularDataController(DEFAULT_SIM_SLOT_ID);
@@ -1457,13 +1413,11 @@ HWTEST_F(CellularDataTest, InitCellularDataController_Test_03, TestSize.Level3)
 HWTEST_F(CellularDataTest, SUPL_Apn_Test_01, TestSize.Level3)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     if (callback == nullptr) {
         std::cout << "callback is null" << std::endl;
-        return;
     }
     NetSpecifier netSpecifier;
     NetAllCapabilities netAllCapabilities;
@@ -1475,14 +1429,12 @@ HWTEST_F(CellularDataTest, SUPL_Apn_Test_01, TestSize.Level3)
     sptr<NetSpecifier> specifier = new (std::nothrow) NetSpecifier(netSpecifier);
     if (specifier == nullptr) {
         std::cout << "specifier is null" << std::endl;
-        return;
     }
     int32_t result = NetConnClient::GetInstance().RegisterNetConnCallback(specifier, callback, NET_REGISTER_TIMEOUT_MS);
     std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
     auto suplCallback = static_cast<TestCallback *>(callback.GetRefPtr());
     if (suplCallback == nullptr) {
         std::cout << "suplCallback is null" << std::endl;
-        return;
     }
     int32_t count = 0;
     while (count < MAX_TIMES) {
@@ -1505,13 +1457,11 @@ HWTEST_F(CellularDataTest, SUPL_Apn_Test_01, TestSize.Level3)
 HWTEST_F(CellularDataTest, SUPL_Apn_Test_02, TestSize.Level3)
 {
     if (!HasSimCard(SIM_SLOT_ID_1)) {
-        return;
     }
     DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     if (callback == nullptr) {
         std::cout << "callback is null" << std::endl;
-        return;
     }
     NetSpecifier netSpecifier;
     NetAllCapabilities netAllCapabilities;
@@ -1523,14 +1473,12 @@ HWTEST_F(CellularDataTest, SUPL_Apn_Test_02, TestSize.Level3)
     sptr<NetSpecifier> specifier = new (std::nothrow) NetSpecifier(netSpecifier);
     if (specifier == nullptr) {
         std::cout << "specifier is null" << std::endl;
-        return;
     }
     int32_t result = NetConnClient::GetInstance().RegisterNetConnCallback(specifier, callback, NET_REGISTER_TIMEOUT_MS);
     std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
     auto suplCallback = static_cast<TestCallback *>(callback.GetRefPtr());
     if (suplCallback == nullptr) {
         std::cout << "suplCallback is null" << std::endl;
-        return;
     }
     int32_t count = 0;
     while (count < MAX_TIMES) {
@@ -1553,13 +1501,11 @@ HWTEST_F(CellularDataTest, SUPL_Apn_Test_02, TestSize.Level3)
 HWTEST_F(CellularDataTest, DUN_Apn_Test_01, TestSize.Level3)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     if (callback == nullptr) {
         std::cout << "callback is null" << std::endl;
-        return;
     }
     NetSpecifier netSpecifier;
     NetAllCapabilities netAllCapabilities;
@@ -1571,14 +1517,12 @@ HWTEST_F(CellularDataTest, DUN_Apn_Test_01, TestSize.Level3)
     sptr<NetSpecifier> specifier = new (std::nothrow) NetSpecifier(netSpecifier);
     if (specifier == nullptr) {
         std::cout << "specifier is null" << std::endl;
-        return;
     }
     int32_t result = NetConnClient::GetInstance().RegisterNetConnCallback(specifier, callback, NET_REGISTER_TIMEOUT_MS);
     std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
     auto dunCallback = static_cast<TestCallback *>(callback.GetRefPtr());
     if (dunCallback == nullptr) {
         std::cout << "dunCallback is null" << std::endl;
-        return;
     }
     int32_t count = 0;
     while (count < MAX_TIMES) {
@@ -1601,13 +1545,11 @@ HWTEST_F(CellularDataTest, DUN_Apn_Test_01, TestSize.Level3)
 HWTEST_F(CellularDataTest, DUN_Apn_Test_02, TestSize.Level3)
 {
     if (!HasSimCard(SIM_SLOT_ID_1)) {
-        return;
     }
     DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     if (callback == nullptr) {
         std::cout << "callback is null" << std::endl;
-        return;
     }
     NetSpecifier netSpecifier;
     NetAllCapabilities netAllCapabilities;
@@ -1619,14 +1561,12 @@ HWTEST_F(CellularDataTest, DUN_Apn_Test_02, TestSize.Level3)
     sptr<NetSpecifier> specifier = new (std::nothrow) NetSpecifier(netSpecifier);
     if (specifier == nullptr) {
         std::cout << "specifier is null" << std::endl;
-        return;
     }
     int32_t result = NetConnClient::GetInstance().RegisterNetConnCallback(specifier, callback, NET_REGISTER_TIMEOUT_MS);
     std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
     auto dunCallback = static_cast<TestCallback *>(callback.GetRefPtr());
     if (dunCallback == nullptr) {
         std::cout << "dunCallback is null" << std::endl;
-        return;
     }
     int32_t count = 0;
     while (count < MAX_TIMES) {
@@ -1649,13 +1589,11 @@ HWTEST_F(CellularDataTest, DUN_Apn_Test_02, TestSize.Level3)
 HWTEST_F(CellularDataTest, IA_Apn_Test_01, TestSize.Level3)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     if (callback == nullptr) {
         std::cout << "callback is null" << std::endl;
-        return;
     }
     NetSpecifier netSpecifier;
     NetAllCapabilities netAllCapabilities;
@@ -1667,14 +1605,12 @@ HWTEST_F(CellularDataTest, IA_Apn_Test_01, TestSize.Level3)
     sptr<NetSpecifier> specifier = new (std::nothrow) NetSpecifier(netSpecifier);
     if (specifier == nullptr) {
         std::cout << "specifier is null" << std::endl;
-        return;
     }
     int32_t result = NetConnClient::GetInstance().RegisterNetConnCallback(specifier, callback, NET_REGISTER_TIMEOUT_MS);
     std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
     auto iaCallback = static_cast<TestCallback *>(callback.GetRefPtr());
     if (iaCallback == nullptr) {
         std::cout << "iaCallback is null" << std::endl;
-        return;
     }
     int32_t count = 0;
     while (count < MAX_TIMES) {
@@ -1697,13 +1633,11 @@ HWTEST_F(CellularDataTest, IA_Apn_Test_01, TestSize.Level3)
 HWTEST_F(CellularDataTest, IA_Apn_Test_02, TestSize.Level3)
 {
     if (!HasSimCard(SIM_SLOT_ID_1)) {
-        return;
     }
     DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     if (callback == nullptr) {
         std::cout << "callback is null" << std::endl;
-        return;
     }
     NetSpecifier netSpecifier;
     NetAllCapabilities netAllCapabilities;
@@ -1715,14 +1649,12 @@ HWTEST_F(CellularDataTest, IA_Apn_Test_02, TestSize.Level3)
     sptr<NetSpecifier> specifier = new (std::nothrow) NetSpecifier(netSpecifier);
     if (specifier == nullptr) {
         std::cout << "specifier is null" << std::endl;
-        return;
     }
     int32_t result = NetConnClient::GetInstance().RegisterNetConnCallback(specifier, callback, NET_REGISTER_TIMEOUT_MS);
     std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
     auto iaCallback = static_cast<TestCallback *>(callback.GetRefPtr());
     if (iaCallback == nullptr) {
         std::cout << "iaCallback is null" << std::endl;
-        return;
     }
     int32_t count = 0;
     while (count < MAX_TIMES) {
@@ -1745,13 +1677,11 @@ HWTEST_F(CellularDataTest, IA_Apn_Test_02, TestSize.Level3)
 HWTEST_F(CellularDataTest, XCAP_Apn_Test_01, TestSize.Level3)
 {
     if (!HasSimCard(DEFAULT_SIM_SLOT_ID)) {
-        return;
     }
     DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     if (callback == nullptr) {
         std::cout << "callback is null" << std::endl;
-        return;
     }
     NetSpecifier netSpecifier;
     NetAllCapabilities netAllCapabilities;
@@ -1763,14 +1693,12 @@ HWTEST_F(CellularDataTest, XCAP_Apn_Test_01, TestSize.Level3)
     sptr<NetSpecifier> specifier = new (std::nothrow) NetSpecifier(netSpecifier);
     if (specifier == nullptr) {
         std::cout << "specifier is null" << std::endl;
-        return;
     }
     int32_t result = NetConnClient::GetInstance().RegisterNetConnCallback(specifier, callback, NET_REGISTER_TIMEOUT_MS);
     std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
     auto xcapCallback = static_cast<TestCallback *>(callback.GetRefPtr());
     if (xcapCallback == nullptr) {
         std::cout << "xcapCallback is null" << std::endl;
-        return;
     }
     int32_t count = 0;
     while (count < MAX_TIMES) {
@@ -1793,13 +1721,11 @@ HWTEST_F(CellularDataTest, XCAP_Apn_Test_01, TestSize.Level3)
 HWTEST_F(CellularDataTest, XCAP_Apn_Test_02, TestSize.Level3)
 {
     if (!HasSimCard(SIM_SLOT_ID_1)) {
-        return;
     }
     DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     if (callback == nullptr) {
         std::cout << "callback is null" << std::endl;
-        return;
     }
     NetSpecifier netSpecifier;
     NetAllCapabilities netAllCapabilities;
@@ -1811,14 +1737,12 @@ HWTEST_F(CellularDataTest, XCAP_Apn_Test_02, TestSize.Level3)
     sptr<NetSpecifier> specifier = new (std::nothrow) NetSpecifier(netSpecifier);
     if (specifier == nullptr) {
         std::cout << "specifier is null" << std::endl;
-        return;
     }
     int32_t result = NetConnClient::GetInstance().RegisterNetConnCallback(specifier, callback, NET_REGISTER_TIMEOUT_MS);
     std::cout << "RegisterNetConnCallback result [" << result << "]" << std::endl;
     auto xcapCallback = static_cast<TestCallback *>(callback.GetRefPtr());
     if (xcapCallback == nullptr) {
         std::cout << "xcapCallback is null" << std::endl;
-        return;
     }
     int32_t count = 0;
     while (count < MAX_TIMES) {
