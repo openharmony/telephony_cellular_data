@@ -182,7 +182,7 @@ void DataConnectionMonitor::HandleRecovery()
         case RecoveryState::STATE_REREGISTER_NETWORK: {
             TELEPHONY_LOGI("Slot%{public}d: Handle Recovery: re-register network", slotId_);
             dataRecoveryState_ = RecoveryState::STATE_RADIO_STATUS_RESTART;
-            GetPreferredNetworkPara();
+            ReregisterNetwork();
             break;
         }
         case RecoveryState::STATE_RADIO_STATUS_RESTART: {
@@ -245,8 +245,18 @@ void DataConnectionMonitor::SetRadioState(const int32_t &radioState, const int32
     CoreManagerInner::GetInstance().SetRadioState(slotId_, eventCode, radioState, 0, shared_from_this());
 }
 
-void DataConnectionMonitor::GetPreferredNetworkPara()
+void DataConnectionMonitor::ReregisterNetwork()
 {
+    bool isProcess = false;
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (TELEPHONY_EXT_WRAPPER.reRegisterNetwork_) {
+        TELEPHONY_EXT_WRAPPER.reRegisterNetwork_(slotId_, isProcess);
+    }
+#endif
+    TELEPHONY_LOGI("ReregisterNetwork isProcess:%{public}d", isProcess);
+    if (isProcess) {
+        return;
+    }
     CoreManagerInner::GetInstance().GetPreferredNetworkPara(slotId_,
         RadioEvent::RADIO_GET_PREFERRED_NETWORK_MODE, shared_from_this());
 }

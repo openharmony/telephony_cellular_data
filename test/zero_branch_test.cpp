@@ -1943,7 +1943,7 @@ HWTEST_F(BranchTest, CellularDataUtils_Test_01, Function | MediumTest | Level3)
     dataConnectionMonitor->HandleRecovery();
     dataConnectionMonitor->GetPdpContextList();
     dataConnectionMonitor->SetRadioState(0, RadioEvent::RADIO_ON);
-    dataConnectionMonitor->GetPreferredNetworkPara();
+    dataConnectionMonitor->ReregisterNetwork();
     dataConnectionMonitor->GetDataFlowType();
     dataConnectionMonitor->IsNeedDoRecovery(true);
     dataConnectionMonitor->IsNeedDoRecovery(false);

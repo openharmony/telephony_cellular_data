@@ -70,6 +70,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCellularData()
     InitSendApnNeedRetryInfo();
     InitJudgeOtherRequestHolding();
     InitCreateDcApnItemExt();
+    InitReregisterNetwork();
     InitIsVirtualModemConnected();
     InitIsDcCellularDataAllowed();
 }
@@ -93,6 +94,16 @@ void TelephonyExtWrapper::InitDataEndSelfCure()
         return;
     }
     TELEPHONY_LOGD("telephony ext wrapper init DataEndSelfCure success");
+}
+
+void TelephonyExtWrapper::InitReregisterNetwork()
+{
+    reRegisterNetwork_ = (ReRegisterNetwork)dlsym(telephonyExtWrapperHandle_, "ReregisterNetwork");
+    if (reRegisterNetwork_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol ReregisterNetwork failed, error: %{public}s", dlerror());
+        return;
+    }
+    TELEPHONY_LOGD("telephony ext wrapper init ReregisterNetwork success");
 }
 
 void TelephonyExtWrapper::InitTelephonyExtForCustomization()
