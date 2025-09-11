@@ -439,7 +439,7 @@ HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test, TestSize.Level2)
     EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
     DataAccessToken token;
     int32_t result = CellularDataTest::GetDefaultCellularDataSlotIdTest();
-    EXPECT_FALSE(result < DEFAULT_SIM_SLOT_ID_REMOVE, 0);
+    EXPECT_FALSE(result < DEFAULT_SIM_SLOT_ID_REMOVE);
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
     ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     // Multiple cards will need to be optimized again
@@ -471,7 +471,7 @@ HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test_01, TestSize.Level2)
     EXPECT_NE(HasSimCard(SIM_SLOT_ID_1), 0);
     DataAccessToken token;
     int32_t result = CellularDataTest::GetDefaultCellularDataSlotIdTest();
-    EXPECT_FALSE(result < DEFAULT_SIM_SLOT_ID_REMOVE, 0);
+    EXPECT_FALSE(result < DEFAULT_SIM_SLOT_ID_REMOVE);
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
     ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(DATA_SLOT_ID_INVALID);
