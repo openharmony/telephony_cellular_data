@@ -690,6 +690,41 @@ bool CellularDataHandler::CheckApnState(sptr<ApnHolder> &apnHolder)
     return true;
 }
 
+bool CellularDataHandler::IsMultiDefaultApn(const sptr<ApnHolder> &apnHolder)
+{
+    std::string apnType = apnHolder->GetApnType();
+    return !apnType.compare(DATA_CONTEXT_ROLE_BIP);
+}
+
+bool CellularDataHandler::CheckMultiApnState(sptr<ApnHolder> &apnHolder)
+{
+    if (apnManager_ == nullptr) {
+        return false;
+    }
+    std::string apnType = apnHolder->GetApnType();
+    if (apnType.compare(DATA_CONTEXT_ROLE_DEFAULT)) {
+        return false;
+    }
+    bool needDelayEstablish = false;
+    for (const sptr<ApnHolder> &apnHolderItem : apnManager_->GetAllApnHolder()) {
+        if (!IsMultiDefaultApn(apnHolderItem)) {
+            continue;
+        }
+        if (apnHolderItem->GetApnState() == PROFILE_STATE_CONNECTED ||
+            apnHolderItem->GetApnState() == PROFILE_STATE_CONNECTING
+        ) {
+            apnHolderItem->ReleaseDataConnection();
+            needDelayEstablish = true;
+            continue;
+        }
+        if (apnHolderItem->GetApnState() == PROFILE_STATE_DISCONNECTING) {
+            needDelayEstablish = true;
+            continue;
+        }
+    }
+    return needDelayEstablish;
+}
+
 void CellularDataHandler::AttemptEstablishDataConnection(sptr<ApnHolder> &apnHolder)
 {
     if ((airplaneObserver_ != nullptr) && (airplaneObserver_->IsAirplaneModeOn())) {
@@ -701,6 +736,11 @@ void CellularDataHandler::AttemptEstablishDataConnection(sptr<ApnHolder> &apnHol
     DelayedSingleton<CellularDataHiSysEvent>::GetInstance()->SetCellularDataActivateStartTime();
     StartTrace(HITRACE_TAG_OHOS, "ActivateCellularData");
     if (!CheckApnState(apnHolder)) {
+        FinishTrace(HITRACE_TAG_OHOS);
+        return;
+    }
+    if (CheckMultiApnState(apnHolder)) {
+        TELEPHONY_LOGE("Slot%{public}d: bip is using", slotId_);
         FinishTrace(HITRACE_TAG_OHOS);
         return;
     }
