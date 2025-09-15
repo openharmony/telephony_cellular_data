@@ -93,7 +93,7 @@ std::vector<std::string> CellularDataUtils::Split(const std::string &input, cons
 {
     std::vector<std::string> vec;
     if (input.empty()) {
-        TELEPHONY_LOGE("input is null");
+        TELEPHONY_LOGD("input is null");
         return vec;
     }
     std::string::size_type start = 0;

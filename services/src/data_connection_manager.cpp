@@ -287,7 +287,7 @@ void CcmDefaultState::UpdateNetworkInfo(const AppExecFwk::InnerEvent::Pointer &e
     for (SetupDataCallResultInfo &it : infos->dcList) {
         std::shared_ptr<CellularDataStateMachine> dataConnect = connectManager_.GetActiveConnectionByCid(it.cid);
         if (dataConnect == nullptr) {
-            TELEPHONY_LOGE("get active connection by cid is :=  %{public}d flag:=  %{public}d ", it.cid, it.flag);
+            TELEPHONY_LOGD("get active connection by cid is :=  %{public}d flag:=  %{public}d ", it.cid, it.flag);
             continue;
         }
         dataConnect->UpdateNetworkInfoIfInActive(it);
@@ -438,7 +438,7 @@ LinkBandwidthInfo DataConnectionManager::GetBandwidthsByRadioTech(const int32_t 
     if (radioTechName == "NR") {
         radioTechName = "NR_SA";
     }
-    TELEPHONY_LOGI("Slot%{public}d: accessRadioName is %{private}s", slotId_, radioTechName.c_str());
+    TELEPHONY_LOGD("Slot%{public}d: accessRadioName is %{private}s", slotId_, radioTechName.c_str());
     std::lock_guard<std::mutex> lock(bandwidthConfigMutex_);
     std::map<std::string, LinkBandwidthInfo>::iterator iter = bandwidthConfigMap_.find(radioTechName);
     if (iter != bandwidthConfigMap_.end()) {

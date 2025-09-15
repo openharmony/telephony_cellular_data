@@ -303,7 +303,7 @@ std::string CellularDataStateMachine::GetIpType(std::vector<AddressInfo> ipInfoA
     } else if (HasMatchedIpTypeAddrs(ipv6Type, ipInfoArraySize, ipInfoArray)) {
         result = "IPV6";
     } else {
-        TELEPHONY_LOGE("Ip type not match");
+        TELEPHONY_LOGD("Ip type not match");
     }
     return result;
 }
@@ -396,7 +396,7 @@ void CellularDataStateMachine::UpdateNetworkInfo(const SetupDataCallResultInfo &
     dnsInfoArray.insert(dnsInfoArray.end(), dnsSecArray.begin(), dnsSecArray.end());
     std::vector<AddressInfo> routeInfoArray = CellularDataUtils::ParseNormalIpAddr(dataCallInfo.gateway);
     if (ipInfoArray.empty() || dnsInfoArray.empty() || routeInfoArray.empty()) {
-        TELEPHONY_LOGE("Verifying network Information(ipInfoArray or dnsInfoArray or routeInfoArray empty)");
+        TELEPHONY_LOGD("Verifying network Information(ipInfoArray or dnsInfoArray or routeInfoArray empty)");
     }
     if (netLinkInfo_ == nullptr || netSupplierInfo_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: start update net info,but netLinkInfo or netSupplierInfo is null!", slotId);

@@ -212,7 +212,7 @@ int32_t DataSwitchSettings::QueryUserDataRoamingStatus(bool &dataRoamingEnabled)
     int32_t ret = settingsRdbHelper->GetValue(
         userDataRoamingUri, std::string(CELLULAR_DATA_COLUMN_ROAMING) + std::to_string(simId), userDataRoamingValue);
     if (ret != TELEPHONY_ERR_SUCCESS) {
-        TELEPHONY_LOGE("GetValue failed!");
+        TELEPHONY_LOGD("GetValue failed!");
         return ret;
     }
     userDataRoaming_ = (userDataRoamingValue == static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_ENABLED));
