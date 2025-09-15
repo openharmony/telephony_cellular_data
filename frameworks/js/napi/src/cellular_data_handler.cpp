@@ -2775,7 +2775,7 @@ void CellularDataHandler::EraseApnActivateList()
     for (std::vector<ApnActivateInfo>::iterator iter = apnActivateChrList_.begin();
         iter != apnActivateChrList_.end();) {
         if ((currentTime - iter->actSuccTime) > KEEP_APN_ACTIVATE_PERIOD) {
-            apnActivateChrList_.erase(iter);
+            iter = apnActivateChrList_.erase(iter);
         } else {
             iter++;
         }
