@@ -108,6 +108,8 @@ private:
     bool CheckAttachAndSimState(sptr<ApnHolder> &apnHolder);
     bool CheckRoamingState(sptr<ApnHolder> &apnHolder);
     bool CheckApnState(sptr<ApnHolder> &apnHolder);
+    bool IsMultiDefaultApn(const sptr<ApnHolder> &apnHolder);
+    bool CheckMultiApnState(sptr<ApnHolder> &apnHolder);
     void AttemptEstablishDataConnection(sptr<ApnHolder> &apnHolder);
     bool EstablishDataConnection(sptr<ApnHolder> &apnHolder, int32_t radioTech);
     void RadioPsConnectionAttached(const AppExecFwk::InnerEvent::Pointer &event);
