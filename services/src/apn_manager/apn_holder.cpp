@@ -81,7 +81,7 @@ void ApnHolder::AddUid(uint32_t uid)
 {
     std::unique_lock<std::shared_mutex> lock(reqUidsMutex_);
     if (reqUids_.find(uid) != reqUids_.end()) {
-        TELEPHONY_LOGI("apnholder add uid %{public}u", uid);
+        TELEPHONY_LOGD("apnholder add uid %{public}u", uid);
         return;
     }
     reqUids_.insert(uid);
@@ -93,7 +93,7 @@ void ApnHolder::RemoveUid(uint32_t uid)
     auto it = reqUids_.find(uid);
     if (it != reqUids_.end()) {
         reqUids_.erase(it);
-        TELEPHONY_LOGI("apnholder erase uid %{public}u", uid);
+        TELEPHONY_LOGD("apnholder erase uid %{public}u", uid);
         return;
     }
 }
@@ -221,7 +221,7 @@ bool ApnHolder::ReleaseCellularData(const NetRequest &netRequest)
 void ApnHolder::ReleaseAllCellularData()
 {
     std::unique_lock<std::mutex> lock(netRequestMutex_);
-    TELEPHONY_LOGI("clear all cellular data");
+    TELEPHONY_LOGD("clear all cellular data");
     netRequests_.clear();
     if (netRequests_.empty()) {
         dataCallEnabled_ = false;

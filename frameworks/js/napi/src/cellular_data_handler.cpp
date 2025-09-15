@@ -670,7 +670,7 @@ bool CellularDataHandler::CheckApnState(sptr<ApnHolder> &apnHolder)
         return false;
     }
     if (apnHolder->GetApnState() == PROFILE_STATE_RETRYING) {
-        TELEPHONY_LOGI("during retry, check state fail");
+        TELEPHONY_LOGD("during retry, check state fail");
         return false;
     }
     if (apnHolder->GetApnState() == PROFILE_STATE_FAILED) {
@@ -1166,7 +1166,7 @@ void CellularDataHandler::MsgEstablishDataConnection(const InnerEvent::Pointer &
     if (apnHolder->IsDataCallEnabled()) {
         AttemptEstablishDataConnection(apnHolder);
     } else {
-        TELEPHONY_LOGI("MsgEstablishDataConnection IsDataCallEnabled is false");
+        TELEPHONY_LOGD("MsgEstablishDataConnection IsDataCallEnabled is false");
         DisConnectionReason reason = DisConnectionReason::REASON_CHANGE_CONNECTION;
         int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
         CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, radioTech);
@@ -1226,7 +1226,7 @@ void CellularDataHandler::ConnectIfNeed(
         return;
     }
     if (event->GetParam() == TYPE_REQUEST_NET) {
-        TELEPHONY_LOGI("try to activate Cellular");
+        TELEPHONY_LOGD("try to activate Cellular");
         apnHolder->RequestCellularData(request);
         int32_t id = ApnManager::FindApnIdByCapability(request.capability);
         SendEstablishDataConnectionEvent(id);
@@ -1311,7 +1311,7 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
             TELEPHONY_LOGD("not allow reqeust cellular data because of in controled");
             return;
         } else {
-            TELEPHONY_LOGI("release all cellular data");
+            TELEPHONY_LOGD("release all cellular data");
             apnHolder->ReleaseAllCellularData();
         }
     }
@@ -1347,7 +1347,7 @@ void CellularDataHandler::OnReceiveEvent(const EventFwk::CommonEventData &data)
     const AAFwk::Want &want = data.GetWant();
     std::string action = want.GetAction();
     int32_t slotId = want.GetIntParam("slotId", 0);
-    TELEPHONY_LOGI("[slot%{public}d] action=%{public}s code=%{public}d", slotId_, action.c_str(), data.GetCode());
+    TELEPHONY_LOGD("[slot%{public}d] action=%{public}s code=%{public}d", slotId_, action.c_str(), data.GetCode());
     if (EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED == action) {
         if (slotId_ != slotId) {
             return;
@@ -1372,7 +1372,7 @@ void CellularDataHandler::OnReceiveEvent(const EventFwk::CommonEventData &data)
     } else if (action == CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
         RegisterDataSettingObserver();
     } else {
-        TELEPHONY_LOGI("Slot%{public}d: action=%{public}s code=%{public}d", slotId_, action.c_str(), data.GetCode());
+        TELEPHONY_LOGD("Slot%{public}d: action=%{public}s code=%{public}d", slotId_, action.c_str(), data.GetCode());
     }
 }
 
@@ -1804,11 +1804,11 @@ void CellularDataHandler::HandleDsdsModeChanged(const AppExecFwk::InnerEvent::Po
         TELEPHONY_LOGE("Slot%{public}d: object is null!", slotId_);
         return;
     }
-    TELEPHONY_LOGI("Slot%{public}d: DSDS changed with mode: %{public}d", slotId_, object->data);
+    TELEPHONY_LOGD("Slot%{public}d: DSDS changed with mode: %{public}d", slotId_, object->data);
     int32_t dsdsMode = DSDS_MODE_V2;
     CoreManagerInner::GetInstance().GetDsdsMode(dsdsMode);
     if (object->data == dsdsMode) {
-        TELEPHONY_LOGE("Slot%{public}d: DSDS mode is the same!", slotId_);
+        TELEPHONY_LOGD("Slot%{public}d: DSDS mode is the same!", slotId_);
         return;
     }
     if (object->data < DSDS_MODE_V2) {
@@ -2733,7 +2733,7 @@ ApnActivateReportInfo CellularDataHandler::GetApnActReportInfo(uint32_t apnId)
         }
     }
     info.topReason = topReason;
-    TELEPHONY_LOGI("GetApnActReportInfo,%{public}d,%{public}d,%{public}d,%{public}d,%{public}d,",
+    TELEPHONY_LOGD("GetApnActReportInfo,%{public}d,%{public}d,%{public}d,%{public}d,%{public}d,",
         totalDuration, totalActTimes, totalActSuccTimes, topReason, topReasonCnt);
     return info;
 }

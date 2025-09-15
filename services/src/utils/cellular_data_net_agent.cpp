@@ -172,7 +172,7 @@ int32_t CellularDataNetAgent::UpdateNetSupplierInfo(
 void CellularDataNetAgent::UpdateNetLinkInfo(int32_t supplierId, sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo)
 {
     int32_t result = NetConnClient::GetInstance().UpdateNetLinkInfo(supplierId, netLinkInfo);
-    TELEPHONY_LOGI("result:%{public}d", result);
+    TELEPHONY_LOGD("result:%{public}d", result);
 }
 
 void CellularDataNetAgent::AddNetSupplier(const NetSupplier &netSupplier)
@@ -189,7 +189,7 @@ int32_t CellularDataNetAgent::GetSupplierId(const int32_t slotId, uint64_t capab
 {
     for (const NetSupplier &netSupplier : netSuppliers_) {
         if (netSupplier.slotId == slotId && netSupplier.capability == capability) {
-            TELEPHONY_LOGI(
+            TELEPHONY_LOGD(
                 "find supplierId %{public}d capability:%{public}" PRIu64 "", netSupplier.supplierId, capability);
             return netSupplier.supplierId;
         }

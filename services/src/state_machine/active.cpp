@@ -327,7 +327,7 @@ void Active::RefreshTcpBufferSizes()
         return;
     }
     std::string tcpBuffer = shareStateMachine->cdConnectionManager_->GetTcpBufferByRadioTech(radioTech);
-    TELEPHONY_LOGI("tcpBuffer is %{public}s", tcpBuffer.c_str());
+    TELEPHONY_LOGD("tcpBuffer is %{public}s", tcpBuffer.c_str());
     shareStateMachine->SetConnectionTcpBuffer(tcpBuffer);
 }
 
@@ -346,7 +346,7 @@ void Active::RefreshConnectionBandwidths()
         return;
     }
     LinkBandwidthInfo linkBandwidthInfo = shareStateMachine->cdConnectionManager_->GetBandwidthsByRadioTech(radioTech);
-    TELEPHONY_LOGI("upBandwidth is %{public}u, downBandwidth is %{public}u", linkBandwidthInfo.upBandwidth,
+    TELEPHONY_LOGD("upBandwidth is %{public}u, downBandwidth is %{public}u", linkBandwidthInfo.upBandwidth,
         linkBandwidthInfo.downBandwidth);
     shareStateMachine->SetConnectionBandwidth(linkBandwidthInfo.upBandwidth, linkBandwidthInfo.downBandwidth);
 }

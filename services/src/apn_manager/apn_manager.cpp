@@ -515,7 +515,7 @@ ApnProfileState ApnManager::GetOverallApnState() const
         return ApnProfileState::PROFILE_STATE_IDLE;
     }
     if (HasAnyConnectedState()) {
-        TELEPHONY_LOGI("apn overall state is STATE_CONNECTED");
+        TELEPHONY_LOGD("apn overall state is STATE_CONNECTED");
         return ApnProfileState::PROFILE_STATE_CONNECTED;
     }
     bool failState = false;
@@ -525,7 +525,7 @@ ApnProfileState ApnManager::GetOverallApnState() const
         }
         if (apnHolder->GetApnState() == ApnProfileState::PROFILE_STATE_CONNECTING ||
             apnHolder->GetApnState() == ApnProfileState::PROFILE_STATE_RETRYING) {
-            TELEPHONY_LOGI("apn overall state is STATE_CONNECTING");
+            TELEPHONY_LOGD("apn overall state is STATE_CONNECTING");
             return ApnProfileState::PROFILE_STATE_CONNECTING;
         } else if (apnHolder->GetApnState() == ApnProfileState::PROFILE_STATE_IDLE) {
             failState = true;

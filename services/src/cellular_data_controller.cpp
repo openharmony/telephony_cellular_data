@@ -483,7 +483,7 @@ bool CellularDataController::ReleaseCellularDataConnection() const
         TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler is null", slotId_);
         return false;
     }
-    TELEPHONY_LOGI("ReleaseCellularDataConnection slot%{public}d", slotId_);
+    TELEPHONY_LOGD("ReleaseCellularDataConnection slot%{public}d", slotId_);
     cellularDataHandler_->ReleaseCellularDataConnection();
     return true;
 }

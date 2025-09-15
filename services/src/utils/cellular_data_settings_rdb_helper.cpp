@@ -120,7 +120,7 @@ int32_t CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &col
     settingHelper->Release();
     TELEPHONY_LOGD("Query end resultValue is %{public}s", resultValue.c_str());
     if (resultValue.empty()) {
-        TELEPHONY_LOGE("resultValue is empty");
+        TELEPHONY_LOGD("resultValue is empty");
         return TELEPHONY_ERR_DATABASE_READ_EMPTY;
     }
     value = atoi(resultValue.c_str());

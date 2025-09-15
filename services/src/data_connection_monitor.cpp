@@ -87,10 +87,10 @@ int32_t DataConnectionMonitor::GetStallDetectionPeriod()
 
 void DataConnectionMonitor::StartStallDetectionTimer()
 {
-    TELEPHONY_LOGI("Slot%{public}d: start stall detection", slotId_);
+    TELEPHONY_LOGD("Slot%{public}d: start stall detection", slotId_);
     stallDetectionEnabled_ = true;
     int32_t stallDetectionPeriod = GetStallDetectionPeriod();
-    TELEPHONY_LOGI("stallDetectionPeriod = %{public}d", stallDetectionPeriod);
+    TELEPHONY_LOGD("stallDetectionPeriod = %{public}d", stallDetectionPeriod);
     if (!HasInnerEvent(CellularDataEventCode::MSG_STALL_DETECTION_EVENT_ID)) {
         AppExecFwk::InnerEvent::Pointer event =
             AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_STALL_DETECTION_EVENT_ID);
@@ -113,7 +113,7 @@ __attribute__((no_sanitize("cfi"))) void DataConnectionMonitor::OnStallDetection
         noRecvPackets_ = 0;
     }
     int32_t stallDetectionPeriod = GetStallDetectionPeriod();
-    TELEPHONY_LOGI("stallDetectionPeriod = %{public}d", stallDetectionPeriod);
+    TELEPHONY_LOGD("stallDetectionPeriod = %{public}d", stallDetectionPeriod);
     if (!HasInnerEvent(CellularDataEventCode::MSG_STALL_DETECTION_EVENT_ID) && stallDetectionEnabled_) {
         AppExecFwk::InnerEvent::Pointer event =
             AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_STALL_DETECTION_EVENT_ID);
@@ -331,7 +331,7 @@ void DataConnectionMonitor::IsNeedDoRecovery(bool needDoRecovery)
         dataRecoveryState_ = RecoveryState::STATE_REQUEST_CONTEXT_LIST;
     }
     int32_t stallDetectionPeriod = GetStallDetectionPeriod();
-    TELEPHONY_LOGI("stallDetectionPeriod = %{public}d", stallDetectionPeriod);
+    TELEPHONY_LOGD("stallDetectionPeriod = %{public}d", stallDetectionPeriod);
     if (!HasInnerEvent(CellularDataEventCode::MSG_STALL_DETECTION_EVENT_ID) && stallDetectionEnabled_) {
         AppExecFwk::InnerEvent::Pointer event =
             AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_STALL_DETECTION_EVENT_ID);
