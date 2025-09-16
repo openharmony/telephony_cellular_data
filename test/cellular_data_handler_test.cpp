@@ -1195,8 +1195,28 @@ HWTEST_F(CellularDataHandlerTest, CheckApnActivate001, Function | MediumTest | L
     cellularDataHandler->SetApnActivateEnd(resultInfo4);
     cellularDataHandler->GetApnActReportInfo(DATA_CONTEXT_ROLE_DEFAULT_ID);
     cellularDataHandler->GetApnActReportInfo(DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID);
-    int32_t sleepTime = 32;
-    sleep(sleepTime);
+    int32_t listLen = 4;
+    EXPECT_EQ(cellularDataHandler->apnActivateChrList_.size(), listLen);
+}
+
+/**
+@tc.number Telephony_CheckApnActivate002
+@tc.name CheckApnActivate002
+@tc.desc Function test
+*/
+HWTEST_F(CellularDataHandlerTest, CheckApnActivate002, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    EventFwk::MatchingSkills matchingSkills;
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, slotId);
+    cellularDataHandler->Init();
+    ApnActivateInfo info1;
+    info1.reason = 0;
+    info1.actSuccTime = 0;
+    info1.apnId = 1;
+    info1.duration = 0;
+    cellularDataHandler->apnActivateChrList_.push_back(info1);
     cellularDataHandler->EraseApnActivateList();
     EXPECT_EQ(cellularDataHandler->apnActivateChrList_.size(), 0);
 }
@@ -1223,8 +1243,29 @@ HWTEST_F(CellularDataHandlerTest, CheckMultiApnState001, Function | MediumTest |
         sptr<ApnHolder> bipApnHolder = apnManager->GetApnHolder(DATA_CONTEXT_ROLE_BIP);
         result = cellularDataHandler->CheckMultiApnState(bipApnHolder);
         EXPECT_EQ(result, false);
+    }
+}
+
+/**
+@tc.number Telephony_CheckMultiApnState
+@tc.name CheckMultiApnState002
+@tc.desc Function test
+*/
+HWTEST_F(CellularDataHandlerTest, CheckMultiApnState002, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    EventFwk::MatchingSkills matchingSkills;
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, slotId);
+    cellularDataHandler->Init();
+    sptr<ApnManager> apnManager = cellularDataHandler->apnManager_;
+    if (apnManager == nullptr) {
+        EXPECT_EQ(apnManager, nullptr);
+    } else {
+        sptr<ApnHolder> defaultApnHolder = apnManager->GetApnHolder(DATA_CONTEXT_ROLE_DEFAULT);
+        sptr<ApnHolder> bipApnHolder = apnManager->GetApnHolder(DATA_CONTEXT_ROLE_BIP);
         bipApnHolder->SetApnState(PROFILE_STATE_DISCONNECTING);
-        result = cellularDataHandler->CheckMultiApnState(defaultApnHolder);
+        bool result = cellularDataHandler->CheckMultiApnState(defaultApnHolder);
         EXPECT_EQ(result, true);
         bipApnHolder->SetApnState(PROFILE_STATE_CONNECTED);
         result = cellularDataHandler->CheckMultiApnState(defaultApnHolder);
@@ -1237,6 +1278,29 @@ HWTEST_F(CellularDataHandlerTest, CheckMultiApnState001, Function | MediumTest |
         EXPECT_EQ(result, false);
         cellularDataHandler->apnManager_ = nullptr;
         result = cellularDataHandler->CheckMultiApnState(defaultApnHolder);
+        EXPECT_EQ(result, false);
+    }
+}
+
+/**
+@tc.number Telephony_CheckMultiApnState
+@tc.name CheckMultiApnState003
+@tc.desc Function test
+*/
+HWTEST_F(CellularDataHandlerTest, CheckMultiApnState003, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    EventFwk::MatchingSkills matchingSkills;
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, slotId);
+    cellularDataHandler->Init();
+    sptr<ApnManager> apnManager = cellularDataHandler->apnManager_;
+    if (apnManager == nullptr) {
+        EXPECT_EQ(apnManager, nullptr);
+    } else {
+        sptr<ApnHolder> defaultApnHolder = apnManager->GetApnHolder(DATA_CONTEXT_ROLE_DEFAULT);
+        cellularDataHandler->apnManager_ = nullptr;
+        bool result = cellularDataHandler->CheckMultiApnState(defaultApnHolder);
         EXPECT_EQ(result, false);
     }
 }
