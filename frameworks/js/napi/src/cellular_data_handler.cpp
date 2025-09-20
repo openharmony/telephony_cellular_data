@@ -693,7 +693,7 @@ bool CellularDataHandler::CheckApnState(sptr<ApnHolder> &apnHolder)
 bool CellularDataHandler::IsMultiDefaultApn(const sptr<ApnHolder> &apnHolder)
 {
     std::string apnType = apnHolder->GetApnType();
-    return !apnType.compare(DATA_CONTEXT_ROLE_BIP);
+    return (!apnType.compare(DATA_CONTEXT_ROLE_BIP) || !apnType.compare(DATA_CONTEXT_ROLE_DUN));
 }
 
 bool CellularDataHandler::CheckMultiApnState(sptr<ApnHolder> &apnHolder)
@@ -740,7 +740,7 @@ void CellularDataHandler::AttemptEstablishDataConnection(sptr<ApnHolder> &apnHol
         return;
     }
     if (CheckMultiApnState(apnHolder)) {
-        TELEPHONY_LOGE("Slot%{public}d: bip is using", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: bip or dun is using", slotId_);
         FinishTrace(HITRACE_TAG_OHOS);
         return;
     }
