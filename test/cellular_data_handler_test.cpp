@@ -1304,5 +1304,66 @@ HWTEST_F(CellularDataHandlerTest, CheckMultiApnState003, Function | MediumTest |
         EXPECT_EQ(result, false);
     }
 }
+
+/**
+@tc.number Telephony_CheckMultiApnState
+@tc.name CheckMultiApnState004
+@tc.desc Function test
+*/
+HWTEST_F(CellularDataHandlerTest, CheckMultiApnState004, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    EventFwk::MatchingSkills matchingSkills;
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, slotId);
+    cellularDataHandler->Init();
+    sptr<ApnManager> apnManager = cellularDataHandler->apnManager_;
+    if (apnManager == nullptr) {
+        EXPECT_EQ(apnManager, nullptr);
+    } else {
+        sptr<ApnHolder> defaultApnHolder = apnManager->GetApnHolder(DATA_CONTEXT_ROLE_DEFAULT);
+        bool result = cellularDataHandler->CheckMultiApnState(defaultApnHolder);
+        EXPECT_EQ(result, false);
+        sptr<ApnHolder> dunApnHolder = apnManager->GetApnHolder(DATA_CONTEXT_ROLE_DUN);
+        result = cellularDataHandler->CheckMultiApnState(dunApnHolder);
+        EXPECT_EQ(result, false);
+    }
+}
+
+/**
+@tc.number Telephony_CheckMultiApnState
+@tc.name CheckMultiApnState005
+@tc.desc Function test
+*/
+HWTEST_F(CellularDataHandlerTest, CheckMultiApnState005, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    EventFwk::MatchingSkills matchingSkills;
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, slotId);
+    cellularDataHandler->Init();
+    sptr<ApnManager> apnManager = cellularDataHandler->apnManager_;
+    if (apnManager == nullptr) {
+        EXPECT_EQ(apnManager, nullptr);
+    } else {
+        sptr<ApnHolder> defaultApnHolder = apnManager->GetApnHolder(DATA_CONTEXT_ROLE_DEFAULT);
+        sptr<ApnHolder> dunApnHolder = apnManager->GetApnHolder(DATA_CONTEXT_ROLE_DUN);
+        dunApnHolder->SetApnState(PROFILE_STATE_DISCONNECTING);
+        bool result = cellularDataHandler->CheckMultiApnState(defaultApnHolder);
+        EXPECT_EQ(result, true);
+        dunApnHolder->SetApnState(PROFILE_STATE_CONNECTED);
+        result = cellularDataHandler->CheckMultiApnState(defaultApnHolder);
+        EXPECT_EQ(result, true);
+        dunApnHolder->SetApnState(PROFILE_STATE_CONNECTING);
+        result = cellularDataHandler->CheckMultiApnState(defaultApnHolder);
+        EXPECT_EQ(result, true);
+        dunApnHolder->SetApnState(PROFILE_STATE_IDLE);
+        result = cellularDataHandler->CheckMultiApnState(defaultApnHolder);
+        EXPECT_EQ(result, false);
+        cellularDataHandler->apnManager_ = nullptr;
+        result = cellularDataHandler->CheckMultiApnState(defaultApnHolder);
+        EXPECT_EQ(result, false);
+    }
+}
 } // namespace Telephony
 } // namespace OHOS
