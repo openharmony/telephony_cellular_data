@@ -74,27 +74,42 @@ sptr<ApnItem> ApnHolder::GetCurrentApn() const
 bool ApnHolder::IsReqUidsEmpty()
 {
     std::shared_lock<std::shared_mutex> lock(reqUidsMutex_);
-    return reqUids_.empty();
+    return reqUids_.empty() && regUids_.empty();
 }
 
-void ApnHolder::AddUid(uint32_t uid)
+void ApnHolder::AddUid(uint32_t uid, int32_t registerType)
 {
     std::unique_lock<std::shared_mutex> lock(reqUidsMutex_);
-    if (reqUids_.find(uid) != reqUids_.end()) {
-        TELEPHONY_LOGD("apnholder add uid %{public}u", uid);
-        return;
+    if (registerType == REQUEST) {
+        if (reqUids_.find(uid) != reqUids_.end()) {
+            TELEPHONY_LOGI("apnholder request uid %{public}u already exists", uid);
+            return;
+        }
+        reqUids_.insert(uid);
+    } else if (registerType == REGISTER) {
+        if (regUids_.find(uid) != regUids_.end()) {
+            TELEPHONY_LOGI("apnholder register uid %{public}u already exists", uid);
+            return;
+        }
+        regUids_.insert(uid);
     }
-    reqUids_.insert(uid);
 }
 
-void ApnHolder::RemoveUid(uint32_t uid)
+void ApnHolder::RemoveUid(uint32_t uid, int32_t registerType)
 {
     std::unique_lock<std::shared_mutex> lock(reqUidsMutex_);
-    auto it = reqUids_.find(uid);
-    if (it != reqUids_.end()) {
-        reqUids_.erase(it);
-        TELEPHONY_LOGD("apnholder erase uid %{public}u", uid);
-        return;
+    if (registerType == REQUEST) {
+        auto it = reqUids_.find(uid);
+        if (it != reqUids_.end()) {
+            reqUids_.erase(it);
+            TELEPHONY_LOGI("apnholder erase uid request %{public}u", uid);
+        }
+    } else if (registerType == REGISTER) {
+        auto it = regUids_.find(uid);
+        if (it != regUids_.end()) {
+            regUids_.erase(it);
+            TELEPHONY_LOGI("apnholder erase uid register %{public}u", uid);
+        }
     }
 }
 
@@ -102,6 +117,7 @@ void ApnHolder::ReleaseAllUids()
 {
     std::unique_lock<std::shared_mutex> lock(reqUidsMutex_);
     reqUids_.clear();
+    regUids_.clear();
 }
 
 void ApnHolder::SetApnState(ApnProfileState state)
@@ -181,6 +197,11 @@ HasSystemUse ApnHolder::GetUidStatus() const
 {
     std::unique_lock<std::shared_mutex> lock(reqUidsMutex_);
     for (auto item : reqUids_) {
+        if (item < SYSTEM_UID) {
+            return HasSystemUse::HAS;
+        }
+    }
+    for (auto item : regUids_) {
         if (item < SYSTEM_UID) {
             return HasSystemUse::HAS;
         }
