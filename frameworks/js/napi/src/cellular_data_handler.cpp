@@ -341,8 +341,6 @@ void CellularDataHandler::ClearConnection(const sptr<ApnHolder> &apn, DisConnect
         TELEPHONY_LOGD("Slot%{public}d: stateMachine is null", slotId_);
         return;
     }
-    TELEPHONY_LOGI("Slot%{public}d: The APN holder is of type %{public}s, reason:%{public}d",
-        slotId_, apn->GetApnType().c_str(), reason);
     std::unique_ptr<DataDisconnectParams> object = std::make_unique<DataDisconnectParams>(apn->GetApnType(), reason);
     if (object == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: ClearConnection fail, object is null", slotId_);
@@ -352,9 +350,11 @@ void CellularDataHandler::ClearConnection(const sptr<ApnHolder> &apn, DisConnect
     if (apnState == ApnProfileState::PROFILE_STATE_IDLE ||
         apnState == ApnProfileState::PROFILE_STATE_DISCONNECTING ||
         apnState == ApnProfileState::PROFILE_STATE_RETRYING) {
-        TELEPHONY_LOGE("Slot%{public}d: apn state has been idle, disconnecting, or retrying", slotId_);
+        TELEPHONY_LOGD("Slot%{public}d: apn state has been idle, disconnecting, or retrying", slotId_);
         return;
     }
+    TELEPHONY_LOGI("Slot%{public}d: The APN holder is of type %{public}s, reason:%{public}d",
+        slotId_, apn->GetApnType().c_str(), reason);
     apn->SetApnState(PROFILE_STATE_DISCONNECTING);
     CellularDataHiSysEvent::WriteDataConnectStateBehaviorEvent(slotId_, apn->GetApnType(),
         apn->GetCapability(), static_cast<int32_t>(PROFILE_STATE_DISCONNECTING));
