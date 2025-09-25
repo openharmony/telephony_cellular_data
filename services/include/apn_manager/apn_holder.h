@@ -64,8 +64,8 @@ public:
     static bool IsSameApnItem(const sptr<ApnItem> &newApnItem, const sptr<ApnItem> &oldApnItem, bool roamingState);
     static bool IsCompatibleApnItem(const sptr<ApnItem> &newApnItem, const sptr<ApnItem> &oldApnItem,
         bool roamingState);
-    void AddUid(uint32_t uid);
-    void RemoveUid(uint32_t uid);
+    void AddUid(uint32_t uid, int32_t registerType);
+    void RemoveUid(uint32_t uid, int32_t registerType);
     void ReleaseAllUids();
     HasSystemUse GetUidStatus() const;
     void SetApnBadState(bool isBad);
@@ -87,6 +87,7 @@ private:
     std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine_;
     std::vector<NetRequest> netRequests_;
     std::set<uint32_t> reqUids_;
+    std::set<uint32_t> regUids_;
 };
 } // namespace Telephony
 } // namespace OHOS
