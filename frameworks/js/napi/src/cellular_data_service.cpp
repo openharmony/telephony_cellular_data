@@ -752,7 +752,7 @@ int32_t CellularDataService::IsNeedDoRecovery(int32_t slotId, bool needDoRecover
 std::shared_ptr<CellularDataController> CellularDataService::GetCellularDataController(int32_t slotId)
 {
     if (slotId < 0 || !isInitSuccess_) {
-        TELEPHONY_LOGE("Invalid slotId or Init is not success. slotId=%{public}d, isInitSuccess=%{public}d",
+        TELEPHONY_LOGD("Invalid slotId or Init is not success. slotId=%{public}d, isInitSuccess=%{public}d",
             slotId, (int32_t)isInitSuccess_);
         return nullptr;
     }
@@ -768,7 +768,7 @@ std::shared_ptr<CellularDataController> CellularDataService::GetCellularDataCont
 
 std::shared_ptr<CellularDataController> CellularDataService::GetCellularDataControllerForce(int32_t simId)
 {
-    TELEPHONY_LOGI("GetCellularDataControllerForce, enter");
+    TELEPHONY_LOGD("GetCellularDataControllerForce, enter");
     if (!isInitSuccess_) {
         return nullptr;
     }
