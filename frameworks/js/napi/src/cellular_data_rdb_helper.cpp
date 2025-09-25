@@ -28,7 +28,7 @@ CellularDataRdbHelper::CellularDataRdbHelper() : cellularDataUri_(CELLULAR_DATA_
 
 CellularDataRdbHelper::~CellularDataRdbHelper() = default;
 
-std::shared_ptr<DataShare::DataShareHelper> CellularDataRdbHelper::CreateDataAbilityHelper()
+std::shared_ptr<DataShare::DataShareHelper> CellularDataRdbHelper::CreateDataAbilityHelper(const int waitTime)
 {
     TELEPHONY_LOGI("Create data ability helper");
     sptr<ISystemAbilityManager> saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -41,7 +41,14 @@ std::shared_ptr<DataShare::DataShareHelper> CellularDataRdbHelper::CreateDataAbi
         TELEPHONY_LOGE("GetSystemAbility Service Failed.");
         return nullptr;
     }
-    return DataShare::DataShareHelper::Creator(remoteObj, CELLULAR_DATA_RDB_URI);
+    int32_t errCode = 0;
+    auto resPair = DataShare::DataShareHelper::Create(remoteObj, CELLULAR_DATA_RDB_URI, "", waitTime);
+    errCode = resPair.first;
+    if (errCode != 0) {
+        TELEPHONY_LOGE("Call DataShareHelper::Create failed %{public}d", errCode);
+        return nullptr;
+    }
+    return resPair.second;
 }
 
 int CellularDataRdbHelper::Update(
@@ -92,7 +99,7 @@ bool CellularDataRdbHelper::ResetApns(int32_t slotId)
 bool CellularDataRdbHelper::QueryApns(
     const std::string &mcc, const std::string &mnc, std::vector<PdpProfile> &apnVec, int32_t slotId)
 {
-    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAbilityHelper();
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAbilityHelper(DB_CONNECT_MAX_WAIT_TIME);
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("dataShareHelper is null");
         return false;
@@ -147,9 +154,9 @@ bool CellularDataRdbHelper::QueryMvnoApnsByType(const std::string &mcc, const st
     return true;
 }
 
-bool CellularDataRdbHelper::QueryPreferApn(int32_t slotId, std::vector<PdpProfile> &apnVec)
+bool CellularDataRdbHelper::QueryPreferApn(int32_t slotId, std::vector<PdpProfile> &apnVec, const int waitTime)
 {
-    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAbilityHelper();
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAbilityHelper(waitTime);
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("dataShareHelper is null");
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId, SWITCH_ON,

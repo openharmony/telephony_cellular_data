@@ -772,7 +772,7 @@ bool ApnManager::GetPreferId(int32_t slotId)
         return false;
     }
     std::vector<PdpProfile> preferApnVec;
-    if (helper->QueryPreferApn(slotId, preferApnVec)) {
+    if (helper->QueryPreferApn(slotId, preferApnVec, DB_CONNECT_MAX_WAIT_TIME)) {
         if (preferApnVec.size() > 0) {
             preferId_ = preferApnVec[0].profileId;
             TELEPHONY_LOGI("query preferId_ = %{public}d", preferId_);

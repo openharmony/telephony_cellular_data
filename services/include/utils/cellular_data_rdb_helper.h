@@ -37,6 +37,7 @@ namespace Telephony {
 struct PdpProfile;
 static constexpr int SETUP_DATA_AUTH_NONE = 0;
 static constexpr int SETUP_DATA_AUTH_PAP_CHAP = 3;
+static constexpr int DB_CONNECT_MAX_WAIT_TIME = 5;
 class CellularDataRdbHelper : public DelayedSingleton<CellularDataRdbHelper> {
     DECLARE_DELAYED_SINGLETON(CellularDataRdbHelper);
 
@@ -44,7 +45,7 @@ public:
     bool QueryApns(const std::string &mcc, const std::string &mnc, std::vector<PdpProfile> &apnVec, int32_t slotId);
     bool QueryMvnoApnsByType(const std::string &mcc, const std::string &mnc, const std::string &mvnoType,
         const std::string &mvnoDataFromSim, std::vector<PdpProfile> &mvnoApnVec, int32_t slotId);
-    bool QueryPreferApn(int32_t slotId, std::vector<PdpProfile> &apnVec);
+    bool QueryPreferApn(int32_t slotId, std::vector<PdpProfile> &apnVec, const int waitTime = 2);
     void RegisterObserver(const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
     void UnRegisterObserver(const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
     bool ResetApns(int32_t slotId);
@@ -53,7 +54,7 @@ public:
     void QueryAllApnInfo(std::vector<ApnInfo> &apnInfoList);
 
 private:
-    std::shared_ptr<DataShare::DataShareHelper> CreateDataAbilityHelper();
+    std::shared_ptr<DataShare::DataShareHelper> CreateDataAbilityHelper(const int waitTime = 2);
     int Update(const DataShare::DataShareValuesBucket &value, const DataShare::DataSharePredicates &predicates);
     int Insert(const DataShare::DataShareValuesBucket &values);
     void ReadApnResult(const std::shared_ptr<DataShare::DataShareResultSet> &result, std::vector<PdpProfile> &apnVec);
