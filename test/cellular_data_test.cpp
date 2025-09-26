@@ -2014,5 +2014,17 @@ HWTEST_F(CellularDataTest, TelephonyExtWrapperTest001, TestSize.Level3)
     EXPECT_EQ(ptr->telephonyDynamicLoadWrapperHandle_, nullptr);
     delete ptr;
 }
+
+/**
+ * @tc.number   CreateDataAbilityHelper_Test_01
+ * @tc.name     Test the CreateDataAbilityHelper and QueryPreferApn with wait time
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, CreateDataAbilityHelper_Test_01, TestSize.Level3)
+{
+    CellularDataRdbHelper cellularDataRdbHelper;
+    std::vector<PdpProfile> apnVec;
+    ASSERT_FALSE(cellularDataRdbHelper.QueryPreferApn(-1, apnVec, 5));
+}
 } // namespace Telephony
 } // namespace OHOS
