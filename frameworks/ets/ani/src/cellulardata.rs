@@ -1,4 +1,4 @@
-// Copyright (c) 2023 Huawei Device Co., Ltd.
+// Copyright (c) 2025 Huawei Device Co., Ltd.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -44,7 +44,7 @@ impl From<i32> for bridge::DataFlowType {
 #[ani_rs::native]
 pub fn is_cellulardata_enabled_sync() -> Result<bool, BusinessError> {
     let mut data_enabled = false;
-    let arkts_error = wrapper::ffi::isCellularDataEnabled(&mut data_enabled);
+    let arkts_error = wrapper::ffi::IsCellularDataEnabled(&mut data_enabled);
     if arkts_error.is_error() {
         return Err(BusinessError::from(arkts_error));
     }
@@ -54,7 +54,7 @@ pub fn is_cellulardata_enabled_sync() -> Result<bool, BusinessError> {
 
 #[ani_rs::native]
 pub fn enable_cellular_data_sync() -> Result<(), BusinessError> {
-    let arkts_error = wrapper::ffi::enableCellularDataSync();
+    let arkts_error = wrapper::ffi::EnableCellularDataSync();
     if arkts_error.is_error() {
         return Err(BusinessError::from(arkts_error));
     }
@@ -64,7 +64,7 @@ pub fn enable_cellular_data_sync() -> Result<(), BusinessError> {
 
 #[ani_rs::native]
 pub fn disable_cellular_data_sync() -> Result<(), BusinessError> {
-    let arkts_error = wrapper::ffi::disableCellularDataSync();
+    let arkts_error = wrapper::ffi::DisableCellularDataSync();
     if arkts_error.is_error() {
         return Err(BusinessError::from(arkts_error));
     }
@@ -74,14 +74,14 @@ pub fn disable_cellular_data_sync() -> Result<(), BusinessError> {
 
 #[ani_rs::native]
 pub fn get_default_cellular_data_slot_id_sync() -> Result<i32, BusinessError> {
-    let slot_id = wrapper::ffi::getDefaultCellularDataSlotIdSync();
+    let slot_id = wrapper::ffi::GetDefaultCellularDataSlotIdSync();
     Ok(slot_id)
 }
 
 #[ani_rs::native]
 pub fn get_cellular_data_state() -> Result<bridge::DataConnectState, BusinessError> {
     let mut cellular_data_state = -1;
-    let arkts_error = wrapper::ffi::getCellularDataState(&mut cellular_data_state);
+    let arkts_error = wrapper::ffi::GetCellularDataState(&mut cellular_data_state);
     if arkts_error.is_error() {
         return Err(BusinessError::from(arkts_error));
     }
@@ -91,7 +91,7 @@ pub fn get_cellular_data_state() -> Result<bridge::DataConnectState, BusinessErr
 
 #[ani_rs::native]
 pub fn disable_cellular_data_roaming_sync(slotId: i32) -> Result<(), BusinessError> {
-    let arkts_error = wrapper::ffi::disableCellularDataRoamingSync(slotId);
+    let arkts_error = wrapper::ffi::DisableCellularDataRoamingSync(slotId);
     if arkts_error.is_error() {
         return Err(BusinessError::from(arkts_error));
     }
@@ -101,7 +101,7 @@ pub fn disable_cellular_data_roaming_sync(slotId: i32) -> Result<(), BusinessErr
 
 #[ani_rs::native]
 pub fn enable_cellular_data_roaming_sync(slotId: i32) -> Result<(), BusinessError> {
-    let arkts_error = wrapper::ffi::enableCellularDataRoamingSync(slotId);
+    let arkts_error = wrapper::ffi::EnableCellularDataRoamingSync(slotId);
     if arkts_error.is_error() {
         return Err(BusinessError::from(arkts_error));
     }
@@ -112,7 +112,7 @@ pub fn enable_cellular_data_roaming_sync(slotId: i32) -> Result<(), BusinessErro
 #[ani_rs::native]
 pub fn is_cellular_data_roaming_enabled_sync(slotId: i32) -> Result<bool, BusinessError> {
     let mut data_enabled = false;
-    let arkts_error = wrapper::ffi::isCellularDataRoamingEnabledSync(slotId, &mut data_enabled);
+    let arkts_error = wrapper::ffi::IsCellularDataRoamingEnabledSync(slotId, &mut data_enabled);
     if arkts_error.is_error() {
         return Err(BusinessError::from(arkts_error));
     }
@@ -122,7 +122,7 @@ pub fn is_cellular_data_roaming_enabled_sync(slotId: i32) -> Result<bool, Busine
 
 #[ani_rs::native]
 pub fn set_default_cellular_data_slot_id_sync(slotId: i32) -> Result<(), BusinessError> {
-    let arkts_error = wrapper::ffi::setDefaultCellularDataSlotIdSyn(slotId);
+    let arkts_error = wrapper::ffi::SetDefaultCellularDataSlotIdSyn(slotId);
     if arkts_error.is_error() {
         return Err(BusinessError::from(arkts_error));
     }
@@ -134,14 +134,14 @@ pub fn set_default_cellular_data_slot_id_sync(slotId: i32) -> Result<(), Busines
 pub fn get_cellular_data_flow_type_sync(
     slotId: i32,
 ) -> Result<bridge::DataFlowType, BusinessError> {
-    let flowType = wrapper::ffi::getCellularDataFlowTypeSyn();
+    let flowType = wrapper::ffi::GetCellularDataFlowTypeSyn();
     Ok(bridge::DataFlowType::from(flowType))
 }
 
 #[ani_rs::native]
 pub fn set_preferred_apn_sync(apnId: i32) -> Result<bool, BusinessError> {
     let mut ret = false;
-    let arkts_error = wrapper::ffi::setPreferredApnSyn(apnId, &mut ret);
+    let arkts_error = wrapper::ffi::SetPreferredApnSyn(apnId, &mut ret);
     if arkts_error.is_error() {
         return Err(BusinessError::from(arkts_error));
     }
@@ -151,14 +151,14 @@ pub fn set_preferred_apn_sync(apnId: i32) -> Result<bool, BusinessError> {
 
 #[ani_rs::native]
 pub fn get_default_cellular_data_sim_id_sync() -> Result<i32, BusinessError> {
-    let mut ret = wrapper::ffi::getDefaultCellularDataSimIdSyn();
+    let mut ret = wrapper::ffi::GetDefaultCellularDataSimIdSyn();
     Ok(ret)
 }
 
 #[ani_rs::native]
 pub fn query_apn_ids_sync(info: bridge::ApnInfo) -> Result<Vec<u32>, BusinessError> {
     let mut ret: Vec<u32> = vec![];
-    let arkts_error = wrapper::ffi::queryApnIdsSync(&info.into(), &mut ret);
+    let arkts_error = wrapper::ffi::QueryApnIdsSync(&info.into(), &mut ret);
     if arkts_error.is_error() {
         return Err(BusinessError::from(arkts_error));
     }
@@ -168,7 +168,7 @@ pub fn query_apn_ids_sync(info: bridge::ApnInfo) -> Result<Vec<u32>, BusinessErr
 #[ani_rs::native]
 pub fn query_all_apns_sync() -> Result<Vec<bridge::ApnInfo>, BusinessError> {
     let mut ret: Vec<wrapper::ffi::ApnInfo> = vec![];
-    let arkts_error = wrapper::ffi::queryAllApnsSync(&mut ret);
+    let arkts_error = wrapper::ffi::QueryAllApnsSync(&mut ret);
     if arkts_error.is_error() {
         return Err(BusinessError::from(arkts_error));
     }
@@ -178,7 +178,7 @@ pub fn query_all_apns_sync() -> Result<Vec<bridge::ApnInfo>, BusinessError> {
 #[ani_rs::native]
 pub fn get_active_apn_name_sync() -> Result<String, BusinessError> {
     let mut ret = String::new();
-    let arkts_error = wrapper::ffi::getActiveApnNameSync(&mut ret);
+    let arkts_error = wrapper::ffi::GetActiveApnNameSync(&mut ret);
     if arkts_error.is_error() {
         return Err(BusinessError::from(arkts_error));
     }

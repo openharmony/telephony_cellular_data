@@ -1,4 +1,4 @@
-# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Copyright (C) 2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -10,6 +10,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import("//build/config/components/ets_frontend/ets2abc_config.gni")
 import("//build/ohos.gni")
 SUBSYSTEM_DIR = "../../../.."
@@ -33,6 +34,8 @@ ohos_static_library("cellular_data_ani_cxx") {
     "${target_gen_dir}/src",
   ]
 
+  branch_protector_ret = "pac_ret"
+
   sources = [
     "src/cxx/ani_cellular_data.cpp",
   ]
@@ -40,7 +43,6 @@ ohos_static_library("cellular_data_ani_cxx") {
   deps = [
     ":cellular_data_ani_cxx_gen",
     "$SUBSYSTEM_DIR/cellular_data/frameworks/native:tel_cellular_data_api",
-    "//third_party/rust/crates/cxx:cxx_cppdeps",
   ]
   external_deps = [
     "c_utils:utils",
@@ -48,6 +50,8 @@ ohos_static_library("cellular_data_ani_cxx") {
     "core_service:tel_core_service_api",
     "hilog:libhilog",
     "napi:ace_napi",
+    "rust_cxx:cxx_cppdeps",
+    "ipc:ipc_single"
   ]
   part_name = "cellular_data"
   subsystem_name = "telephony"
@@ -67,11 +71,11 @@ ohos_rust_shared_library("cellular_data_ani") {
   external_deps = [
     "runtime_core:ani",
     "netmanager_base:ani_rs",
+    "rust_cxx:lib"
   ]
   deps = [
     ":cellular_data_ani_cxx",
     "//third_party/rust/crates/serde/serde:lib",
-    "//third_party/rust/crates/cxx:lib",
   ]
 
   clippy_lints = "none"

@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
+#include "ani_cellular_data.h"
 #include "cellular_data_client.h"
 #include "napi_util.h"
 #include "cxx.h"
-#include "ani_cellular_data.h"
 #include "wrapper.rs.h"
 
 namespace OHOS {
@@ -30,7 +30,7 @@ static bool IsCellularDataManagerInited()
     return CellularDataClient::GetInstance().IsConnect();
 }
 
-ArktsError isCellularDataEnabled(bool &dataEnabled)
+ArktsError IsCellularDataEnabled(bool &dataEnabled)
 {
     int32_t errorCode;
 
@@ -51,7 +51,7 @@ ArktsError isCellularDataEnabled(bool &dataEnabled)
     return ArktsErr;
 }
 
-ArktsError enableCellularDataSync()
+ArktsError EnableCellularDataSync()
 {
     int32_t errorCode;
 
@@ -72,7 +72,7 @@ ArktsError enableCellularDataSync()
     return ArktsErr;
 }
 
-ArktsError disableCellularDataSync()
+ArktsError DisableCellularDataSync()
 {
     int32_t errorCode;
 
@@ -93,7 +93,7 @@ ArktsError disableCellularDataSync()
     return ArktsErr;
 }
 
-int32_t getDefaultCellularDataSlotIdSync()
+int32_t GetDefaultCellularDataSlotIdSync()
 {
     int32_t slotId = -1;
     slotId = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
@@ -121,7 +121,7 @@ static int32_t WrapCellularDataType(const int32_t cellularDataType)
     }
 }
 
-ArktsError getCellularDataState(int32_t &CellularDataState)
+ArktsError GetCellularDataState(int32_t &CellularDataState)
 {
     int32_t errorCode;
     if (IsCellularDataManagerInited()) {
@@ -140,7 +140,7 @@ ArktsError getCellularDataState(int32_t &CellularDataState)
     return ArktsErr;
 }
 
-ArktsError disableCellularDataRoamingSync(int32_t slotId)
+ArktsError DisableCellularDataRoamingSync(int32_t slotId)
 {
     int32_t errorCode = ERROR_SERVICE_UNAVAILABLE;
 
@@ -158,7 +158,7 @@ ArktsError disableCellularDataRoamingSync(int32_t slotId)
     return ArktsErr;
 }
 
-ArktsError enableCellularDataRoamingSync(int32_t slotId)
+ArktsError EnableCellularDataRoamingSync(int32_t slotId)
 {
     int32_t errorCode = ERROR_SERVICE_UNAVAILABLE;
 
@@ -177,7 +177,7 @@ ArktsError enableCellularDataRoamingSync(int32_t slotId)
     return ArktsErr;
 }
 
-ArktsError isCellularDataRoamingEnabledSync(int32_t slotId, bool &dataEnabled)
+ArktsError IsCellularDataRoamingEnabledSync(int32_t slotId, bool &dataEnabled)
 {
     int32_t errorCode = ERROR_SERVICE_UNAVAILABLE;
 
@@ -196,7 +196,7 @@ ArktsError isCellularDataRoamingEnabledSync(int32_t slotId, bool &dataEnabled)
     return ArktsErr;
 }
 
-ArktsError setDefaultCellularDataSlotIdSyn(int32_t slotId)
+ArktsError SetDefaultCellularDataSlotIdSyn(int32_t slotId)
 {
     int32_t errorCode = ERROR_SERVICE_UNAVAILABLE;
 
@@ -215,12 +215,12 @@ ArktsError setDefaultCellularDataSlotIdSyn(int32_t slotId)
     return ArktsErr;
 }
 
-int32_t getCellularDataFlowTypeSyn()
+int32_t GetCellularDataFlowTypeSyn()
 {
     return CellularDataClient::GetInstance().GetCellularDataFlowType();
 }
 
-ArktsError setPreferredApnSyn(int32_t apnId, bool &ret)
+ArktsError SetPreferredApnSyn(int32_t apnId, bool &ret)
 {
     int32_t errorCode = ERROR_SERVICE_UNAVAILABLE;
     if (IsCellularDataManagerInited()) {
@@ -238,7 +238,7 @@ ArktsError setPreferredApnSyn(int32_t apnId, bool &ret)
     return ArktsErr;
 }
 
-int32_t getDefaultCellularDataSimIdSyn()
+int32_t GetDefaultCellularDataSimIdSyn()
 {
     int32_t simId = 0;
     return CellularDataClient::GetInstance().GetDefaultCellularDataSimId(simId);
@@ -254,7 +254,7 @@ std::string U16StringToUtf8(const std::u16string &str)
     return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(str);
 }
 
-ArktsError queryApnIdsSync(const ApnInfo &info, rust::vec<uint32_t> &ret)
+ArktsError QueryApnIdsSync(const ApnInfo &info, rust::vec<uint32_t> &ret)
 {
     int32_t errorCode = ERROR_SERVICE_UNAVAILABLE;
     if (IsCellularDataManagerInited()) {
@@ -285,7 +285,7 @@ ArktsError queryApnIdsSync(const ApnInfo &info, rust::vec<uint32_t> &ret)
     return ArktsErr;
 }
 
-ArktsError queryAllApnsSync(rust::vec<ApnInfo> &ret)
+ArktsError QueryAllApnsSync(rust::vec<ApnInfo> &ret)
 {
     int32_t errorCode = ERROR_SERVICE_UNAVAILABLE;
     std::vector<OHOS::Telephony::ApnInfo> apnInfoList;
@@ -314,7 +314,7 @@ ArktsError queryAllApnsSync(rust::vec<ApnInfo> &ret)
     return ArktsErr;
 }
 
-ArktsError getActiveApnNameSync(rust::String &apnName)
+ArktsError GetActiveApnNameSync(rust::String &apnName)
 {
     int32_t errorCode = ERROR_SERVICE_UNAVAILABLE;
     std::string apnNameStr;
