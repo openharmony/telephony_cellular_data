@@ -37,8 +37,8 @@ export default namespace data {
     let p1 = taskpool.execute(nativeGetCellularDataState)
     p1.then((content: NullishType) => {
         callback(new BusinessError(), content as DataConnectState);
-    }, (err: BusinessError): void => {
-        callback(err, DataConnectState.DATA_STATE_UNKNOWN);
+    }, (err: Error): void => {
+        callback(err as BusinessError, DataConnectState.DATA_STATE_UNKNOWN);
     });
   }
 
