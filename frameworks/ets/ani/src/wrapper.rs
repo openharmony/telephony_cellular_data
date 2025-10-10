@@ -1,4 +1,4 @@
-// Copyright (c) 2025 Huawei Device Co., Ltd.
+// Copyright (c) 2023 Huawei Device Co., Ltd.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -68,21 +68,21 @@ pub mod ffi {
     unsafe extern "C++" {
         include!("ani_cellular_data.h");
 
-        fn IsCellularDataEnabled(dataEnabled: &mut bool) -> ArktsError;
-        fn EnableCellularDataSync() -> ArktsError;
-        fn DisableCellularDataSync() -> ArktsError;
-        fn GetDefaultCellularDataSlotIdSync() -> i32;
-        fn GetCellularDataState(cellular_data_state: &mut i32) -> ArktsError;
-        fn DisableCellularDataRoamingSync(slotId: i32) -> ArktsError;
-        fn EnableCellularDataRoamingSync(slotId: i32) -> ArktsError;
-        fn IsCellularDataRoamingEnabledSync(slotId: i32, ret: &mut bool) -> ArktsError;
-        fn SetDefaultCellularDataSlotIdSyn(slotId: i32) -> ArktsError;
-        fn SetPreferredApnSyn(apnId: i32, ret: &mut bool) -> ArktsError;
-        fn GetDefaultCellularDataSimIdSyn() -> i32;
-        fn GetCellularDataFlowTypeSyn() -> i32;
-        fn QueryApnIdsSync(info: &ApnInfo, ret: &mut Vec<u32>) -> ArktsError;
-        fn QueryAllApnsSync(ret: &mut Vec<ApnInfo>) -> ArktsError;
-        fn GetActiveApnNameSync(ret: &mut String) -> ArktsError;
+        fn isCellularDataEnabled(dataEnabled: &mut bool) -> ArktsError;
+        fn enableCellularDataSync() -> ArktsError;
+        fn disableCellularDataSync() -> ArktsError;
+        fn getDefaultCellularDataSlotIdSync() -> i32;
+        fn getCellularDataState(cellular_data_state: &mut i32) -> ArktsError;
+        fn disableCellularDataRoamingSync(slotId: i32) -> ArktsError;
+        fn enableCellularDataRoamingSync(slotId: i32) -> ArktsError;
+        fn isCellularDataRoamingEnabledSync(slotId: i32, ret: &mut bool) -> ArktsError;
+        fn setDefaultCellularDataSlotIdSyn(slotId: i32) -> ArktsError;
+        fn setPreferredApnSyn(apnId: i32, ret: &mut bool) -> ArktsError;
+        fn getDefaultCellularDataSimIdSyn() -> i32;
+        fn getCellularDataFlowTypeSyn() -> i32;
+        fn queryApnIdsSync(info: &ApnInfo, ret: &mut Vec<u32>) -> ArktsError;
+        fn queryAllApnsSync(ret: &mut Vec<ApnInfo>) -> ArktsError;
+        fn getActiveApnNameSync(ret: &mut String) -> ArktsError;
     }
 }
 

@@ -24,21 +24,21 @@ namespace CellularDataAni {
 struct ArktsError;
 struct ApnInfo;
 
-ArktsError IsCellularDataEnabled(bool &dataEnabled);
-ArktsError EnableCellularDataSync();
-ArktsError DisableCellularDataSync();
-int32_t GetDefaultCellularDataSlotIdSync();
-ArktsError GetCellularDataState(int32_t &CellularDataState);
-ArktsError DisableCellularDataRoamingSync(int32_t slotId);
-ArktsError EnableCellularDataRoamingSync(int32_t slotId);
-ArktsError IsCellularDataRoamingEnabledSync(int32_t slotId, bool &dataEnabled);
-ArktsError SetDefaultCellularDataSlotIdSyn(int32_t slotId);
-int32_t GetCellularDataFlowTypeSyn();
-ArktsError SetPreferredApnSyn(int32_t apnId, bool &ret);
-int32_t GetDefaultCellularDataSimIdSyn();
-ArktsError QueryApnIdsSync(const ApnInfo &info, rust::vec<uint32_t> &ret);
-ArktsError QueryAllApnsSync(rust::vec<ApnInfo> &ret);
-ArktsError GetActiveApnNameSync(rust::String &apnName);
+ArktsError isCellularDataEnabled(bool &dataEnabled);
+ArktsError enableCellularDataSync();
+ArktsError disableCellularDataSync();
+int32_t getDefaultCellularDataSlotIdSync();
+ArktsError getCellularDataState(int32_t &CellularDataState);
+ArktsError disableCellularDataRoamingSync(int32_t slotId);
+ArktsError enableCellularDataRoamingSync(int32_t slotId);
+ArktsError isCellularDataRoamingEnabledSync(int32_t slotId, bool &dataEnabled);
+ArktsError setDefaultCellularDataSlotIdSyn(int32_t slotId);
+int32_t getCellularDataFlowTypeSyn();
+ArktsError setPreferredApnSyn(int32_t apnId, bool &ret);
+int32_t getDefaultCellularDataSimIdSyn();
+ArktsError queryApnIdsSync(const ApnInfo &info, rust::vec<uint32_t> &ret);
+ArktsError queryAllApnsSync(rust::vec<ApnInfo> &ret);
+ArktsError getActiveApnNameSync(rust::String &apnName);
 } // namespace CellularDataAni
 } // namespace OHOS
 #endif
