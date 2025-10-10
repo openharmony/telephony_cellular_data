@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
+#include "ani_cellular_data.h"
 #include "cellular_data_client.h"
 #include "napi_util.h"
 #include "cxx.h"
-#include "ani_cellular_data.h"
 #include "wrapper.rs.h"
 
 namespace OHOS {
@@ -30,7 +30,7 @@ static bool IsCellularDataManagerInited()
     return CellularDataClient::GetInstance().IsConnect();
 }
 
-ArktsError isCellularDataEnabled(bool &dataEnabled)
+ArktsError IsCellularDataEnabled(bool &dataEnabled)
 {
     int32_t errorCode;
 
@@ -51,7 +51,7 @@ ArktsError isCellularDataEnabled(bool &dataEnabled)
     return ArktsErr;
 }
 
-ArktsError enableCellularDataSync()
+ArktsError EnableCellularDataSync()
 {
     int32_t errorCode;
 
@@ -72,7 +72,7 @@ ArktsError enableCellularDataSync()
     return ArktsErr;
 }
 
-ArktsError disableCellularDataSync()
+ArktsError DisableCellularDataSync()
 {
     int32_t errorCode;
 
@@ -93,7 +93,7 @@ ArktsError disableCellularDataSync()
     return ArktsErr;
 }
 
-int32_t getDefaultCellularDataSlotIdSync()
+int32_t GetDefaultCellularDataSlotIdSync()
 {
     int32_t slotId = -1;
     slotId = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
@@ -121,7 +121,7 @@ static int32_t WrapCellularDataType(const int32_t cellularDataType)
     }
 }
 
-ArktsError getCellularDataState(int32_t &CellularDataState)
+ArktsError GetCellularDataState(int32_t &CellularDataState)
 {
     int32_t errorCode;
     if (IsCellularDataManagerInited()) {

@@ -1,4 +1,4 @@
-// Copyright (c) 2023 Huawei Device Co., Ltd.
+// Copyright (c) 2025 Huawei Device Co., Ltd.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -26,11 +26,11 @@ pub mod ffi {
     unsafe extern "C++" {
         include!("ani_cellular_data.h");
 
-        fn isCellularDataEnabled(dataEnabled: &mut bool) -> ArktsError;
-        fn enableCellularDataSync() -> ArktsError;
-        fn disableCellularDataSync() -> ArktsError;
-        fn getDefaultCellularDataSlotIdSync() -> i32;
-        fn getCellularDataState(cellular_data_state: &mut i32) -> ArktsError;
+        fn IsCellularDataEnabled(dataEnabled: &mut bool) -> ArktsError;
+        fn EnableCellularDataSync() -> ArktsError;
+        fn DisableCellularDataSync() -> ArktsError;
+        fn GetDefaultCellularDataSlotIdSync() -> i32;
+        fn GetCellularDataState(cellular_data_state: &mut i32) -> ArktsError;
     }
 }
 

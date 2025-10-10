@@ -23,11 +23,11 @@ namespace OHOS {
 namespace CellularDataAni {
 struct ArktsError;
 
-ArktsError isCellularDataEnabled(bool &dataEnabled);
-ArktsError enableCellularDataSync();
-ArktsError disableCellularDataSync();
-int32_t getDefaultCellularDataSlotIdSync();
-ArktsError getCellularDataState(int32_t &CellularDataState);
+ArktsError IsCellularDataEnabled(bool &dataEnabled);
+ArktsError EnableCellularDataSync();
+ArktsError DisableCellularDataSync();
+int32_t GetDefaultCellularDataSlotIdSync();
+ArktsError GetCellularDataState(int32_t &CellularDataState);
 
 } // namespace CellularDataAni
 } // namespace OHOS

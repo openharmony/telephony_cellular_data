@@ -55,6 +55,7 @@
                 "samgr",
                 "telephony_data",
                 "runtime_core",
+                "rust_cxx",
                 "power_manager",
                 "netmanager_ext"
             ]
