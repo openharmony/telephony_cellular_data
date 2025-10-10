@@ -313,23 +313,5 @@ ArktsError queryAllApnsSync(rust::vec<ApnInfo> &ret)
     };
     return ArktsErr;
 }
-
-ArktsError getActiveApnNameSync(rust::String &apnName)
-{
-    int32_t errorCode = ERROR_SERVICE_UNAVAILABLE;
-    std::string apnNameStr;
-    if (IsCellularDataManagerInited()) {
-        errorCode = CellularDataClient::GetInstance().GetActiveApnName(apnNameStr);
-    }
-    apnName = rust::string(apnNameStr);
-    JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(errorCode,
-                                                                    "GetActiveApnName",
-                                                                    SET_TELEPHONY_STATE);
-    ArktsError ArktsErr = {
-        .errorCode = error.errorCode,
-        .errorMessage = rust::string(error.errorMessage),
-    };
-    return ArktsErr;
-}
 } // namespace CellularDataAni
 } // namespace OHOS

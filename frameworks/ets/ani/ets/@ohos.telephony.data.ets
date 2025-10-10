@@ -354,22 +354,6 @@ export default namespace data {
     })
   }
 
-  export native function nativeGetActiveApnName(): string;
-
-  export function getActiveApnName(): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      let p1 = taskpool.execute((): string => {
-        return nativeGetActiveApnName();
-      })
-      p1.then((e: NullishType) => {
-          let r = e as string
-          resolve(r)
-      }).catch((e: Error): void => {
-          reject(e)
-      })
-    })
-  }
-
   export function isCellularDataRoamingEnabledSync(slotId: int): boolean {
     return nativeIsCellularDataRoamingEnabled(slotId);
   }
