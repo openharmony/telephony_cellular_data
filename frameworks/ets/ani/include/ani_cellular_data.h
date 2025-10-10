@@ -22,22 +22,12 @@
 namespace OHOS {
 namespace CellularDataAni {
 struct ArktsError;
-struct ApnInfo;
 
 ArktsError isCellularDataEnabled(bool &dataEnabled);
 ArktsError enableCellularDataSync();
 ArktsError disableCellularDataSync();
 int32_t getDefaultCellularDataSlotIdSync();
 ArktsError getCellularDataState(int32_t &CellularDataState);
-ArktsError disableCellularDataRoamingSync(int32_t slotId);
-ArktsError enableCellularDataRoamingSync(int32_t slotId);
-ArktsError isCellularDataRoamingEnabledSync(int32_t slotId, bool &dataEnabled);
-ArktsError setDefaultCellularDataSlotIdSyn(int32_t slotId);
-int32_t getCellularDataFlowTypeSyn();
-ArktsError setPreferredApnSyn(int32_t apnId, bool &ret);
-int32_t getDefaultCellularDataSimIdSyn();
-ArktsError queryApnIdsSync(const ApnInfo &info, rust::vec<uint32_t> &ret);
-ArktsError queryAllApnsSync(rust::vec<ApnInfo> &ret);
 
 } // namespace CellularDataAni
 } // namespace OHOS
