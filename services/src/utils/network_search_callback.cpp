@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Telephony {
 bool NetworkSearchCallback::HasInternetCapability(int32_t slotId, int32_t cId)
 {
-    int32_t result;
+    int32_t result = 0;
     DelayedRefSingleton<CellularDataService>::GetInstance().HasInternetCapability(slotId, cId, result);
     if (result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)) {
         return true;
