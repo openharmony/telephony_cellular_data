@@ -127,6 +127,7 @@ public:
     MOCK_METHOD(int32_t, GetProxyMode, (OHOS::NetManagerStandard::ProxyModeType &mode));
     MOCK_METHOD(int32_t, GetPacFileUrl, (std::string &pacUrl));
     MOCK_METHOD(int32_t, FindProxyForURL, (const std::string &url, const std::string &host, std::string &proxy));
+    MOCK_METHOD(int32_t, GetIpNeighTable, (std::vector<OHOS::NetManagerStandard::NetIpMacInfo> &ipMacInfo));
 };
 
 }  // namespace NetManagerStandard
