@@ -21,6 +21,32 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t USER_OPERATION = 1;
+constexpr int64_t MSG_POWER_SAVE_MODE_TIMEOUT_DELAY_TIME = 3 * 1000;
+void CellularDataPowerSaveModeSubscriber::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("Event is null!");
+        return;
+    }
+    uint32_t eventCode = event->GetInnerEventId();
+    TELEPHONY_LOGI("Recv CellularDataHandler eventCode: %{public}u", eventCode);
+    switch(eventCode) {
+        case PowerSaveModeEvent::MSG_ENTER_POWER_SAVE_MODE_COMPLETE:
+            FinishTelePowerCommonEvent();
+            break;
+        case PowerSaveModeEvent::MSG_EXIT_POWER_SAVE_MODE_COMPLETE:
+            FinishTelePowerCommonEvent();
+            break;
+        case PowerSaveModeEvent::MSG_POWER_SAVE_MODE_TIMEOUT:
+            FinishTelePowerCommonEvent();
+            break;
+        default:
+            break;
+    }
+    RemoveEvent(PowerSaveModeEvent::MSG_POWER_SAVE_MODE_TIMEOUT);
+}
+
 void CellularDataPowerSaveModeSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
 {
     std::string action = data.GetWant().GetAction();
@@ -32,7 +58,7 @@ void CellularDataPowerSaveModeSubscriber::OnReceiveEvent(const EventFwk::CommonE
         TELEPHONY_LOGI("Exit str mode");
         int32_t reason = data.GetCode();
         // process only in user operation
-        if (reason == 1) {
+        if (reason == USER_OPERATION) {
             HandleExitStrEvent(action);
         }
     }
@@ -42,7 +68,9 @@ void CellularDataPowerSaveModeSubscriber::OnReceiveEvent(const EventFwk::CommonE
 void CellularDataPowerSaveModeSubscriber::HandleEnterStrEvent(std::string &action)
 {
     // except same msg
-    if (action != lastMsg) {
+    if (action != lastMsg_ && savedCellularDataStatus_) {
+        auto event = AppExecFwk::InnerEvent::Get(PowerSaveModeEvent::MSG_POWER_SAVE_MODE_TIMEOUT);
+        SendEvent(event, MSG_POWER_SAVE_MODE_TIMEOUT_DELAY_TIME);
         auto powerSaveModeCellularDataHandler = powerSaveModeCellularDataHandler_.lock();
         if (powerSaveModeCellularDataHandler != nullptr) {
             powerSaveModeCellularDataHandler->ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
@@ -51,21 +79,25 @@ void CellularDataPowerSaveModeSubscriber::HandleEnterStrEvent(std::string &actio
             powerSaveModeCellularDataHandler->SetCellularDataEnable(false);
         }
     } else {
-        TELEPHONY_LOGI("Recv same msg in succession lastMsg:%{public}s", lastMsg.c_str());
+        FinishTelePowerCommonEvent();  // 不去激活，没有超时消息
+        TELEPHONY_LOGI("No need to deactive data call");
     }
     lastMsg = ENTER_STR_TELEPHONY_NOTIFY;
 }
 
 void CellularDataPowerSaveModeSubscriber::HandleExitStrEvent(std::string &action)
 {
-    if (action != lastMsg) {
+    if (action != lastMsg_ && savedCellularDataStatus_) {
+        auto event = AppExecFwk::InnerEvent::Get(PowerSaveModeEvent::MSG_POWER_SAVE_MODE_TIMEOUT);
+        SendEvent(event, MSG_POWER_SAVE_MODE_TIMEOUT_DELAY_TIME);
         auto powerSaveModeCellularDataHandler = powerSaveModeCellularDataHandler_.lock();
         if (powerSaveModeCellularDataHandler != nullptr) {
             int32_t ret = powerSaveModeCellularDataHandler->SetCellularDataEnable(savedCellularDataStatus_);
             TELEPHONY_LOGI("Resume cellular status %{public}d, ret = %{public}d", savedCellularDataStatus_, ret);
         }
     } else {
-        TELEPHONY_LOGI("Recv same msg in succession lastMsg:%{public}s", lastMsg.c_str());
+        FinishTelePowerCommonEvent();  // 不激活，没有超时消息
+        TELEPHONY_LOGI("No need to active data call");
     }
     lastMsg = EXIT_STR_TELEPHONY_NOTIFY;
 }

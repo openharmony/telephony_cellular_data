@@ -310,6 +310,7 @@ private:
 #ifdef BASE_POWER_IMPROVEMENT
     std::shared_ptr<CellularDataPowerSaveModeSubscriber> CreateCommonSubscriber(
         const std::string &event, int32_t priority);
+    void SendPowerSaveModeEvent(uint32_t eventId, std::shared_ptr<CellularDataPowerSaveModeSubscriber> &subscriber);
 #endif
 };
 } // namespace Telephony

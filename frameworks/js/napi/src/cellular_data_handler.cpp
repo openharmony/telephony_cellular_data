@@ -902,6 +902,9 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
             SendEvent(CellularDataEventCode::MSG_RETRY_TO_SETUP_DATACALL, DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID, 0);
         }
         DataConnCompleteUpdateState(apnHolder, resultInfo);
+#ifdef BASE_POWER_IMPROVEMENT
+        SendPowerSaveModeEvent(PowerSaveModeEvent::MSG_EXIT_POWER_SAVE_MODE_COMPLETE, strExitSubscriber_);
+#endif
     }
 }
 
@@ -1096,6 +1099,9 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
         HandleSortConnection();
     }
     HandleDisconnectDataCompleteForMmsType(apnHolder);
+#ifdef BASE_POWER_IMPROVEMENT
+    SendPowerSaveModeEvent(PowerSaveModeEvent::MSG_ENTER_POWER_SAVE_MODE_COMPLETE, strEnterSubscriber_);
+#endif
 }
 
 void CellularDataHandler::HandleDisconnectDataCompleteForMmsType(sptr<ApnHolder> &apnHolder)
@@ -2839,6 +2845,22 @@ std::shared_ptr<CellularDataPowerSaveModeSubscriber> CellularDataHandler::Create
     subscribeInfo.SetPermission(PERMISSION_STARTUP_COMPLETED);
     std::weak_ptr<CellularDataHandler> handler = std::static_pointer_cast<CellularDataHandler>(shared_from_this());
     return std::make_shared<CellularDataPowerSaveModeSubscriber>(subscribeInfo, handler);
+}
+
+void CellularDataHandler::SendPowerSaveModeEvent(uint32_t eventId,
+    std::shared_ptr<CellularDataPowerSaveModeSubscriber>& subscriber)
+{
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("Create event failed");
+        return;
+    }
+    if (subscriber != nullptr) {
+        bool hasTimeOutEvent = subscriber->HasInnerEvent(PowerSaveModeEvent::MSG_POWER_SAVE_MODE_TIMEOUT);
+        if (hasTimeOutEvent) {
+            subscriber->SendEvent(event);
+        }
+    }
 }
 #endif
 } // namespace Telephony
