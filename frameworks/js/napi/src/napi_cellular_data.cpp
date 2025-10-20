@@ -170,7 +170,7 @@ static void GetCellularDataStateCallback(napi_env env, napi_status status, void 
                 NapiUtil::CreateErrorMessage(env, "cellular data service unavailable", ERROR_SERVICE_UNAVAILABLE);
         } else {
             JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
-            asyncContext->errorCode, "GetCellularDataState", GET_NETWORK_INFO);
+                asyncContext->errorCode, "GetCellularDataState", GET_NETWORK_INFO);
             callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
         }
     }
@@ -868,7 +868,7 @@ void GetCellularDataFlowTypeCallback(napi_env env, napi_status status, void *dat
                 NapiUtil::CreateErrorMessage(env, "cellular data service unavailable", ERROR_SERVICE_UNAVAILABLE);
         } else {
             JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
-            asyncContext->errorCode, "GetCellularDataFlowType", GET_NETWORK_INFO);
+                asyncContext->errorCode, "GetCellularDataFlowType", GET_NETWORK_INFO);
             callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
         }
     }
