@@ -219,8 +219,7 @@ int32_t CellularDataService::EnableIntelligenceSwitch(bool enable)
 
 int32_t CellularDataService::GetCellularDataState(int32_t &state)
 {
-    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO))
-    {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     int32_t slotId;
@@ -558,8 +557,7 @@ int32_t CellularDataService::SetDefaultCellularDataSlotId(const int32_t slotId)
 
 int32_t CellularDataService::GetCellularDataFlowType(int32_t &type)
 {
-    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO))
-    {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     int32_t slotId;
