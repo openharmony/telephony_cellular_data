@@ -108,7 +108,7 @@ void CellularDataDumpHelper::ShowCellularDataInfo(std::string &result) const
     result.append(GetBoolValue(dataEnabled));
     result.append("\n");
     result.append("CellularDataState            : ");
-    int32_t cellularDataState;
+    int32_t cellularDataState = 0;
     dataService.GetCellularDataState(cellularDataState);
     result.append(GetCellularDataConnectionState(cellularDataState));
     result.append("\n");
