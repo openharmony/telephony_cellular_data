@@ -141,9 +141,13 @@ static void NativeGetCellularDataState(napi_env env, void *data)
         return;
     }
     if (IsCellularDataManagerInited()) {
-        int32_t dataState = CellularDataClient::GetInstance().GetCellularDataState();
-        asyncContext->resolved = true;
-        asyncContext->result = WrapCellularDataType(dataState);
+        int32_t result = CellularDataClient::GetInstance().GetCellularDataState();
+        if (result == TELEPHONY_ERR_PERMISSION_ERR) {
+            asyncContext->errorCode = result;
+        } else {
+            asyncContext->resolved = true;
+            asyncContext->result = WrapCellularDataType(result);
+        }
     } else {
         asyncContext->resolved = false;
         asyncContext->errorCode = ERROR_SERVICE_UNAVAILABLE;
@@ -165,7 +169,9 @@ static void GetCellularDataStateCallback(napi_env env, napi_status status, void 
             callbackValue =
                 NapiUtil::CreateErrorMessage(env, "cellular data service unavailable", ERROR_SERVICE_UNAVAILABLE);
         } else {
-            callbackValue = NapiUtil::CreateErrorMessage(env, "unkonwn error");
+            JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+                asyncContext->errorCode, "GetCellularDataState", GET_NETWORK_INFO);
+            callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
         }
     }
     NapiUtil::Handle2ValueCallback(env, asyncContext.release(), callbackValue);
@@ -832,10 +838,14 @@ void NativeGetCellularDataFlowType(napi_env env, void *data)
         return;
     }
     if (IsCellularDataManagerInited()) {
-        int32_t dataState = CellularDataClient::GetInstance().GetCellularDataFlowType();
-        TELEPHONY_LOGI("dataState = %{public}d", dataState);
-        asyncContext->resolved = true;
-        asyncContext->result = WrapGetCellularDataFlowTypeType(dataState);
+        int32_t result = CellularDataClient::GetInstance().GetCellularDataFlowType();
+        TELEPHONY_LOGI("result = %{public}d", result);
+        if (result == TELEPHONY_ERR_PERMISSION_ERR) {
+            asyncContext->errorCode = result;
+        } else {
+            asyncContext->resolved = true;
+            asyncContext->result = WrapGetCellularDataFlowTypeType(result);
+        }
     } else {
         asyncContext->resolved = false;
         asyncContext->errorCode = ERROR_SERVICE_UNAVAILABLE;
@@ -857,7 +867,9 @@ void GetCellularDataFlowTypeCallback(napi_env env, napi_status status, void *dat
             callbackValue =
                 NapiUtil::CreateErrorMessage(env, "cellular data service unavailable", ERROR_SERVICE_UNAVAILABLE);
         } else {
-            callbackValue = NapiUtil::CreateErrorMessage(env, "unkonwn error");
+            JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+                asyncContext->errorCode, "GetCellularDataFlowType", GET_NETWORK_INFO);
+            callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
         }
     }
     NapiUtil::Handle2ValueCallback(env, asyncContext.release(), callbackValue);
