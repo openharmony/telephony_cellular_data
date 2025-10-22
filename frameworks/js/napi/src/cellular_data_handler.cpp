@@ -1115,7 +1115,7 @@ void CellularDataHandler::HandleDisconnectDataCompleteForMmsType(sptr<ApnHolder>
         RemoveEvent(CellularDataEventCode::MSG_RESUME_DATA_PERMITTED_TIMEOUT);
     }
 #ifdef BASE_POWER_IMPROVEMENT
-    ReplyCommonEventScenario(PowerSaveModeScenario::ENTERING);
+    ReplyCommonEvent(strEnterSubscriber_, true);
 #endif
 }
 
@@ -2886,15 +2886,9 @@ void CellularDataHandler::HandleReplyCommonEvent(const AppExecFwk::InnerEvent::P
         TELEPHONY_LOGE("Event is error!");
         return;
     }
-    int64_t eventScenario = event->GetParam();
-    PowerSaveModeScenario scenario = static_cast<PowerSaveModeScenario>(eventScenario);
-    TELEPHONY_LOGI("Recv timeout event: %{public}d", scenario);
+    TELEPHONY_LOGI("Recv timeout event");
     // 接收到事件后事件被移除，HasInnerEvent无事件
-    if (scenario == PowerSaveModeScenario::ENTERING_TIMEOUT) {
-        ReplyCommonEvent(strEnterSubscriber_, false);
-    } else {
-        ReplyCommonEvent(strExitSubscriber_, false);
-    }
+    ReplyCommonEvent(strEnterSubscriber_, false);
 }
 
 void CellularDataHandler::ReplyCommonEvent(std::shared_ptr<CellularDataPowerSaveModeSubscriber> &subscriber,
