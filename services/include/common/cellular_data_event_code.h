@@ -78,6 +78,9 @@ public:
     static const uint32_t MSG_SYNC_ALLOWED_NSSAI_WITH_MODEM = BASE + 51;
     static const uint32_t MSG_SYNC_EHPLMN_WITH_MODEM = BASE + 52;
     static const uint32_t MSG_RETRY_TO_CREATE_APN = BASE + 53;
+#ifdef BASE_POWER_IMPROVEMENT
+    static const uint32_t MSG_REPLY_COMMON_EVENT = BASE + 54;
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS
