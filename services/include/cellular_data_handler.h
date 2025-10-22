@@ -44,7 +44,6 @@ namespace Telephony {
 const uint32_t KEEP_APN_ACTIVATE_PERIOD = 30 * 1000;
 #ifdef BASE_POWER_IMPROVEMENT
 class CellularDataPowerSaveModeSubscriber;
-enum class PowerSaveModeScenario;
 #endif
 class CellularDataHandler : public TelEventHandler, public EventFwk::CommonEventSubscriber {
 public:
@@ -93,7 +92,6 @@ public:
         const AppExecFwk::InnerEvent::Pointer &event, sptr<ApnHolder> apnHolder, const NetRequest &request);
 #ifdef BASE_POWER_IMPROVEMENT
     void SubscribeTelePowerEvent();
-    void ReplyCommonEventScenario(PowerSaveModeScenario scenario);
 #endif
 
     ApnActivateReportInfo GetDefaultActReportInfo();
