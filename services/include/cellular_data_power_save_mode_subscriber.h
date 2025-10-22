@@ -21,12 +21,6 @@
 namespace OHOS {
 namespace Telephony {
 class CellularDataHandler;
-enum class PowerSaveModeScenario {
-    ENTERING = 1,
-    EXITING = 2,
-    ENTERING_TIMEOUT = 3,
-    EXITING_TIMEOUT = 4,
-};
 class CellularDataPowerSaveModeSubscriber : public EventFwk::CommonEventSubscriber {
 public:
     explicit CellularDataPowerSaveModeSubscriber(
