@@ -50,6 +50,7 @@ static const int32_t ESM_FLAG_INVALID = -1;
 const std::string DEFAULT_DATA_ROAMING = "persist.telephony.defaultdataroaming";
 #ifdef BASE_POWER_IMPROVEMENT
 constexpr const char *PERMISSION_STARTUP_COMPLETED = "ohos.permission.RECEIVER_STARTUP_COMPLETED";
+static constexpr int64_t REPLY_COMMON_EVENT_DEALY = 3 * 1000;
 #endif
 constexpr const char *PERSIST_EDM_MOBILE_DATA_POLICY = "persist.edm.mobile_data_policy";
 constexpr const char *MOBILE_DATA_POLICY_FORCE_OPEN = "force_open";
@@ -883,6 +884,9 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
         TELEPHONY_LOGE("Slot%{public}d: event is null", slotId_);
         return;
     }
+#ifdef BASE_POWER_IMPROVEMENT
+    ReplyCommonEventScenario(PowerSaveModeScenario::EXITING);
+#endif
     std::shared_ptr<SetupDataCallResultInfo> resultInfo = event->GetSharedObject<SetupDataCallResultInfo>();
     if ((resultInfo != nullptr) && (apnManager_ != nullptr)) {
         TELEPHONY_LOGI("EstablishDataConnectionComplete reason: %{public}d, flag: %{public}d",
@@ -1110,6 +1114,9 @@ void CellularDataHandler::HandleDisconnectDataCompleteForMmsType(sptr<ApnHolder>
         SetDataPermittedForMms(false);
         RemoveEvent(CellularDataEventCode::MSG_RESUME_DATA_PERMITTED_TIMEOUT);
     }
+#ifdef BASE_POWER_IMPROVEMENT
+    ReplyCommonEventScenario(PowerSaveModeScenario::ENTERING);
+#endif
 }
 
 void CellularDataHandler::RetryOrClearConnection(const sptr<ApnHolder> &apnHolder, DisConnectionReason reason,
@@ -2847,20 +2854,60 @@ std::shared_ptr<CellularDataPowerSaveModeSubscriber> CellularDataHandler::Create
     return std::make_shared<CellularDataPowerSaveModeSubscriber>(subscribeInfo, handler);
 }
 
-void CellularDataHandler::SendPowerSaveModeEvent(uint32_t eventId,
-    std::shared_ptr<CellularDataPowerSaveModeSubscriber>& subscriber)
+void CellularDataHandler::ReplyCommonEventScenario(PowerSaveModeScenario scenario)
 {
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId);
+    uint32_t eventId = CellularDataEventCode::MSG_TIMEOUT_TO_REPLY_COMMON_EVENT;
+    switch(scenario) {
+        case PowerSaveModeScenario::ENTERING:
+            ReplyCommonEvent(strEnterSubscriber_, true);
+            break;
+        case PowerSaveModeScenario::EXITING:
+            ReplyCommonEvent(strExitSubscriber_, true);
+            break;
+        case PowerSaveModeScenario::ENTERING_TIMEOUT:
+            SendEvent(eventId, static_cast<int64_t>(scenario), REPLY_COMMON_EVENT_DEALY);
+            break;
+        case PowerSaveModeScenario::EXITING_TIMEOUT:
+            SendEvent(eventId, static_cast<int64_t>(scenario), REPLY_COMMON_EVENT_DEALY);
+            break;
+        default:
+            break;
+    }
+}
+
+void CellularDataHandler::HandleReplyCommonEvent(const AppExecFwk::InnerEvent::Pointer &event)
+{
     if (event == nullptr) {
-        TELEPHONY_LOGE("Create event failed");
+        TELEPHONY_LOGE("Event is null!");
+        return;
+    }
+    uint32_t eventCode = event->GetInnerEventId();
+    if (eventCode != CellularDataEventCode::MSG_TIMEOUT_TO_REPLY_COMMON_EVENT) {
+        TELEPHONY_LOGE("Event is error!");
+        return;
+    }
+    int64_t eventScenario = event->GetParam();
+    PowerSaveModeScenario scenario = static_cast<PowerSaveModeScenario>(eventScenario);
+    TELEPHONY_LOGI("Recv timeout event: %{public}d", scenario);
+    // 接收到事件后事件被移除，HasInnerEvent无事件
+    if (scenario == PowerSaveModeScenario::ENTERING_TIMEOUT) {
+        ReplyCommonEvent(strEnterSubscriber_, false);
+    } else {
+        ReplyCommonEvent(strExitSubscriber_, false);
+    }
+}
+
+void CellularDataHandler::ReplyCommonEvent(std::shared_ptr<CellularDataPowerSaveModeSubscriber> &subscriber,
+    bool isNeedCheck)
+{
+    if (isNeedCheck && !HasInnerEvent(CellularDataEventCode::MSG_TIMEOUT_TO_REPLY_COMMON_EVENT)) {
+        TELEPHONY_LOGE("Not in str mode");
         return;
     }
     if (subscriber != nullptr) {
-        bool hasTimeOutEvent = subscriber->HasInnerEvent(PowerSaveModeEvent::MSG_POWER_SAVE_MODE_TIMEOUT);
-        if (hasTimeOutEvent) {
-            subscriber->SendEvent(event);
-        }
+        subscriber->FinishTelePowerCommonEvent();
     }
+    RemoveEvent(CellularDataEventCode::MSG_TIMEOUT_TO_REPLY_COMMON_EVENT);
 }
 #endif
 } // namespace Telephony
