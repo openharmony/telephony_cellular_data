@@ -44,6 +44,7 @@ namespace Telephony {
 const uint32_t KEEP_APN_ACTIVATE_PERIOD = 30 * 1000;
 #ifdef BASE_POWER_IMPROVEMENT
 class CellularDataPowerSaveModeSubscriber;
+enum class PowerSaveModeScenario;
 #endif
 class CellularDataHandler : public TelEventHandler, public EventFwk::CommonEventSubscriber {
 public:
@@ -92,6 +93,7 @@ public:
         const AppExecFwk::InnerEvent::Pointer &event, sptr<ApnHolder> apnHolder, const NetRequest &request);
 #ifdef BASE_POWER_IMPROVEMENT
     void SubscribeTelePowerEvent();
+    void ReplyCommonEventScenario(PowerSaveModeScenario scenario);
 #endif
 
     ApnActivateReportInfo GetDefaultActReportInfo();
@@ -306,11 +308,16 @@ private:
             [this](const AppExecFwk::InnerEvent::Pointer &event) { ResumeDataPermittedTimerOut(event); } },
         { CellularDataEventCode::MSG_RETRY_TO_CREATE_APN,
             [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleApnChanged(event); } },
+#ifdef BASE_POWER_IMPROVEMENT
+        { CellularDataEventCode::MSG_TIMEOUT_TO_REPLY_COMMON_EVENT,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleReplyCommonEvent(event); } },
+#endif
     };
 #ifdef BASE_POWER_IMPROVEMENT
     std::shared_ptr<CellularDataPowerSaveModeSubscriber> CreateCommonSubscriber(
         const std::string &event, int32_t priority);
-    void SendPowerSaveModeEvent(uint32_t eventId, std::shared_ptr<CellularDataPowerSaveModeSubscriber> &subscriber);
+    void HandleReplyCommonEvent(const AppExecFwk::InnerEvent::Pointer &event);
+    void ReplyCommonEvent(std::shared_ptr<CellularDataPowerSaveModeSubscriber> &subscriber, bool isNeedCheck);
 #endif
 };
 } // namespace Telephony
