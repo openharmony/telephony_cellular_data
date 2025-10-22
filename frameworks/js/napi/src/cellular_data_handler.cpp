@@ -884,9 +884,6 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
         TELEPHONY_LOGE("Slot%{public}d: event is null", slotId_);
         return;
     }
-#ifdef BASE_POWER_IMPROVEMENT
-    ReplyCommonEventScenario(PowerSaveModeScenario::EXITING);
-#endif
     std::shared_ptr<SetupDataCallResultInfo> resultInfo = event->GetSharedObject<SetupDataCallResultInfo>();
     if ((resultInfo != nullptr) && (apnManager_ != nullptr)) {
         TELEPHONY_LOGI("EstablishDataConnectionComplete reason: %{public}d, flag: %{public}d",
@@ -906,9 +903,6 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
             SendEvent(CellularDataEventCode::MSG_RETRY_TO_SETUP_DATACALL, DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID, 0);
         }
         DataConnCompleteUpdateState(apnHolder, resultInfo);
-#ifdef BASE_POWER_IMPROVEMENT
-        SendPowerSaveModeEvent(PowerSaveModeEvent::MSG_EXIT_POWER_SAVE_MODE_COMPLETE, strExitSubscriber_);
-#endif
     }
 }
 
@@ -1103,9 +1097,6 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
         HandleSortConnection();
     }
     HandleDisconnectDataCompleteForMmsType(apnHolder);
-#ifdef BASE_POWER_IMPROVEMENT
-    SendPowerSaveModeEvent(PowerSaveModeEvent::MSG_ENTER_POWER_SAVE_MODE_COMPLETE, strEnterSubscriber_);
-#endif
 }
 
 void CellularDataHandler::HandleDisconnectDataCompleteForMmsType(sptr<ApnHolder> &apnHolder)
@@ -2852,27 +2843,6 @@ std::shared_ptr<CellularDataPowerSaveModeSubscriber> CellularDataHandler::Create
     subscribeInfo.SetPermission(PERMISSION_STARTUP_COMPLETED);
     std::weak_ptr<CellularDataHandler> handler = std::static_pointer_cast<CellularDataHandler>(shared_from_this());
     return std::make_shared<CellularDataPowerSaveModeSubscriber>(subscribeInfo, handler);
-}
-
-void CellularDataHandler::ReplyCommonEventScenario(PowerSaveModeScenario scenario)
-{
-    uint32_t eventId = CellularDataEventCode::MSG_TIMEOUT_TO_REPLY_COMMON_EVENT;
-    switch(scenario) {
-        case PowerSaveModeScenario::ENTERING:
-            ReplyCommonEvent(strEnterSubscriber_, true);
-            break;
-        case PowerSaveModeScenario::EXITING:
-            ReplyCommonEvent(strExitSubscriber_, true);
-            break;
-        case PowerSaveModeScenario::ENTERING_TIMEOUT:
-            SendEvent(eventId, static_cast<int64_t>(scenario), REPLY_COMMON_EVENT_DEALY);
-            break;
-        case PowerSaveModeScenario::EXITING_TIMEOUT:
-            SendEvent(eventId, static_cast<int64_t>(scenario), REPLY_COMMON_EVENT_DEALY);
-            break;
-        default:
-            break;
-    }
 }
 
 void CellularDataHandler::HandleReplyCommonEvent(const AppExecFwk::InnerEvent::Pointer &event)
