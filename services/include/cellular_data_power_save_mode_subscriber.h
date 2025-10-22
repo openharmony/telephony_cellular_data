@@ -21,28 +21,26 @@
 namespace OHOS {
 namespace Telephony {
 class CellularDataHandler;
-enum PowerSaveModeEvent : uint32_t {
-    MSG_EXIT_POWER_SAVE_MODE_COMPLETE = 0,
-    MSG_ENTER_POWER_SAVE_MODE_COMPLETE,
-    MSG_POWER_SAVE_MODE_TIMEOUT,
+enum class PowerSaveModeScenario {
+    ENTERING = 1,
+    EXITING = 2,
+    ENTERING_TIMEOUT = 3,
+    EXITING_TIMEOUT = 4,
 };
-+class CellularDataPowerSaveModeSubscriber : public TelEventHandler, public EventFwk::CommonEventSubscriber {
- public:
-    
+class CellularDataPowerSaveModeSubscriber : public EventFwk::CommonEventSubscriber {
+public:
     explicit CellularDataPowerSaveModeSubscriber(
         const EventFwk::CommonEventSubscribeInfo &info, std::weak_ptr<CellularDataHandler> &handler)
-        : TelEventHandler("CellularDataPowerSaveModeSubscriber"), CommonEventSubscriber(info),
-        powerSaveModeCellularDataHandler_(handler) {}
+        : CommonEventSubscriber(info), powerSaveModeCellularDataHandler_(handler) {}
     ~CellularDataPowerSaveModeSubscriber() = default;
-    void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
     bool FinishTelePowerCommonEvent();
 private:
-    void HandleEnterStrEvent(std::string &action);
-    void HandleExitStrEvent(std::string &action);
+    void OnHandleEnterStrEvent(std::string &action);
+    void OnHandleExitStrEvent(std::string &action);
     std::shared_ptr<EventFwk::AsyncCommonEventResult> strAsyncCommonEvent_ = nullptr;
     std::weak_ptr<CellularDataHandler> powerSaveModeCellularDataHandler_;
-    static inline std::string lastMsg = "";
+    static inline std::string lastMsg_ = "";
     static inline bool savedCellularDataStatus_ = true;
 };
 }  // namespace Telephony
