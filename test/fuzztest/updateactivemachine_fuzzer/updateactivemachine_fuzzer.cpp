@@ -21,6 +21,7 @@
 #include "active.h"
 #include "adddatatoken_fuzzer.h"
 #include "statemachine_fuzzer.h"
+#include "common_event_manager.h"
 #include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {

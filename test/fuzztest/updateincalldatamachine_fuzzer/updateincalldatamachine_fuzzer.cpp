@@ -20,6 +20,7 @@
 
 #include "adddatatoken_fuzzer.h"
 #include "incalldatastatemachine_fuzzer.h"
+#include "common_event_manager.h"
 #include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
