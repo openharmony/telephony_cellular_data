@@ -54,8 +54,8 @@ constexpr const char *PERMISSION_STARTUP_COMPLETED = "ohos.permission.RECEIVER_S
 constexpr const char *PERSIST_EDM_MOBILE_DATA_POLICY = "persist.edm.mobile_data_policy";
 constexpr const char *MOBILE_DATA_POLICY_FORCE_OPEN = "force_open";
 constexpr const char *MOBILE_DATA_POLICY_DISALLOW = "disallow";
-CellularDataHandler::CellularDataHandler(const EventFwk::CommonEventSubscribeInfo &sp, int32_t slotId)
-    : TelEventHandler("CellularDataHandler"), CommonEventSubscriber(sp), slotId_(slotId)
+CellularDataHandler::CellularDataHandler(int32_t slotId)
+    : TelEventHandler("CellularDataHandler"), slotId_(slotId)
 {}
 
 void CellularDataHandler::Init()
@@ -1382,38 +1382,40 @@ void CellularDataHandler::ProcessEvent(const InnerEvent::Pointer &event)
     }
 }
 
-void CellularDataHandler::OnReceiveEvent(const EventFwk::CommonEventData &data)
+void CellularDataHandler::OnCallStateChanged(int32_t slotId, int32_t state)
 {
-    const AAFwk::Want &want = data.GetWant();
-    std::string action = want.GetAction();
-    int32_t slotId = want.GetIntParam("slotId", 0);
-    TELEPHONY_LOGD("[slot%{public}d] action=%{public}s code=%{public}d", slotId_, action.c_str(), data.GetCode());
-    if (EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED == action) {
-        if (slotId_ != slotId) {
-            return;
-        }
-        int32_t state = want.GetIntParam("state", CALL_STATUS_UNKNOWN);
-        if (state == CALL_STATUS_UNKNOWN) {
-            TELEPHONY_LOGE("Slot%{public}d: unknown call state=%{public}d", slotId, state);
-            return;
-        }
-        HandleCallChanged(state);
-    } else if (action == CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_DATA_SUBSCRIPTION_CHANGED) {
-        HandleDefaultDataSubscriptionChanged();
-    } else if (action == CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED) {
-        if (slotId_ != slotId) {
-            return;
-        }
-        GetConfigurationFor5G();
-    } else if (action == CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
-        HandleScreenStateChanged(true);
-    } else if (action == CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
-        HandleScreenStateChanged(false);
-    } else if (action == CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
-        RegisterDataSettingObserver();
-    } else {
-        TELEPHONY_LOGD("Slot%{public}d: action=%{public}s code=%{public}d", slotId_, action.c_str(), data.GetCode());
+    if (slotId_ != slotId) {
+        return;
     }
+    HandleCallChanged(state);
+}
+
+void CellularDataHandler::OnSimCardDefaultDataSubscriptionChanged(int32_t simId)
+{
+    HandleDefaultDataSubscriptionChanged();
+}
+
+void CellularDataHandler::OnOperatorConfigChanged(int32_t slotId, int32_t state)
+{
+    if (slotId_ != slotId) {
+        return;
+    }
+    GetConfigurationFor5G();
+}
+
+void CellularDataHandler::OnScreenOn()
+{
+    HandleScreenStateChanged(true);
+}
+
+void CellularDataHandler::OnScreenOff()
+{
+    HandleScreenStateChanged(false);
+}
+
+void CellularDataHandler::OnDataShareReady()
+{
+    RegisterDataSettingObserver();
 }
 
 void CellularDataHandler::HandleScreenStateChanged(bool isScreenOn) const

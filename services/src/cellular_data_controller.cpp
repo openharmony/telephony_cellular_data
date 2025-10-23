@@ -16,8 +16,6 @@
 #include "cellular_data_controller.h"
 
 #include "cellular_data_constant.h"
-#include "common_event_manager.h"
-#include "common_event_support.h"
 #include "core_manager_inner.h"
 #include "network_search_callback.h"
 #include "radio_event.h"
@@ -27,7 +25,6 @@
 namespace OHOS {
 namespace Telephony {
 using namespace NetManagerStandard;
-using namespace OHOS::EventFwk;
 
 CellularDataController::CellularDataController(int32_t slotId)
     : TelEventHandler("CellularDataController"), slotId_(slotId)
@@ -50,16 +47,7 @@ CellularDataController::~CellularDataController()
 
 void CellularDataController::Init()
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_DATA_SUBSCRIPTION_CHANGED);
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
-    cellularDataHandler_ = std::make_shared<CellularDataHandler>(subscriberInfo, slotId_);
+    cellularDataHandler_ = std::make_shared<CellularDataHandler>(slotId_);
     if (cellularDataHandler_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler_ is null", slotId_);
         return;
@@ -382,8 +370,13 @@ void CellularDataController::SystemAbilityStatusChangeListener::OnAddSystemAbili
         case COMMON_EVENT_SERVICE_ID:
             TELEPHONY_LOGI("COMMON_EVENT_SERVICE_ID running");
             if (handler_ != nullptr) {
-                bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(handler_);
-                TELEPHONY_LOGI("subscribeResult = %{public}d", subscribeResult);
+                CoreManagerInner::GetInstance().RegisterCommonEventCallback(handler_,
+                    {TelCommonEvent::CALL_STATE_CHANGED,
+                        TelCommonEvent::SIM_CARD_DEFAULT_DATA_SUBSCRIPTION_CHANGED,
+                        TelCommonEvent::OPERATOR_CONFIG_CHANGED,
+                        TelCommonEvent::SCREEN_ON,
+                        TelCommonEvent::SCREEN_OFF,
+                        TelCommonEvent::DATA_SHARE_READY});
 #ifdef BASE_POWER_IMPROVEMENT
                if (system::GetBoolParameter("const.vendor.ril.power.feature_tele_power", false)) {
                     handler_->SubscribeTelePowerEvent();
@@ -417,8 +410,7 @@ void CellularDataController::SystemAbilityStatusChangeListener::OnRemoveSystemAb
         case COMMON_EVENT_SERVICE_ID:
             TELEPHONY_LOGE("COMMON_EVENT_SERVICE_ID stopped");
             if (handler_ != nullptr) {
-                bool unSubscribeResult = EventFwk::CommonEventManager::UnSubscribeCommonEvent(handler_);
-                TELEPHONY_LOGI("unSubscribeResult = %{public}d", unSubscribeResult);
+                CoreManagerInner::GetInstance().UnregisterCommonEventCallback(handler_);
             }
             break;
         case DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID:

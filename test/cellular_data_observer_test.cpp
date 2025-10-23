@@ -50,10 +50,7 @@ public:
 
     static std::shared_ptr<CellularDataHandler> createCellularDataHandler()
     {
-        EventFwk::CommonEventSubscribeInfo subscriberInfo;
-        subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
-        std::shared_ptr<CellularDataHandler> cellularDataHandler =
-            std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+        std::shared_ptr<CellularDataHandler> cellularDataHandler = std::make_shared<CellularDataHandler>(0);
         return cellularDataHandler;
     }
 };

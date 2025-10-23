@@ -28,7 +28,6 @@
 #include "cellular_data_setting_observer.h"
 #include "cellular_data_airplane_observer.h"
 #include "cellular_data_state_machine.h"
-#include "common_event_manager.h"
 #include "data_switch_settings.h"
 #include "incall_data_state_machine.h"
 #include "inner_event.h"
@@ -38,6 +37,7 @@
 #include "tel_profile_util.h"
 #include "tel_ril_data_parcel.h"
 #include "telephony_types.h"
+#include "core_service_common_event_callback.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -45,9 +45,9 @@ const uint32_t KEEP_APN_ACTIVATE_PERIOD = 30 * 1000;
 #ifdef BASE_POWER_IMPROVEMENT
 class CellularDataPowerSaveModeSubscriber;
 #endif
-class CellularDataHandler : public TelEventHandler, public EventFwk::CommonEventSubscriber {
+class CellularDataHandler : public TelEventHandler, public CoreServiceCommonEventCallback {
 public:
-    explicit CellularDataHandler(const EventFwk::CommonEventSubscribeInfo &sp, int32_t slotId);
+    explicit CellularDataHandler(int32_t slotId);
     ~CellularDataHandler();
     void Init();
     bool ReleaseNet(const NetRequest &request);
@@ -55,7 +55,12 @@ public:
     bool AddUid(const NetRequest &request);
     bool RemoveUid(const NetRequest &request);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
-    void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
+    void OnCallStateChanged(int32_t slotId, int32_t state) override;
+    void OnSimCardDefaultDataSubscriptionChanged(int32_t simId) override;
+    void OnOperatorConfigChanged(int32_t slotId, int32_t state) override;
+    void OnScreenOn() override;
+    void OnScreenOff() override;
+    void OnDataShareReady() override;
     int32_t SetCellularDataEnable(bool userDataEnabled);
     int32_t SetIntelligenceSwitchEnable(bool userDataEnabled);
     int32_t IsCellularDataEnabled(bool &dataEnabled) const;
