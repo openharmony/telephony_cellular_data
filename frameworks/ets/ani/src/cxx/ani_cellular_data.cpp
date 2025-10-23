@@ -12,11 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "cellular_data_client.h"
-#include "napi_util.h"
-#include "cxx.h"
 #include "ani_cellular_data.h"
+#include "cellular_data_client.h"
+#include "cxx.h"
+#include "napi_util.h"
+#include "telephony_types.h"
 #include "wrapper.rs.h"
 
 namespace OHOS {
@@ -24,10 +24,28 @@ using namespace Telephony;
 namespace CellularDataAni {
 static constexpr const char *SET_TELEPHONY_STATE = "ohos.permission.SET_TELEPHONY_STATE";
 static constexpr const char *GET_NETWORK_INFO = "ohos.permission.GET_NETWORK_INFO";
+static constexpr const char *MANAGE_APN_SETTING = "ohos.permission.MANAGE_APN_SETTING";
 
 static bool IsCellularDataManagerInited()
 {
     return CellularDataClient::GetInstance().IsConnect();
+}
+
+static inline bool IsValidSlotId(int32_t slotId)
+{
+    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT));
+}
+
+static inline ArktsError ConvertArktsErrorWithPermission(int32_t errorCode, const std::string &funcName,
+                                                         const std::string &permission)
+{
+    JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(errorCode, funcName, permission);
+
+    ArktsError ArktsErr = {
+        .errorCode = error.errorCode,
+        .errorMessage = rust::string(error.errorMessage),
+    };
+    return ArktsErr;
 }
 
 ArktsError isCellularDataEnabled(bool &dataEnabled)
@@ -37,18 +55,10 @@ ArktsError isCellularDataEnabled(bool &dataEnabled)
     if (IsCellularDataManagerInited()) {
         errorCode = CellularDataClient::GetInstance().IsCellularDataEnabled(dataEnabled);
     } else {
-        errorCode =  ERROR_SERVICE_UNAVAILABLE;
+        errorCode = ERROR_SERVICE_UNAVAILABLE;
     }
 
-    JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(errorCode,
-                                                                    "IsCellularDataEnabled",
-                                                                    GET_NETWORK_INFO);
-    ArktsError ArktsErr = {
-        .errorCode = error.errorCode,
-        .errorMessage = rust::string(error.errorMessage),
-    };
-
-    return ArktsErr;
+    return ConvertArktsErrorWithPermission(errorCode, "IsCellularDataEnabled", GET_NETWORK_INFO);
 }
 
 ArktsError enableCellularDataSync()
@@ -58,18 +68,10 @@ ArktsError enableCellularDataSync()
     if (IsCellularDataManagerInited()) {
         errorCode = CellularDataClient::GetInstance().EnableCellularData(true);
     } else {
-        errorCode =  ERROR_SERVICE_UNAVAILABLE;
+        errorCode = ERROR_SERVICE_UNAVAILABLE;
     }
 
-    JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(errorCode,
-                                                                    "enableCellularData",
-                                                                    SET_TELEPHONY_STATE);
-    ArktsError ArktsErr = {
-        .errorCode = error.errorCode,
-        .errorMessage = rust::string(error.errorMessage),
-    };
-
-    return ArktsErr;
+    return ConvertArktsErrorWithPermission(errorCode, "enableCellularData", SET_TELEPHONY_STATE);
 }
 
 ArktsError disableCellularDataSync()
@@ -82,15 +84,7 @@ ArktsError disableCellularDataSync()
         errorCode = ERROR_SERVICE_UNAVAILABLE;
     }
 
-    JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(errorCode,
-                                                                    "disableCellularData",
-                                                                    SET_TELEPHONY_STATE);
-    ArktsError ArktsErr = {
-        .errorCode = error.errorCode,
-        .errorMessage = rust::string(error.errorMessage),
-    };
-
-    return ArktsErr;
+    return ConvertArktsErrorWithPermission(errorCode, "disableCellularData", SET_TELEPHONY_STATE);
 }
 
 int32_t getDefaultCellularDataSlotIdSync()
@@ -142,77 +136,64 @@ ArktsError getCellularDataState(int32_t &CellularDataState)
 
 ArktsError disableCellularDataRoamingSync(int32_t slotId)
 {
+    if (!IsValidSlotId(slotId)) {
+        return ConvertArktsErrorWithPermission(ERROR_SLOT_ID_INVALID, "disableCellularDataRoaming",
+                                               SET_TELEPHONY_STATE);
+    }
+
     int32_t errorCode = ERROR_SERVICE_UNAVAILABLE;
 
     if (IsCellularDataManagerInited()) {
         errorCode = CellularDataClient::GetInstance().EnableCellularDataRoaming(slotId, false);
     }
 
-    JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(errorCode,
-                                                                    "disableCellularDataRoaming",
-                                                                    SET_TELEPHONY_STATE);
-    ArktsError ArktsErr = {
-        .errorCode = error.errorCode,
-        .errorMessage = rust::string(error.errorMessage),
-    };
-    return ArktsErr;
+    return ConvertArktsErrorWithPermission(errorCode, "disableCellularDataRoaming", SET_TELEPHONY_STATE);
 }
 
 ArktsError enableCellularDataRoamingSync(int32_t slotId)
 {
+    if (!IsValidSlotId(slotId)) {
+        return ConvertArktsErrorWithPermission(ERROR_SLOT_ID_INVALID, "enableCellularDataRoaming", SET_TELEPHONY_STATE);
+    }
+
     int32_t errorCode = ERROR_SERVICE_UNAVAILABLE;
 
     if (IsCellularDataManagerInited()) {
         errorCode = CellularDataClient::GetInstance().EnableCellularDataRoaming(slotId, true);
     }
 
-    JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(errorCode,
-                                                                    "disableCellularDataRoaming",
-                                                                    SET_TELEPHONY_STATE);
-    ArktsError ArktsErr = {
-        .errorCode = error.errorCode,
-        .errorMessage = rust::string(error.errorMessage),
-    };
-
-    return ArktsErr;
+    return ConvertArktsErrorWithPermission(errorCode, "enableCellularDataRoaming", SET_TELEPHONY_STATE);
 }
 
 ArktsError isCellularDataRoamingEnabledSync(int32_t slotId, bool &dataEnabled)
 {
+    if (!IsValidSlotId(slotId)) {
+        return ConvertArktsErrorWithPermission(ERROR_SLOT_ID_INVALID, "isCellularDataRoamingEnabled", GET_NETWORK_INFO);
+    }
+
     int32_t errorCode = ERROR_SERVICE_UNAVAILABLE;
 
     if (IsCellularDataManagerInited()) {
         errorCode = CellularDataClient::GetInstance().IsCellularDataRoamingEnabled(slotId, dataEnabled);
     }
 
-    JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(errorCode,
-                                                                    "isCellularDataRoamingEnabled",
-                                                                    SET_TELEPHONY_STATE);
-    ArktsError ArktsErr = {
-        .errorCode = error.errorCode,
-        .errorMessage = rust::string(error.errorMessage),
-    };
-
-    return ArktsErr;
+    return ConvertArktsErrorWithPermission(errorCode, "isCellularDataRoamingEnabled", GET_NETWORK_INFO);
 }
 
 ArktsError setDefaultCellularDataSlotIdSyn(int32_t slotId)
 {
+    if (!IsValidSlotId(slotId)) {
+        return ConvertArktsErrorWithPermission(ERROR_SLOT_ID_INVALID, "setDefaultCellularDataSlotId",
+                                               SET_TELEPHONY_STATE);
+    }
+
     int32_t errorCode = ERROR_SERVICE_UNAVAILABLE;
 
     if (IsCellularDataManagerInited()) {
         errorCode = CellularDataClient::GetInstance().SetDefaultCellularDataSlotId(slotId);
     }
 
-    JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(errorCode,
-                                                                    "setDefaultCellularDataSlotId",
-                                                                    SET_TELEPHONY_STATE);
-    ArktsError ArktsErr = {
-        .errorCode = error.errorCode,
-        .errorMessage = rust::string(error.errorMessage),
-    };
-
-    return ArktsErr;
+    return ConvertArktsErrorWithPermission(errorCode, "setDefaultCellularDataSlotId", SET_TELEPHONY_STATE);
 }
 
 int32_t getCellularDataFlowTypeSyn()
@@ -227,15 +208,7 @@ ArktsError setPreferredApnSyn(int32_t apnId, bool &ret)
         errorCode = CellularDataClient::GetInstance().SetPreferApn(apnId);
     }
     ret = errorCode == TELEPHONY_SUCCESS;
-    JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(errorCode,
-                                                                    "setPreferredApn",
-                                                                    SET_TELEPHONY_STATE);
-    ArktsError ArktsErr = {
-        .errorCode = error.errorCode,
-        .errorMessage = rust::string(error.errorMessage),
-    };
-
-    return ArktsErr;
+    return ConvertArktsErrorWithPermission(errorCode, "setPreferredApn", MANAGE_APN_SETTING);
 }
 
 int32_t getDefaultCellularDataSimIdSyn()
@@ -275,14 +248,7 @@ ArktsError queryApnIdsSync(const ApnInfo &info, rust::vec<uint32_t> &ret)
             }
         }
     }
-    JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(errorCode,
-                                                                    "queryApnIds",
-                                                                    SET_TELEPHONY_STATE);
-    ArktsError ArktsErr = {
-        .errorCode = error.errorCode,
-        .errorMessage = rust::string(error.errorMessage),
-    };
-    return ArktsErr;
+    return ConvertArktsErrorWithPermission(errorCode, "queryApnIds", MANAGE_APN_SETTING);
 }
 
 ArktsError queryAllApnsSync(rust::vec<ApnInfo> &ret)
@@ -304,14 +270,8 @@ ArktsError queryAllApnsSync(rust::vec<ApnInfo> &ret)
             .mmsproxy = rust::string(U16StringToUtf8(info.mmsproxy)),
         });
     }
-    JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(errorCode,
-                                                                    "queryAllApns",
-                                                                    SET_TELEPHONY_STATE);
-    ArktsError ArktsErr = {
-        .errorCode = error.errorCode,
-        .errorMessage = rust::string(error.errorMessage),
-    };
-    return ArktsErr;
+
+    return ConvertArktsErrorWithPermission(errorCode, "queryAllApns", MANAGE_APN_SETTING);
 }
 
 ArktsError getActiveApnNameSync(rust::String &apnName)
@@ -322,14 +282,7 @@ ArktsError getActiveApnNameSync(rust::String &apnName)
         errorCode = CellularDataClient::GetInstance().GetActiveApnName(apnNameStr);
     }
     apnName = rust::string(apnNameStr);
-    JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(errorCode,
-                                                                    "GetActiveApnName",
-                                                                    SET_TELEPHONY_STATE);
-    ArktsError ArktsErr = {
-        .errorCode = error.errorCode,
-        .errorMessage = rust::string(error.errorMessage),
-    };
-    return ArktsErr;
+    return ConvertArktsErrorWithPermission(errorCode, "GetActiveApnName", GET_NETWORK_INFO);
 }
 } // namespace CellularDataAni
 } // namespace OHOS
