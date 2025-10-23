@@ -154,7 +154,8 @@ void CellularDataStateMachine::DoConnect(const DataConnectionParams &connectionP
     }
     int32_t bitMap = ApnManager::FindApnTypeByApnName(connectionParams.GetApnHolder()->GetApnType());
     activeDataParam.dataProfile.supportedApnTypesBitmap = bitMap;
-    TELEPHONY_LOGI("Slot%{public}d: Activate PDP context (%{public}d, %{public}s, %{public}s, %{public}s, %{public}d)",
+    HILOG_COMM_IMPL(LOG_INFO, LOG_DOMAIN, TELEPHONY_LOG_TAG,
+        "Slot%{public}d: Activate PDP context (%{public}d, %{public}s, %{public}s, %{public}s, %{public}d)",
         slotId, apn->attr_.profileId_, apn->attr_.apn_, apn->attr_.protocol_, apn->attr_.types_, bitMap);
     int32_t result = CoreManagerInner::GetInstance().ActivatePdpContext(slotId, RadioEvent::RADIO_RIL_SETUP_DATA_CALL,
         activeDataParam, stateMachineEventHandler_);
@@ -178,7 +179,8 @@ void CellularDataStateMachine::FreeConnection(const DataDisconnectParams &params
 {
     const int32_t slotId = GetSlotId();
     int32_t apnId = ApnManager::FindApnIdByApnName(params.GetApnType());
-    TELEPHONY_LOGI("Slot%{public}d: Deactivate PDP context cid:%{public}d type:%{public}s id:%{public}d",
+    HILOG_COMM_IMPL(LOG_INFO, LOG_DOMAIN, TELEPHONY_LOG_TAG,
+        "Slot%{public}d: Deactivate PDP context cid:%{public}d type:%{public}s id:%{public}d",
         slotId, cid_, params.GetApnType().c_str(), apnId);
     DeactivateDataParam deactivateDataParam;
     deactivateDataParam.param = connectId_;

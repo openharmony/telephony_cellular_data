@@ -163,35 +163,41 @@ void DataConnectionMonitor::HandleRecovery()
     }
     switch (dataRecoveryState_) {
         case RecoveryState::STATE_REQUEST_CONTEXT_LIST: {
-            TELEPHONY_LOGI("Slot%{public}d: Handle Recovery: get data call list", slotId_);
+            HILOG_COMM_IMPL(LOG_INFO, LOG_DOMAIN, TELEPHONY_LOG_TAG,
+                "Slot%{public}d: Handle Recovery: get data call list", slotId_);
             dataRecoveryState_ = RecoveryState::STATE_CLEANUP_CONNECTIONS;
             GetPdpContextList();
             CellularDataHiSysEvent::WriteDataDeactiveBehaviorEvent(slotId_, DataDisconnectCause::ON_THE_NETWORK_SIDE);
             break;
         }
         case RecoveryState::STATE_CLEANUP_CONNECTIONS: {
-            TELEPHONY_LOGI("Slot%{public}d: Handle Recovery: cleanup connections", slotId_);
+            HILOG_COMM_IMPL(LOG_INFO, LOG_DOMAIN, TELEPHONY_LOG_TAG,
+                "Slot%{public}d: Handle Recovery: cleanup connections", slotId_);
             dataRecoveryState_ = RecoveryState::STATE_REREGISTER_NETWORK;
             int32_t ret = DelayedRefSingleton<CellularDataService>::GetInstance().ClearAllConnections(
                 slotId_, (int32_t) DisConnectionReason::REASON_RETRY_CONNECTION);
             if (ret != static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)) {
-                TELEPHONY_LOGE("Slot%{public}d: Handle Recovery: cleanup connections failed", slotId_);
+                HILOG_COMM_IMPL(LOG_ERROR, LOG_DOMAIN, TELEPHONY_LOG_TAG,
+                    "Slot%{public}d: Handle Recovery: cleanup connections failed", slotId_);
             }
             break;
         }
         case RecoveryState::STATE_REREGISTER_NETWORK: {
-            TELEPHONY_LOGI("Slot%{public}d: Handle Recovery: re-register network", slotId_);
+            HILOG_COMM_IMPL(LOG_INFO, LOG_DOMAIN, TELEPHONY_LOG_TAG,
+                "Slot%{public}d: Handle Recovery: re-register network", slotId_);
             dataRecoveryState_ = RecoveryState::STATE_RADIO_STATUS_RESTART;
             ReregisterNetwork();
             break;
         }
         case RecoveryState::STATE_RADIO_STATUS_RESTART: {
-            TELEPHONY_LOGI("Slot%{public}d: Handle Recovery: radio restart", slotId_);
+            HILOG_COMM_IMPL(LOG_INFO, LOG_DOMAIN, TELEPHONY_LOG_TAG,
+                "Slot%{public}d: Handle Recovery: radio restart", slotId_);
             dataRecoveryState_ = RecoveryState::STATE_REQUEST_CONTEXT_LIST;
             int32_t ret = DelayedRefSingleton<CellularDataService>::GetInstance().ClearAllConnections(
                 slotId_, (int32_t)DisConnectionReason::REASON_RETRY_CONNECTION);
             if (ret != static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)) {
-                TELEPHONY_LOGE("Slot%{public}d: Handle Recovery: radio restart cleanup connections failed", slotId_);
+                HILOG_COMM_IMPL(LOG_ERROR, LOG_DOMAIN, TELEPHONY_LOG_TAG,
+                    "Slot%{public}d: Handle Recovery: radio restart cleanup connections failed", slotId_);
             }
             SetRadioState(CORE_SERVICE_POWER_OFF, RadioEvent::RADIO_OFF);
             break;
