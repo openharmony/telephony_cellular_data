@@ -50,7 +50,6 @@ static const int32_t ESM_FLAG_INVALID = -1;
 const std::string DEFAULT_DATA_ROAMING = "persist.telephony.defaultdataroaming";
 #ifdef BASE_POWER_IMPROVEMENT
 constexpr const char *PERMISSION_STARTUP_COMPLETED = "ohos.permission.RECEIVER_STARTUP_COMPLETED";
-static constexpr int64_t REPLY_COMMON_EVENT_DEALY = 3 * 1000;
 #endif
 constexpr const char *PERSIST_EDM_MOBILE_DATA_POLICY = "persist.edm.mobile_data_policy";
 constexpr const char *MOBILE_DATA_POLICY_FORCE_OPEN = "force_open";
