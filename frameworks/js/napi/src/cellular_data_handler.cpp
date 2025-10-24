@@ -2033,7 +2033,7 @@ bool CellularDataHandler::GetEsmFlagFromOpCfg()
 void CellularDataHandler::SetRilAttachApn()
 {
     if (!IsSimStateReadyOrLoaded()) {
-        TELEPHONY_LOGE("Slot%{punlic}d: sim not ready", slotId_);
+        TELEPHONY_LOGE("Slot%{public}d: sim not ready", slotId_);
         return;
     }
     DataProfile dataProfile;
