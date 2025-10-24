@@ -150,18 +150,13 @@ std::shared_ptr<IncallDataStateMachine> IncallStateMachineTest::CreateIncallData
  */
 HWTEST_F(BranchTest, Telephony_CellularDataHandler_001, Function | MediumTest | Level1)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    CellularDataHandler cellularDataHandler { subscriberInfo, 0 };
+    CellularDataHandler cellularDataHandler { 0 };
     cellularDataHandler.HandleSimStateChanged();
     cellularDataHandler.ReleaseAllNetworkRequest();
     cellularDataHandler.CreateApnItem();
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
     cellularDataHandler.ProcessEvent(event);
-    EventFwk::CommonEventData data;
-    cellularDataHandler.OnReceiveEvent(data);
     ASSERT_NE(cellularDataHandler.SetCellularDataEnable(true), TELEPHONY_ERR_SUCCESS);
     bool dataEnaled = false;
     cellularDataHandler.IsCellularDataEnabled(dataEnaled);
@@ -203,10 +198,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_001, Function | MediumTest | 
  */
 HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | Level1)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    CellularDataHandler cellularDataHandler { subscriberInfo, 0 };
+    CellularDataHandler cellularDataHandler { 0 };
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
     sptr<ApnHolder> apnHolder;
@@ -258,10 +250,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_002, Function | MediumTest | 
  */
 HWTEST_F(BranchTest, Telephony_CellularDataHandler_003, Function | MediumTest | Level3)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    CellularDataHandler cellularDataHandler { subscriberInfo, INVALID_SLOTID };
+    CellularDataHandler cellularDataHandler { INVALID_SLOTID };
     cellularDataHandler.apnManager_ = std::make_unique<ApnManager>().release();
     cellularDataHandler.SetDataPermittedForMms(false);
     sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
@@ -318,8 +307,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_004, Function | MediumTest | 
     controller.cellularDataHandler_->PsDataRatChanged(event);
     ApnItem::Attribute apnAttr;
     controller.cellularDataHandler_->GetDataConnApnAttr(apnAttr);
-    EventFwk::CommonEventData data;
-    controller.cellularDataHandler_->OnReceiveEvent(data);
     ASSERT_EQ(controller.cellularDataHandler_->SetCellularDataEnable(true), TELEPHONY_ERR_SUCCESS);
     bool dataEnaled = false;
     controller.cellularDataHandler_->IsCellularDataEnabled(dataEnaled);
@@ -412,10 +399,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_005, Function | MediumTest | 
  */
 HWTEST_F(BranchTest, Telephony_CellularDataHandler_006, Function | MediumTest | Level3)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    CellularDataHandler cellularDataHandler { subscriberInfo, 0 };
+    CellularDataHandler cellularDataHandler { 0 };
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
     cellularDataHandler.apnManager_ = std::make_unique<ApnManager>().release();
@@ -641,10 +625,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_012, Function | MediumTest | 
  */
 HWTEST_F(BranchTest, Telephony_CellularDataHandler_013, Function | MediumTest | Level1)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    CellularDataHandler cellularDataHandler { subscriberInfo, 0 };
+    CellularDataHandler cellularDataHandler { 0 };
     auto event = AppExecFwk::InnerEvent::Get(-1);
     cellularDataHandler.RetryToSetupDatacall(event);
     ASSERT_FALSE(cellularDataHandler.HasInnerEvent(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION));

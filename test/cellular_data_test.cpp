@@ -1941,10 +1941,7 @@ HWTEST_F(CellularDataTest, ControllerUpdateNetworkInfo_Test_01, TestSize.Level3)
 HWTEST_F(CellularDataTest, ControllerUpdateNetworkInfo_Test_02, TestSize.Level3)
 {
     auto controller = std::make_shared<CellularDataController>(DEFAULT_SIM_SLOT_ID);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
     cellularDataHandler->Init();
     controller->cellularDataHandler_ = cellularDataHandler;
     ASSERT_TRUE(controller->cellularDataHandler_ != nullptr);

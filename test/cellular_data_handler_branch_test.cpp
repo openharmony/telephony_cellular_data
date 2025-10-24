@@ -66,10 +66,7 @@ public:
 
     void InitCellularDataHandler()
     {
-        EventFwk::MatchingSkills matchingSkills;
-        matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-        EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-        cellularDataHandler_ = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+        cellularDataHandler_ = std::make_shared<CellularDataHandler>(0);
         cellularDataHandler_->Init();
     }
 
@@ -137,10 +134,7 @@ HWTEST_F(CellularDataHandlerBranchTest, CheckRoamingState_001, Function | Medium
 
 HWTEST_F(CellularDataHandlerBranchTest, IsCellularDataRoamingEnabled_001, Function | MediumTest | Level3)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 2);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(2);
 
     EXPECT_EQ(cellularDataHandler->dataSwitchSettings_, nullptr);
     cellularDataHandler->defaultDataRoamingEnable_ = false;
@@ -155,10 +149,7 @@ HWTEST_F(CellularDataHandlerBranchTest, IsCellularDataRoamingEnabled_001, Functi
 
 HWTEST_F(CellularDataHandlerBranchTest, SetDataPermittedForMms_001, Function | MediumTest | Level3)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 2);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(2);
 
     EXPECT_EQ(cellularDataHandler->incallDataStateMachine_, nullptr);
     cellularDataHandler->incallDataStateMachine_ =
@@ -168,10 +159,7 @@ HWTEST_F(CellularDataHandlerBranchTest, SetDataPermittedForMms_001, Function | M
 
 HWTEST_F(CellularDataHandlerBranchTest, CheckApnState_001, Function | MediumTest | Level3)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 2);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(2);
     cellularDataHandler->Init();
 
     sptr<ApnHolder> apnHolder = new ApnHolder("mms", 0);
@@ -187,10 +175,7 @@ HWTEST_F(CellularDataHandlerBranchTest, CheckApnState_001, Function | MediumTest
 
 HWTEST_F(CellularDataHandlerBranchTest, EstablishDataConnection_001, Function | MediumTest | Level3)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 2);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(2);
     cellularDataHandler->Init();
 
     sptr<ApnHolder> apnHolder = new ApnHolder("mms", 0);
@@ -205,10 +190,7 @@ HWTEST_F(CellularDataHandlerBranchTest, EstablishDataConnection_001, Function | 
 
 HWTEST_F(CellularDataHandlerBranchTest, DisconnectDataComplete_001, Function | MediumTest | Level3)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 2);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(2);
     cellularDataHandler->Init();
 
     auto event = AppExecFwk::InnerEvent::Get(0);
@@ -218,10 +200,7 @@ HWTEST_F(CellularDataHandlerBranchTest, DisconnectDataComplete_001, Function | M
 
 HWTEST_F(CellularDataHandlerBranchTest, DisconnectDataComplete_002, Function | MediumTest | Level3)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 2);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(2);
     cellularDataHandler->Init();
 
     std::shared_ptr<SetupDataCallResultInfo> resultInfo = std::make_shared<SetupDataCallResultInfo>();
@@ -242,10 +221,7 @@ HWTEST_F(CellularDataHandlerBranchTest, DisconnectDataComplete_002, Function | M
 
 HWTEST_F(CellularDataHandlerBranchTest, UpdatePhysicalConnectionState_001, Function | MediumTest | Level3)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 2);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(2);
     cellularDataHandler->Init();
 
     cellularDataHandler->physicalConnectionActiveState_ = true;
@@ -263,94 +239,11 @@ HWTEST_F(CellularDataHandlerBranchTest, UpdatePhysicalConnectionState_001, Funct
     cellularDataHandler->physicalConnectionActiveState_ = false;
     cellularDataHandler->UpdatePhysicalConnectionState(false);
     ASSERT_TRUE(cellularDataHandler->physicalConnectionActiveState_);
-}
-
-HWTEST_F(CellularDataHandlerBranchTest, OnReceiveEvent_001, Function | MediumTest | Level3)
-{
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 2);
-    cellularDataHandler->Init();
-
-    auto want = EventFwk::Want();
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    auto event = EventFwk::CommonEventData(want);
-    cellularDataHandler->OnReceiveEvent(event);
-    ASSERT_EQ(want.GetAction(), EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_DATA_SUBSCRIPTION_CHANGED);
-    event = EventFwk::CommonEventData(want);
-    cellularDataHandler->OnReceiveEvent(event);
-    ASSERT_EQ(want.GetAction(), EventFwk::CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_DATA_SUBSCRIPTION_CHANGED);
-
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    event = EventFwk::CommonEventData(want);
-    cellularDataHandler->OnReceiveEvent(event);
-    ASSERT_EQ(want.GetAction(), EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
-    event = EventFwk::CommonEventData(want);
-    cellularDataHandler->OnReceiveEvent(event);
-    ASSERT_EQ(want.GetAction(), EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
-
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
-    event = EventFwk::CommonEventData(want);
-    cellularDataHandler->OnReceiveEvent(event);
-    ASSERT_EQ(want.GetAction(), EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
-
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
-    event = EventFwk::CommonEventData(want);
-    cellularDataHandler->OnReceiveEvent(event);
-    ASSERT_EQ(want.GetAction(), EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
-}
-
-HWTEST_F(CellularDataHandlerBranchTest, OnReceiveEvent_002, Function | MediumTest | Level3)
-{
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
-    cellularDataHandler->Init();
-
-    auto want = EventFwk::Want();
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    auto event = EventFwk::CommonEventData(want);
-    cellularDataHandler->OnReceiveEvent(event);
-    ASSERT_EQ(want.GetAction(), EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_DATA_SUBSCRIPTION_CHANGED);
-    event = EventFwk::CommonEventData(want);
-    cellularDataHandler->OnReceiveEvent(event);
-    ASSERT_EQ(want.GetAction(), EventFwk::CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_DATA_SUBSCRIPTION_CHANGED);
-
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    event = EventFwk::CommonEventData(want);
-    cellularDataHandler->OnReceiveEvent(event);
-    ASSERT_EQ(want.GetAction(), EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
-    event = EventFwk::CommonEventData(want);
-    cellularDataHandler->OnReceiveEvent(event);
-    ASSERT_EQ(want.GetAction(), EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
-
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
-    event = EventFwk::CommonEventData(want);
-    cellularDataHandler->OnReceiveEvent(event);
-    ASSERT_EQ(want.GetAction(), EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
-
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
-    event = EventFwk::CommonEventData(want);
-    cellularDataHandler->OnReceiveEvent(event);
-    ASSERT_EQ(want.GetAction(), EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
 }
 
 HWTEST_F(CellularDataHandlerBranchTest, HandleScreenStateChanged_001, Function | MediumTest | Level3)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
     cellularDataHandler->HandleScreenStateChanged(true);
     ASSERT_EQ(cellularDataHandler->connectionManager_, nullptr);
     cellularDataHandler->Init();
@@ -360,10 +253,7 @@ HWTEST_F(CellularDataHandlerBranchTest, HandleScreenStateChanged_001, Function |
 
 HWTEST_F(CellularDataHandlerBranchTest, UpdateCellularDataConnectState_001, Function | MediumTest | Level3)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
     cellularDataHandler->Init();
 
     cellularDataHandler->UpdateCellularDataConnectState("default");
@@ -378,10 +268,7 @@ HWTEST_F(CellularDataHandlerBranchTest, UpdateCellularDataConnectState_001, Func
 
 HWTEST_F(CellularDataHandlerBranchTest, HandleDBSettingIncallChanged_001, Function | MediumTest | Level3)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
     cellularDataHandler->Init();
     cellularDataHandler->HandleImsCallChanged(TelCallStatus::CALL_STATUS_DIALING);
 
@@ -399,10 +286,7 @@ HWTEST_F(CellularDataHandlerBranchTest, HandleDBSettingIncallChanged_001, Functi
 
 HWTEST_F(CellularDataHandlerBranchTest, HandleImsCallChanged, Function | MediumTest | Level3)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
     cellularDataHandler->Init();
 
     ASSERT_EQ(cellularDataHandler->incallDataStateMachine_, nullptr);
@@ -416,10 +300,7 @@ HWTEST_F(CellularDataHandlerBranchTest, HandleImsCallChanged, Function | MediumT
 
 HWTEST_F(CellularDataHandlerBranchTest, ReleaseAllNetworkRequest, Function | MediumTest | Level3)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
     cellularDataHandler->Init();
     cellularDataHandler->ReleaseAllNetworkRequest();
     ASSERT_NE(cellularDataHandler->apnManager_, nullptr);
@@ -478,10 +359,7 @@ HWTEST_F(CellularDataHandlerBranchTest, HandleRecordsChanged, Function | MediumT
 
 HWTEST_F(CellularDataHandlerBranchTest, SetPolicyDataOn, Function | MediumTest | Level3)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
     cellularDataHandler->Init();
 
     cellularDataHandler->dataSwitchSettings_->SetPolicyDataOn(true);
@@ -494,10 +372,7 @@ HWTEST_F(CellularDataHandlerBranchTest, SetPolicyDataOn, Function | MediumTest |
 
 HWTEST_F(CellularDataHandlerBranchTest, ChangeConnectionForDsds, Function | MediumTest | Level3)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
     cellularDataHandler->Init();
 
     cellularDataHandler->ChangeConnectionForDsds(false);
@@ -507,10 +382,7 @@ HWTEST_F(CellularDataHandlerBranchTest, ChangeConnectionForDsds, Function | Medi
 
 HWTEST_F(CellularDataHandlerBranchTest, HandleDBSettingRoamingChanged, Function | MediumTest | Level3)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
     cellularDataHandler->Init();
 
     auto event = AppExecFwk::InnerEvent::Get(0, static_cast<int64_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_ENABLED));
@@ -540,10 +412,7 @@ HWTEST_F(CellularDataHandlerBranchTest, UnRegisterDataSettingObserver, Function 
 
 HWTEST_F(CellularDataHandlerBranchTest, CheckForCompatibleDataConnection, Function | MediumTest | Level3)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
     cellularDataHandler->Init();
 
     sptr<ApnHolder> apnHolder = new ApnHolder("dun", 0);
@@ -553,10 +422,7 @@ HWTEST_F(CellularDataHandlerBranchTest, CheckForCompatibleDataConnection, Functi
 
 HWTEST_F(CellularDataHandlerBranchTest, ReleaseCellularDataConnection, Function | MediumTest | Level3)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0);
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
 
     cellularDataHandler->ReleaseCellularDataConnection();
     ASSERT_EQ(cellularDataHandler->apnManager_, nullptr);
@@ -567,17 +433,13 @@ HWTEST_F(CellularDataHandlerBranchTest, ReleaseCellularDataConnection, Function 
 
 HWTEST_F(CellularDataHandlerBranchTest, CheckCellularDataSlotId, Function | MediumTest | Level3)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 2); // 2: vsim slot id
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(2); // 2: vsim slot id
     cellularDataHandler->Init();
     sptr<ApnHolder> apnHolder = new ApnHolder(DATA_CONTEXT_ROLE_DEFAULT, 0);
     cellularDataHandler->CheckCellularDataSlotId(apnHolder);
 
     cellularDataHandler.reset();
-    cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 0); // 0: sim0 slot id
+    cellularDataHandler = std::make_shared<CellularDataHandler>(0); // 0: sim0 slot id
     cellularDataHandler->Init();
     apnHolder = new ApnHolder(DATA_CONTEXT_ROLE_MMS, 0);
     cellularDataHandler->CheckCellularDataSlotId(apnHolder);
@@ -586,7 +448,7 @@ HWTEST_F(CellularDataHandlerBranchTest, CheckCellularDataSlotId, Function | Medi
     EXPECT_FALSE(ret);
 
     cellularDataHandler.reset();
-    cellularDataHandler = std::make_shared<CellularDataHandler>(subscriberInfo, 1); // 1: sim1 slot id
+    cellularDataHandler = std::make_shared<CellularDataHandler>(1); // 1: sim1 slot id
     cellularDataHandler->Init();
     apnHolder = new ApnHolder(DATA_CONTEXT_ROLE_MMS, 0);
     cellularDataHandler->CheckCellularDataSlotId(apnHolder);

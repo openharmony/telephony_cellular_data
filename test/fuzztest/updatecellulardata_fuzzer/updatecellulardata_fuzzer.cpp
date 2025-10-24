@@ -21,6 +21,7 @@
 #include "adddatatoken_fuzzer.h"
 #include "cellular_data_dump_helper.h"
 #include "cellular_data_handler.h"
+#include "common_event_manager.h"
 #include "cellular_data_incall_observer.h"
 
 
