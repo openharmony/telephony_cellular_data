@@ -60,7 +60,7 @@ int32_t DataSwitchSettings::SetUserDataOn(bool userDataOn)
     }
     int value = (userDataOn ? static_cast<int>(DataSwitchCode::CELLULAR_DATA_ENABLED)
                             : static_cast<int>(DataSwitchCode::CELLULAR_DATA_DISABLED));
-    TELEPHONY_LOGI("value:%{public}d", value);
+    HILOG_COMM_IMPL(LOG_INFO, LOG_DOMAIN, TELEPHONY_LOG_TAG, "value:%{public}d", value);
     bool userDataOnTmp = userDataOn_;
     userDataOn_ = userDataOn;
     Uri userDataEnableUri(CELLULAR_DATA_SETTING_DATA_ENABLE_URI);
@@ -93,7 +93,7 @@ int32_t DataSwitchSettings::SetIntelliSwitchOn(bool userSwitchOn)
     }
     int value = (userSwitchOn ? static_cast<int>(IntelligenceSwitchCode::INTELLIGENCE_SWITCH_ENABLED)
                             : static_cast<int>(IntelligenceSwitchCode::INTELLIGENCE_SWITCH_DISABLED));
-    TELEPHONY_LOGI("value:%{public}d", value);
+    HILOG_COMM_IMPL(LOG_INFO, LOG_DOMAIN, TELEPHONY_LOG_TAG, "value:%{public}d", value);
     Uri intelliSwitchEnableUri(CELLULAR_DATA_SETTING_INTELLIGENCE_SWITCH_URI);
     int32_t result = settingsRdbHelper->PutValue(intelliSwitchEnableUri, INTELLIGENCE_SWITCH_COLUMN_ENABLE, value);
     if (result == TELEPHONY_ERR_SUCCESS) {
@@ -179,7 +179,7 @@ int32_t DataSwitchSettings::SetUserDataRoamingOn(bool dataRoamingEnabled)
     }
     int value = (dataRoamingEnabled ? static_cast<int>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_ENABLED)
                                     : static_cast<int>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_DISABLED));
-    TELEPHONY_LOGI("value:%{public}d", value);
+    HILOG_COMM_IMPL(LOG_INFO, LOG_DOMAIN, TELEPHONY_LOG_TAG, "value:%{public}d", value);
     Uri userDataRoamingUri(std::string(CELLULAR_DATA_SETTING_DATA_ROAMING_URI) + std::to_string(simId));
     int32_t result = settingsRdbHelper->PutValue(
         userDataRoamingUri, std::string(CELLULAR_DATA_COLUMN_ROAMING) + std::to_string(simId), value);

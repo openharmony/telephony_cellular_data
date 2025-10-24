@@ -559,8 +559,8 @@ ApnProfileState ApnManager::GetOverallDefaultApnState() const
             internalApnState = apnHolder->GetApnState();
         }
     }
-    TELEPHONY_LOGI("defaultApnState is %{public}d, internalApnState is %{public}d", defaultApnState,
-        internalApnState);
+    HILOG_COMM_IMPL(LOG_INFO, LOG_DOMAIN, TELEPHONY_LOG_TAG,
+        "defaultApnState is %{public}d, internalApnState is %{public}d", defaultApnState, internalApnState);
     for (auto apnState : apnStateArr_) {
         if (defaultApnState == apnState || internalApnState == apnState) {
             return apnState;

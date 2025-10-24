@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Telephony {
 void Inactive::StateBegin()
 {
-    TELEPHONY_LOGI("Enter inactive state");
+    HILOG_COMM_IMPL(LOG_INFO, LOG_DOMAIN, TELEPHONY_LOG_TAG, "Enter inactive state");
     std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
     if (stateMachine == nullptr) {
         TELEPHONY_LOGE("stateMachine is null");

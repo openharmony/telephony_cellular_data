@@ -848,7 +848,8 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
     UpdateCellularDataConnectState(apnHolder->GetApnType());
     std::unique_ptr<DataConnectionParams> object = std::make_unique<DataConnectionParams>(
         apnHolder, apnItem->attr_.profileId_, radioTech, roamingState, userDataRoaming, true);
-    TELEPHONY_LOGI("Slot%{public}d: MSG_SM_CONNECT profileId:%{public}d type:%{public}s networkType:%{public}d",
+    HILOG_COMM_IMPL(LOG_INFO, LOG_DOMAIN, TELEPHONY_LOG_TAG,
+        "Slot%{public}d: MSG_SM_CONNECT profileId:%{public}d type:%{public}s networkType:%{public}d",
         slotId_, apnItem->attr_.profileId_, apnHolder->GetApnType().c_str(), radioTech);
     InnerEvent::Pointer event = InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT, object);
     if (event == nullptr) {
@@ -898,7 +899,8 @@ void CellularDataHandler::EstablishDataConnectionComplete(const InnerEvent::Poin
             apnHolder->GetCapability(), static_cast<int32_t>(PROFILE_STATE_CONNECTED));
         apnHolder->InitialApnRetryCount();
         if (apnHolder->GetApnType() == DATA_CONTEXT_ROLE_DEFAULT) {
-            TELEPHONY_LOGI("default apn has connected, to setup internal_default apn");
+            HILOG_COMM_IMPL(LOG_INFO, LOG_DOMAIN, TELEPHONY_LOG_TAG,
+                "default apn has connected, to setup internal_default apn");
             SendEvent(CellularDataEventCode::MSG_RETRY_TO_SETUP_DATACALL, DATA_CONTEXT_ROLE_INTERNAL_DEFAULT_ID, 0);
         }
         DataConnCompleteUpdateState(apnHolder, resultInfo);

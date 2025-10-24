@@ -27,7 +27,7 @@ namespace OHOS {
 namespace Telephony {
 void Active::StateBegin()
 {
-    TELEPHONY_LOGI("Enter active state");
+    HILOG_COMM_IMPL(LOG_INFO, LOG_DOMAIN, TELEPHONY_LOG_TAG, "Enter active state");
     std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
     if (stateMachine == nullptr) {
         TELEPHONY_LOGE("stateMachine is null");
@@ -41,7 +41,7 @@ void Active::StateBegin()
 
 void Active::StateEnd()
 {
-    TELEPHONY_LOGI("Exit active state");
+    HILOG_COMM_IMPL(LOG_INFO, LOG_DOMAIN, TELEPHONY_LOG_TAG, "Exit active state");
 }
 
 bool Active::StateProcess(const AppExecFwk::InnerEvent::Pointer &event)
@@ -69,7 +69,7 @@ bool Active::ProcessConnectDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool Active::ProcessDisconnectDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("Active::MSG_SM_DISCONNECT");
+    HILOG_COMM_IMPL(LOG_INFO, LOG_DOMAIN, TELEPHONY_LOG_TAG, "Active::MSG_SM_DISCONNECT");
     std::shared_ptr<CellularDataStateMachine> stateMachine = stateMachine_.lock();
     if (stateMachine == nullptr) {
         TELEPHONY_LOGE("stateMachine is null");
