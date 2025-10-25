@@ -1110,9 +1110,6 @@ void CellularDataHandler::HandleDisconnectDataCompleteForMmsType(sptr<ApnHolder>
         SetDataPermittedForMms(false);
         RemoveEvent(CellularDataEventCode::MSG_RESUME_DATA_PERMITTED_TIMEOUT);
     }
-#ifdef BASE_POWER_IMPROVEMENT
-    ReplyCommonEvent(strEnterSubscriber_, true);
-#endif
 }
 
 void CellularDataHandler::RetryOrClearConnection(const sptr<ApnHolder> &apnHolder, DisConnectionReason reason,
@@ -1385,6 +1382,11 @@ void CellularDataHandler::ProcessEvent(const InnerEvent::Pointer &event)
         return;
     }
     uint32_t eventCode = event->GetInnerEventId();
+#ifdef BASE_POWER_IMPROVEMENT
+    if (eventCode == CellularDataEventCode::MSG_DISCONNECT_DATA_COMPLETE) {
+        ReplyCommonEvent(strEnterSubscriber_, true);
+    }
+#endif
     std::map<uint32_t, Fun>::iterator it = eventIdMap_.find(eventCode);
     if (it != eventIdMap_.end()) {
         it->second(event);
