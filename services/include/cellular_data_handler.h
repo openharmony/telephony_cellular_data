@@ -315,7 +315,7 @@ private:
     std::shared_ptr<CellularDataPowerSaveModeSubscriber> CreateCommonSubscriber(
         const std::string &event, int32_t priority);
     void HandleReplyCommonEvent(const AppExecFwk::InnerEvent::Pointer &event);
-    void ReplyCommonEvent(std::shared_ptr<CellularDataPowerSaveModeSubscriber> &subscriber, bool isNeedCheck);
+    void ReplyCommonEvent(std::shared_ptr<CellularDataPowerSaveModeSubscriber> &subscriber, bool isNeedCheckInnerEvent);
 #endif
 };
 } // namespace Telephony
