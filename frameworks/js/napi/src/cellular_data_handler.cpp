@@ -727,6 +727,12 @@ bool CellularDataHandler::CheckMultiApnState(sptr<ApnHolder> &apnHolder)
 
 void CellularDataHandler::AttemptEstablishDataConnection(sptr<ApnHolder> &apnHolder)
 {
+#ifdef BASE_POWER_IMPROVEMENT
+    if (CellularDataPowerSaveModeSubscriber::GetPowerSaveModeFlag()) {
+        TELEPHONY_LOGE("Slot%{public}d: In power save mode", slotId_);
+        return;
+    }
+#endif
     if ((airplaneObserver_ != nullptr) && (airplaneObserver_->IsAirplaneModeOn())) {
         return;
     }
@@ -2861,10 +2867,10 @@ void CellularDataHandler::HandleReplyCommonEvent(const AppExecFwk::InnerEvent::P
 }
 
 void CellularDataHandler::ReplyCommonEvent(std::shared_ptr<CellularDataPowerSaveModeSubscriber> &subscriber,
-    bool isNeedCheck)
+    bool isNeedCheckInnerEvent)
 {
-    if (isNeedCheck && !HasInnerEvent(CellularDataEventCode::MSG_TIMEOUT_TO_REPLY_COMMON_EVENT)) {
-        TELEPHONY_LOGE("Not in str mode");
+    if (isNeedCheckInnerEvent && !HasInnerEvent(CellularDataEventCode::MSG_TIMEOUT_TO_REPLY_COMMON_EVENT)) {
+        TELEPHONY_LOGE("Not in power save mode");
         return;
     }
     if (subscriber != nullptr) {
