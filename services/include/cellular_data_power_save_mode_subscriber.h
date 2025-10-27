@@ -38,7 +38,6 @@ private:
     std::weak_ptr<CellularDataHandler> powerSaveModeCellularDataHandler_;
     static inline std::string lastMsg_ = "";
     static inline bool powerSaveModeFlag_ = false;
-    static std::mutex powerSaveFlagMutex_;
 };
 }  // namespace Telephony
 }  // namespace OHOS
