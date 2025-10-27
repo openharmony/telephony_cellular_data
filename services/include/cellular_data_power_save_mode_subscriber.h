@@ -29,13 +29,15 @@ public:
     ~CellularDataPowerSaveModeSubscriber() = default;
     void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
     bool FinishTelePowerCommonEvent();
+    static bool GetPowerSaveModeFlag();
+    static void SetPowerSaveModeFlag(bool value);
 private:
-    void HandleEnterStrEvent(std::string &action);
-    void HandleExitStrEvent(std::string &action);
+    void OnHandleEnterStrEvent(std::string &action);
+    void OnHandleExitStrEvent(std::string &action);
     std::shared_ptr<EventFwk::AsyncCommonEventResult> strAsyncCommonEvent_ = nullptr;
     std::weak_ptr<CellularDataHandler> powerSaveModeCellularDataHandler_;
-    static inline std::string lastMsg = "";
-    static inline bool savedCellularDataStatus_ = true;
+    static inline std::string lastMsg_ = "";
+    static inline bool powerSaveModeFlag_ = false;
 };
 }  // namespace Telephony
 }  // namespace OHOS

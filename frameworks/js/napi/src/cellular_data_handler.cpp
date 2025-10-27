@@ -727,6 +727,12 @@ bool CellularDataHandler::CheckMultiApnState(sptr<ApnHolder> &apnHolder)
 
 void CellularDataHandler::AttemptEstablishDataConnection(sptr<ApnHolder> &apnHolder)
 {
+#ifdef BASE_POWER_IMPROVEMENT
+    if (CellularDataPowerSaveModeSubscriber::GetPowerSaveModeFlag()) {
+        TELEPHONY_LOGE("Slot%{public}d: In power save mode", slotId_);
+        return;
+    }
+#endif
     if ((airplaneObserver_ != nullptr) && (airplaneObserver_->IsAirplaneModeOn())) {
         return;
     }
@@ -1378,6 +1384,11 @@ void CellularDataHandler::ProcessEvent(const InnerEvent::Pointer &event)
         return;
     }
     uint32_t eventCode = event->GetInnerEventId();
+#ifdef BASE_POWER_IMPROVEMENT
+    if (eventCode == CellularDataEventCode::MSG_DISCONNECT_DATA_COMPLETE) {
+        ReplyCommonEvent(strEnterSubscriber_, true);
+    }
+#endif
     std::map<uint32_t, Fun>::iterator it = eventIdMap_.find(eventCode);
     if (it != eventIdMap_.end()) {
         it->second(event);
@@ -2847,6 +2858,35 @@ std::shared_ptr<CellularDataPowerSaveModeSubscriber> CellularDataHandler::Create
     subscribeInfo.SetPermission(PERMISSION_STARTUP_COMPLETED);
     std::weak_ptr<CellularDataHandler> handler = std::static_pointer_cast<CellularDataHandler>(shared_from_this());
     return std::make_shared<CellularDataPowerSaveModeSubscriber>(subscribeInfo, handler);
+}
+
+void CellularDataHandler::HandleReplyCommonEvent(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("Event is null!");
+        return;
+    }
+    uint32_t eventCode = event->GetInnerEventId();
+    if (eventCode != CellularDataEventCode::MSG_TIMEOUT_TO_REPLY_COMMON_EVENT) {
+        TELEPHONY_LOGE("Event is error!");
+        return;
+    }
+    TELEPHONY_LOGI("Recv timeout event");
+    // 接收到事件后事件被移除，HasInnerEvent无事件
+    ReplyCommonEvent(strEnterSubscriber_, false);
+}
+
+void CellularDataHandler::ReplyCommonEvent(std::shared_ptr<CellularDataPowerSaveModeSubscriber> &subscriber,
+    bool isNeedCheckInnerEvent)
+{
+    if (isNeedCheckInnerEvent && !HasInnerEvent(CellularDataEventCode::MSG_TIMEOUT_TO_REPLY_COMMON_EVENT)) {
+        TELEPHONY_LOGE("Not in power save mode");
+        return;
+    }
+    if (subscriber != nullptr) {
+        subscriber->FinishTelePowerCommonEvent();
+    }
+    RemoveEvent(CellularDataEventCode::MSG_TIMEOUT_TO_REPLY_COMMON_EVENT);
 }
 #endif
 } // namespace Telephony

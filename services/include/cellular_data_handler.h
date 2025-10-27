@@ -311,10 +311,16 @@ private:
             [this](const AppExecFwk::InnerEvent::Pointer &event) { ResumeDataPermittedTimerOut(event); } },
         { CellularDataEventCode::MSG_RETRY_TO_CREATE_APN,
             [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleApnChanged(event); } },
+#ifdef BASE_POWER_IMPROVEMENT
+        { CellularDataEventCode::MSG_TIMEOUT_TO_REPLY_COMMON_EVENT,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleReplyCommonEvent(event); } },
+#endif
     };
 #ifdef BASE_POWER_IMPROVEMENT
     std::shared_ptr<CellularDataPowerSaveModeSubscriber> CreateCommonSubscriber(
         const std::string &event, int32_t priority);
+    void HandleReplyCommonEvent(const AppExecFwk::InnerEvent::Pointer &event);
+    void ReplyCommonEvent(std::shared_ptr<CellularDataPowerSaveModeSubscriber> &subscriber, bool isNeedCheckInnerEvent);
 #endif
 };
 } // namespace Telephony
