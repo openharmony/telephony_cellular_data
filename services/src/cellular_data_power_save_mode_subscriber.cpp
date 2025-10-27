@@ -23,7 +23,6 @@ namespace OHOS {
 namespace Telephony {
 constexpr int32_t USER_OPERATION = 1;
 static constexpr int64_t REPLY_COMMON_EVENT_DELAY = 3 * 1000;
-std::mutex CellularDataPowerSaveModeSubscriber::powerSaveFlagMutex_;
 void CellularDataPowerSaveModeSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
 {
     std::string action = data.GetWant().GetAction();
@@ -88,14 +87,12 @@ bool CellularDataPowerSaveModeSubscriber::FinishTelePowerCommonEvent()
 
 bool CellularDataPowerSaveModeSubscriber::GetPowerSaveModeFlag()
 {
-    std::lock_guard<std::mutex> lock(powerSaveFlagMutex_);
     return powerSaveModeFlag_;
 }
 
 void CellularDataPowerSaveModeSubscriber::SetPowerSaveModeFlag(bool value)
 {
     TELEPHONY_LOGI("Set power save mode flag: %{public}d", value);
-    std::lock_guard<std::mutex> lock(powerSaveFlagMutex_);
     powerSaveModeFlag_ = value;
 }
 }  // namespace Telephony
