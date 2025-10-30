@@ -71,6 +71,7 @@ struct NetRequest {
     int32_t registerType = RELEASE;
     uint64_t bearTypes = 0;
     uint32_t uid = 0;
+    uint32_t requestId = 0;
 };
 
 static const uint32_t DEFAULT_BANDWIDTH = 14;
