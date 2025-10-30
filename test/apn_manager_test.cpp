@@ -1286,16 +1286,35 @@ HWTEST_F(ApnManagerTest, ApnHolderAddUid001, TestSize.Level0)
 {
     sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
     EXPECT_TRUE(apnHolder != nullptr);
-    apnHolder->AddUid(1);
-    apnHolder->AddUid(1);
+    NetRequest request;
+    request.uid = 1;
+    request.requestId = 1;
+    apnHolder->AddUid(request);
+    request.uid = 1099;
+    request.requestId = 2;
+    apnHolder->AddUid(request);
 }
 
 HWTEST_F(ApnManagerTest, ApnHolderRemoveUid001, TestSize.Level0)
 {
     sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
     EXPECT_TRUE(apnHolder != nullptr);
-    apnHolder->RemoveUid(1);
-    apnHolder->RemoveUid(1);
+    NetRequest request;
+    request.uid = 1;
+    request.requestId = 1;
+    apnHolder->AddUid(request);
+    request.uid = 1099;
+    request.requestId = 2;
+    apnHolder->AddUid(request);
+    EXPECT_TRUE(apnHolder->netMgrReqList_.size() == 1);
+    request.uid = 1;
+    request.requestId = 1;
+    apnHolder->RemoveUid(request);
+    EXPECT_TRUE(apnHolder->netMgrReqList_.size() == 1);
+    request.uid = 1099;
+    request.requestId = 2;
+    apnHolder->RemoveUid(request);
+    EXPECT_TRUE(apnHolder->netMgrReqList_.size() == 0);
 }
 
 /**

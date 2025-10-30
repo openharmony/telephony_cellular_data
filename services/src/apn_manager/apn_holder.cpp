@@ -23,6 +23,7 @@ namespace OHOS {
 namespace Telephony {
 namespace {
     constexpr int32_t SYSTEM_UID = 1e4;
+    constexpr int32_t NETMANAGER_UID = 1099;
     std::shared_mutex reqUidsMutex_;
     std::mutex netRequestMutex_;
 }
@@ -74,12 +75,20 @@ sptr<ApnItem> ApnHolder::GetCurrentApn() const
 bool ApnHolder::IsReqUidsEmpty()
 {
     std::shared_lock<std::shared_mutex> lock(reqUidsMutex_);
-    return reqUids_.empty();
+    return reqUids_.empty() && netMgrReqList_.empty();
 }
 
-void ApnHolder::AddUid(uint32_t uid)
+void ApnHolder::AddUid(const NetRequest &netRequest)
 {
     std::unique_lock<std::shared_mutex> lock(reqUidsMutex_);
+    uint32_t uid = netRequest.uid;
+    uint32_t requestId = netRequest.requestId;
+    if (uid == NETMANAGER_UID) {
+        if (netMgrReqList_.find(requestId) == netMgrReqList_.end()) {
+            netMgrReqList_.insert(requestId);
+            TELEPHONY_LOGD("netMgrReqList add reqId %{public}u", requestId);
+        }
+    }
     if (reqUids_.find(uid) != reqUids_.end()) {
         TELEPHONY_LOGD("apnholder add uid %{public}u", uid);
         return;
@@ -87,9 +96,18 @@ void ApnHolder::AddUid(uint32_t uid)
     reqUids_.insert(uid);
 }
 
-void ApnHolder::RemoveUid(uint32_t uid)
+void ApnHolder::RemoveUid(const NetRequest &netRequest)
 {
     std::unique_lock<std::shared_mutex> lock(reqUidsMutex_);
+    uint32_t uid = netRequest.uid;
+    uint32_t requestId = netRequest.requestId;
+    if (uid == NETMANAGER_UID) {
+        auto netIt = netMgrReqList_.find(requestId);
+        if (netIt != netMgrReqList_.end()) {
+            netMgrReqList_.erase(netIt);
+            TELEPHONY_LOGD("netMgrReqList remove reqId %{public}u", requestId);
+        }
+    }
     auto it = reqUids_.find(uid);
     if (it != reqUids_.end()) {
         reqUids_.erase(it);
@@ -102,6 +120,7 @@ void ApnHolder::ReleaseAllUids()
 {
     std::unique_lock<std::shared_mutex> lock(reqUidsMutex_);
     reqUids_.clear();
+    netMgrReqList_.clear();
 }
 
 void ApnHolder::SetApnState(ApnProfileState state)
@@ -180,6 +199,9 @@ int32_t ApnHolder::GetPriority() const
 HasSystemUse ApnHolder::GetUidStatus() const
 {
     std::unique_lock<std::shared_mutex> lock(reqUidsMutex_);
+    if (!netMgrReqList_.empty()) {
+        return HasSystemUse::HAS;
+    }
     for (auto item : reqUids_) {
         if (item < SYSTEM_UID) {
             return HasSystemUse::HAS;

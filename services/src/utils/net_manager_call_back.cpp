@@ -56,6 +56,7 @@ int32_t NetManagerCallBack::ReleaseNetwork(const NetManagerStandard::NetRequest 
     }
     request.uid = netrequest.uid;
     request.ident = netrequest.ident;
+    request.requestId = netrequest.requestId;
     int32_t result = DelayedRefSingleton<CellularDataService>::GetInstance().RemoveUid(request);
     if (result != static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)) {
         TELEPHONY_LOGD("RemoveUid Request Fail");
@@ -76,6 +77,7 @@ int32_t NetManagerCallBack::AddRequest(const NetManagerStandard::NetRequest &net
         request.capability |= 1L << netCap;
     }
     request.uid = netrequest.uid;
+    request.requestId = netrequest.requestId;
     return DelayedRefSingleton<CellularDataService>::GetInstance().AddUid(request);
 }
 
