@@ -577,7 +577,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_011, Function | MediumTest | 
 {
     CellularDataController controller { 0 };
     controller.Init();
-    controller.cellularDataHandler_->SendEstablishDataConnectionEvent(0);
+    controller.cellularDataHandler_->SendEstablishDataConnectionEvent(0, NetBearType::BEARER_DEFAULT);
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     int32_t reqType = TYPE_REQUEST_NET;
     bool isMmsType = false;
@@ -673,6 +673,51 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_015, Function | MediumTest | 
     controller.cellularDataHandler_->RemoveAllEvents();
     system::SetParameter("persist.edm.mobile_data_policy", "none");
     sleep(SLEEP_TIME_SECONDS);
+}
+
+/**
+ * @tc.number   Telephony_CellularDataHandler_016
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataHandler_016, Function | MediumTest | Level1)
+{
+    CellularDataController controller { 0 };
+    controller.Init();
+    int64_t param = 1;
+    std::string apnTypeDefault(DATA_CONTEXT_ROLE_DEFAULT);
+    std::string apnTypeInterDefault(DATA_CONTEXT_ROLE_INTERNAL_DEFAULT);
+    int64_t priority = 0;
+    sptr<ApnHolder> apnHolder = std::make_unique<ApnHolder>(apnTypeDefault, priority).release();
+    apnHolder->dataCallEnabled_ = false;
+    controller.cellularDataHandler_->apnManager_->apnIdApnHolderMap_.insert({param, apnHolder});
+    auto event = AppExecFwk::InnerEvent::Get(0, param);
+    controller.cellularDataHandler_->MsgEstablishDataConnection(event);
+    EXPECT_FALSE(controller.cellularDataHandler_->isHandoverOccurred_);
+
+    sptr<ApnHolder> apnHolder = std::make_unique<ApnHolder>(apnTypeInterDefault, priority).release();
+    apnHolder->dataCallEnabled_ = false;
+    controller.cellularDataHandler_->apnManager_->apnIdApnHolderMap_.[param] = apnHolder;
+    uint64_t disconnectBearType = NetBearType::BEARER_WIFI;
+    event = AppExecFwk::InnerEvent::Get(0, param, std::unique_ptr<uint64_t>(disconnectBearType));
+    controller.cellularDataHandler_->MsgEstablishDataConnection(event);
+    EXPECT_FALSE(controller.cellularDataHandler_->isHandoverOccurred_);
+
+    sptr<ApnHolder> apnHolder = std::make_unique<ApnHolder>(apnTypeDefault, priority).release();
+    apnHolder->dataCallEnabled_ = false;
+    controller.cellularDataHandler_->apnManager_->apnIdApnHolderMap_.[param] = apnHolder;
+    disconnectBearType = NetBearType::BEARER_WIFI;
+    event = AppExecFwk::InnerEvent::Get(0, param, std::unique_ptr<uint64_t>(disconnectBearType));
+    controller.cellularDataHandler_->MsgEstablishDataConnection(event);
+    EXPECT_TRUE(controller.cellularDataHandler_->isHandoverOccurred_);
+
+    sptr<ApnHolder> apnHolder = std::make_unique<ApnHolder>(apnTypeDefault, priority).release();
+    apnHolder->dataCallEnabled_ = false;
+    controller.cellularDataHandler_->apnManager_->apnIdApnHolderMap_.[param] = apnHolder;
+    disconnectBearType = NetBearType::BEARER_DEFAULT;
+    event = AppExecFwk::InnerEvent::Get(0, param, std::unique_ptr<uint64_t>(disconnectBearType));
+    controller.cellularDataHandler_->MsgEstablishDataConnection(event);
+    EXPECT_FALSE(controller.cellularDataHandler_->isHandoverOccurred_);
 }
 
 /**

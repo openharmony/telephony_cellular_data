@@ -56,6 +56,11 @@ int32_t NetManagerCallBack::ReleaseNetwork(const NetManagerStandard::NetRequest 
     }
     request.uid = netrequest.uid;
     request.ident = netrequest.ident;
+    if (netrequest.bearTypes.find(NetBearType::BEARER_WIFI) != netrequest.bearTypes.end()) {
+        request.bearTypes = NetBearType::BEARER_WIFI;
+    } else {
+        request.bearTypes = NetBearType::BEARER_DEFAULT;
+    }
     request.requestId = netrequest.requestId;
     int32_t result = DelayedRefSingleton<CellularDataService>::GetInstance().RemoveUid(request);
     if (result != static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)) {

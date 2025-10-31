@@ -184,7 +184,7 @@ private:
     bool NotifyReqCellularData(bool isCellularDataRequested);
 #endif
     void SetNetRequest(NetRequest &request, const std::unique_ptr<NetRequest> &netRequest);
-    void SendEstablishDataConnectionEvent(int32_t id);
+    void SendEstablishDataConnectionEvent(int32_t id, uint64_t disconnectBearType);
     bool IsSimStateReadyOrLoaded();
     void UpdateCellularDataConnectState(const std::string &apnType);
     void RetryToSetupDatacall(const AppExecFwk::InnerEvent::Pointer &event);
@@ -227,6 +227,7 @@ private:
     bool multipleConnectionsEnabled_ = false;
     bool defaultDataRoamingEnable_ = false;
     bool isRilApnAttached_ = false;
+    bool isHandoverOccurred_ = false;
     std::mutex mtx_;
     std::mutex apnActivateListMutex_;
     std::vector<std::string> upLinkThresholds_;
