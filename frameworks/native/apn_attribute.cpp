@@ -13,9 +13,7 @@
  * limitations under the License.
  */
 
-#include "apn_item.h"
 #include "apn_attribute.h"
-#include "parcel.h"
  
 namespace OHOS {
 namespace Telephony {

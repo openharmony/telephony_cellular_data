@@ -13,20 +13,13 @@
  * limitations under the License.
  */
 
+#include <cstdint>
 
 #include "tel_cellular_data_log.h"
 #include "tel_cellular_data_impl.h"
 
-#include <memory>
-
 #include "cellular_data_client.h"
-#include "cellular_data_types.h"
-#include "cstddef"
-#include "iosfwd"
 #include "napi_util.h"
-#include "node_api.h"
-#include "string"
-#include "telephony_napi_common_error.h"
 #include "telephony_types.h"
 
 namespace OHOS {

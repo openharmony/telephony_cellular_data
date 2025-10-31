@@ -15,7 +15,6 @@
 
 #include "cellular_data_settings_rdb_helper.h"
 
-#include "cellular_data_constant.h"
 #include "cellular_data_error.h"
 #include "cellular_data_hisysevent.h"
 #include "telephony_log_wrapper.h"

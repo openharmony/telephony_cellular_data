@@ -15,7 +15,6 @@
 #ifndef APN_ACTIVATE_REPORT_INFO_H
 #define APN_ACTIVATE_REPORT_INFO_H
 
-#include "parcel.h"
 #include "apn_item.h"
 namespace OHOS {
 namespace Telephony {

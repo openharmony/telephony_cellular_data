@@ -16,10 +16,7 @@
 #ifndef NETWORK_SEARCH_CALLBACK_H
 #define NETWORK_SEARCH_CALLBACK_H
 
-#include <string>
-
 #include "network_search_callback_base.h"
-
 namespace OHOS {
 namespace Telephony {
 class NetworkSearchCallback : public NetworkSearchCallBackBase {

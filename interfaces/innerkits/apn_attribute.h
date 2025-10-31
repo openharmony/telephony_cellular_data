@@ -16,7 +16,7 @@
 #define APN_ATTRIBUTE_H
 
 #include "apn_item.h"
-#include "parcel.h"
+
 namespace OHOS {
 namespace Telephony {
 constexpr static int ALL_APN_ITEM_CHAR_LENGTH = 256;

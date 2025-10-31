@@ -15,13 +15,8 @@
 
 #include "apn_manager.h"
 
-#include "cellular_data_utils.h"
 #include "cellular_data_hisysevent.h"
 #include "core_manager_inner.h"
-#include "net_specifier.h"
-#include "string_ex.h"
-#include "tel_profile_util.h"
-#include "telephony_log_wrapper.h"
 #include "telephony_ext_wrapper.h"
 #include "pdp_profile_data.h"
 

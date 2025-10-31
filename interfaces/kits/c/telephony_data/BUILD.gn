@@ -41,7 +41,6 @@ ohos_shared_library("telephony_data") {
   deps = [ "$CELLULAR_DATA_DIR/frameworks/native:tel_cellular_data_api" ]
 
   external_deps = [
-    "c_utils:utils",
     "core_service:libtel_common",
     "hilog:libhilog",
     "ipc:ipc_single",

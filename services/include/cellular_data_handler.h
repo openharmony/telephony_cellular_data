@@ -16,12 +16,6 @@
 #ifndef CELLULAR_DATA_HANDLER_H
 #define CELLULAR_DATA_HANDLER_H
 
-#include <atomic>
-#include <memory>
-
-#include "apn_manager.h"
-#include "cellular_data_constant.h"
-#include "cellular_data_event_code.h"
 #include "cellular_data_incall_observer.h"
 #include "cellular_data_rdb_observer.h"
 #include "cellular_data_roaming_observer.h"
@@ -30,12 +24,8 @@
 #include "cellular_data_state_machine.h"
 #include "data_switch_settings.h"
 #include "incall_data_state_machine.h"
-#include "inner_event.h"
 #include "radio_event.h"
 #include "state_notification.h"
-#include "tel_event_handler.h"
-#include "tel_profile_util.h"
-#include "tel_ril_data_parcel.h"
 #include "telephony_types.h"
 #include "core_service_common_event_callback.h"
 

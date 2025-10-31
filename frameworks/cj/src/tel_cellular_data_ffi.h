@@ -17,7 +17,6 @@
 #define TEL_CELLULAR_DATA_FFI_H
 
 #include "ffi_remote_data.h"
-#include "tel_cellular_data_utils.h"
 #include "tel_cellular_data_impl.h"
 
 namespace OHOS {

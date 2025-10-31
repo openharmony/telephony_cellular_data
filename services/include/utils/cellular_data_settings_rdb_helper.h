@@ -16,18 +16,11 @@
 #ifndef CELLULAR_DATA_SETTINGS_RDB_HELPER_H
 #define CELLULAR_DATA_SETTINGS_RDB_HELPER_H
 
-#include <memory>
 #include <singleton.h>
-#include <utility>
 
 #include "datashare_helper.h"
-#include "datashare_predicates.h"
-#include "datashare_result_set.h"
-#include "datashare_values_bucket.h"
 #include "iservice_registry.h"
-#include "result_set.h"
 #include "system_ability_definition.h"
-#include "uri.h"
 
 namespace OHOS {
 namespace Telephony {

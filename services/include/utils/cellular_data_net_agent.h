@@ -16,17 +16,8 @@
 #ifndef CELLULAR_DATA_NET_AGENT_H
 #define CELLULAR_DATA_NET_AGENT_H
 
-#include <singleton.h>
-#include <memory>
-#include <string>
-#include <utility>
-
 #include "i_net_conn_service.h"
-#include "if_system_ability_manager.h"
-#include "iservice_registry.h"
-#include "system_ability_definition.h"
 
-#include "cellular_data_constant.h"
 #include "net_manager_call_back.h"
 #include "net_manager_tactics_call_back.h"
 

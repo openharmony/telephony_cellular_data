@@ -16,12 +16,6 @@
 #ifndef DATA_CONNECTION_PARAMS_H
 #define DATA_CONNECTION_PARAMS_H
 
-#include <utility>
-
-#include "inner_event.h"
-
-#include "apn_holder.h"
-
 namespace OHOS {
 namespace Telephony {
 class DataConnectionParams {

@@ -16,12 +16,9 @@
 #ifndef ACTIVE_H
 #define ACTIVE_H
 
-#include <memory>
 #include <string>
 
-#include "cellular_data_event_code.h"
 #include "cellular_data_state_machine.h"
-#include "inner_event.h"
 #include "radio_event.h"
 
 namespace OHOS {

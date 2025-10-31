@@ -13,13 +13,9 @@
  * limitations under the License.
  */
 
-#include "connection_retry_policy.h"
-
 #include <charconv>
 #include <random>
-#include "parameter.h"
 
-#include "telephony_log_wrapper.h"
 #include "cellular_data_utils.h"
 #include "telephony_ext_wrapper.h"
 

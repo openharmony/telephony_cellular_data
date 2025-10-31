@@ -16,11 +16,7 @@
 #ifndef INACTIVE_H
 #define INACTIVE_H
 
-#include <memory>
-#include <string>
-
 #include "cellular_data_state_machine.h"
-#include "inner_event.h"
 
 namespace OHOS {
 namespace Telephony {

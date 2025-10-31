@@ -16,18 +16,11 @@
 #ifndef CELLULAR_DATA_SERVICE_H
 #define CELLULAR_DATA_SERVICE_H
 
-#include "iremote_object.h"
-#include "nocopyable.h"
-#include "singleton.h"
 #include "system_ability.h"
 
 #include "cellular_data_manager_stub.h"
-#include "cellular_data_constant.h"
 #include "cellular_data_controller.h"
 #include "traffic_management.h"
-#include "apn_activate_report_info.h"
-#include "apn_attribute.h"
-#include "apn_item.h"
 
 namespace OHOS {
 namespace Telephony {

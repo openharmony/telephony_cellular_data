@@ -15,8 +15,6 @@
 
 #include "state_notification.h"
 
-#include "core_manager_inner.h"
-#include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_state_registry_client.h"
 

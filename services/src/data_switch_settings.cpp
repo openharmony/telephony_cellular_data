@@ -15,11 +15,9 @@
 
 #include "data_switch_settings.h"
 
-#include "cellular_data_constant.h"
 #include "cellular_data_error.h"
 #include "cellular_data_settings_rdb_helper.h"
 #include "core_manager_inner.h"
-#include "telephony_log_wrapper.h"
 #include "telephony_ext_wrapper.h"
 
 namespace OHOS {

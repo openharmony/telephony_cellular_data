@@ -16,16 +16,10 @@
 #ifndef CELLULAR_DATA_CLIENT_H
 #define CELLULAR_DATA_CLIENT_H
 
-#include <cstdint>
-#include <iremote_object.h>
 #include <singleton.h>
 
 #include "data_sim_account_callback.h"
 #include "icellular_data_manager.h"
-#include "sim_account_callback.h"
-#include "apn_item.h"
-#include "cellular_data_constant.h"
-#include "apn_attribute.h"
 
 namespace OHOS {
 namespace Telephony {

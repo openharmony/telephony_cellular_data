@@ -16,10 +16,6 @@
 #ifndef CELLULAR_DATA_CONSTANT_H
 #define CELLULAR_DATA_CONSTANT_H
 
-#include <array>
-#include <string>
-#include <vector>
-
 #include "cellular_data_types.h"
 
 namespace OHOS {

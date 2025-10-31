@@ -16,9 +16,6 @@
 #ifndef TEL_CELLULAR_DATA_UTILS_H
 #define TEL_CELLULAR_DATA_UTILS_H
 
-#include <cstdint>
-#include <string>
-
 namespace OHOS {
 namespace Telephony {
 

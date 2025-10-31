@@ -16,15 +16,8 @@
 #ifndef STATE_MACHINE_H
 #define STATE_MACHINE_H
 
-#include <memory>
-#include <mutex>
-#include <utility>
-#include <vector>
-
 #include "cellular_data_event_code.h"
-#include "inner_event.h"
 #include "tel_event_handler.h"
-#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {

@@ -14,7 +14,6 @@
  */
 
 #include "tel_cellular_data_ffi.h"
-#include "tel_cellular_data_impl.h"
 
 using namespace OHOS::FFI;
 

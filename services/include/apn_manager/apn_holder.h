@@ -17,11 +17,7 @@
 #define APN_HOLDER_H
 
 #include <map>
-#include <memory>
-#include <set>
 
-#include "apn_item.h"
-#include "cellular_data_constant.h"
 #include "connection_retry_policy.h"
 #include "net_supplier_callback_base.h"
 

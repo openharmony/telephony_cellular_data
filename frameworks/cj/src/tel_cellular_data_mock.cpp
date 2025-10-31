@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "cj_common_ffi.h"
 
 extern "C" {
 FFI_EXPORT int FfiCellularDataGetDefaultCellularDataSlotId = 0;

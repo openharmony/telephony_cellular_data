@@ -16,14 +16,8 @@
 #ifndef APN_MANAGER_H
 #define APN_MANAGER_H
 
-#include <mutex>
-#include <string>
-#include <vector>
-
 #include "apn_holder.h"
-#include "apn_item.h"
 #include "cellular_data_rdb_helper.h"
-#include "net_all_capabilities.h"
 
 namespace OHOS {
 namespace Telephony {

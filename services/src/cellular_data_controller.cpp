@@ -15,12 +15,8 @@
 
 #include "cellular_data_controller.h"
 
-#include "cellular_data_constant.h"
 #include "core_manager_inner.h"
 #include "network_search_callback.h"
-#include "radio_event.h"
-#include "telephony_log_wrapper.h"
-#include "uri.h"
 
 namespace OHOS {
 namespace Telephony {

@@ -15,10 +15,8 @@
 
 #include "apn_holder.h"
 
-#include "cellular_data_event_code.h"
 #include "cellular_data_state_machine.h"
-#include "data_disconnect_params.h"
-#include "apn_manager.h"
+
 namespace OHOS {
 namespace Telephony {
 namespace {

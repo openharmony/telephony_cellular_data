@@ -106,7 +106,6 @@ ohos_shared_library("tel_cellular_data_api") {
 
   external_deps = [
     "c_utils:utils",
-    "core_service:libtel_common",
     "core_service:tel_core_service_api",
     "hilog:libhilog",
     "init:libbegetutil",

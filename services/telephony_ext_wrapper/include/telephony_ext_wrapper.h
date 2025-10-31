@@ -16,13 +16,9 @@
 #ifndef TELEPHONY_EXT_WRAPPER_H
 #define TELEPHONY_EXT_WRAPPER_H
 
-#include "nocopyable.h"
 #include "singleton.h"
 
-#include "apn_item.h"
 #include "apn_holder.h"
-#include "net_manager_call_back.h"
-#include "net_supplier_callback_base.h"
 
 namespace OHOS {
 namespace Telephony {

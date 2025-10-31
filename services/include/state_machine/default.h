@@ -16,12 +16,9 @@
 #ifndef DEFAULT_H
 #define DEFAULT_H
 
-#include <memory>
 #include <string>
 
-#include "cellular_data_event_code.h"
 #include "cellular_data_state_machine.h"
-#include "inner_event.h"
 
 namespace OHOS {
 namespace Telephony {

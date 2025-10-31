@@ -14,8 +14,6 @@
  */
 
 #include "sim_account_callback_proxy.h"
-
-#include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {

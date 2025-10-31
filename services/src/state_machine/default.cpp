@@ -14,10 +14,7 @@
  */
 
 #include "default.h"
-
-#include "cellular_data_utils.h"
 #include "core_manager_inner.h"
-#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
