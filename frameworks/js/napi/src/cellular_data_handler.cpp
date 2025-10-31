@@ -290,7 +290,7 @@ void CellularDataHandler::ClearAllConnections(DisConnectionReason reason)
 {
     if (isHandoverOccurred_) {
         DeactivatePdpAfterHandover(slotId_);
-        ifHandoverOccurred_ = false;
+        isHandoverOccurred_ = false;
         return;
     }
     if (apnManager_ == nullptr) {
@@ -1309,7 +1309,7 @@ void CellularDataHandler::SetNetRequest(NetRequest &request, const std::unique_p
 void CellularDataHandler::SendEstablishDataConnectionEvent(int32_t id, uint64_t disconnectBearType)
 {
     InnerEvent::Pointer innerEvent = InnerEvent::Get(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, id,
-                                                     std::unique_ptr<uint64_t>(disconnectBearType));
+                                                     std::make_unique<uint64_t>(disconnectBearType));
     if (!SendEvent(innerEvent)) {
         TELEPHONY_LOGE("Slot%{public}d: send data connection event failed", slotId_);
     }
@@ -1411,7 +1411,7 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
             apnHolder->ReleaseAllCellularData();
         }
     }
-    SendEstablishDataConnectionEvent(id, reqeust.bearTypes);
+    SendEstablishDataConnectionEvent(id, request.bearTypes);
 }
 
 bool CellularDataHandler::WriteEventCellularRequest(NetRequest request, int32_t state)
