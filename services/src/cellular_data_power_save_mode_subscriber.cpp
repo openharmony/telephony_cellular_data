@@ -22,6 +22,7 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t USER_OPERATION = 1;
+constexpr int32_t ABNORMAL_OPERATION = 17;
 static constexpr int64_t REPLY_COMMON_EVENT_DELAY = 3 * 1000;
 void CellularDataPowerSaveModeSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
 {
@@ -35,7 +36,7 @@ void CellularDataPowerSaveModeSubscriber::OnReceiveEvent(const EventFwk::CommonE
         FinishTelePowerCommonEvent();
         int32_t reason = data.GetCode();
         // process only in user operation
-        if (reason == USER_OPERATION) {
+        if (reason == USER_OPERATION || reason == ABNORMAL_OPERATION) {
             OnHandleExitStrEvent(action);
         }
     }
