@@ -236,6 +236,7 @@ ohos_static_library("tel_cellular_data_static") {
     "netmanager_base:net_stats_manager_if",
     "netmanager_ext:networkslice_manager_if",
     "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
     "telephony_data:tel_telephony_data",
   ]
 
