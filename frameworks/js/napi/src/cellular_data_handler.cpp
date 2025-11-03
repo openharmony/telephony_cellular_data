@@ -271,27 +271,27 @@ int32_t CellularDataHandler::SetCellularDataRoamingEnabled(bool dataRoamingEnabl
     return dataSwitchSettings_->SetUserDataRoamingOn(dataRoamingEnabled);
 }
 
-static void DeactivatePdpAfterHandover(const int32_t& slotId)
+static int32_t DeactivatePdpAfterHandover(const int32_t& slotId)
 {
     DeactivateDataParam deactivateDataParam;
     deactivateDataParam.param = -1;
     deactivateDataParam.cid = -1;
     deactivateDataParam.reason = static_cast<int32_t>(DisConnectionReason::REASON_CLEAR_CONNECTION);
-    int32_t result = CoreManagerInner::GetInstance().DeactivatePdpContext(slotId,
+    return CoreManagerInner::GetInstance().DeactivatePdpContext(slotId,
         RadioEvent::RADIO_RIL_DEACTIVATE_DATA_CALL, deactivateDataParam, nullptr);
-    if (result != TELEPHONY_ERR_SUCCESS) {
-        TELEPHONY_LOGE("Slot%{public}d: Deactivate PDP context failed", slotId);
-        CellularDataHiSysEvent::WriteDataActivateFaultEvent(
-            slotId, SWITCH_OFF, CellularDataErrorCode::DATA_ERROR_PDP_DEACTIVATE_FAIL, "Deactivate PDP context failed");
-        return;
-    }
-    isHandoverOccurred_ = false;
 }
 
 void CellularDataHandler::ClearAllConnections(DisConnectionReason reason)
 {
     if (isHandoverOccurred_) {
-        DeactivatePdpAfterHandover(slotId_);
+        int32_t result = DeactivatePdpAfterHandover(slotId_);
+        if (result != TELEPHONY_ERR_SUCCESS) {
+            TELEPHONY_LOGE("Slot%{public}d: Deactivate PDP context failed", slotId);
+            CellularDataHiSysEvent::WriteDataActivateFaultEvent(
+                slotId, SWITCH_OFF, CellularDataErrorCode::DATA_ERROR_PDP_DEACTIVATE_FAIL, "Deactivate PDP context failed");
+            return;
+        }
+        isHandoverOccurred_ = false;
         return;
     }
     if (apnManager_ == nullptr) {
