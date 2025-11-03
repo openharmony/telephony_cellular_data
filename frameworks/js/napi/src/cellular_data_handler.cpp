@@ -286,9 +286,9 @@ void CellularDataHandler::ClearAllConnections(DisConnectionReason reason)
     if (isHandoverOccurred_) {
         int32_t result = DeactivatePdpAfterHandover(slotId_);
         if (result != TELEPHONY_ERR_SUCCESS) {
-            TELEPHONY_LOGE("Slot%{public}d: Deactivate PDP context failed", slotId);
+            TELEPHONY_LOGE("Slot%{public}d: Deactivate PDP context failed", slotId_);
             CellularDataHiSysEvent::WriteDataActivateFaultEvent(
-                slotId, SWITCH_OFF, CellularDataErrorCode::DATA_ERROR_PDP_DEACTIVATE_FAIL, "Deactivate PDP context failed");
+                slotId_, SWITCH_OFF, CellularDataErrorCode::DATA_ERROR_PDP_DEACTIVATE_FAIL, "Deactivate PDP context failed");
             return;
         }
         isHandoverOccurred_ = false;
