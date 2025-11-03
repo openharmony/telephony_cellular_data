@@ -283,14 +283,15 @@ static void DeactivatePdpAfterHandover(const int32_t& slotId)
         TELEPHONY_LOGE("Slot%{public}d: Deactivate PDP context failed", slotId);
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(
             slotId, SWITCH_OFF, CellularDataErrorCode::DATA_ERROR_PDP_DEACTIVATE_FAIL, "Deactivate PDP context failed");
+        return;
     }
+    isHandoverOccurred_ = false;
 }
 
 void CellularDataHandler::ClearAllConnections(DisConnectionReason reason)
 {
     if (isHandoverOccurred_) {
         DeactivatePdpAfterHandover(slotId_);
-        isHandoverOccurred_ = false;
         return;
     }
     if (apnManager_ == nullptr) {
