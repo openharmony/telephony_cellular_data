@@ -292,7 +292,6 @@ void CellularDataHandler::ClearAllConnections(DisConnectionReason reason)
             return;
         }
         isHandoverOccurred_ = false;
-        return;
     }
     if (apnManager_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: apnManager is null", slotId_);
