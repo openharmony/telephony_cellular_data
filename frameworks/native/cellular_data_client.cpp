@@ -15,17 +15,7 @@
 
 #include "cellular_data_client.h"
 
-#include "__mutex_base"
-#include "apn_activate_report_info.h"
-#include "cellular_data_manager_proxy.h"
-#include "cellular_data_types.h"
-#include "icellular_data_manager.h"
-#include "if_system_ability_manager.h"
-#include "iremote_broker.h"
-#include "iremote_object.h"
 #include "iservice_registry.h"
-#include "memory"
-#include "refbase.h"
 #include "system_ability_definition.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"

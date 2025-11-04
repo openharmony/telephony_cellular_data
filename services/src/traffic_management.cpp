@@ -19,7 +19,6 @@
 #include "core_manager_inner.h"
 #include "data_flow_statistics.h"
 #include "net_conn_client.h"
-#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {

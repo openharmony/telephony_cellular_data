@@ -18,7 +18,6 @@
 #include "cellular_data_service.h"
 #include "core_manager_inner.h"
 #include "enum_convert.h"
-#include "telephony_types.h"
 
 namespace OHOS {
 namespace Telephony {

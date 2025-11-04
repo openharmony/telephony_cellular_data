@@ -16,7 +16,6 @@
 #ifndef CELLULAR_DATA_TYPES_H
 #define CELLULAR_DATA_TYPES_H
 
-#include <cstdint>
 #include <parcel.h>
 
 namespace OHOS {

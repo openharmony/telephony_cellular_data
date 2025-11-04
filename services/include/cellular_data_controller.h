@@ -16,12 +16,8 @@
 #ifndef CELLULAR_DATA_CONTROLLER_H
 #define CELLULAR_DATA_CONTROLLER_H
 
-#include <memory>
-
-#include "cellular_data_constant.h"
 #include "cellular_data_handler.h"
 #include "system_ability_status_change_stub.h"
-#include "tel_event_handler.h"
 
 namespace OHOS {
 namespace Telephony {

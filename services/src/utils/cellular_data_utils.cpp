@@ -16,7 +16,6 @@
 #include "cellular_data_utils.h"
 
 #include "telephony_common_utils.h"
-#include "telephony_log_wrapper.h"
 #include <charconv>
 
 namespace OHOS {

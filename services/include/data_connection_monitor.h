@@ -17,7 +17,6 @@
 #define DATA_CONNECTION_MONITOR_H
 
 #include "apn_holder.h"
-#include "inner_event.h"
 #include "tel_event_handler.h"
 #include "traffic_management.h"
 

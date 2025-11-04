@@ -13,12 +13,8 @@
 * limitations under the License.
 */
 
-#include "net_manager_call_back.h"
-
-#include "cellular_data_constant.h"
 #include "cellular_data_error.h"
 #include "cellular_data_service.h"
-#include "cellular_data_types.h"
 
 namespace OHOS {
 namespace Telephony {

@@ -16,15 +16,8 @@
 #ifndef INCALL_DATA_STATE_MACHINE_H
 #define INCALL_DATA_STATE_MACHINE_H
 
-#include <map>
-#include <memory>
-
 #include "apn_manager.h"
-#include "cellular_data_constant.h"
-#include "inner_event.h"
-#include "refbase.h"
 #include "state_machine.h"
-#include "tel_event_handler.h"
 
 namespace OHOS {
 namespace Telephony {

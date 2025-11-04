@@ -17,9 +17,6 @@
 #define APN_ITEM_H
 
 #include <string>
-#include <vector>
-
-#include "refbase.h"
 
 #include "cellular_data_constant.h"
 

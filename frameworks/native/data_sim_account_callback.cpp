@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-#include "data_sim_account_callback.h"
-
 #include "cellular_data_client.h"
 #include "telephony_log_wrapper.h"
 

@@ -16,12 +16,8 @@
 #ifndef CELLULAR_DATA_UTILS_H
 #define CELLULAR_DATA_UTILS_H
 
-#include <vector>
-#include <utility>
-
 #include "parameter.h"
 
-#include "cellular_data_constant.h"
 #include "cellular_data_state_machine.h"
 
 namespace OHOS {

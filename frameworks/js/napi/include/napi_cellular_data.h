@@ -16,11 +16,8 @@
 #ifndef NAPI_CELLULAR_DATA_H
 #define NAPI_CELLULAR_DATA_H
 
-#include <stdint.h>
-
 #include "base_context.h"
 #include "cellular_data_types.h"
-#include "telephony_napi_common_error.h"
 #include "telephony_types.h"
 
 namespace OHOS {

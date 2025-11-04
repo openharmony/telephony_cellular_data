@@ -16,12 +16,7 @@
 #ifndef CONNECTION_RETRY_POLICY_H
 #define CONNECTION_RETRY_POLICY_H
 
-#include <memory>
-#include <string>
-#include <vector>
-
 #include "apn_item.h"
-#include "cellular_data_constant.h"
 
 namespace OHOS {
 namespace Telephony {

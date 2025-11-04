@@ -13,13 +13,10 @@
 * limitations under the License.
  */
 
-#include "net_manager_tactics_call_back.h"
-
 #include "cellular_data_error.h"
 #include "cellular_data_service.h"
 #include "core_manager_inner.h"
 #include "telephony_common_utils.h"
-#include "telephony_log_wrapper.h"
 #include <charconv>
 
 namespace OHOS {

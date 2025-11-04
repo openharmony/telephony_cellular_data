@@ -17,8 +17,6 @@
 #define DATA_CONNECTION_MANAGER_H
 
 #include <tel_ril_data_parcel.h>
-#include <map>
-#include <memory>
 
 #include "data_connection_monitor.h"
 #include "state_machine.h"

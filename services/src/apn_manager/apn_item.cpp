@@ -12,13 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "apn_item.h"
-
-#include <securec.h>
-
-#include "telephony_log_wrapper.h"
-
 #include "cellular_data_utils.h"
 #include "pdp_profile_data.h"
 

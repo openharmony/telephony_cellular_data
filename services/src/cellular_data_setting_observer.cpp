@@ -19,7 +19,6 @@
 #include "cellular_data_event_code.h"
 #include "cellular_data_settings_rdb_helper.h"
 #include "telephony_errors.h"
-#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {

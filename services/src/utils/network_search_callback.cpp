@@ -16,7 +16,6 @@
 #include "network_search_callback.h"
 
 #include "cellular_data_service.h"
-#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {

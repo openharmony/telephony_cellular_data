@@ -16,10 +16,8 @@
 #include "active.h"
 
 #include "cellular_data_hisysevent.h"
-#include "cellular_data_utils.h"
 #include "core_manager_inner.h"
 #include "inactive.h"
-#include "telephony_log_wrapper.h"
 #include "telephony_ext_wrapper.h"
 #include "apn_manager.h"
 

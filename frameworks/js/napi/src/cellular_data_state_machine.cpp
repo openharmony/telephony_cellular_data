@@ -13,10 +13,7 @@
  * limitations under the License.
  */
 
-#include "cellular_data_state_machine.h"
-
 #include <cinttypes>
-#include <string_ex.h>
 #include <charconv>
 
 #include "activating.h"
@@ -28,9 +25,7 @@
 #include "default.h"
 #include "disconnecting.h"
 #include "inactive.h"
-#include "radio_event.h"
 #include "telephony_common_utils.h"
-#include "telephony_log_wrapper.h"
 #include "networkslice_client.h"
 
 namespace OHOS {

@@ -16,9 +16,6 @@
 #ifndef CELLULAR_DATA_DUMP_HELPER_H
 #define CELLULAR_DATA_DUMP_HELPER_H
 
-#include <string>
-#include <vector>
-
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {

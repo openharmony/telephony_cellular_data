@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "apn_item.h"
+
 #include "apn_activate_report_info.h"
 
 namespace OHOS {

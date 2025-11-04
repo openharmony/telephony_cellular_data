@@ -16,11 +16,6 @@
 #ifndef DATA_DISCONNECT_PARAMS_H
 #define DATA_DISCONNECT_PARAMS_H
 
-#include <string>
-#include <utility>
-
-#include "inner_event.h"
-
 namespace OHOS {
 namespace Telephony {
 class DataDisconnectParams {

@@ -16,7 +16,6 @@
 #ifndef DATA_SERVICE_EXT_WRAPPER_H
 #define DATA_SERVICE_EXT_WRAPPER_H
 
-#include "nocopyable.h"
 #include "singleton.h"
 
 namespace OHOS {

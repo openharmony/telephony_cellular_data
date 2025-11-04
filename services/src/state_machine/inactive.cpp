@@ -15,11 +15,6 @@
 
 #include "inactive.h"
 
-#include "telephony_log_wrapper.h"
-
-#include "apn_manager.h"
-#include "cellular_data_event_code.h"
-
 namespace OHOS {
 namespace Telephony {
 void Inactive::StateBegin()

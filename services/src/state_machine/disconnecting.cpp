@@ -14,12 +14,8 @@
  */
 
 #include "disconnecting.h"
-
-#include "tel_ril_data_parcel.h"
-#include "telephony_log_wrapper.h"
 #include "radio_event.h"
 
-#include "cellular_data_event_code.h"
 #include "inactive.h"
 
 namespace OHOS {

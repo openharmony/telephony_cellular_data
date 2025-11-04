@@ -13,23 +13,12 @@
  * limitations under the License.
  */
 
-#include "data_connection_monitor.h"
-
 #include "core_manager_inner.h"
-#include "radio_event.h"
-#include "telephony_log_wrapper.h"
 
-#include "cellular_data_event_code.h"
 #include "cellular_data_hisysevent.h"
 #include "cellular_data_service.h"
-#include "cellular_data_types.h"
-#include "cellular_data_constant.h"
 #include "data_service_ext_wrapper.h"
 #include "telephony_ext_wrapper.h"
-
-#ifdef ABILITY_POWER_SUPPORT
-#include "power_mgr_client.h"
-#endif
 
 namespace OHOS {
 namespace Telephony {

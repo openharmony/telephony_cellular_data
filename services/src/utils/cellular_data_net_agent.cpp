@@ -13,15 +13,11 @@
  * limitations under the License.
  */
 
-#include "cellular_data_net_agent.h"
-
 #include <cinttypes>
 
 #include "cellular_data_utils.h"
 #include "core_manager_inner.h"
-#include "net_conn_client.h"
 #include "net_policy_client.h"
-#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {

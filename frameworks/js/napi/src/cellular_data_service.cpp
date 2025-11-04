@@ -17,20 +17,12 @@
 
 #include <cinttypes>
 
-#include "apn_manager.h"
 #include "cellular_data_dump_helper.h"
-#include "cellular_data_rdb_helper.h"
 #include "cellular_data_error.h"
 #include "cellular_data_hisysevent.h"
-#include "cellular_data_net_agent.h"
 #include "core_manager_inner.h"
-#include "data_connection_monitor.h"
-#include "net_specifier.h"
-#include "string_ex.h"
-#include "system_ability_definition.h"
 #include "telephony_ext_wrapper.h"
 #include "telephony_common_utils.h"
-#include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
 #include "data_service_ext_wrapper.h"
 #include "pdp_profile_data.h"
