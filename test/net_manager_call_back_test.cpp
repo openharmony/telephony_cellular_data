@@ -65,6 +65,23 @@ HWTEST_F(NetManagerCallBackTest, ReleaseNetwork_001, TestSize.Level3)
 }
 
 /**
+ * @tc.number   ReleaseNetwork_002
+ * @tc.name     Test NetManagerCallBack ReleaseNetwork
+ * @tc.desc     ReleaseNetwork ipc
+ */
+HWTEST_F(NetManagerCallBackTest, ReleaseNetwork_002, TestSize.Level3)
+{
+    auto netManagerCallBack = std::make_shared<NetManagerCallBack>();
+    NetManagerStandard::NetRequest request;
+    request.ident = "testIdent";
+    request.bearTypes.insert(NetManagerStandard::NetBearType::BEARER_WIFI);
+    request.netCaps.insert(NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET);
+    request.isRemoveUid = 255;
+    int32_t result = netManagerCallBack->ReleaseNetwork(request);
+    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
+}
+
+/**
  * @tc.number   AddRequest_001
  * @tc.name     Test NetManagerCallBack AddRequest
  * @tc.desc     Add Request and uid

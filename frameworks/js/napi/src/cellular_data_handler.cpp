@@ -85,6 +85,7 @@ bool CellularDataHandler::ReleaseNet(const NetRequest &request)
     }
     netRequest->capability = ApnManager::FindBestCapability(request.capability);
     netRequest->ident = request.ident;
+    netRequest->bearTypes = request.bearTypes;
     AppExecFwk::InnerEvent::Pointer event =
         InnerEvent::Get(CellularDataEventCode::MSG_REQUEST_NETWORK, netRequest, TYPE_RELEASE_NET);
     if (event == nullptr) {
@@ -260,8 +261,28 @@ int32_t CellularDataHandler::SetCellularDataRoamingEnabled(bool dataRoamingEnabl
     return dataSwitchSettings_->SetUserDataRoamingOn(dataRoamingEnabled);
 }
 
+static int32_t DeactivatePdpAfterHandover(const int32_t& slotId)
+{
+    DeactivateDataParam deactivateDataParam;
+    deactivateDataParam.param = -1;
+    deactivateDataParam.cid = -1;
+    deactivateDataParam.reason = static_cast<int32_t>(DisConnectionReason::REASON_CLEAR_CONNECTION);
+    return CoreManagerInner::GetInstance().DeactivatePdpContext(slotId,
+        RadioEvent::RADIO_RIL_DEACTIVATE_DATA_CALL, deactivateDataParam, nullptr);
+}
+
 void CellularDataHandler::ClearAllConnections(DisConnectionReason reason)
 {
+    if (isHandoverOccurred_) {
+        int32_t result = DeactivatePdpAfterHandover(slotId_);
+        if (result != TELEPHONY_ERR_SUCCESS) {
+            TELEPHONY_LOGE("Slot%{public}d: Deactivate PDP context failed", slotId_);
+            CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_OFF,
+                CellularDataErrorCode::DATA_ERROR_PDP_DEACTIVATE_FAIL, "Deactivate PDP context failed");
+            return;
+        }
+        isHandoverOccurred_ = false;
+    }
     if (apnManager_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: apnManager is null", slotId_);
         return;
@@ -745,6 +766,8 @@ void CellularDataHandler::AttemptEstablishDataConnection(sptr<ApnHolder> &apnHol
     coreInner.GetPsRadioTech(slotId_, radioTech);
     if (!EstablishDataConnection(apnHolder, radioTech)) {
         TELEPHONY_LOGE("Slot%{public}d: Establish data connection fail", slotId_);
+    } else {
+        isHandoverOccurred_ = false;
     }
     FinishTrace(HITRACE_TAG_OHOS);
     DelayedSingleton<CellularDataHiSysEvent>::GetInstance()->JudgingDataActivateTimeOut(slotId_, SWITCH_ON);
@@ -1188,6 +1211,23 @@ void CellularDataHandler::HandleSortConnection()
     }
 }
 
+static void FindDisConnectionReason(DisConnectionReason& reason, const std::unique_ptr<uint64_t>& disconnectBearType,
+                                    const std::string& apnType)
+{
+    if (disconnectBearType == nullptr) {
+        return;
+    }
+    if (apnType.compare(DATA_CONTEXT_ROLE_INTERNAL_DEFAULT) == 0) {
+        reason = DisConnectionReason::REASON_HANDOVER_CONNECTION;
+    } else {
+        if (*disconnectBearType == NetBearType::BEARER_WIFI) {
+            reason = DisConnectionReason::REASON_HANDOVER_CONNECTION;
+        } else {
+            reason = DisConnectionReason::REASON_CLEAR_CONNECTION;
+        }
+    }
+}
+
 void CellularDataHandler::MsgEstablishDataConnection(const InnerEvent::Pointer &event)
 {
     if (apnManager_ == nullptr || event == nullptr) {
@@ -1206,10 +1246,17 @@ void CellularDataHandler::MsgEstablishDataConnection(const InnerEvent::Pointer &
     } else {
         TELEPHONY_LOGD("MsgEstablishDataConnection IsDataCallEnabled is false");
         DisConnectionReason reason = DisConnectionReason::REASON_CHANGE_CONNECTION;
+        std::unique_ptr<uint64_t> disconnectBearType = event->GetUniqueObject<uint64_t>();
         int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
         CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, radioTech);
         if (!IsSingleConnectionEnabled(radioTech)) {
             reason = DisConnectionReason::REASON_CLEAR_CONNECTION;
+        }
+        std::string apnType = apnHolder->GetApnType();
+        FindDisConnectionReason(reason, disconnectBearType, apnType);
+        if (reason == DisConnectionReason::REASON_HANDOVER_CONNECTION &&
+                apnType.compare(DATA_CONTEXT_ROLE_DEFAULT) == 0) {
+            isHandoverOccurred_ = true;
         }
         ClearConnection(apnHolder, reason);
     }
@@ -1249,9 +1296,10 @@ void CellularDataHandler::SetNetRequest(NetRequest &request, const std::unique_p
     request.uid = netRequest->uid;
 }
 
-void CellularDataHandler::SendEstablishDataConnectionEvent(int32_t id)
+void CellularDataHandler::SendEstablishDataConnectionEvent(int32_t id, uint64_t disconnectBearType)
 {
-    InnerEvent::Pointer innerEvent = InnerEvent::Get(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, id);
+    InnerEvent::Pointer innerEvent = InnerEvent::Get(CellularDataEventCode::MSG_ESTABLISH_DATA_CONNECTION, id,
+                                                     std::make_unique<uint64_t>(disconnectBearType));
     if (!SendEvent(innerEvent)) {
         TELEPHONY_LOGE("Slot%{public}d: send data connection event failed", slotId_);
     }
@@ -1267,7 +1315,7 @@ void CellularDataHandler::ConnectIfNeed(
         TELEPHONY_LOGD("try to activate Cellular");
         apnHolder->RequestCellularData(request);
         int32_t id = ApnManager::FindApnIdByCapability(request.capability);
-        SendEstablishDataConnectionEvent(id);
+        SendEstablishDataConnectionEvent(id, request.bearTypes);
     }
 }
 #ifdef BASE_POWER_IMPROVEMENT
@@ -1353,7 +1401,7 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
             apnHolder->ReleaseAllCellularData();
         }
     }
-    SendEstablishDataConnectionEvent(id);
+    SendEstablishDataConnectionEvent(id, request.bearTypes);
 }
 
 bool CellularDataHandler::WriteEventCellularRequest(NetRequest request, int32_t state)
