@@ -55,6 +55,7 @@ public:
     MOCK_METHOD(int32_t, RegisterNetDetectionCallback, (int32_t netId, const sptr<INetDetectionCallback> &callback));
     MOCK_METHOD(int32_t, UnRegisterNetDetectionCallback, (int32_t netId, const sptr<INetDetectionCallback> &callback));
     MOCK_METHOD(int32_t, NetDetection, (int32_t netId));
+    MOCK_METHOD(int32_t, NetDetection, (const std::string &rawUrl, PortalResponse &resp));
     MOCK_METHOD(int32_t, GetDefaultNet, (int32_t & netId));
     MOCK_METHOD(int32_t, HasDefaultNet, (bool &flag));
     MOCK_METHOD(int32_t, GetAddressesByName, (const std::string &host, int32_t netId, std::vector<INetAddr> &addrList));
