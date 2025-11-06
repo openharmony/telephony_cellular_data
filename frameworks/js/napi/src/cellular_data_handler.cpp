@@ -1276,6 +1276,33 @@ bool CellularDataHandler::IsSimRequestNetOnVSimEnabled(int32_t reqType, bool isM
     return false;
 }
 
+void CellularDataHandler::HandleMmsRequestOnVsimEnabled(int32_t reqType, bool isMmsType)
+{
+    if (!isMmsType || slotId_ == CELLULAR_DATA_VSIM_SLOT_ID) {
+        return;
+    }
+    if (TELEPHONY_EXT_WRAPPER.isVSimEnabled_ == nullptr || !TELEPHONY_EXT_WRAPPER.isVSimEnabled_() ||
+        TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_ == nullptr || TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_()) {
+        return;
+    }
+    if (reqType == TYPE_REQUEST_NET) {
+        SetDataPermittedForSlotId(slotId_);
+    } else {
+        SetDataPermittedForSlotId(CELLULAR_DATA_VSIM_SLOT_ID);
+    }
+}
+ 
+void CellularDataHandler::SetDataPermittedForSlotId(const int32_t slotId)
+{
+    TELEPHONY_LOGI("SetDataPermittedForSlotId slotId %{public}d", slotId);
+    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
+    int32_t count = coreInner.GetMaxSimCount();
+    for (auto id = 0; id < count; id++) {
+        SetDataPermitted(id, id == slotId);
+    }
+    SetDataPermitted(CELLULAR_DATA_VSIM_SLOT_ID, slotId == CELLULAR_DATA_VSIM_SLOT_ID);
+}
+
 bool CellularDataHandler::NotifyReqCellularData(bool isCellularDataRequested)
 {
     if (TELEPHONY_EXT_WRAPPER.dynamicLoadNotifyReqCellularDataStatus_) {
@@ -1368,6 +1395,7 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
     if (IsSimRequestNetOnVSimEnabled(event->GetParam(), apnHolder->IsMmsType())) {
         return;
     }
+    HandleMmsRequestOnVsimEnabled(event->GetParam(), apnHolder->IsMmsType());
 #endif
 
     bool isAllCellularDataAllowed = true;

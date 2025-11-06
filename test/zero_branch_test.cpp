@@ -590,6 +590,52 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_011, Function | MediumTest | 
 }
 
 /**
+ * @tc.number   Telephony_CellularDataHandler_HandleMmsRequestOnVsimEnabled
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataHandler_HandleMmsRequestOnVsimEnabled, Function | MediumTest | Level1)
+{
+    CellularDataController controller { 0 };
+    controller.Init();
+    controller.cellularDataHandler_->SendEstablishDataConnectionEvent(0, NetBearType::BEARER_DEFAULT);
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    int32_t reqType = TYPE_REQUEST_NET;
+    bool isMmsType = false;
+    controller.cellularDataHandler_->HandleMmsRequestOnVsimEnabled(reqType, isMmsType);
+    isMmsType = true;
+    controller.cellularDataHandler_->slotId_ = 2;
+    controller.cellularDataHandler_->HandleMmsRequestOnVsimEnabled(reqType, isMmsType);
+    isMmsType = true;
+    controller.cellularDataHandler_->slotId_ = 1;
+    controller.cellularDataHandler_->HandleMmsRequestOnVsimEnabled(reqType, isMmsType);
+    auto isVSimEnabled = TELEPHONY_EXT_WRAPPER.isVSimEnabled_;
+    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = nullptr;
+    controller.cellularDataHandler_->HandleMmsRequestOnVsimEnabled(reqType, isMmsType);
+    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = isVSimEnabled;
+    controller.cellularDataHandler_->HandleMmsRequestOnVsimEnabled(reqType, isMmsType);
+    reqType = 0;
+    EXPECT_EQ(controller.cellularDataHandler_->slotId_, 1);
+#endif
+}
+
+/**
+ * @tc.number   Telephony_CellularDataHandler_SetDataPermittedForSlotId
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataHandler_SetDataPermittedForSlotId, Function | MediumTest | Level1)
+{
+    CellularDataController controller { 0 };
+    controller.Init();
+    controller.cellularDataHandler_->SendEstablishDataConnectionEvent(0, NetBearType::BEARER_DEFAULT);
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    controller.cellularDataHandler_->SetDataPermittedForSlotId(1);
+    EXPECT_NE(controller.cellularDataHandler_->slotId_, 3);
+#endif
+}
+
+/**
  * @tc.number   Telephony_CellularDataHandler_012
  * @tc.name     test error branch
  * @tc.desc     Function test
