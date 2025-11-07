@@ -313,7 +313,7 @@ export default namespace data {
     })
   }
 
-  interface ApnInfo {
+  export interface ApnInfo {
     apnName: string;
     apn: string;
     mcc: string;
