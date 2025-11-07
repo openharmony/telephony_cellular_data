@@ -290,7 +290,7 @@ std::vector<sptr<ApnHolder>> ApnManager::GetSortApnHolder() const
 
 int32_t ApnManager::PushApnItem(int32_t count, sptr<ApnItem> extraApnItem)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<std::shared_mutex> lock(mutex_);
     allApnItem_.clear();
     allApnItem_.push_back(extraApnItem);
     return ++count;
@@ -420,7 +420,7 @@ void ApnManager::ReportApnInfo(int32_t slotId, PdpProfile &apnData)
 
 int32_t ApnManager::MakeSpecificApnItem(std::vector<PdpProfile> &apnVec, int32_t slotId)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<std::shared_mutex> lock(mutex_);
     allApnItem_.clear();
     TryMergeSimilarPdpProfile(apnVec);
     int32_t count = 0;
@@ -450,7 +450,6 @@ int32_t ApnManager::MakeSpecificApnItem(std::vector<PdpProfile> &apnVec, int32_t
 
 std::vector<sptr<ApnItem>> ApnManager::FilterMatchedApns(const std::string &requestApnType, const int32_t slotId)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
     std::vector<sptr<ApnItem>> matchApnItemList;
     if (requestApnType == DATA_CONTEXT_ROLE_DUN) {
         FetchDunApns(matchApnItemList, slotId);
@@ -459,6 +458,7 @@ std::vector<sptr<ApnItem>> ApnManager::FilterMatchedApns(const std::string &requ
         FetchBipApns(matchApnItemList);
         return matchApnItemList;
     }
+    std::shared_lock<std::shared_mutex> lock(mutex_);
     for (const sptr<ApnItem> &apnItem : allApnItem_) {
         if (apnItem->CanDealWithType(requestApnType)) {
             matchApnItemList.push_back(apnItem);
@@ -566,7 +566,7 @@ ApnProfileState ApnManager::GetOverallDefaultApnState() const
 
 sptr<ApnItem> ApnManager::GetRilAttachApn()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::shared_lock<std::shared_mutex> lock(mutex_);
     if (allApnItem_.empty()) {
         TELEPHONY_LOGE("apn item is null");
         return nullptr;
@@ -620,6 +620,7 @@ bool ApnManager::ResetApns(int32_t slotId)
 
 void ApnManager::FetchBipApns(std::vector<sptr<ApnItem>> &matchApnItemList)
 {
+    std::shared_lock<std::shared_mutex> lock(mutex_);
     for (const sptr<ApnItem> &apnItem : allApnItem_) {
         if (apnItem->CanDealWithType(DATA_CONTEXT_ROLE_BIP)) {
             matchApnItemList.push_back(apnItem);
@@ -637,6 +638,7 @@ void ApnManager::FetchDunApns(std::vector<sptr<ApnItem>> &matchApnItemList, cons
     }
     int32_t preferId = preferId_;
     sptr<ApnItem> preferredApn = nullptr;
+    std::shared_lock<std::shared_mutex> lock(mutex_);
     auto it = std::find_if(allApnItem_.begin(), allApnItem_.end(), [preferId](auto &apn) {
         return apn != nullptr && apn->attr_.profileId_ == preferId;
     });
@@ -659,6 +661,7 @@ bool ApnManager::IsPreferredApnUserEdited()
 {
     bool isUserEdited = false;
     int32_t preferId = preferId_;
+    std::shared_lock<std::shared_mutex> lock(mutex_);
     auto it = std::find_if(allApnItem_.begin(), allApnItem_.end(), [preferId](auto &apn) {
         return apn->attr_.profileId_ == preferId;
     });

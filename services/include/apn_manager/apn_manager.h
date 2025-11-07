@@ -69,7 +69,7 @@ private:
     std::vector<sptr<ApnHolder>> apnHolders_;
     std::map<int32_t, sptr<ApnHolder>> apnIdApnHolderMap_;
     std::vector<sptr<ApnHolder>> sortedApnHolders_;
-    std::mutex mutex_;
+    std::shared_mutex mutex_;
     int32_t preferId_ = -1;
 };
 } // namespace Telephony

@@ -209,9 +209,11 @@ int32_t CellularDataStateMachine::NetInterfaceCallback::OnInterfaceLinkStateChan
 
 int32_t CellularDataStateMachine::OnInterfaceLinkStateChanged(const std::string &ifName, bool up)
 {
+    std::unique_lock<std::mutex> lock(mtx_);
     if (ifName != ifName_) {
         return 0;
     }
+    lock.unlock();
     if (!up) {
         if (stateMachineEventHandler_ == nullptr) {
             TELEPHONY_LOGE("stateMachineEventHandler_ is nullptr");
@@ -525,7 +527,7 @@ void CellularDataStateMachine::SetConnectionBandwidth(const uint32_t upBandwidth
 
 void CellularDataStateMachine::SetConnectionTcpBuffer(const std::string &tcpBuffer)
 {
-    std::lock_guard<std::mutex> guard(mtx_);
+    std::unique_lock<std::mutex> lock(mtx_);
     tcpBuffer_ = tcpBuffer;
 }
 
