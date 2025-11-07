@@ -1701,6 +1701,7 @@ void CellularDataHandler::HandleSimStateChanged()
             EstablishAllApnsIfConnectable();
         }
     } else if (simState != SimState::SIM_STATE_LOADED) {
+        isSimAccountLoaded_ = false;
         isRilApnAttached_ = false;
         ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
         if (simState == SimState::SIM_STATE_NOT_PRESENT) {
@@ -1779,6 +1780,9 @@ void CellularDataHandler::HandleSimAccountLoaded()
     bool registerRes = CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
     if (!registerRes) {
         TELEPHONY_LOGE("Slot%{public}d register supplierid fail", slotId_);
+        CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
+            CellularDataErrorCode::DATA_ERROR_REGISTER_SUPPLIERID_FAIL,
+            "register supplierid fail");
     }
     if (slotId_ == 0) {
         CellularDataNetAgent::GetInstance().UnregisterPolicyCallback();
@@ -1790,6 +1794,10 @@ void CellularDataHandler::HandleSimAccountLoaded()
     }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
+    isSimAccountLoaded_ = true;
+    CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
+        CellularDataErrorCode::DATA_ERROR_RECEIVE_SIM_ACCOUNT_READY,
+        "receive sim account ready");
     CreateApnItem();
     if (defSlotId == slotId_) {
         EstablishAllApnsIfConnectable();
@@ -1822,6 +1830,11 @@ void CellularDataHandler::CreateApnItem()
             SendEvent(event, RETRY_DELAY_TIME);
         } else {
             retryCreateApnTimes_ = 0;
+            if (isSimAccountLoaded_) {
+                CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
+                    CellularDataErrorCode::DATA_ERROR_CREATE_APN_EMPTY,
+                    "create apn is null");
+            }
         }
     } else if (result != 0) {
         retryCreateApnTimes_ = 0;

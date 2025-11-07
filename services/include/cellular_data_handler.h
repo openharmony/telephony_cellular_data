@@ -219,6 +219,7 @@ private:
     bool multipleConnectionsEnabled_ = false;
     bool defaultDataRoamingEnable_ = false;
     bool isRilApnAttached_ = false;
+    bool isSimAccountLoaded_ = false;
     bool isHandoverOccurred_ = false;
     std::mutex mtx_;
     std::mutex apnActivateListMutex_;
