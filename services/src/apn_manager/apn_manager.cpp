@@ -593,7 +593,6 @@ sptr<ApnItem> ApnManager::GetRilAttachApn()
 
 sptr<ApnItem> ApnManager::GetApnItemById(const int32_t id)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
     if (allApnItem_.empty()) {
         TELEPHONY_LOGE("apn item is null");
         return nullptr;
