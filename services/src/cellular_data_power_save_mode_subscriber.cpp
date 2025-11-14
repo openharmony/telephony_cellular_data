@@ -113,7 +113,7 @@ bool CellularDataPowerSaveModeSubscriber::HasEsimProfile()
         return false;
     }
     Uri esimUri(CELLULAR_DATA_ESIM_PROFILE_URI);
-    int value = ESIM_PROFILE_STATE_DISABLED;
+    int32_t value = ESIM_PROFILE_STATE_DISABLED;
     if (settingHelper->GetValue(esimUri, CELLULAR_DATA_COLUMN_ESIM, value) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetValue failed");
         return false;
