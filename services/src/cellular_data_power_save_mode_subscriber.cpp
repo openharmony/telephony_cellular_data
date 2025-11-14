@@ -32,11 +32,7 @@ void CellularDataPowerSaveModeSubscriber::OnReceiveEvent(const EventFwk::CommonE
     std::string action = data.GetWant().GetAction();
     strAsyncCommonEvent_ = this->GoAsyncCommonEvent();
     if (action == ENTER_STR_TELEPHONY_NOTIFY) {
-        if (!HasEsimProfile()) {
-            TELEPHONY_LOGI("Not have Esim profile");
-            FinishTelePowerCommonEvent();
-            return;
-        }
+        
         TELEPHONY_LOGI("Enter str mode");
         OnHandleEnterStrEvent(action);
     } else if (action == EXIT_STR_TELEPHONY_NOTIFY) {
