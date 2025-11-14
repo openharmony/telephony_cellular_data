@@ -35,7 +35,7 @@ export default namespace data {
 
   export function getCellularDataState(callback: AsyncCallback<DataConnectState>): void {
     let p1 = taskpool.execute(nativeGetCellularDataState)
-    p1.then((content: NullishType) => {
+    p1.then((content: Any) => {
         callback(new BusinessError(), content as DataConnectState);
     }, (err: Error): void => {
         callback(err as BusinessError, DataConnectState.DATA_STATE_UNKNOWN);
@@ -45,7 +45,7 @@ export default namespace data {
   export function getCellularDataState(): Promise<DataConnectState> {
     return new Promise<DataConnectState>((resolve, reject) => {
       let p = taskpool.execute(nativeGetCellularDataState)
-      p.then((e: NullishType) => {
+      p.then((e: Any) => {
           let r = e as DataConnectState
           resolve(r)
       }).catch((e: Error): void => {
@@ -56,7 +56,7 @@ export default namespace data {
 
   export function isCellularDataEnabled(callback: AsyncCallback<boolean>): void {
     let p1 = taskpool.execute(nativeIsCellularDataEnabled)
-    p1.then((content: NullishType) => {
+    p1.then((content: Any) => {
         callback(new BusinessError(), content as boolean);
     }, (err: Error): void => {
         callback(err as BusinessError, false);
@@ -66,7 +66,7 @@ export default namespace data {
   export function isCellularDataEnabled(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       let p = taskpool.execute(nativeIsCellularDataEnabled)
-      p.then((e: NullishType) => {
+      p.then((e: Any) => {
           let r = e as boolean
           resolve(r)
       }).catch((e: Error): void => {
@@ -201,7 +201,7 @@ export default namespace data {
     let p1 = taskpool.execute((): boolean => {
       return nativeIsCellularDataRoamingEnabled(slotId);
     })
-    p1.then((content: NullishType) => {
+    p1.then((content: Any) => {
         callback(new BusinessError(), content as boolean);
     }, (err: Error): void => {
         callback(err as BusinessError, false);
@@ -213,7 +213,7 @@ export default namespace data {
       let p1 = taskpool.execute((): boolean => {
         return nativeIsCellularDataRoamingEnabled(slotId);
       })
-      p1.then((e: NullishType) => {
+      p1.then((e: Any) => {
           let r = e as boolean
           resolve(r)
       }).catch((e: Error): void => {
@@ -254,7 +254,7 @@ export default namespace data {
     let p1 = taskpool.execute((): DataFlowType => {
       return nativeGetCellularDataFlowType();
     })
-    p1.then((content: NullishType) => {
+    p1.then((content: Any) => {
         callback(new BusinessError(), content as DataFlowType);
     }, (err: BusinessError): void => {
         callback(err, DataFlowType.DATA_FLOW_TYPE_NONE);
@@ -265,7 +265,7 @@ export default namespace data {
       let p = taskpool.execute((): DataFlowType => {
         return nativeGetCellularDataFlowType();
       })
-      p.then((e: NullishType) => {
+      p.then((e: Any) => {
           let r = e as DataFlowType
           resolve(r)
       }).catch((e: Error): void => {
@@ -279,7 +279,7 @@ export default namespace data {
     let p1 = taskpool.execute((): int => {
       return nativeGetDefaultCellularDataSlotIdSync();
     })
-    p1.then((content: NullishType) => {
+    p1.then((content: Any) => {
         callback(new BusinessError(), content as int);
     }, (err: Error): void => {
         callback(err as BusinessError, 0);
@@ -289,7 +289,7 @@ export default namespace data {
     return new Promise<int>((resolve, reject) => {
         taskpool.execute((): int => {
         return nativeGetDefaultCellularDataSlotIdSync();
-      }).then((content: NullishType) => {
+      }).then((content: Any) => {
         resolve(content as int);
       }, (err: Error): void => {
         reject(err as BusinessError);
@@ -304,7 +304,7 @@ export default namespace data {
       let p1 = taskpool.execute((): boolean => {
         return nativeSetPreferredApn(apnId);
       })
-      p1.then((e: NullishType) => {
+      p1.then((e: Any) => {
           let r = e as boolean
           resolve(r)
       }).catch((e: Error): void => {
@@ -330,7 +330,7 @@ export default namespace data {
       let p1 = taskpool.execute((): Array<int> => {
         return nativeQueryApnIds(apnInfo);
       })
-      p1.then((e: NullishType) => {
+      p1.then((e: Any) => {
           let r = e as Array<int>
           resolve(r)
       }).catch((e: Error): void => {
@@ -345,7 +345,7 @@ export default namespace data {
       let p1 = taskpool.execute((): Array<ApnInfo> => {
         return nativeQueryAllApns();
       })
-      p1.then((e: NullishType) => {
+      p1.then((e: Any) => {
           let r = e as Array<ApnInfo>
           resolve(r)
       }).catch((e: Error): void => {
@@ -361,7 +361,7 @@ export default namespace data {
       let p1 = taskpool.execute((): string => {
         return nativeGetActiveApnName();
       })
-      p1.then((e: NullishType) => {
+      p1.then((e: Any) => {
           let r = e as string
           resolve(r)
       }).catch((e: Error): void => {
