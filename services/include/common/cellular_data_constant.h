@@ -273,7 +273,7 @@ static constexpr const char *CELLULAR_DATA_SETTING_INTELLIGENCE_NETWORK_URI =
     "Proxy=true&key=intelligence_network_switching";
 static constexpr const char *CELLULAR_DATA_AIRPLANE_MODE_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=airplane_mode";
-static constexpr const char *CELLULAR_DATA_ESIM_PROFILE_URI = 
+static constexpr const char *CELLULAR_DATA_ESIM_PROFILE_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=has_esim_profile";
 static const int32_t DEFAULT_NET_STATISTICS_PERIOD = 3 * 1000;
 static const int32_t DATA_STALL_ALARM_NON_AGGRESSIVE_DELAY_IN_MS_DEFAULT = 1000 * 60 * 10;
