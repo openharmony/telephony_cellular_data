@@ -37,6 +37,7 @@ void CellularDataPowerSaveModeSubscriber::OnReceiveEvent(const EventFwk::CommonE
     } else if (action == EXIT_STR_TELEPHONY_NOTIFY) {
         if (!HasEsimProfile()) {
             TELEPHONY_LOGI("Not have Esim profile");
+            FinishTelePowerCommonEvent();
             return;
         }
         TELEPHONY_LOGI("Exit str mode");
