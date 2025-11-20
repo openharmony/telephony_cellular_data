@@ -49,6 +49,7 @@ ohos_static_library("cellular_data_ani_cxx") {
     "core_service:libtel_common",
     "core_service:tel_core_service_api",
     "hilog:libhilog",
+    "init:libbegetutil",
     "napi:ace_napi",
     "rust_cxx:cxx_cppdeps",
     "ipc:ipc_single"
