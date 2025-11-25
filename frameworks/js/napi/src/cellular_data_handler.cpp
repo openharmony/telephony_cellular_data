@@ -2953,7 +2953,8 @@ void CellularDataHandler::HandleReplyCommonEvent(const AppExecFwk::InnerEvent::P
     ReplyCommonEvent(strEnterSubscriber_, false);
 }
 
-void CellularDataHandler::ReplyCommonEvent(std::shared_ptr<CellularDataPowerSaveModeSubscriber> &subscriber, bool isNeedCheck)
+void CellularDataHandler::ReplyCommonEvent(std::shared_ptr<CellularDataPowerSaveModeSubscriber> &subscriber,
+    bool isNeedCheck)
 {
     if (isNeedCheck) {
         ApnProfileState apnState = apnManager_->GetOverallDefaultApnState();
