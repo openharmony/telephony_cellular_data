@@ -1108,6 +1108,15 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
         NotifyReqCellularData(false);
 #endif
     }
+    HandleIncallDataDisconnectComplete();
+    if (reason == DisConnectionReason::REASON_CHANGE_CONNECTION) {
+        HandleSortConnection();
+    }
+    HandleDisconnectDataCompleteForMmsType(apnHolder);
+}
+
+void CellularDataHandler::HandleIncallDataDisconnectComplete()
+{
     if (!apnManager_->HasAnyConnectedState()) {
         connectionManager_->StopStallDetectionTimer();
         connectionManager_->EndNetStatistics();
@@ -1116,10 +1125,6 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
             incallDataStateMachine_->SendEvent(incallEvent);
         }
     }
-    if (reason == DisConnectionReason::REASON_CHANGE_CONNECTION) {
-        HandleSortConnection();
-    }
-    HandleDisconnectDataCompleteForMmsType(apnHolder);
 }
 
 void CellularDataHandler::HandleDisconnectDataCompleteForMmsType(sptr<ApnHolder> &apnHolder)
