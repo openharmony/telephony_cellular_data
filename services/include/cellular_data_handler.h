@@ -114,6 +114,7 @@ private:
     void PsRadioEmergencyStateClose(const AppExecFwk::InnerEvent::Pointer &event);
     void EstablishDataConnectionComplete(const AppExecFwk::InnerEvent::Pointer &event);
     void DisconnectDataComplete(const AppExecFwk::InnerEvent::Pointer &event);
+    void HandleIncallDataDisconnectComplete();
     void HandleDisconnectDataCompleteForMmsType(sptr<ApnHolder> &apnHolder);
     void MsgEstablishDataConnection(const AppExecFwk::InnerEvent::Pointer &event);
     void MsgRequestNetwork(const AppExecFwk::InnerEvent::Pointer &event);
