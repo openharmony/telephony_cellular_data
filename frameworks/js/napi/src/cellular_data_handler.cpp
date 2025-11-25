@@ -1097,6 +1097,12 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
     CellularDataHiSysEvent::WriteDataConnectStateBehaviorEvent(slotId_, apnHolder->GetApnType(),
         apnHolder->GetCapability(), static_cast<int32_t>(PROFILE_STATE_IDLE));
     UpdateCellularDataConnectState(apnHolder->GetApnType());
+#ifdef BASE_POWER_IMPROVEMENT
+    ApnProfileState apnState = apnManager_->GetOverallDefaultApnState();
+    if (apnState != PROFILE_STATE_CONNECTED && apnState != PROFILE_STATE_DISCONNECTING) {
+        ReplyCommonEvent(strEnterSubscriber_, true);
+    }
+#endif
     UpdatePhysicalConnectionState(connectionManager_->isNoActiveConnection());
     if (apnHolder->IsDataCallEnabled()) {
         RetryOrClearConnection(apnHolder, reason, netInfo);
@@ -1450,11 +1456,6 @@ void CellularDataHandler::ProcessEvent(const InnerEvent::Pointer &event)
         return;
     }
     uint32_t eventCode = event->GetInnerEventId();
-#ifdef BASE_POWER_IMPROVEMENT
-    if (eventCode == CellularDataEventCode::MSG_DISCONNECT_DATA_COMPLETE) {
-        ReplyCommonEvent(strEnterSubscriber_, true);
-    }
-#endif
     std::map<uint32_t, Fun>::iterator it = eventIdMap_.find(eventCode);
     if (it != eventIdMap_.end()) {
         it->second(event);
