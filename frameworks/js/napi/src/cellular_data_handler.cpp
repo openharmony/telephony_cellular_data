@@ -1097,6 +1097,9 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
     CellularDataHiSysEvent::WriteDataConnectStateBehaviorEvent(slotId_, apnHolder->GetApnType(),
         apnHolder->GetCapability(), static_cast<int32_t>(PROFILE_STATE_IDLE));
     UpdateCellularDataConnectState(apnHolder->GetApnType());
+#ifdef BASE_POWER_IMPROVEMENT
+    ReplyCommonEvent(strEnterSubscriber_, true);
+#endif
     UpdatePhysicalConnectionState(connectionManager_->isNoActiveConnection());
     if (apnHolder->IsDataCallEnabled()) {
         RetryOrClearConnection(apnHolder, reason, netInfo);
@@ -1105,6 +1108,15 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
         NotifyReqCellularData(false);
 #endif
     }
+    HandleIncallDataDisconnectComplete();
+    if (reason == DisConnectionReason::REASON_CHANGE_CONNECTION) {
+        HandleSortConnection();
+    }
+    HandleDisconnectDataCompleteForMmsType(apnHolder);
+}
+
+void CellularDataHandler::HandleIncallDataDisconnectComplete()
+{
     if (!apnManager_->HasAnyConnectedState()) {
         connectionManager_->StopStallDetectionTimer();
         connectionManager_->EndNetStatistics();
@@ -1113,10 +1125,6 @@ void CellularDataHandler::DisconnectDataComplete(const InnerEvent::Pointer &even
             incallDataStateMachine_->SendEvent(incallEvent);
         }
     }
-    if (reason == DisConnectionReason::REASON_CHANGE_CONNECTION) {
-        HandleSortConnection();
-    }
-    HandleDisconnectDataCompleteForMmsType(apnHolder);
 }
 
 void CellularDataHandler::HandleDisconnectDataCompleteForMmsType(sptr<ApnHolder> &apnHolder)
@@ -1450,11 +1458,6 @@ void CellularDataHandler::ProcessEvent(const InnerEvent::Pointer &event)
         return;
     }
     uint32_t eventCode = event->GetInnerEventId();
-#ifdef BASE_POWER_IMPROVEMENT
-    if (eventCode == CellularDataEventCode::MSG_DISCONNECT_DATA_COMPLETE) {
-        ReplyCommonEvent(strEnterSubscriber_, true);
-    }
-#endif
     std::map<uint32_t, Fun>::iterator it = eventIdMap_.find(eventCode);
     if (it != eventIdMap_.end()) {
         it->second(event);
@@ -2956,11 +2959,18 @@ void CellularDataHandler::HandleReplyCommonEvent(const AppExecFwk::InnerEvent::P
 }
 
 void CellularDataHandler::ReplyCommonEvent(std::shared_ptr<CellularDataPowerSaveModeSubscriber> &subscriber,
-    bool isNeedCheckInnerEvent)
+    bool isNeedCheck)
 {
-    if (isNeedCheckInnerEvent && !HasInnerEvent(CellularDataEventCode::MSG_TIMEOUT_TO_REPLY_COMMON_EVENT)) {
-        TELEPHONY_LOGE("Not in power save mode");
-        return;
+    if (isNeedCheck) {
+        ApnProfileState apnState = apnManager_->GetOverallDefaultApnState();
+        if (apnState == PROFILE_STATE_CONNECTED || apnState == PROFILE_STATE_DISCONNECTING) {
+            TELEPHONY_LOGE("Disconnecting apn profile");
+            return;
+        }
+        if (!HasInnerEvent(CellularDataEventCode::MSG_TIMEOUT_TO_REPLY_COMMON_EVENT)) {
+            TELEPHONY_LOGE("Not in power save mode");
+            return;
+        }
     }
     if (subscriber != nullptr) {
         subscriber->FinishTelePowerCommonEvent();

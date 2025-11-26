@@ -114,6 +114,7 @@ private:
     void PsRadioEmergencyStateClose(const AppExecFwk::InnerEvent::Pointer &event);
     void EstablishDataConnectionComplete(const AppExecFwk::InnerEvent::Pointer &event);
     void DisconnectDataComplete(const AppExecFwk::InnerEvent::Pointer &event);
+    void HandleIncallDataDisconnectComplete();
     void HandleDisconnectDataCompleteForMmsType(sptr<ApnHolder> &apnHolder);
     void MsgEstablishDataConnection(const AppExecFwk::InnerEvent::Pointer &event);
     void MsgRequestNetwork(const AppExecFwk::InnerEvent::Pointer &event);
@@ -314,7 +315,7 @@ private:
     std::shared_ptr<CellularDataPowerSaveModeSubscriber> CreateCommonSubscriber(
         const std::string &event, int32_t priority);
     void HandleReplyCommonEvent(const AppExecFwk::InnerEvent::Pointer &event);
-    void ReplyCommonEvent(std::shared_ptr<CellularDataPowerSaveModeSubscriber> &subscriber, bool isNeedCheckInnerEvent);
+    void ReplyCommonEvent(std::shared_ptr<CellularDataPowerSaveModeSubscriber> &subscriber, bool isNeedCheck);
 #endif
 };
 } // namespace Telephony

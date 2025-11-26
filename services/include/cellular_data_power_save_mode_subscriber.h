@@ -34,7 +34,6 @@ public:
 private:
     void OnHandleEnterStrEvent(std::string &action);
     void OnHandleExitStrEvent(std::string &action);
-    bool HasEsimProfile();
     std::shared_ptr<EventFwk::AsyncCommonEventResult> strAsyncCommonEvent_ = nullptr;
     std::weak_ptr<CellularDataHandler> powerSaveModeCellularDataHandler_;
     static inline std::string lastMsg_ = "";
