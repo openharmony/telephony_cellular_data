@@ -1742,13 +1742,13 @@ void CellularDataHandler::HandleSimEvent(const AppExecFwk::InnerEvent::Pointer &
         return;
     }
     auto slotId = event->GetParam();
-    if (slotId != slotId_) {
+    auto eventId = event->GetInnerEventId();
+    if (slotId != slotId_ && eventId != RadioEvent::RADIO_NV_REFRESH_FINISHED) {
         return;
     }
     if (dataSwitchSettings_ != nullptr) {
         dataSwitchSettings_->LoadSwitchValue();
     }
-    auto eventId = event->GetInnerEventId();
     TELEPHONY_LOGI("Slot%{public}d, event:%{public}d", slotId_, eventId);
     switch (eventId) {
         case RadioEvent::RADIO_SIM_STATE_CHANGE:
