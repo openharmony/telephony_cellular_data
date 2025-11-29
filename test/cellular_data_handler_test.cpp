@@ -301,6 +301,34 @@ HWTEST_F(CellularDataHandlerTest, HandleSimEvent_006, Function | MediumTest | Le
 }
 
 /**
+ * @tc.number   HandleSimEvent_007
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, HandleSimEvent_007, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
+    cellularDataHandler->Init();
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_NV_REFRESH_FINISHED, 0);
+    cellularDataHandler->HandleSimEvent(event);
+    EXPECT_EQ(event->GetInnerEventId(), RadioEvent::RADIO_NV_REFRESH_FINISHED);
+}
+
+/**
+ * @tc.number   HandleSimEvent_008
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataHandlerTest, HandleSimEvent_008, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
+    cellularDataHandler->Init();
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_NV_REFRESH_FINISHED, 1);
+    cellularDataHandler->HandleSimEvent(event);
+    EXPECT_EQ(event->GetInnerEventId(), RadioEvent::RADIO_NV_REFRESH_FINISHED);
+}
+
+/**
  * @tc.number   ClearConnectionsOnUpdateApns_001
  * @tc.name     test error branch
  * @tc.desc     Function test
