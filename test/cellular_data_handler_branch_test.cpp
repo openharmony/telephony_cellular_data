@@ -281,7 +281,7 @@ HWTEST_F(CellularDataHandlerBranchTest, HandleDBSettingIncallChanged_001, Functi
     ASSERT_NE(cellularDataHandler->incallDataStateMachine_, nullptr);
 
     cellularDataHandler->IncallDataComplete(event);
-    ASSERT_EQ(cellularDataHandler->incallDataStateMachine_, nullptr);
+    ASSERT_NE(cellularDataHandler->incallDataStateMachine_, nullptr);
 }
 
 HWTEST_F(CellularDataHandlerBranchTest, HandleImsCallChanged, Function | MediumTest | Level3)

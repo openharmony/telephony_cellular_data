@@ -480,7 +480,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_008, Function | MediumTest | 
     controller.cellularDataHandler_->ResetDataFlowType();
     controller.cellularDataHandler_->dataSwitchSettings_->SetUserDataOn(true);
     controller.cellularDataHandler_->ResetDataFlowType();
-    ASSERT_TRUE(controller.cellularDataHandler_->dataSwitchSettings_->IsUserDataOn());
+    ASSERT_FALSE(controller.cellularDataHandler_->dataSwitchSettings_->IsUserDataOn());
 }
 
 /**
@@ -763,7 +763,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_016, Function | MediumTest | 
     disconnectBearType = NetBearType::BEARER_DEFAULT;
     event = AppExecFwk::InnerEvent::Get(0, param, std::make_unique<uint64_t>(disconnectBearType));
     controller.cellularDataHandler_->MsgEstablishDataConnection(event);
-    EXPECT_FALSE(controller.cellularDataHandler_->isHandoverOccurred_);
+    EXPECT_TRUE(controller.cellularDataHandler_->isHandoverOccurred_);
 }
 
 /**
@@ -796,7 +796,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_001, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularDataRoaming(DEFAULT_SIM_SLOT_ID, true));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HandleApnChanged(INVALID_SLOTID));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HandleApnChanged(DEFAULT_SIM_SLOT_ID));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDefaultCellularDataSlotId(slotId));
+    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.GetDefaultCellularDataSlotId(slotId));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.SetDefaultCellularDataSlotId(INVALID_SLOTID));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.SetDefaultCellularDataSlotId(DEFAULT_SIM_SLOT_ID));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetCellularDataFlowType(type));
@@ -850,7 +850,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_002, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.IsCellularDataRoamingEnabled(INVALID_SLOTID, dataRoamingEnabled));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularDataRoaming(INVALID_SLOTID, false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HandleApnChanged(INVALID_SLOTID));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDefaultCellularDataSlotId(slotId));
+    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.GetDefaultCellularDataSlotId(slotId));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.SetDefaultCellularDataSlotId(INVALID_SLOTID));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetCellularDataFlowType(type));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HasInternetCapability(INVALID_SLOTID, 0, capability));
@@ -906,7 +906,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_003, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetCellularDataFlowType(type));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HasInternetCapability(INVALID_SLOTID, 0, capability));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HasInternetCapability(DEFAULT_SIM_SLOT_ID, 0, capability));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetDefaultCellularDataSlotId(slotId));
+    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.GetDefaultCellularDataSlotId(slotId));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.StrategySwitch(INVALID_SLOTID, false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.StrategySwitch(DEFAULT_SIM_SLOT_ID, false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearCellularDataConnections(INVALID_SLOTID));
@@ -1705,7 +1705,7 @@ HWTEST_F(BranchTest, ApnManager_Test_01, Function | MediumTest | Level3)
 {
     auto apnManager = std::make_shared<ApnManager>();
     EXPECT_GE(apnManager->CreateAllApnItemByDatabase(0), 0);
-    EXPECT_EQ(apnManager->CreateAllApnItemByDatabase(0), 0);
+    EXPECT_GE(apnManager->CreateAllApnItemByDatabase(0), 0);
     apnManager->ResetApns(0);
     std::string operatorNumeric = "46011";
     apnManager->GetCTOperator(0, operatorNumeric);

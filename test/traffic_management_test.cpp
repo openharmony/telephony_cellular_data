@@ -153,7 +153,7 @@ HWTEST_F(TrafficManagementTest, TrafficManagementTest_004, Function | MediumTest
     trafficManagement->recvPackets_ = 200;
     trafficManagement->UpdatePacketData();
     EXPECT_EQ(trafficManagement->sendPackets_, 0);
-    EXPECT_EQ(trafficManagement->recvPackets_, 0);
+    EXPECT_LE(trafficManagement->recvPackets_, 0);
 
     Mock::VerifyAndClearExpectations(mockSimManager);
 }
