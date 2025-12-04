@@ -256,8 +256,8 @@ export default namespace data {
     })
     p1.then((content: Any) => {
         callback(new BusinessError(), content as DataFlowType);
-    }, (err: BusinessError): void => {
-        callback(err, DataFlowType.DATA_FLOW_TYPE_NONE);
+    }, (err: Error): void => {
+        callback(err as BusinessError, DataFlowType.DATA_FLOW_TYPE_NONE);
     });
   }
   export function getCellularDataFlowType(): Promise<DataFlowType> {
