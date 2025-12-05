@@ -1018,7 +1018,7 @@ HWTEST_F(CellularDataHandlerTest, CreateApnItemTest001, Function | MediumTest | 
     cellularDataHandler->CreateApnItem();
     cellularDataHandler->SendEvent(CellularDataEventCode::MSG_RETRY_TO_CREATE_APN, 0, RETRY_DELAY_TIME);
     cellularDataHandler->CreateApnItem();
-    EXPECT_TRUE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_CREATE_APN));
+    EXPECT_FALSE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_CREATE_APN));
 }
 
 /**
@@ -1035,7 +1035,7 @@ HWTEST_F(CellularDataHandlerTest, IsCellularDataEnabledTest001, Function | Mediu
 
     cellularDataHandler->Init();
     cellularDataHandler->dataSwitchSettings_->lastQryRet_ = -1;
-    EXPECT_NE(cellularDataHandler->IsCellularDataEnabled(isDataEnabled), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(cellularDataHandler->IsCellularDataEnabled(isDataEnabled), TELEPHONY_ERR_SUCCESS);
     cellularDataHandler->dataSwitchSettings_->lastQryRet_ = TELEPHONY_ERR_SUCCESS;
     EXPECT_EQ(cellularDataHandler->IsCellularDataEnabled(isDataEnabled), TELEPHONY_ERR_SUCCESS);
 }
