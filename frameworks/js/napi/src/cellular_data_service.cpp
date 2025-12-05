@@ -738,6 +738,10 @@ int32_t CellularDataService::GetDataConnIpType(int32_t slotId, std::string &ipTy
 
 int32_t CellularDataService::IsNeedDoRecovery(int32_t slotId, bool needDoRecovery)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
     if (cellularDataController == nullptr) {
         TELEPHONY_LOGE("cellularDataControllers is null, slotId=%{public}d", slotId);
