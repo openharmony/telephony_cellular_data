@@ -441,7 +441,7 @@ HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test, TestSize.Level2)
     int32_t result = CellularDataTest::GetDefaultCellularDataSlotIdTest();
     EXPECT_FALSE(result < DEFAULT_SIM_SLOT_ID_REMOVE);
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
-    ASSERT_NE(result, TELEPHONY_ERR_SUCCESS);
+    ASSERT_EQ(result, TELEPHONY_ERR_SUCCESS);
     // Multiple cards will need to be optimized again
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID - 1);
     ASSERT_TRUE(result != TELEPHONY_ERR_SUCCESS);
@@ -458,7 +458,7 @@ HWTEST_F(CellularDataTest, DefaultCellularDataSimId_Test, TestSize.Level2)
 {
     EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
     int32_t result = CellularDataTest::GetDefaultCellularDataSimIdTest();
-    ASSERT_NE(result, TELEPHONY_ERR_SUCCESS);
+    ASSERT_EQ(result, TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -473,7 +473,7 @@ HWTEST_F(CellularDataTest, DefaultCellularDataSlotId_Test_01, TestSize.Level2)
     int32_t result = CellularDataTest::GetDefaultCellularDataSlotIdTest();
     EXPECT_FALSE(result < DEFAULT_SIM_SLOT_ID_REMOVE);
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
-    ASSERT_NE(result, TELEPHONY_ERR_SUCCESS);
+    ASSERT_EQ(result, TELEPHONY_ERR_SUCCESS);
     result = CellularDataTest::SetDefaultCellularDataSlotIdTest(DATA_SLOT_ID_INVALID);
     ASSERT_TRUE(result != TELEPHONY_ERR_SUCCESS);
 }
@@ -503,7 +503,7 @@ HWTEST_F(CellularDataTest, EnableCellularData_Test_01, TestSize.Level2)
     sleep(SLEEP_TIME);
     std::cout << "Cellular Data Disconnected Ping..." << std::endl;
     pingResult = CellularDataTest::PingTest();
-    ASSERT_NE(pingResult, PING_CHECK_FAIL);
+    ASSERT_EQ(pingResult, PING_CHECK_FAIL);
 }
 
 /**
@@ -531,7 +531,7 @@ HWTEST_F(CellularDataTest, EnableCellularData_Test_02, TestSize.Level2)
     sleep(SLEEP_TIME);
     std::cout << "Cellular Data Disconnected Ping..." << std::endl;
     pingResult = CellularDataTest::PingTest();
-    ASSERT_NE(pingResult, PING_CHECK_FAIL);
+    ASSERT_EQ(pingResult, PING_CHECK_FAIL);
 }
 
 /**
@@ -550,7 +550,7 @@ HWTEST_F(CellularDataTest, DataRoamingState_ValidSlot_Test_01, TestSize.Level3)
 
     // slot0 enable data roaming
     int32_t enabled = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID, true);
-    ASSERT_NE(enabled, TELEPHONY_ERR_SUCCESS);
+    ASSERT_EQ(enabled, TELEPHONY_ERR_SUCCESS);
     bool dataRoamingEnabled = false;
     CellularDataTest::IsCellularDataRoamingEnabledTest(DEFAULT_SIM_SLOT_ID, dataRoamingEnabled);
     ASSERT_TRUE(dataRoamingEnabled);
@@ -588,7 +588,7 @@ HWTEST_F(CellularDataTest, DataRoamingState_ValidSlot_Test_02, TestSize.Level3)
 
     // slot1 enable data roaming
     int32_t enabled = CellularDataTest::EnableCellularDataRoamingTest(SIM_SLOT_ID_1, true);
-    ASSERT_NE(enabled, TELEPHONY_ERR_SUCCESS);
+    ASSERT_EQ(enabled, TELEPHONY_ERR_SUCCESS);
     bool dataRoamingEnabled = false;
     CellularDataTest::IsCellularDataRoamingEnabledTest(SIM_SLOT_ID_1, dataRoamingEnabled);
     ASSERT_TRUE(dataRoamingEnabled);
@@ -685,7 +685,7 @@ HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_02, TestSize
  */
 HWTEST_F(CellularDataTest, GetCellularDataState_ValidityTest_01, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
+    EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
     DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
     bool dataEnabled = false;
@@ -718,7 +718,7 @@ HWTEST_F(CellularDataTest, GetCellularDataState_ValidityTest_01, TestSize.Level3
  */
 HWTEST_F(CellularDataTest, GetCellularDataState_ValidityTest_02, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(SIM_SLOT_ID_1), 0);
+    EXPECT_NE(HasSimCard(SIM_SLOT_ID_1), 0);
     DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(SIM_SLOT_ID_1);
     bool dataEnabled = false;
@@ -751,7 +751,7 @@ HWTEST_F(CellularDataTest, GetCellularDataState_ValidityTest_02, TestSize.Level3
  */
 HWTEST_F(CellularDataTest, DataRoamingState_InValidSlot_Test_01, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
+    EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
     DataAccessToken token;
     // invalid slot turn on data roaming
     int32_t enable = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID - 1, true);
@@ -802,7 +802,7 @@ HWTEST_F(CellularDataTest, DataFlowType_Test_01, TestSize.Level3)
     sleep(SLEEP_TIME);
     std::cout << "Cellular Data Disconnected Ping..." << std::endl;
     pingResult = CellularDataTest::PingTest();
-    ASSERT_NE(pingResult, PING_CHECK_FAIL);
+    ASSERT_EQ(pingResult, PING_CHECK_FAIL);
     dataFlowType = CellularDataTest::GetCellularDataFlowTypeTest();
     ASSERT_TRUE(dataFlowType == 0);
 }
@@ -835,7 +835,7 @@ HWTEST_F(CellularDataTest, DataFlowType_Test_02, TestSize.Level3)
     sleep(SLEEP_TIME);
     std::cout << "Cellular Data Disconnected Ping..." << std::endl;
     pingResult = CellularDataTest::PingTest();
-    ASSERT_NE(pingResult, PING_CHECK_FAIL);
+    ASSERT_EQ(pingResult, PING_CHECK_FAIL);
     dataFlowType = CellularDataTest::GetCellularDataFlowTypeTest();
     ASSERT_TRUE(dataFlowType == 0);
 }
@@ -847,7 +847,7 @@ HWTEST_F(CellularDataTest, DataFlowType_Test_02, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, MmsApn_Test_01, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
+    EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
     DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     EXPECT_NE(callback, nullptr);
@@ -884,7 +884,7 @@ HWTEST_F(CellularDataTest, MmsApn_Test_01, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, MmsApn_Test_02, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(SIM_SLOT_ID_1), 0);
+    EXPECT_NE(HasSimCard(SIM_SLOT_ID_1), 0);
     DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     EXPECT_NE(callback, nullptr);
@@ -921,7 +921,7 @@ HWTEST_F(CellularDataTest, MmsApn_Test_02, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, HasInternetCapability_Test_01, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(SIM_SLOT_ID_1), 0);
+    EXPECT_NE(HasSimCard(SIM_SLOT_ID_1), 0);
 
     int32_t cid = 1;
     int32_t result = CellularDataTest::HasInternetCapability(SIM_SLOT_ID_1, cid);
@@ -935,7 +935,7 @@ HWTEST_F(CellularDataTest, HasInternetCapability_Test_01, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, HasInternetCapability_Test_02, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
+    EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
 
     int32_t cid = 1;
     int32_t result = CellularDataTest::HasInternetCapability(DEFAULT_SIM_SLOT_ID, cid);
@@ -949,7 +949,7 @@ HWTEST_F(CellularDataTest, HasInternetCapability_Test_02, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, ClearCellularDataConnections_Test_01, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(SIM_SLOT_ID_1), 0);
+    EXPECT_NE(HasSimCard(SIM_SLOT_ID_1), 0);
     DataAccessToken token;
     int32_t result = CellularDataTest::ClearCellularDataConnections(SIM_SLOT_ID_1);
     ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
@@ -962,7 +962,7 @@ HWTEST_F(CellularDataTest, ClearCellularDataConnections_Test_01, TestSize.Level3
  */
 HWTEST_F(CellularDataTest, ClearCellularDataConnections_Test_02, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
+    EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
     DataAccessToken token;
     int32_t result = CellularDataTest::ClearCellularDataConnections(DEFAULT_SIM_SLOT_ID);
     ASSERT_TRUE(result == static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS));
@@ -975,7 +975,7 @@ HWTEST_F(CellularDataTest, ClearCellularDataConnections_Test_02, TestSize.Level3
  */
 HWTEST_F(CellularDataTest, ClearAllConnections_Test_01, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
+    EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
     DataAccessToken token;
     int32_t result = CellularDataTest::ClearAllConnections(
         DEFAULT_SIM_SLOT_ID, DisConnectionReason::REASON_RETRY_CONNECTION);
@@ -989,7 +989,7 @@ HWTEST_F(CellularDataTest, ClearAllConnections_Test_01, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, GetApnState_Test_01, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
+    EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
     DataAccessToken token;
     int32_t result = CellularDataTest::GetApnState(DEFAULT_SIM_SLOT_ID, "default");
     ASSERT_TRUE(result >= 0 && result <= 5);
@@ -1002,7 +1002,7 @@ HWTEST_F(CellularDataTest, GetApnState_Test_01, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, GetDataRecoveryState_Test_01, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
+    EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
     DataAccessToken token;
     int32_t result = CellularDataTest::GetDataRecoveryState();
     ASSERT_TRUE(result >= 0 && result <= 3);
