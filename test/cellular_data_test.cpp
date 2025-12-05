@@ -1137,7 +1137,7 @@ HWTEST_F(CellularDataTest, Telephony_Cellulardata_InitTelephonyExtService_0104, 
  */
 HWTEST_F(CellularDataTest, GetDataConnApnAttr_Test_01, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(SIM_SLOT_ID_1), 0);
+    EXPECT_NE(HasSimCard(SIM_SLOT_ID_1), 0);
     DataAccessToken token;
     ApnItem::Attribute apnAttr;
     int32_t result = CellularDataTest::GetDataConnApnAttr(SIM_SLOT_ID_1, apnAttr);
@@ -1151,7 +1151,7 @@ HWTEST_F(CellularDataTest, GetDataConnApnAttr_Test_01, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, GetDataConnApnAttr_Test_02, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
+    EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
     DataAccessToken token;
     ApnItem::Attribute apnAttr;
     int32_t result = CellularDataTest::GetDataConnApnAttr(DEFAULT_SIM_SLOT_ID, apnAttr);
@@ -1165,7 +1165,7 @@ HWTEST_F(CellularDataTest, GetDataConnApnAttr_Test_02, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, GetDataConnIpType_Test_01, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(SIM_SLOT_ID_1), 0);
+    EXPECT_NE(HasSimCard(SIM_SLOT_ID_1), 0);
     DataAccessToken token;
     std::string ipType;
     int32_t result = CellularDataTest::GetDataConnIpType(SIM_SLOT_ID_1, ipType);
@@ -1179,7 +1179,7 @@ HWTEST_F(CellularDataTest, GetDataConnIpType_Test_01, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, GetDataConnIpType_Test_02, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
+    EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
     DataAccessToken token;
     std::string ipType;
     int32_t result = CellularDataTest::GetDataConnIpType(DEFAULT_SIM_SLOT_ID, ipType);
@@ -1193,7 +1193,7 @@ HWTEST_F(CellularDataTest, GetDataConnIpType_Test_02, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, IsNeedDoRecovery_Test_01, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(SIM_SLOT_ID_1), 0);
+    EXPECT_NE(HasSimCard(SIM_SLOT_ID_1), 0);
     DataAccessToken token;
     bool needDoRecovery = true;
     int32_t result = CellularDataTest::IsNeedDoRecovery(SIM_SLOT_ID_1, needDoRecovery);
@@ -1207,7 +1207,7 @@ HWTEST_F(CellularDataTest, IsNeedDoRecovery_Test_01, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, IsNeedDoRecovery_Test_02, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
+    EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
     DataAccessToken token;
     bool needDoRecovery = true;
     int32_t result = CellularDataTest::IsNeedDoRecovery(DEFAULT_SIM_SLOT_ID, needDoRecovery);
@@ -1221,7 +1221,7 @@ HWTEST_F(CellularDataTest, IsNeedDoRecovery_Test_02, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, GetCellularDataSupplierId_Test_01, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
+    EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
     DataAccessToken token;
     uint32_t supplierId = 0;
     uint64_t capabilityInvalid = NetCap::NET_CAPABILITY_END;
@@ -1240,7 +1240,7 @@ HWTEST_F(CellularDataTest, GetCellularDataSupplierId_Test_01, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, CorrectNetSupplierNoAvailable_Test_01, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
+    EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
     DataAccessToken token;
     int32_t result = CellularDataTest::CorrectNetSupplierNoAvailable(DEFAULT_SIM_SLOT_ID);
     int32_t apnState = CellularDataTest::GetApnState(DEFAULT_SIM_SLOT_ID, "default");
@@ -1264,7 +1264,7 @@ HWTEST_F(CellularDataTest, GetSupplierRegisterState_Test_01, TestSize.Level3)
     int32_t result = CellularDataTest::GetSupplierRegisterState(supplierId, regState);
     ASSERT_TRUE(result == TELEPHONY_ERR_FAIL);
 
-    EXPECT_EQ(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
+    EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
     int32_t getSupplierIdRet =
         CellularDataTest::GetCellularDataSupplierId(DEFAULT_SIM_SLOT_ID, NetCap::NET_CAPABILITY_INTERNET, supplierId);
     if (getSupplierIdRet == TELEPHONY_ERR_SUCCESS) {
@@ -1280,7 +1280,7 @@ HWTEST_F(CellularDataTest, GetSupplierRegisterState_Test_01, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, EnableIntelligenceSwitch_Test_01, TestSize.Level2)
 {
-    EXPECT_EQ(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
+    EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
     DataAccessToken token;
     CellularDataTest::SetDefaultCellularDataSlotIdTest(DEFAULT_SIM_SLOT_ID);
     int32_t result1 = CellularDataTest::EnableIntelligenceSwitchTest(true);
@@ -1337,7 +1337,7 @@ HWTEST_F(CellularDataTest, InitCellularDataController_Test_01, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, InitCellularDataController_Test_02, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
+    EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
     DataAccessToken token;
     int32_t result = CellularDataTest::InitCellularDataController(DEFAULT_SIM_SLOT_ID);
     ASSERT_TRUE(result == CELLULAR_DATA_INVALID_PARAM);
@@ -1362,7 +1362,7 @@ HWTEST_F(CellularDataTest, InitCellularDataController_Test_03, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, SUPL_Apn_Test_01, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
+    EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
     DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     EXPECT_NE(callback, nullptr);
@@ -1399,7 +1399,7 @@ HWTEST_F(CellularDataTest, SUPL_Apn_Test_01, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, SUPL_Apn_Test_02, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(SIM_SLOT_ID_1), 0);
+    EXPECT_NE(HasSimCard(SIM_SLOT_ID_1), 0);
     DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     EXPECT_NE(callback, nullptr);
@@ -1436,7 +1436,7 @@ HWTEST_F(CellularDataTest, SUPL_Apn_Test_02, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, DUN_Apn_Test_01, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
+    EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
     DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     EXPECT_NE(callback, nullptr);
@@ -1473,7 +1473,7 @@ HWTEST_F(CellularDataTest, DUN_Apn_Test_01, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, DUN_Apn_Test_02, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(SIM_SLOT_ID_1), 0);
+    EXPECT_NE(HasSimCard(SIM_SLOT_ID_1), 0);
     DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     EXPECT_NE(callback, nullptr);
@@ -1510,7 +1510,7 @@ HWTEST_F(CellularDataTest, DUN_Apn_Test_02, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, IA_Apn_Test_01, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
+    EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
     DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     EXPECT_NE(callback, nullptr);
@@ -1547,7 +1547,7 @@ HWTEST_F(CellularDataTest, IA_Apn_Test_01, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, IA_Apn_Test_02, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(SIM_SLOT_ID_1), 0);
+    EXPECT_NE(HasSimCard(SIM_SLOT_ID_1), 0);
     DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     EXPECT_NE(callback, nullptr);
@@ -1584,7 +1584,7 @@ HWTEST_F(CellularDataTest, IA_Apn_Test_02, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, XCAP_Apn_Test_01, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
+    EXPECT_NE(HasSimCard(DEFAULT_SIM_SLOT_ID), 0);
     DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     EXPECT_NE(callback, nullptr);
@@ -1621,7 +1621,7 @@ HWTEST_F(CellularDataTest, XCAP_Apn_Test_01, TestSize.Level3)
  */
 HWTEST_F(CellularDataTest, XCAP_Apn_Test_02, TestSize.Level3)
 {
-    EXPECT_EQ(HasSimCard(SIM_SLOT_ID_1), 0);
+    EXPECT_NE(HasSimCard(SIM_SLOT_ID_1), 0);
     DataAccessToken token;
     sptr<INetConnCallback> callback = new (std::nothrow) TestCallback();
     EXPECT_NE(callback, nullptr);
