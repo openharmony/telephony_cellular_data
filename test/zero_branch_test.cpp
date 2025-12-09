@@ -480,7 +480,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_008, Function | MediumTest | 
     controller.cellularDataHandler_->ResetDataFlowType();
     controller.cellularDataHandler_->dataSwitchSettings_->SetUserDataOn(true);
     controller.cellularDataHandler_->ResetDataFlowType();
-    ASSERT_FALSE(controller.cellularDataHandler_->dataSwitchSettings_->IsUserDataOn());
+    ASSERT_TRUE(controller.cellularDataHandler_->dataSwitchSettings_->IsUserDataOn());
 }
 
 /**
