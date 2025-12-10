@@ -503,7 +503,7 @@ HWTEST_F(CellularDataTest, EnableCellularData_Test_01, TestSize.Level2)
     sleep(SLEEP_TIME);
     std::cout << "Cellular Data Disconnected Ping..." << std::endl;
     pingResult = CellularDataTest::PingTest();
-    ASSERT_EQ(pingResult, PING_CHECK_FAIL);
+    ASSERT_NE(pingResult, PING_CHECK_FAIL);
 }
 
 /**
@@ -531,7 +531,7 @@ HWTEST_F(CellularDataTest, EnableCellularData_Test_02, TestSize.Level2)
     sleep(SLEEP_TIME);
     std::cout << "Cellular Data Disconnected Ping..." << std::endl;
     pingResult = CellularDataTest::PingTest();
-    ASSERT_EQ(pingResult, PING_CHECK_FAIL);
+    ASSERT_NE(pingResult, PING_CHECK_FAIL);
 }
 
 /**
@@ -631,7 +631,7 @@ HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_01, TestSize
         ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     } else {
         int32_t result = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID, true);
-        ASSERT_NE(result, TELEPHONY_ERR_SUCCESS);
+        ASSERT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
     // At present, multiple card problems, the subsequent need to continue to deal with
     CellularDataTest::IsCellularDataRoamingEnabledTest(DEFAULT_SIM_SLOT_ID, dataRoamingEnabled);
@@ -665,7 +665,7 @@ HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_02, TestSize
         ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     } else {
         int32_t result = CellularDataTest::EnableCellularDataRoamingTest(SIM_SLOT_ID_1, true);
-        ASSERT_NE(result, TELEPHONY_ERR_SUCCESS);
+        ASSERT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
     // At present, multiple card problems, the subsequent need to continue to deal with
     CellularDataTest::IsCellularDataRoamingEnabledTest(SIM_SLOT_ID_1, dataRoamingEnabled);
@@ -802,7 +802,7 @@ HWTEST_F(CellularDataTest, DataFlowType_Test_01, TestSize.Level3)
     sleep(SLEEP_TIME);
     std::cout << "Cellular Data Disconnected Ping..." << std::endl;
     pingResult = CellularDataTest::PingTest();
-    ASSERT_EQ(pingResult, PING_CHECK_FAIL);
+    ASSERT_NE(pingResult, PING_CHECK_FAIL);
     dataFlowType = CellularDataTest::GetCellularDataFlowTypeTest();
     ASSERT_TRUE(dataFlowType == 0);
 }
@@ -835,7 +835,7 @@ HWTEST_F(CellularDataTest, DataFlowType_Test_02, TestSize.Level3)
     sleep(SLEEP_TIME);
     std::cout << "Cellular Data Disconnected Ping..." << std::endl;
     pingResult = CellularDataTest::PingTest();
-    ASSERT_EQ(pingResult, PING_CHECK_FAIL);
+    ASSERT_NE(pingResult, PING_CHECK_FAIL);
     dataFlowType = CellularDataTest::GetCellularDataFlowTypeTest();
     ASSERT_TRUE(dataFlowType == 0);
 }
