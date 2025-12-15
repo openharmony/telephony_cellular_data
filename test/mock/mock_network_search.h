@@ -29,6 +29,7 @@ public:
     virtual ~MockNetworkSearchManager() = default;
 
     MOCK_METHOD0(OnInit, bool());
+    MOCK_METHOD0(DeInit, void());
     MOCK_METHOD1(InitTelExtraModule, int32_t(int32_t slotId));
     MOCK_METHOD2(GetPsRadioTech, int32_t(int32_t slotId, int32_t &psRadioTech));
     MOCK_METHOD2(GetCsRadioTech, int32_t(int32_t slotId, int32_t &csRadioTech));
