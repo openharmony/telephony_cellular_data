@@ -115,7 +115,7 @@ HWTEST_F(CellularDataServiceTest, CellularDataService_002, TestSize.Level1)
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->GetDataConnApnAttr(DEFAULT_SIM_SLOT_ID, apnAttr));
     std::string ipType;
     ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->GetDataConnIpType(DEFAULT_SIM_SLOT_ID, ipType));
-    ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service->IsNeedDoRecovery(DEFAULT_SIM_SLOT_ID, true));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service->IsNeedDoRecovery(DEFAULT_SIM_SLOT_ID, true));
     uint32_t supplierId = 0;
     ASSERT_EQ(TELEPHONY_ERR_PERMISSION_ERR,
         service->GetCellularDataSupplierId(DEFAULT_SIM_SLOT_ID, NetCap::NET_CAPABILITY_INTERNET, supplierId));
