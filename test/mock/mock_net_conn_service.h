@@ -129,6 +129,10 @@ public:
     MOCK_METHOD(int32_t, GetPacFileUrl, (std::string &pacUrl));
     MOCK_METHOD(int32_t, FindProxyForURL, (const std::string &url, const std::string &host, std::string &proxy));
     MOCK_METHOD(int32_t, GetIpNeighTable, (std::vector<OHOS::NetManagerStandard::NetIpMacInfo> &ipMacInfo));
+    MOCK_METHOD(int32_t, CreateVlan, (const std::string &ifName, uint32_t vlanId));
+    MOCK_METHOD(int32_t, DestroyVlan, (const std::string &ifName, uint32_t vlanId));
+    MOCK_METHOD(int32_t, SetVlanIp, (const std::string &ifName, uint32_t vlanId,
+        const std::string &ip, uint32_t mask));
 };
 
 }  // namespace NetManagerStandard
