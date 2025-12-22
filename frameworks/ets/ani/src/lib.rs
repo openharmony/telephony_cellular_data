@@ -18,7 +18,7 @@ mod wrapper;
 use ani_rs::ani_constructor;
 
 ani_constructor!(
-    namespace "L@ohos/telephony/data/data"
+    namespace "@ohos.telephony.data.data"
     [
         "nativeIsCellularDataEnabled": cellulardata::is_cellulardata_enabled_sync,
         "nativeEnableCellularData": cellulardata::enable_cellular_data_sync,

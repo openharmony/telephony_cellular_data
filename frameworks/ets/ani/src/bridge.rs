@@ -13,7 +13,7 @@
 
 use ani_rs::ani;
 
-#[ani_rs::ani(path = "L@ohos/telephony/data/data/DataConnectState")]
+#[ani_rs::ani(path = "@ohos.telephony.data.data.DataConnectState")]
 #[repr(i32)]
 pub enum DataConnectState {
     DataStateUnknown = -1,
@@ -27,7 +27,7 @@ pub enum DataConnectState {
     DataStateSuspended = 3,
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/data/data/DataFlowType")]
+#[ani_rs::ani(path = "@ohos.telephony.data.data.DataFlowType")]
 #[repr(i32)]
 pub enum DataFlowType {
     DataFlowTypeNone = 0,
@@ -37,7 +37,7 @@ pub enum DataFlowType {
     DataFlowTypeDormant = 4,
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/data/data/ApnInfo")]
+#[ani_rs::ani(path = "@ohos.telephony.data.data.ApnInfo")]
 pub struct ApnInfo {
     pub apnName: String,
     pub apn: String,
