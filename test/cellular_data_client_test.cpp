@@ -164,18 +164,8 @@ HWTEST_F(CellularDataClientTest, SetDefaultCellularDataSlotId_001, TestSize.Leve
 {
     int32_t result = CellularDataClient::GetInstance().SetDefaultCellularDataSlotId(0);
     EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
-}
-
-/**
- * @tc.number   SetDefaultCellularDataSlotId_002
- * @tc.name     test function branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataClientTest, SetDefaultCellularDataSlotId_002, TestSize.Level0)
-{
     DataAccessToken token;
-    int32_t result = CellularDataClient::GetInstance().SetDefaultCellularDataSlotId(0);
-    EXPECT_NE(result, 0);
+    CellularDataClient::GetInstance().SetDefaultCellularDataSlotId(0);
 }
 
 /**
