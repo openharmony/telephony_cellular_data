@@ -133,6 +133,7 @@ public:
     MOCK_METHOD(int32_t, DestroyVlan, (const std::string &ifName, uint32_t vlanId));
     MOCK_METHOD(int32_t, SetVlanIp, (const std::string &ifName, uint32_t vlanId,
         const std::string &ip, uint32_t mask));
+    MOCK_METHOD(int32_t, GetConnectOwnerUid, (const NetConnInfo &netConnInfo, int32_t &ownerUid));
 };
 
 }  // namespace NetManagerStandard
