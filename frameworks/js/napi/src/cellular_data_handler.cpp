@@ -1559,13 +1559,13 @@ void CellularDataHandler::HandleDBSettingIncallChanged(const AppExecFwk::InnerEv
 
 std::shared_ptr<IncallDataStateMachine> CellularDataHandler::CreateIncallDataStateMachine(int32_t callState)
 {
-    std::shared_ptr<IncallDataStateMachine> incallDataStateMachine = std::make_shared<IncallDataStateMachine>(slotId_,
-        std::weak_ptr<TelEventHandler>(std::static_pointer_cast<TelEventHandler>(shared_from_this())), apnManager_);
+    std::shared_ptr<IncallDataStateMachine> incallDataStateMachine = std::make_shared<IncallDataStateMachine>();
     if (incallDataStateMachine == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: incallDataStateMachine is null", slotId_);
         return nullptr;
     }
-    incallDataStateMachine->Init(callState);
+    incallDataStateMachine->Init(callState, slotId_,
+        std::weak_ptr<TelEventHandler>(std::static_pointer_cast<TelEventHandler>(shared_from_this())), apnManager_);
     return incallDataStateMachine;
 }
 
@@ -1609,7 +1609,8 @@ void CellularDataHandler::HandleImsCallChanged(int32_t state)
             incallDataStateMachine_ = CreateIncallDataStateMachine(state);
         } else {
             if (incallDataStateMachine_->GetCurrentState() == nullptr) {
-                incallDataStateMachine_->Init(state);
+                incallDataStateMachine_->Init(state, slotId_, std::weak_ptr<TelEventHandler>(
+                    std::static_pointer_cast<TelEventHandler>(shared_from_this())), apnManager_);
             }
         }
     }
