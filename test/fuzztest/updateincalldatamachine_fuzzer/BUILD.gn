@@ -81,7 +81,6 @@ ohos_fuzztest("UpdateIncallDataMachineFuzzTest") {
 
   sources = [
     "$SOURCE_DIR/test/fuzztest/common_fuzzer/adddatatoken_fuzzer.cpp",
-    "$SOURCE_DIR/test/fuzztest/common_fuzzer/incalldatastatemachine_fuzzer.cpp",
     "updateincalldatamachine_fuzzer.cpp",
   ]
 }
