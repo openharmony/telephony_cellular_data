@@ -132,8 +132,12 @@ bool IncallDataStateMachine::CanActiveDataByRadioTech()
     }
 }
 
-void IncallDataStateMachine::Init(int32_t callState)
+void IncallDataStateMachine::Init(int32_t callState, int32_t slotId,
+    std::weak_ptr<TelEventHandler> &&cellularDataHandler, sptr<ApnManager> &apnManager)
 {
+    slotId_ = slotId;
+    cellularDataHandler_ = std::move(cellularDataHandler);
+    apnManager_ = apnManager;
     idleState_ = new (std::nothrow) IdleState(std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "IdleState");
     secondaryActiveState_ = new (std::nothrow)
         SecondaryActiveState(std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "SecondaryActiveState");

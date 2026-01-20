@@ -123,24 +123,30 @@ class IncallStateMachineTest : public TelEventHandler {
 public:
     IncallStateMachineTest() : TelEventHandler("IncallStateMachineTest") {}
     ~IncallStateMachineTest() = default;
-    std::shared_ptr<IncallDataStateMachine> CreateIncallDataStateMachine(int32_t slotId);
-
+    std::shared_ptr<IncallDataStateMachine> CreateIncallDataStateMachine();
+    int32_t Init(int32_t callState, int32_t slotId);
 public:
     std::shared_ptr<IncallDataStateMachine> incallStateMachine_ = nullptr;
 };
 
-std::shared_ptr<IncallDataStateMachine> IncallStateMachineTest::CreateIncallDataStateMachine(int32_t slotId)
+std::shared_ptr<IncallDataStateMachine> IncallStateMachineTest::CreateIncallDataStateMachine()
 {
     if (incallStateMachine_ != nullptr) {
         return incallStateMachine_;
     }
+    incallStateMachine_ = std::make_shared<IncallDataStateMachine>();
+    return incallStateMachine_;
+}
+
+int32_t IncallStateMachineTest::Init(int32_t callState, int32_t slotId)
+{
     sptr<ApnManager> apnManager = std::make_unique<ApnManager>().release();
     if (apnManager == nullptr) {
-        return nullptr;
+        return -1;
     }
-    incallStateMachine_ = std::make_shared<IncallDataStateMachine>(slotId,
-        std::weak_ptr<TelEventHandler>(std::static_pointer_cast<TelEventHandler>(shared_from_this())), apnManager);
-    return incallStateMachine_;
+    incallStateMachine_->Init(callState, slotId, std::weak_ptr<TelEventHandler>(
+        std::static_pointer_cast<TelEventHandler>(shared_from_this())), apnManager);
+    return 0;
 }
 
 /**
@@ -1780,8 +1786,10 @@ HWTEST_F(BranchTest, Idle_Test_01, Function | MediumTest | Level3)
 {
     std::shared_ptr<IncallStateMachineTest> incallStateMachineTest = std::make_shared<IncallStateMachineTest>();
     std::shared_ptr<IncallDataStateMachine> incallStateMachine =
-        incallStateMachineTest->CreateIncallDataStateMachine(0);
-    incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
+        incallStateMachineTest->CreateIncallDataStateMachine();
+    if (incallStateMachineTest->Init(TelCallStatus::CALL_STATUS_DIALING, 0) < 0) {
+        incallStateMachine = nullptr;
+    }
     incallStateMachine->GetCurrentState();
     incallStateMachine->GetSlotId();
     incallStateMachine->GetCallState();
@@ -1811,8 +1819,10 @@ HWTEST_F(BranchTest, Idle_Test_02, Function | MediumTest | Level3)
 {
     std::shared_ptr<IncallStateMachineTest> incallStateMachineTest = std::make_shared<IncallStateMachineTest>();
     std::shared_ptr<IncallDataStateMachine> incallStateMachine =
-        incallStateMachineTest->CreateIncallDataStateMachine(0);
-    incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
+        incallStateMachineTest->CreateIncallDataStateMachine();
+    if (incallStateMachineTest->Init(TelCallStatus::CALL_STATUS_DIALING, 0) < 0) {
+        incallStateMachine = nullptr;
+    }
     auto idleState = static_cast<IdleState *>(incallStateMachine->idleState_.GetRefPtr());
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
@@ -1842,8 +1852,10 @@ HWTEST_F(BranchTest, ActivatingSecondaryState_Test_01, Function | MediumTest | L
 {
     std::shared_ptr<IncallStateMachineTest> incallStateMachineTest = std::make_shared<IncallStateMachineTest>();
     std::shared_ptr<IncallDataStateMachine> incallStateMachine =
-        incallStateMachineTest->CreateIncallDataStateMachine(0);
-    incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
+        incallStateMachineTest->CreateIncallDataStateMachine();
+    if (incallStateMachineTest->Init(TelCallStatus::CALL_STATUS_DIALING, 0) < 0) {
+        incallStateMachine = nullptr;
+    }
     incallStateMachine->TransitionTo(incallStateMachine->activatingSecondaryState_);
     auto activatingSecondaryState =
         static_cast<ActivatingSecondaryState *>(incallStateMachine->activatingSecondaryState_.GetRefPtr());
@@ -1872,8 +1884,10 @@ HWTEST_F(BranchTest, ActivatedSecondaryState_Test_01, Function | MediumTest | Le
 {
     std::shared_ptr<IncallStateMachineTest> incallStateMachineTest = std::make_shared<IncallStateMachineTest>();
     std::shared_ptr<IncallDataStateMachine> incallStateMachine =
-        incallStateMachineTest->CreateIncallDataStateMachine(0);
-    incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
+        incallStateMachineTest->CreateIncallDataStateMachine();
+    if (incallStateMachineTest->Init(TelCallStatus::CALL_STATUS_DIALING, 0) < 0) {
+        incallStateMachine = nullptr;
+    }
     incallStateMachine->TransitionTo(incallStateMachine->activatingSecondaryState_);
     incallStateMachine->TransitionTo(incallStateMachine->activatedSecondaryState_);
     auto activatedSecondaryState =
@@ -1901,8 +1915,10 @@ HWTEST_F(BranchTest, DeactivatingSecondaryState_Test_01, Function | MediumTest |
 {
     std::shared_ptr<IncallStateMachineTest> incallStateMachineTest = std::make_shared<IncallStateMachineTest>();
     std::shared_ptr<IncallDataStateMachine> incallStateMachine =
-        incallStateMachineTest->CreateIncallDataStateMachine(0);
-    incallStateMachine->Init(TelCallStatus::CALL_STATUS_DIALING);
+        incallStateMachineTest->CreateIncallDataStateMachine();
+    if (incallStateMachineTest->Init(TelCallStatus::CALL_STATUS_DIALING, 0) < 0) {
+        incallStateMachine = nullptr;
+    }
     incallStateMachine->TransitionTo(incallStateMachine->activatingSecondaryState_);
     incallStateMachine->TransitionTo(incallStateMachine->activatedSecondaryState_);
     incallStateMachine->TransitionTo(incallStateMachine->deactivatingSecondaryState_);

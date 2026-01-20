@@ -39,12 +39,17 @@ void IdleStateMachineFuzz(const uint8_t *data, size_t size)
     }
     FuzzedDataProvider fdp(data, size);
     int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
-    std::shared_ptr<IncallDataStateMachine> machine = fuzzer->CreateIncallDataStateMachine(slotId);
+    std::shared_ptr<IncallDataStateMachine> machine = fuzzer->CreateIncallDataStateMachine();
     if (machine == nullptr) {
         return;
     }
     std::int32_t intValue = fdp.ConsumeIntegralInRange<uint32_t>(0, EVENT_ID_MAX);
-    machine->Init(intValue);
+    sptr<ApnManager> apnManager = std::make_unique<ApnManager>().release();
+    if (apnManager == nullptr) {
+        return;
+    }
+    
+    machine->Init(intValue, slotId, std::weak_ptr<TelEventHandler>(std::static_pointer_cast<TelEventHandler>(fuzzer)), apnManager);
     if (machine->idleState_ == nullptr) {
         return;
     }
@@ -77,12 +82,17 @@ void ActivatingSecondaryStateMachineFuzz(const uint8_t *data, size_t size)
     }
     FuzzedDataProvider fdp(data, size);
     int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
-    std::shared_ptr<IncallDataStateMachine> machine = fuzzer->CreateIncallDataStateMachine(slotId);
+    std::shared_ptr<IncallDataStateMachine> machine = fuzzer->CreateIncallDataStateMachine();
     if (machine == nullptr) {
         return;
     }
     std::int32_t intValue = fdp.ConsumeIntegralInRange<uint32_t>(0, EVENT_ID_MAX);
-    machine->Init(intValue);
+    sptr<ApnManager> apnManager = std::make_unique<ApnManager>().release();
+    if (apnManager == nullptr) {
+        return;
+    }
+    
+    machine->Init(intValue, slotId, std::weak_ptr<TelEventHandler>(std::static_pointer_cast<TelEventHandler>(fuzzer)), apnManager);
     if (machine->activatingSecondaryState_ == nullptr || machine->secondaryActiveState_ == nullptr) {
         return;
     }
@@ -119,12 +129,17 @@ void ActivatedSecondaryStateMachineFuzz(const uint8_t *data, size_t size)
     }
     FuzzedDataProvider fdp(data, size);
     int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
-    std::shared_ptr<IncallDataStateMachine> machine = fuzzer->CreateIncallDataStateMachine(slotId);
+    std::shared_ptr<IncallDataStateMachine> machine = fuzzer->CreateIncallDataStateMachine();
     if (machine == nullptr) {
         return;
     }
     std::int32_t intValue = fdp.ConsumeIntegralInRange<uint32_t>(0, EVENT_ID_MAX);
-    machine->Init(intValue);
+    sptr<ApnManager> apnManager = std::make_unique<ApnManager>().release();
+    if (apnManager == nullptr) {
+        return;
+    }
+    
+    machine->Init(intValue, slotId, std::weak_ptr<TelEventHandler>(std::static_pointer_cast<TelEventHandler>(fuzzer)), apnManager);
     if (machine->activatedSecondaryState_ == nullptr || machine->secondaryActiveState_ == nullptr) {
         return;
     }
@@ -162,12 +177,17 @@ void DeactivatingSecondaryStateMachineFuzz(const uint8_t *data, size_t size)
     }
     FuzzedDataProvider fdp(data, size);
     int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
-    std::shared_ptr<IncallDataStateMachine> machine = fuzzer->CreateIncallDataStateMachine(slotId);
+    std::shared_ptr<IncallDataStateMachine> machine = fuzzer->CreateIncallDataStateMachine();
     if (machine == nullptr) {
         return;
     }
     std::int32_t intValue = fdp.ConsumeIntegralInRange<uint32_t>(0, EVENT_ID_MAX);
-    machine->Init(intValue);
+    sptr<ApnManager> apnManager = std::make_unique<ApnManager>().release();
+    if (apnManager == nullptr) {
+        return;
+    }
+    
+    machine->Init(intValue, slotId, std::weak_ptr<TelEventHandler>(std::static_pointer_cast<TelEventHandler>(fuzzer)), apnManager);
     if (machine->deactivatingSecondaryState_ == nullptr || machine->idleState_ == nullptr) {
         return;
     }

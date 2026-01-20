@@ -23,18 +23,15 @@ namespace OHOS {
 namespace Telephony {
 class IncallDataStateMachine : public StateMachine, public std::enable_shared_from_this<IncallDataStateMachine> {
 public:
-    IncallDataStateMachine(
-        int32_t slotId, std::weak_ptr<TelEventHandler> &&cellularDataHandler, sptr<ApnManager> &apnManager)
-        : StateMachine("IncallDataStateMachine"), cellularDataHandler_(std::move(cellularDataHandler)),
-          apnManager_(apnManager), slotId_(slotId)
-    {}
+    IncallDataStateMachine() : StateMachine("IncallDataStateMachine") {}
     ~IncallDataStateMachine() = default;
     sptr<State> GetCurrentState() const;
     int32_t GetSlotId() const;
     int32_t GetCallState() const;
     bool HasAnyConnectedState() const;
     void UpdateCallState(int32_t state);
-    void Init(int32_t callState);
+    void Init(int32_t callState, int32_t slotId, std::weak_ptr<TelEventHandler> &&cellularDataHandler,
+        sptr<ApnManager> &apnManager);
     bool IsSecondaryActiveState() const;
     void DeInit();
 
