@@ -19,17 +19,12 @@ namespace OHOS {
 namespace Telephony {
 using namespace AppExecFwk;
 
-std::shared_ptr<IncallDataStateMachine> IncallDataStateMachineFuzzer::CreateIncallDataStateMachine(int32_t slotId)
+std::shared_ptr<IncallDataStateMachine> IncallDataStateMachineFuzzer::CreateIncallDataStateMachine()
 {
     if (incallDataStateMachine_ != nullptr) {
         return incallDataStateMachine_;
     }
-    sptr<ApnManager> apnManager = std::make_unique<ApnManager>().release();
-    if (apnManager == nullptr) {
-        return nullptr;
-    }
-    incallDataStateMachine_ = std::make_shared<IncallDataStateMachine>(slotId,
-        std::weak_ptr<TelEventHandler>(std::static_pointer_cast<TelEventHandler>(shared_from_this())), apnManager);
+    incallDataStateMachine_ = std::make_shared<IncallDataStateMachine>();
     return incallDataStateMachine_;
 }
 } // namespace Telephony

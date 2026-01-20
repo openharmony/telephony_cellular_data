@@ -28,7 +28,7 @@ class IncallDataStateMachineFuzzer : public TelEventHandler {
 public:
     explicit IncallDataStateMachineFuzzer() : TelEventHandler("IncallDataStateMachineFuzzer") {}
     ~IncallDataStateMachineFuzzer() = default;
-    std::shared_ptr<IncallDataStateMachine> CreateIncallDataStateMachine(int32_t slotId);
+    std::shared_ptr<IncallDataStateMachine> CreateIncallDataStateMachine();
 
 public:
     std::shared_ptr<IncallDataStateMachine> incallDataStateMachine_ = nullptr;
