@@ -151,7 +151,6 @@ HWTEST_F(CellularDataHandlerBranchTest, SetDataPermittedForMms_001, Function | M
 {
     auto cellularDataHandler = std::make_shared<CellularDataHandler>(2);
 
-    EXPECT_EQ(cellularDataHandler->incallDataStateMachine_, nullptr);
     cellularDataHandler->incallDataStateMachine_ =
         cellularDataHandler->CreateIncallDataStateMachine(CALL_STATUS_DIALING);
     ASSERT_FALSE(cellularDataHandler->SetDataPermittedForMms(false));
@@ -289,7 +288,6 @@ HWTEST_F(CellularDataHandlerBranchTest, HandleImsCallChanged, Function | MediumT
     auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
     cellularDataHandler->Init();
 
-    ASSERT_EQ(cellularDataHandler->incallDataStateMachine_, nullptr);
     cellularDataHandler->HandleImsCallChanged(TelCallStatus::CALL_STATUS_DIALING);
     cellularDataHandler->HandleImsCallChanged(TelCallStatus::CALL_STATUS_INCOMING);
     ASSERT_NE(cellularDataHandler->incallDataStateMachine_, nullptr);
