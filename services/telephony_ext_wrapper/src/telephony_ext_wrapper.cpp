@@ -16,6 +16,7 @@
 #include <dlfcn.h>
 #include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
+#include "parameters.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -246,6 +247,11 @@ void TelephonyExtWrapper::InitCreateDcApnItemExt()
 
 void TelephonyExtWrapper::InitIsVirtualModemConnected()
 {
+    auto virtualModemSwitch = system::GetBoolParameter("const.booster.virtual_modem_switch", false);
+    if (!virtualModemSwitch) {
+        isVirtualModemConnected_ = nullptr;
+        return;
+    }
     isVirtualModemConnected_ =
         (IsDcCellularDataAllowedType)dlsym(telephonyExtWrapperHandle_, "IsVirtualModemConnected");
     if (isVirtualModemConnected_ == nullptr) {
@@ -257,6 +263,11 @@ void TelephonyExtWrapper::InitIsVirtualModemConnected()
 
 void TelephonyExtWrapper::InitIsDcCellularDataAllowed()
 {
+    auto virtualModemSwitch = system::GetBoolParameter("const.booster.virtual_modem_switch", false);
+    if (!virtualModemSwitch) {
+        isDcCellularDataAllowed_ = nullptr;
+        return;
+    }
     isDcCellularDataAllowed_ =
         (IsDcCellularDataAllowedType)dlsym(telephonyExtWrapperHandle_, "IsDcCellularDataAllowed");
     if (isDcCellularDataAllowed_ == nullptr) {
