@@ -97,6 +97,12 @@ bool CellularDataHandler::ReleaseNet(const NetRequest &request)
 
 bool CellularDataHandler::RequestNet(const NetRequest &request)
 {
+#ifdef BASE_POWER_IMPROVEMENT
+    if (CellularDataPowerSaveModeSubscriber::GetPowerSaveModeFlag()) {
+        TELEPHONY_LOGE("Prohibit network requests in power save mode");
+        return false;
+    }
+#endif
     std::unique_ptr<NetRequest> netRequest = std::make_unique<NetRequest>();
     if (netRequest == nullptr) {
         TELEPHONY_LOGE("Netrequest is null");
@@ -107,12 +113,6 @@ bool CellularDataHandler::RequestNet(const NetRequest &request)
     netRequest->registerType = request.registerType;
     netRequest->bearTypes = request.bearTypes;
     netRequest->uid = request.uid;
-#ifdef BASE_POWER_IMPROVEMENT
-    if (CellularDataPowerSaveModeSubscriber::GetPowerSaveModeFlag()) {
-        TELEPHONY_LOGE("Prohibit network requests in power save mode");
-        return false;
-    }
-#endif
     AppExecFwk::InnerEvent::Pointer event =
         InnerEvent::Get(CellularDataEventCode::MSG_REQUEST_NETWORK, netRequest, TYPE_REQUEST_NET);
     return SendEvent(event);
