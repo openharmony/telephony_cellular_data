@@ -224,6 +224,7 @@ private:
     bool isHandoverOccurred_ = false;
     std::mutex mtx_;
     std::mutex apnActivateListMutex_;
+    std::mutex initMutex_;
     std::vector<std::string> upLinkThresholds_;
     std::vector<std::string> downLinkThresholds_;
     sptr<CellularDataSettingObserver> settingObserver_;
