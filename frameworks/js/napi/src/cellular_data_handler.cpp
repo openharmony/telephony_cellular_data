@@ -1604,6 +1604,7 @@ void CellularDataHandler::HandleCallChanged(int32_t state)
 
 void CellularDataHandler::HandleImsCallChanged(int32_t state)
 {
+    std::unique_lock<std::mutex> lock(initMutex_);
     if (state == TelCallStatus::CALL_STATUS_DIALING || state == TelCallStatus::CALL_STATUS_INCOMING) {
         if (incallDataStateMachine_ == nullptr) {
             incallDataStateMachine_ = CreateIncallDataStateMachine(state);
