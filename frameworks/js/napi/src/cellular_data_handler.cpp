@@ -1620,6 +1620,7 @@ void CellularDataHandler::HandleImsCallChanged(int32_t state)
         return;
     }
     incallDataStateMachine_->UpdateCallState(state);
+    lock.unlock();
     if (state == TelCallStatus::CALL_STATUS_DIALING || state == TelCallStatus::CALL_STATUS_INCOMING) {
         InnerEvent::Pointer incallEvent = InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_CALL_STARTED);
         incallDataStateMachine_->SendEvent(incallEvent);
