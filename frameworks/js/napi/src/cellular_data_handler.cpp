@@ -97,6 +97,12 @@ bool CellularDataHandler::ReleaseNet(const NetRequest &request)
 
 bool CellularDataHandler::RequestNet(const NetRequest &request)
 {
+#ifdef BASE_POWER_IMPROVEMENT
+    if (CellularDataPowerSaveModeSubscriber::GetPowerSaveModeFlag()) {
+        TELEPHONY_LOGE("Prohibit network requests in power save mode");
+        return false;
+    }
+#endif
     std::unique_ptr<NetRequest> netRequest = std::make_unique<NetRequest>();
     if (netRequest == nullptr) {
         TELEPHONY_LOGE("Netrequest is null");
