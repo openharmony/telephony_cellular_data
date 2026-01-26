@@ -138,14 +138,14 @@ void IncallDataStateMachine::Init(int32_t callState, int32_t slotId,
     slotId_ = slotId;
     cellularDataHandler_ = std::move(cellularDataHandler);
     apnManager_ = apnManager;
-    idleState_ = new (std::nothrow) IdleState(std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "IdleState");
-    secondaryActiveState_ = new (std::nothrow)
-        SecondaryActiveState(std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "SecondaryActiveState");
-    activatingSecondaryState_ = new (std::nothrow)
-        ActivatingSecondaryState(std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "ActivatingSecondaryState");
-    activatedSecondaryState_ = new (std::nothrow)
-        ActivatedSecondaryState(std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "ActivatedSecondaryState");
-    deactivatingSecondaryState_ = new (std::nothrow) DeactivatingSecondaryState(
+    idleState_ = sptr<IdleState>::MakeSptr(std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "IdleState");
+    secondaryActiveState_ = sptr<SecondaryActiveState>::MakeSptr(
+        std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "SecondaryActiveState");
+    activatingSecondaryState_ = sptr<ActivatingSecondaryState>::MakeSptr(
+        std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "ActivatingSecondaryState");
+    activatedSecondaryState_ = sptr<ActivatedSecondaryState>::MakeSptr(
+        std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "ActivatedSecondaryState");
+    deactivatingSecondaryState_ = sptr<DeactivatingSecondaryState>::MakeSptr(
         std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "DeactivatingSecondaryState");
     if (idleState_ == nullptr || secondaryActiveState_ == nullptr || activatingSecondaryState_ == nullptr ||
         activatedSecondaryState_ == nullptr || deactivatingSecondaryState_ == nullptr) {
