@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace Telephony {
-class State : public RefBase {
+class State : public std::enable_shared_from_this<State> {
 #define PROCESSED true
 #define NOT_PROCESSED false
 public:
@@ -31,7 +31,7 @@ public:
     virtual void StateEnd() = 0;
     virtual bool StateProcess(const AppExecFwk::InnerEvent::Pointer &event) = 0;
 
-    void SetParentState(sptr<State> &parent)
+    void SetParentState(std::shared_ptr<State> &parent)
     {
         parent_ = parent;
     }
@@ -44,7 +44,7 @@ public:
 protected:
     friend class StateMachineEventHandler;
     std::string name_;
-    sptr<State> parent_;
+    std::shared_ptr<State> parent_ = nullptr;
     bool isActive_ = false;
 };
 
@@ -53,12 +53,12 @@ public:
     explicit StateMachineEventHandler(const std::string &name) : TelEventHandler(name) {}
     ~StateMachineEventHandler() = default;
 
-    virtual void SetOriginalState(sptr<State> &originalState)
+    virtual void SetOriginalState(std::shared_ptr<State> &originalState)
     {
         originalState_ = originalState;
     }
 
-    virtual void TransitionTo(sptr<State> &destState)
+    virtual void TransitionTo(std::shared_ptr<State> &destState)
     {
         TELEPHONY_LOGI("State machine transition to %{public}s", destState->name_.c_str());
         destState_ = destState;
@@ -66,7 +66,7 @@ public:
 
     virtual void Quit()
     {
-        sptr<State> tmpState = curState_;
+        std::shared_ptr<State> tmpState = curState_;
         while (tmpState != nullptr && tmpState->isActive_) {
             tmpState->StateEnd();
             tmpState = tmpState->parent_;
@@ -80,7 +80,7 @@ public:
         if (curState_ != destState_) {
             TELEPHONY_LOGD("Begin process transitions");
             if (curState_ != nullptr) {
-                sptr<State> tmpState = curState_->parent_;
+                std::shared_ptr<State> tmpState = curState_->parent_;
                 while (tmpState != nullptr) {
                     tmpState->StateEnd();
                     tmpState = tmpState->parent_;
@@ -88,7 +88,7 @@ public:
                 curState_->StateEnd();
             }
             if (destState_ != nullptr) {
-                sptr<State> tmpState = destState_->parent_;
+                std::shared_ptr<State> tmpState = destState_->parent_;
                 while (tmpState != nullptr) {
                     tmpState->StateBegin();
                     tmpState = tmpState->parent_;
@@ -127,7 +127,7 @@ public:
 
     virtual void ProcessMsg(const AppExecFwk::InnerEvent::Pointer &event)
     {
-        sptr<State> tmpState = curState_;
+        std::shared_ptr<State> tmpState = curState_;
         TELEPHONY_LOGD("The event id: %{public}u", event->GetInnerEventId());
         while (tmpState != nullptr && !tmpState->StateProcess(event)) {
             tmpState = tmpState->parent_;
@@ -135,7 +135,7 @@ public:
     }
 
 private:
-    void InitCmdEnter(const sptr<State> &state)
+    void InitCmdEnter(const std::shared_ptr<State> &state)
     {
         if (state == nullptr) {
             TELEPHONY_LOGE("registerState_ is null");
@@ -163,9 +163,9 @@ private:
     }
 
 private:
-    sptr<State> originalState_;
-    sptr<State> destState_;
-    sptr<State> curState_;
+    std::shared_ptr<State> originalState_ = nullptr;
+    std::shared_ptr<State> destState_ = nullptr;
+    std::shared_ptr<State> curState_ = nullptr;
     std::vector<AppExecFwk::InnerEvent::Pointer> deferEvents_;
     std::mutex mtx_;
     bool isQuit_ = false;
@@ -206,7 +206,7 @@ public:
         stateMachineEventHandler_->SendImmediateEvent(event);
     }
 
-    void SetOriginalState(sptr<State> &originalState)
+    void SetOriginalState(std::shared_ptr<State> &originalState)
     {
         if (originalState == nullptr) {
             TELEPHONY_LOGE("originalState is null");
@@ -219,7 +219,7 @@ public:
         stateMachineEventHandler_->SetOriginalState(originalState);
     }
 
-    void TransitionTo(sptr<State> &destState)
+    void TransitionTo(std::shared_ptr<State> &destState)
     {
         if (destState == nullptr) {
             TELEPHONY_LOGE("destState is null");

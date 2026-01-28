@@ -25,7 +25,7 @@ class IncallDataStateMachine : public StateMachine, public std::enable_shared_fr
 public:
     IncallDataStateMachine() : StateMachine("IncallDataStateMachine") {}
     ~IncallDataStateMachine() = default;
-    sptr<State> GetCurrentState() const;
+    std::shared_ptr<State> GetCurrentState() const;
     int32_t GetSlotId() const;
     int32_t GetCallState() const;
     bool HasAnyConnectedState() const;
@@ -36,17 +36,17 @@ public:
     void DeInit();
 
 protected:
-    sptr<State> idleState_;
-    sptr<State> secondaryActiveState_;
-    sptr<State> activatingSecondaryState_;
-    sptr<State> activatedSecondaryState_;
-    sptr<State> deactivatingSecondaryState_;
-    sptr<State> currentState_;
+    std::shared_ptr<State> idleState_ = nullptr;
+    std::shared_ptr<State> secondaryActiveState_ = nullptr;
+    std::shared_ptr<State> activatingSecondaryState_ = nullptr;
+    std::shared_ptr<State> activatedSecondaryState_ = nullptr;
+    std::shared_ptr<State> deactivatingSecondaryState_ = nullptr;
+    std::shared_ptr<State> currentState_  = nullptr;
     std::weak_ptr<TelEventHandler> cellularDataHandler_;
     sptr<ApnManager> apnManager_;
 
 private:
-    void SetCurrentState(const sptr<State> &&state);
+    void SetCurrentState(std::shared_ptr<State> state);
     bool IsIncallDataSwitchOn();
     bool IsSecondaryCanActiveData();
     bool CanActiveDataByRadioTech();

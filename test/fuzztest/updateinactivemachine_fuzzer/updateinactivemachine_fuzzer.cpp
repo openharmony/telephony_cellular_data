@@ -47,10 +47,9 @@ void UpdateInActiveMachineFuzz(const uint8_t *data, size_t size)
     }
     cellularMachine->Init();
 
-    sptr<Inactive> inactive =
-        std::make_unique<Inactive>(std::weak_ptr<CellularDataStateMachine>(cellularMachine), "Inactive").release();
-    sptr<Activating> activating =
-        std::make_unique<Activating>(std::weak_ptr<CellularDataStateMachine>(cellularMachine), "Activating").release();
+    auto inactive = std::make_shared<Inactive>(std::weak_ptr<CellularDataStateMachine>(cellularMachine), "Inactive");
+    auto activating =
+        std::make_shared<Activating>(std::weak_ptr<CellularDataStateMachine>(cellularMachine), "Activating");
 
     if (inactive == nullptr || activating == nullptr) {
         TELEPHONY_LOGE("memory allocation failed");

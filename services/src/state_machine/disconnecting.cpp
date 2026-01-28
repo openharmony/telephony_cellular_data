@@ -29,7 +29,7 @@ void Disconnecting::StateBegin()
         return;
     }
     isActive_ = true;
-    stateMachine->SetCurrentState(sptr<State>(this));
+    stateMachine->SetCurrentState(shared_from_this());
 }
 
 void Disconnecting::StateEnd()
@@ -53,7 +53,7 @@ void Disconnecting::ProcessDisconnectTimeout(const AppExecFwk::InnerEvent::Point
     if (connectId != stateMachine->connectId_) {
         return;
     }
-    Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+    auto inActive = std::static_pointer_cast<Inactive>(stateMachine->inActiveState_);
     if (inActive == nullptr) {
         TELEPHONY_LOGE("inActive is null");
         return;
@@ -71,7 +71,7 @@ void Disconnecting::ProcessRilAdapterHostDied(const AppExecFwk::InnerEvent::Poin
         TELEPHONY_LOGE("stateMachine is null");
         return;
     }
-    Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+    auto inActive = std::static_pointer_cast<Inactive>(stateMachine->inActiveState_);
     if (inActive == nullptr) {
         TELEPHONY_LOGE("inActive is null");
         return;
@@ -93,7 +93,7 @@ void Disconnecting::ProcessRilDeactivateDataCall(const AppExecFwk::InnerEvent::P
         TELEPHONY_LOGE("stateMachine is null");
         return;
     }
-    Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+    auto inActive = std::static_pointer_cast<Inactive>(stateMachine->inActiveState_);
     if (inActive == nullptr) {
         TELEPHONY_LOGE("inActive is null");
         return;
