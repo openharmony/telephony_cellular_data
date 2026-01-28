@@ -34,7 +34,7 @@ void Active::StateBegin()
     isActive_ = true;
     RefreshTcpBufferSizes();
     RefreshConnectionBandwidths();
-    stateMachine->SetCurrentState(sptr<State>(this));
+    stateMachine->SetCurrentState(shared_from_this());
 }
 
 void Active::StateEnd()
@@ -88,7 +88,7 @@ bool Active::ProcessDisconnectDone(const AppExecFwk::InnerEvent::Pointer &event)
         stateMachine->SetReuseApnCap(NetManagerStandard::NetCap::NET_CAPABILITY_END);
     }
     DisConnectionReason reason = object->GetReason();
-    Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+    auto inActive = std::static_pointer_cast<Inactive>(stateMachine->inActiveState_);
     if (inActive == nullptr) {
         TELEPHONY_LOGE("inActive is null");
         return false;
@@ -121,7 +121,7 @@ bool Active::ProcessDisconnectAllDone(const AppExecFwk::InnerEvent::Pointer &eve
         stateMachine->SetReuseApnCap(NetManagerStandard::NetCap::NET_CAPABILITY_END);
     }
     DisConnectionReason reason = object->GetReason();
-    Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+    auto inActive = std::static_pointer_cast<Inactive>(stateMachine->inActiveState_);
     if (inActive == nullptr) {
         TELEPHONY_LOGE("inActive is null");
         return false;
@@ -155,7 +155,7 @@ bool Active::ProcessLostConnection(const AppExecFwk::InnerEvent::Pointer &event)
     }
     CellularDataHiSysEvent::WriteDataDeactiveBehaviorEvent(stateMachine->GetSlotId(),
         DataDisconnectCause::LOST_CONNECTION, ApnManager::FindApnNameByApnId(stateMachine->apnId_));
-    Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+    auto inActive = std::static_pointer_cast<Inactive>(stateMachine->inActiveState_);
     if (inActive == nullptr) {
         TELEPHONY_LOGE("inActive is null");
         return false;

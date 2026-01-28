@@ -41,7 +41,7 @@ void IdleStateMachineFuzz(const uint8_t *data, size_t size)
         return;
     }
     std::int32_t intValue = fdp.ConsumeIntegralInRange<uint32_t>(0, EVENT_ID_MAX);
-    sptr<ApnManager> apnManager = std::make_unique<ApnManager>().release();
+    sptr<ApnManager> apnManager = sptr<ApnManager>::MakeSptr();
     if (apnManager == nullptr) {
         return;
     }
@@ -50,7 +50,7 @@ void IdleStateMachineFuzz(const uint8_t *data, size_t size)
     if (machine->idleState_ == nullptr) {
         return;
     }
-    auto idleState = static_cast<IdleState *>(machine->idleState_.GetRefPtr());
+    auto idleState = std::static_pointer_cast<IdleState>(machine->idleState_);
     machine->GetCurrentState();
     machine->CanActiveDataByRadioTech();
     machine->IsSecondaryCanActiveData();
@@ -90,8 +90,8 @@ void ActivatingSecondaryStateMachineFuzz(const uint8_t *data, size_t size)
         return;
     }
     auto activatingSecondaryState =
-        static_cast<ActivatingSecondaryState *>(machine->activatingSecondaryState_.GetRefPtr());
-    auto secondaryActiveState = static_cast<SecondaryActiveState *>(machine->secondaryActiveState_.GetRefPtr());
+        std::static_pointer_cast<ActivatingSecondaryState>(machine->activatingSecondaryState_);
+    auto secondaryActiveState = std::static_pointer_cast<SecondaryActiveState>(machine->secondaryActiveState_);
     machine->TransitionTo(machine->activatingSecondaryState_);
     machine->GetCurrentState();
     machine->CanActiveDataByRadioTech();
@@ -133,8 +133,8 @@ void ActivatedSecondaryStateMachineFuzz(const uint8_t *data, size_t size)
         return;
     }
     auto activatedSecondaryState =
-        static_cast<ActivatedSecondaryState *>(machine->activatedSecondaryState_.GetRefPtr());
-    auto secondaryActiveState = static_cast<SecondaryActiveState *>(machine->secondaryActiveState_.GetRefPtr());
+        std::static_pointer_cast<ActivatedSecondaryState>(machine->activatedSecondaryState_);
+    auto secondaryActiveState = std::static_pointer_cast<SecondaryActiveState>(machine->secondaryActiveState_);
     machine->TransitionTo(machine->activatingSecondaryState_);
     machine->TransitionTo(machine->activatedSecondaryState_);
     machine->GetCurrentState();
@@ -177,8 +177,8 @@ void DeactivatingSecondaryStateMachineFuzz(const uint8_t *data, size_t size)
         return;
     }
     auto deactivatingSecondaryState =
-        static_cast<DeactivatingSecondaryState *>(machine->deactivatingSecondaryState_.GetRefPtr());
-    auto idleState = static_cast<IdleState *>(machine->idleState_.GetRefPtr());
+        std::static_pointer_cast<DeactivatingSecondaryState>(machine->deactivatingSecondaryState_);
+    auto idleState = std::static_pointer_cast<IdleState>(machine->idleState_);
     machine->TransitionTo(machine->activatingSecondaryState_);
     machine->TransitionTo(machine->activatedSecondaryState_);
     machine->TransitionTo(machine->deactivatingSecondaryState_);

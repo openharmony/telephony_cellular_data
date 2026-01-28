@@ -160,7 +160,7 @@ HWTEST_F(CellularStateMachineTest, IdleState_StateBegin_001, Function | MediumTe
     }
     
     incallStateMachine->TransitionTo(incallStateMachine->idleState_);
-    auto idleState = static_cast<IdleState *>(incallStateMachine->idleState_.GetRefPtr());
+    auto idleState = std::static_pointer_cast<IdleState>(incallStateMachine->idleState_);
     incallStateMachine = nullptr;
     idleState->stateMachine_ = incallStateMachine;
     idleState->StateBegin();
@@ -181,7 +181,7 @@ HWTEST_F(CellularStateMachineTest, IdleState_StateBegin_002, Function | MediumTe
         incallStateMachine = nullptr;
     }
     incallStateMachine->TransitionTo(incallStateMachine->idleState_);
-    auto idleState = static_cast<IdleState *>(incallStateMachine->idleState_.GetRefPtr());
+    auto idleState = std::static_pointer_cast<IdleState>(incallStateMachine->idleState_);
     incallStateMachine->UpdateCallState(static_cast<int32_t>(TelCallStatus::CALL_STATUS_IDLE));
     idleState->stateMachine_ = incallStateMachine;
     idleState->StateBegin();
@@ -202,7 +202,7 @@ HWTEST_F(CellularStateMachineTest, IdleState_StateBegin_003, Function | MediumTe
         incallStateMachine = nullptr;
     }
     incallStateMachine->TransitionTo(incallStateMachine->idleState_);
-    auto idleState = static_cast<IdleState *>(incallStateMachine->idleState_.GetRefPtr());
+    auto idleState = std::static_pointer_cast<IdleState>(incallStateMachine->idleState_);
     incallStateMachine->UpdateCallState(static_cast<int32_t>(TelCallStatus::CALL_STATUS_DISCONNECTED));
     idleState->stateMachine_ = incallStateMachine;
     idleState->StateBegin();
@@ -223,7 +223,7 @@ HWTEST_F(CellularStateMachineTest, IdleState_StateProcess_001, Function | Medium
         incallStateMachine = nullptr;
     }
     incallStateMachine->TransitionTo(incallStateMachine->idleState_);
-    auto idleState = static_cast<IdleState *>(incallStateMachine->idleState_.GetRefPtr());
+    auto idleState = std::static_pointer_cast<IdleState>(incallStateMachine->idleState_);
     incallStateMachine = nullptr;
     idleState->stateMachine_ = incallStateMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_DISCONNECTED);
@@ -245,7 +245,7 @@ HWTEST_F(CellularStateMachineTest, IdleState_StateProcess_002, Function | Medium
         incallStateMachine = nullptr;
     }
     incallStateMachine->TransitionTo(incallStateMachine->idleState_);
-    auto idleState = static_cast<IdleState *>(incallStateMachine->idleState_.GetRefPtr());
+    auto idleState = std::static_pointer_cast<IdleState>(incallStateMachine->idleState_);
     idleState->stateMachine_ = incallStateMachine;
     idleState->eventIdFunMap_.clear();
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_CALL_STARTED);
@@ -267,7 +267,7 @@ HWTEST_F(CellularStateMachineTest, IdleState_IncallStateMachine_001, Function | 
         incallStateMachine = nullptr;
     }
     incallStateMachine->TransitionTo(incallStateMachine->idleState_);
-    auto idleState = static_cast<IdleState *>(incallStateMachine->idleState_.GetRefPtr());
+    auto idleState = std::static_pointer_cast<IdleState>(incallStateMachine->idleState_);
     incallStateMachine = nullptr;
     idleState->stateMachine_ = incallStateMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_DISCONNECTED);
@@ -299,7 +299,7 @@ HWTEST_F(CellularStateMachineTest, StateProcess_001, Function | MediumTest | Lev
     incallStateMachine->TransitionTo(incallStateMachine->activatedSecondaryState_);
     incallStateMachine->TransitionTo(incallStateMachine->deactivatingSecondaryState_);
     auto deactivatingSecondaryState =
-        static_cast<DeactivatingSecondaryState *>(incallStateMachine->deactivatingSecondaryState_.GetRefPtr());
+        std::static_pointer_cast<DeactivatingSecondaryState>(incallStateMachine->deactivatingSecondaryState_);
     bool result = deactivatingSecondaryState->StateProcess(event);
     EXPECT_EQ(result, true);
 }
@@ -322,7 +322,7 @@ HWTEST_F(CellularStateMachineTest, StateProcess_002, Function | MediumTest | Lev
     incallStateMachine->TransitionTo(incallStateMachine->activatedSecondaryState_);
     incallStateMachine->TransitionTo(incallStateMachine->deactivatingSecondaryState_);
     auto deactivatingSecondaryState =
-        static_cast<DeactivatingSecondaryState *>(incallStateMachine->deactivatingSecondaryState_.GetRefPtr());
+        std::static_pointer_cast<DeactivatingSecondaryState>(incallStateMachine->deactivatingSecondaryState_);
     bool result = deactivatingSecondaryState->StateProcess(event);
     EXPECT_EQ(result, true);
 }
@@ -345,7 +345,7 @@ HWTEST_F(CellularStateMachineTest, StateProcess_003, Function | MediumTest | Lev
     incallStateMachine->TransitionTo(incallStateMachine->activatedSecondaryState_);
     incallStateMachine->TransitionTo(incallStateMachine->deactivatingSecondaryState_);
     auto deactivatingSecondaryState =
-        static_cast<DeactivatingSecondaryState *>(incallStateMachine->deactivatingSecondaryState_.GetRefPtr());
+        std::static_pointer_cast<DeactivatingSecondaryState>(incallStateMachine->deactivatingSecondaryState_);
     incallStateMachine = nullptr;
     deactivatingSecondaryState->stateMachine_ = incallStateMachine;
     bool result = deactivatingSecondaryState->StateProcess(event);
@@ -371,7 +371,7 @@ HWTEST_F(CellularStateMachineTest, StateProcess_004, Function | MediumTest | Lev
     incallStateMachine->TransitionTo(incallStateMachine->activatedSecondaryState_);
     incallStateMachine->TransitionTo(incallStateMachine->deactivatingSecondaryState_);
     auto deactivatingSecondaryState =
-        static_cast<DeactivatingSecondaryState *>(incallStateMachine->deactivatingSecondaryState_.GetRefPtr());
+        std::static_pointer_cast<DeactivatingSecondaryState>(incallStateMachine->deactivatingSecondaryState_);
     bool result = deactivatingSecondaryState->StateProcess(event);
     EXPECT_EQ(result, true);
 }
@@ -392,7 +392,7 @@ HWTEST_F(CellularStateMachineTest, ActivatingStateProcess_001, Function | Medium
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_CONNECTED);
     incallStateMachine->TransitionTo(incallStateMachine->activatingSecondaryState_);
     auto activatingSecondaryState =
-        static_cast<ActivatingSecondaryState *>(incallStateMachine->activatingSecondaryState_.GetRefPtr());
+        std::static_pointer_cast<ActivatingSecondaryState>(incallStateMachine->activatingSecondaryState_);
     bool result = activatingSecondaryState->StateProcess(event);
     EXPECT_EQ(result, true);
 }
@@ -413,7 +413,7 @@ HWTEST_F(CellularStateMachineTest, ActivatingStateProcess_002, Function | Medium
     auto event = AppExecFwk::InnerEvent::Get(-1);
     incallStateMachine->TransitionTo(incallStateMachine->activatingSecondaryState_);
     auto activatingSecondaryState =
-        static_cast<ActivatingSecondaryState *>(incallStateMachine->activatingSecondaryState_.GetRefPtr());
+        std::static_pointer_cast<ActivatingSecondaryState>(incallStateMachine->activatingSecondaryState_);
     bool result = activatingSecondaryState->StateProcess(event);
     EXPECT_EQ(result, false);
 }
@@ -434,7 +434,7 @@ HWTEST_F(CellularStateMachineTest, ActivatingSecondaryState_IncallDataStateMachi
     auto event = AppExecFwk::InnerEvent::Get(0);
     incallStateMachine->TransitionTo(incallStateMachine->activatingSecondaryState_);
     auto activatingSecondaryState =
-        static_cast<ActivatingSecondaryState *>(incallStateMachine->activatingSecondaryState_.GetRefPtr());
+        std::static_pointer_cast<ActivatingSecondaryState>(incallStateMachine->activatingSecondaryState_);
     incallStateMachine = nullptr;
     activatingSecondaryState->stateMachine_ = incallStateMachine;
     bool result = activatingSecondaryState->StateProcess(event);
@@ -458,7 +458,7 @@ HWTEST_F(CellularStateMachineTest, SecondaryActiveStateProcess_001, Function | M
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_CONNECTED);
     incallStateMachine->TransitionTo(incallStateMachine->secondaryActiveState_);
     auto secondaryActiveState =
-        static_cast<SecondaryActiveState *>(incallStateMachine->secondaryActiveState_.GetRefPtr());
+        std::static_pointer_cast<SecondaryActiveState>(incallStateMachine->secondaryActiveState_);
     bool result = secondaryActiveState->StateProcess(event);
     EXPECT_EQ(result, false);
 }
@@ -479,7 +479,7 @@ HWTEST_F(CellularStateMachineTest, SecondaryActiveStateProcess_002, Function | M
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_CONNECTED);
     incallStateMachine->TransitionTo(incallStateMachine->secondaryActiveState_);
     auto secondaryActiveState =
-        static_cast<SecondaryActiveState *>(incallStateMachine->secondaryActiveState_.GetRefPtr());
+        std::static_pointer_cast<SecondaryActiveState>(incallStateMachine->secondaryActiveState_);
     incallStateMachine = nullptr;
     secondaryActiveState->stateMachine_ = incallStateMachine;
     bool result = secondaryActiveState->StateProcess(event);
@@ -502,7 +502,7 @@ HWTEST_F(CellularStateMachineTest, SecondaryActiveStateProcess_003, Function | M
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_CONNECTED);
     incallStateMachine->TransitionTo(incallStateMachine->secondaryActiveState_);
     auto secondaryActiveState =
-        static_cast<SecondaryActiveState *>(incallStateMachine->secondaryActiveState_.GetRefPtr());
+        std::static_pointer_cast<SecondaryActiveState>(incallStateMachine->secondaryActiveState_);
     secondaryActiveState->stateMachine_ = incallStateMachine;
     secondaryActiveState->eventIdFunMap_.clear();
     bool result = secondaryActiveState->StateProcess(event);
@@ -525,7 +525,7 @@ HWTEST_F(CellularStateMachineTest, SecondaryActiveState_ProcessCallEnded_001, Fu
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_CONNECTED);
     incallStateMachine->TransitionTo(incallStateMachine->secondaryActiveState_);
     auto secondaryActiveState =
-        static_cast<SecondaryActiveState *>(incallStateMachine->secondaryActiveState_.GetRefPtr());
+        std::static_pointer_cast<SecondaryActiveState>(incallStateMachine->secondaryActiveState_);
     incallStateMachine = nullptr;
     secondaryActiveState->stateMachine_ = incallStateMachine;
     bool result = secondaryActiveState->ProcessCallEnded(event);
@@ -549,7 +549,7 @@ HWTEST_F(CellularStateMachineTest, SecondaryActiveState_ProcessCallEnded_002, Fu
     incallStateMachine->TransitionTo(incallStateMachine->secondaryActiveState_);
     incallStateMachine->UpdateCallState(static_cast<int32_t>(TelCallStatus::CALL_STATUS_IDLE));
     auto secondaryActiveState =
-        static_cast<SecondaryActiveState *>(incallStateMachine->secondaryActiveState_.GetRefPtr());
+        std::static_pointer_cast<SecondaryActiveState>(incallStateMachine->secondaryActiveState_);
     secondaryActiveState->stateMachine_ = incallStateMachine;
     bool result = secondaryActiveState->ProcessCallEnded(event);
     EXPECT_EQ(result, PROCESSED);
@@ -574,7 +574,7 @@ HWTEST_F(CellularStateMachineTest, SecondaryActiveState_IncallDataStateMachine_0
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_INCALL_DATA_DATA_CONNECTED);
     incallStateMachine->TransitionTo(incallStateMachine->secondaryActiveState_);
     auto secondaryActiveState =
-        static_cast<SecondaryActiveState *>(incallStateMachine->secondaryActiveState_.GetRefPtr());
+        std::static_pointer_cast<SecondaryActiveState>(incallStateMachine->secondaryActiveState_);
     incallStateMachine = nullptr;
     secondaryActiveState->stateMachine_ = incallStateMachine;
     bool result = secondaryActiveState->ProcessCallEnded(event);
@@ -595,7 +595,7 @@ HWTEST_F(CellularStateMachineTest, InactiveStateBegin_001, Function | MediumTest
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto inactive = static_cast<Inactive *>(cellularMachine->inActiveState_.GetRefPtr());
+    auto inactive = std::static_pointer_cast<Inactive>(cellularMachine->inActiveState_);
     inactive->deActiveApnTypeId_ = 0;
     inactive->SetStateMachine(cellularMachine);
     inactive->SetPdpErrorReason(PdpErrorReason::PDP_ERR_RETRY);
@@ -614,7 +614,7 @@ HWTEST_F(CellularStateMachineTest, InactiveStateProcess_002, Function | MediumTe
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto inactive = static_cast<Inactive *>(cellularMachine->inActiveState_.GetRefPtr());
+    auto inactive = std::static_pointer_cast<Inactive>(cellularMachine->inActiveState_);
     inactive->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT);
     bool result = inactive->StateProcess(event);
@@ -633,7 +633,7 @@ HWTEST_F(CellularStateMachineTest, InactiveStateProcess_003, Function | MediumTe
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto inactive = static_cast<Inactive *>(cellularMachine->inActiveState_.GetRefPtr());
+    auto inactive = std::static_pointer_cast<Inactive>(cellularMachine->inActiveState_);
     inactive->SetStateMachine(cellularMachine);
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT_ALL);
     bool result = inactive->StateProcess(event);
@@ -652,7 +652,7 @@ HWTEST_F(CellularStateMachineTest, Inactive_CellularDataStateMachine_001, Functi
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto inactive = static_cast<Inactive *>(cellularMachine->inActiveState_.GetRefPtr());
+    auto inactive = std::static_pointer_cast<Inactive>(cellularMachine->inActiveState_);
     cellularMachine = nullptr;
     inactive->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT_ALL);
@@ -673,7 +673,7 @@ HWTEST_F(CellularStateMachineTest, DefaultStateProcess_001, Function | MediumTes
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto mDefault = static_cast<Default *>(cellularMachine->defaultState_.GetRefPtr());
+    auto mDefault = std::static_pointer_cast<Default>(cellularMachine->defaultState_);
     mDefault->stateMachine_ = cellularMachine;
     mDefault->eventIdFunMap_.clear();
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
@@ -693,7 +693,7 @@ HWTEST_F(CellularStateMachineTest, DefaultStateProcess_002, Function | MediumTes
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto mDefault = static_cast<Default *>(cellularMachine->defaultState_.GetRefPtr());
+    auto mDefault = std::static_pointer_cast<Default>(cellularMachine->defaultState_);
     cellularMachine = nullptr;
     mDefault->stateMachine_ = cellularMachine;
     mDefault->eventIdFunMap_.clear();
@@ -714,7 +714,7 @@ HWTEST_F(CellularStateMachineTest, DefaultProcessDisconnectDone_001, Function | 
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto mDefault = static_cast<Default *>(cellularMachine->defaultState_.GetRefPtr());
+    auto mDefault = std::static_pointer_cast<Default>(cellularMachine->defaultState_);
     mDefault->stateMachine_ = cellularMachine;
     mDefault->eventIdFunMap_.clear();
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
@@ -734,7 +734,7 @@ HWTEST_F(CellularStateMachineTest, DefaultProcessDisconnectDone_002, Function | 
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto mDefault = static_cast<Default *>(cellularMachine->defaultState_.GetRefPtr());
+    auto mDefault = std::static_pointer_cast<Default>(cellularMachine->defaultState_);
     cellularMachine = nullptr;
     mDefault->stateMachine_ = cellularMachine;
     mDefault->eventIdFunMap_.clear();
@@ -755,7 +755,7 @@ HWTEST_F(CellularStateMachineTest, DefaultProcessDisconnectAllDone_001, Function
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto mDefault = static_cast<Default *>(cellularMachine->defaultState_.GetRefPtr());
+    auto mDefault = std::static_pointer_cast<Default>(cellularMachine->defaultState_);
     mDefault->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
     bool result = mDefault->ProcessDisconnectAllDone(event);
@@ -774,7 +774,7 @@ HWTEST_F(CellularStateMachineTest, DefaultProcessDisconnectAllDone_002, Function
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto mDefault = static_cast<Default *>(cellularMachine->defaultState_.GetRefPtr());
+    auto mDefault = std::static_pointer_cast<Default>(cellularMachine->defaultState_);
     cellularMachine = nullptr;
     mDefault->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
@@ -794,7 +794,7 @@ HWTEST_F(CellularStateMachineTest, DefaultProcessDataConnectionDrsOrRatChanged_0
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto mDefault = static_cast<Default *>(cellularMachine->defaultState_.GetRefPtr());
+    auto mDefault = std::static_pointer_cast<Default>(cellularMachine->defaultState_);
     cellularMachine->TransitionTo(cellularMachine->activeState_);
     mDefault->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
@@ -814,7 +814,7 @@ HWTEST_F(CellularStateMachineTest, DefaultProcessDataConnectionDrsOrRatChanged_0
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto mDefault = static_cast<Default *>(cellularMachine->defaultState_.GetRefPtr());
+    auto mDefault = std::static_pointer_cast<Default>(cellularMachine->defaultState_);
     cellularMachine->TransitionTo(cellularMachine->activatingState_);
     mDefault->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
@@ -834,7 +834,7 @@ HWTEST_F(CellularStateMachineTest, DefaultProcessDataConnectionDrsOrRatChanged_0
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto mDefault = static_cast<Default *>(cellularMachine->defaultState_.GetRefPtr());
+    auto mDefault = std::static_pointer_cast<Default>(cellularMachine->defaultState_);
     cellularMachine->TransitionTo(cellularMachine->disconnectingState_);
     mDefault->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
@@ -854,7 +854,7 @@ HWTEST_F(CellularStateMachineTest, DefaultProcessDataConnectionDrsOrRatChanged_0
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto mDefault = static_cast<Default *>(cellularMachine->defaultState_.GetRefPtr());
+    auto mDefault = std::static_pointer_cast<Default>(cellularMachine->defaultState_);
     cellularMachine = nullptr;
     mDefault->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
@@ -874,7 +874,7 @@ HWTEST_F(CellularStateMachineTest, Active_StateBegin_001, Function | MediumTest 
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
     active->StateBegin();
@@ -893,7 +893,7 @@ HWTEST_F(CellularStateMachineTest, Active_StateProcess_001, Function | MediumTes
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
     bool result = active->StateProcess(event);
@@ -912,7 +912,7 @@ HWTEST_F(CellularStateMachineTest, Active_StateProcess_002, Function | MediumTes
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(0);
     bool result = active->StateProcess(event);
@@ -931,7 +931,7 @@ HWTEST_F(CellularStateMachineTest, Active_StateProcess_003, Function | MediumTes
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     cellularMachine = nullptr;
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
@@ -951,7 +951,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessDisconnectDone_001, Function | 
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
@@ -971,7 +971,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessDisconnectDone_002, Function | 
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(0);
     bool result = active->ProcessDisconnectDone(event);
@@ -990,7 +990,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessDisconnectAllDone_001, Function
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
@@ -1010,7 +1010,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessDisconnectAllDone_002, Function
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(0);
     bool result = active->ProcessDisconnectAllDone(event);
@@ -1029,7 +1029,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessDisconnectAllDone_003, Function
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     cellularMachine->TransitionTo(cellularMachine->inActiveState_);
     active->stateMachine_ = cellularMachine;
     std::shared_ptr<DataDisconnectParams> dataDisconnectParams =
@@ -1051,7 +1051,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessDisconnectAllDone_004, Function
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     cellularMachine->inActiveState_ = nullptr;
     active->stateMachine_ = cellularMachine;
     std::shared_ptr<DataDisconnectParams> dataDisconnectParams =
@@ -1073,7 +1073,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessLinkCapabilityChanged_001, Func
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(0);
     bool result = active->ProcessLinkCapabilityChanged(event);
@@ -1092,7 +1092,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessLinkCapabilityChanged_002, Func
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     cellularMachine = nullptr;
     active->stateMachine_ = cellularMachine;
     std::shared_ptr<DataLinkCapability> linkCapability = std::make_shared<DataLinkCapability>();
@@ -1113,7 +1113,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessLinkCapabilityChanged_003, Func
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     active->stateMachine_ = cellularMachine;
     std::shared_ptr<DataLinkCapability> linkCapability = std::make_shared<DataLinkCapability>();
     linkCapability->primaryUplinkKbps = 0;
@@ -1134,7 +1134,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessLinkCapabilityChanged_004, Func
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     active->stateMachine_ = cellularMachine;
     std::shared_ptr<DataLinkCapability> linkCapability = std::make_shared<DataLinkCapability>();
     linkCapability->primaryUplinkKbps = 1;
@@ -1156,7 +1156,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessLinkCapabilityChanged_005, Func
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     active->stateMachine_ = cellularMachine;
     std::shared_ptr<DataLinkCapability> linkCapability = std::make_shared<DataLinkCapability>();
     linkCapability->primaryUplinkKbps = 1;
@@ -1178,7 +1178,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessDataConnectionComplete_001, Fun
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(0);
     bool result = active->ProcessDataConnectionComplete(event);
@@ -1197,7 +1197,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessDataConnectionComplete_002, Fun
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     cellularMachine = nullptr;
     active->stateMachine_ = cellularMachine;
     std::shared_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_shared<SetupDataCallResultInfo>();
@@ -1218,7 +1218,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessDataConnectionComplete_003, Fun
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     active->stateMachine_ = cellularMachine;
     std::shared_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_shared<SetupDataCallResultInfo>();
     auto event = AppExecFwk::InnerEvent::Get(0, setupDataCallResultInfo);
@@ -1238,7 +1238,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessDataConnectionComplete_004, Fun
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     cellularMachine->stateMachineEventHandler_ = nullptr;
     active->stateMachine_ = cellularMachine;
     std::shared_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_shared<SetupDataCallResultInfo>();
@@ -1259,7 +1259,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessNrStateChanged_001, Function | 
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
     bool result = active->ProcessNrStateChanged(event);
@@ -1278,7 +1278,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessNrStateChanged_002, Function | 
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     cellularMachine = nullptr;
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
@@ -1298,7 +1298,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessNrFrequencyChanged_001, Functio
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     cellularMachine = nullptr;
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
@@ -1318,7 +1318,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessLostConnection_001, Function | 
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     cellularMachine->TransitionTo(cellularMachine->inActiveState_);
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(0);
@@ -1338,7 +1338,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessLostConnection_002, Function | 
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     cellularMachine->inActiveState_ = nullptr;
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(0);
@@ -1358,7 +1358,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessDataConnectionRoamOn_001, Funct
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
     bool result = active->ProcessDataConnectionRoamOn(event);
@@ -1377,7 +1377,7 @@ HWTEST_F(CellularStateMachineTest, Active_ProcessDataConnectionRoamOff_001, Func
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
     bool result = active->ProcessDataConnectionRoamOff(event);
@@ -1396,7 +1396,7 @@ HWTEST_F(CellularStateMachineTest, ProcessDataConnectionVoiceCallStartedOrEnded_
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     active->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT);
     bool result = active->ProcessDataConnectionVoiceCallStartedOrEnded(event);
@@ -2234,7 +2234,7 @@ HWTEST_F(CellularStateMachineTest, Default_ProcessUpdateNetworkInfo_001, Functio
             return 0;
         });
     }
-    auto defaultState = static_cast<Default *>(cellularMachine->defaultState_.GetRefPtr());
+    auto defaultState = std::static_pointer_cast<Default>(cellularMachine->defaultState_);
     defaultState->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_UPDATE_NETWORK_INFO);
     bool result = defaultState->ProcessUpdateNetworkInfo(event);
@@ -2330,7 +2330,7 @@ HWTEST_F(CellularStateMachineTest, OnInterfaceLinkStateChanged_001, Function | M
     dataCallInfo.reason = 1;
     dataCallInfo.netPortName = "rmnet0";
     cellularMachine->UpdateNetworkInfo(dataCallInfo);
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     cellularMachine->TransitionTo(cellularMachine->inActiveState_);
     active->stateMachine_ = cellularMachine;
     std::shared_ptr<DataDisconnectParams> dataDisconnectParams =

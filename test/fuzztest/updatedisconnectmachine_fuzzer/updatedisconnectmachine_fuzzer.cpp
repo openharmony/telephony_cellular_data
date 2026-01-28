@@ -45,11 +45,9 @@ void UpdateDisconnectMachineFuzz(const uint8_t *data, size_t size)
     if (cellularMachine == nullptr) {
         return;
     }
-    sptr<Disconnecting> disconnecting =
-        std::make_unique<Disconnecting>(std::weak_ptr<CellularDataStateMachine>(cellularMachine), "Disconnecting")
-            .release();
-    sptr<Default> defaultStatus =
-        std::make_unique<Default>(std::weak_ptr<CellularDataStateMachine>(cellularMachine), "Default").release();
+    auto disconnecting =
+        std::make_shared<Disconnecting>(std::weak_ptr<CellularDataStateMachine>(cellularMachine), "Disconnecting");
+    auto defaultStatus = std::make_shared<Default>(std::weak_ptr<CellularDataStateMachine>(cellularMachine), "Default");
 
     if (disconnecting == nullptr || defaultStatus == nullptr) {
         TELEPHONY_LOGE("memory allocation failed");

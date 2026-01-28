@@ -59,7 +59,7 @@ public:
     bool IsDisconnectingState() const;
     bool IsActiveState() const;
     bool IsDefaultState() const;
-    sptr<State> GetCurrentState() const;
+    std::shared_ptr<State> GetCurrentState() const;
     void SetCapability(uint64_t capability);
     uint64_t GetCapability() const;
     int32_t GetCid() const;
@@ -82,19 +82,19 @@ public:
     void UnregisterNetInterfaceCallback();
 
 protected:
-    sptr<State> activeState_;
-    sptr<State> inActiveState_;
-    sptr<State> activatingState_;
-    sptr<State> disconnectingState_;
-    sptr<State> defaultState_;
-    sptr<State> currentState_;
+    std::shared_ptr<State> activeState_;
+    std::shared_ptr<State> inActiveState_;
+    std::shared_ptr<State> activatingState_;
+    std::shared_ptr<State> disconnectingState_;
+    std::shared_ptr<State> defaultState_;
+    std::shared_ptr<State> currentState_;
     sptr<DataConnectionManager> cdConnectionManager_;
     std::shared_ptr<TelEventHandler> cellularDataHandler_;
     sptr<NetManagerStandard::NetLinkInfo> netLinkInfo_;
     sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo_;
 
 private:
-    void SetCurrentState(const sptr<State> &&state);
+    void SetCurrentState(std::shared_ptr<State> state);
     void SetCid(const int32_t cid);
     void DoConnect(const DataConnectionParams &connectionParams);
     void FreeConnection(const DataDisconnectParams &params);

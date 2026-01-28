@@ -138,14 +138,14 @@ void IncallDataStateMachine::Init(int32_t callState, int32_t slotId,
     slotId_ = slotId;
     cellularDataHandler_ = std::move(cellularDataHandler);
     apnManager_ = apnManager;
-    idleState_ = sptr<IdleState>::MakeSptr(std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "IdleState");
-    secondaryActiveState_ = sptr<SecondaryActiveState>::MakeSptr(
+    idleState_ = std::make_shared<IdleState>(std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "IdleState");
+    secondaryActiveState_ = std::make_shared<SecondaryActiveState>(
         std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "SecondaryActiveState");
-    activatingSecondaryState_ = sptr<ActivatingSecondaryState>::MakeSptr(
+    activatingSecondaryState_ = std::make_shared<ActivatingSecondaryState>(
         std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "ActivatingSecondaryState");
-    activatedSecondaryState_ = sptr<ActivatedSecondaryState>::MakeSptr(
+    activatedSecondaryState_ = std::make_shared<ActivatedSecondaryState>(
         std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "ActivatedSecondaryState");
-    deactivatingSecondaryState_ = sptr<DeactivatingSecondaryState>::MakeSptr(
+    deactivatingSecondaryState_ = std::make_shared<DeactivatingSecondaryState>(
         std::weak_ptr<IncallDataStateMachine>(shared_from_this()), "DeactivatingSecondaryState");
     if (idleState_ == nullptr || secondaryActiveState_ == nullptr || activatingSecondaryState_ == nullptr ||
         activatedSecondaryState_ == nullptr || deactivatingSecondaryState_ == nullptr) {
@@ -159,12 +159,12 @@ void IncallDataStateMachine::Init(int32_t callState, int32_t slotId,
     StateMachine::Start();
 }
 
-void IncallDataStateMachine::SetCurrentState(const sptr<State> &&state)
+void IncallDataStateMachine::SetCurrentState(std::shared_ptr<State> state)
 {
-    currentState_ = std::move(state);
+    currentState_ = state;
 }
 
-sptr<State> IncallDataStateMachine::GetCurrentState() const
+std::shared_ptr<State> IncallDataStateMachine::GetCurrentState() const
 {
     return currentState_;
 }
@@ -198,7 +198,7 @@ void IdleState::StateBegin()
         return;
     }
     isActive_ = true;
-    stateMachine->SetCurrentState(sptr<State>(this));
+    stateMachine->SetCurrentState(shared_from_this());
     if (stateMachine->GetCallState() == static_cast<int32_t>(TelCallStatus::CALL_STATUS_IDLE) ||
         stateMachine->GetCallState() == static_cast<int32_t>(TelCallStatus::CALL_STATUS_DISCONNECTED)) {
         std::shared_ptr<TelEventHandler> eventHandler = stateMachine->cellularDataHandler_.lock();
@@ -405,7 +405,7 @@ void ActivatingSecondaryState::StateBegin()
         return;
     }
     isActive_ = true;
-    stateMachine->SetCurrentState(sptr<State>(this));
+    stateMachine->SetCurrentState(shared_from_this());
 }
 
 void ActivatingSecondaryState::StateEnd()
@@ -442,7 +442,7 @@ void ActivatedSecondaryState::StateBegin()
         return;
     }
     isActive_ = true;
-    stateMachine->SetCurrentState(sptr<State>(this));
+    stateMachine->SetCurrentState(shared_from_this());
 }
 
 void ActivatedSecondaryState::StateEnd()
@@ -465,7 +465,7 @@ void DeactivatingSecondaryState::StateBegin()
         return;
     }
     isActive_ = true;
-    stateMachine->SetCurrentState(sptr<State>(this));
+    stateMachine->SetCurrentState(shared_from_this());
     int32_t defaultSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
     int32_t primarySlotId = INVALID_SLOT_ID;
     CoreManagerInner::GetInstance().GetPrimarySlotId(primarySlotId);
