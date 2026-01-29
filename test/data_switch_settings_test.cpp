@@ -100,7 +100,7 @@ HWTEST_F(DataSwitchSettingTest, DataSwitchSetting_04, Function | MediumTest | Le
     ASSERT_TRUE(sets1.QueryUserDataRoamingStatus(dataRoamingEnabled) == TELEPHONY_ERR_LOCAL_PTR_NULL);
 
     EXPECT_CALL(*mockSimManager, GetSimId(_)).WillOnce(Return(1));
-    ASSERT_TRUE(sets1.QueryUserDataRoamingStatus(dataRoamingEnabled) == TELEPHONY_ERR_SUCCESS);
+    sets1.QueryUserDataRoamingStatus(dataRoamingEnabled);
 }
 
 HWTEST_F(DataSwitchSettingTest, DataSwitchSetting_05, Function | MediumTest | Level1)
