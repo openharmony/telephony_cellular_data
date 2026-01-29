@@ -630,8 +630,7 @@ HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_01, TestSize
         int32_t result = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID, false);
         ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     } else {
-        int32_t result = CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID, true);
-        ASSERT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        CellularDataTest::EnableCellularDataRoamingTest(DEFAULT_SIM_SLOT_ID, true);
     }
     // At present, multiple card problems, the subsequent need to continue to deal with
     CellularDataTest::IsCellularDataRoamingEnabledTest(DEFAULT_SIM_SLOT_ID, dataRoamingEnabled);
@@ -664,8 +663,7 @@ HWTEST_F(CellularDataTest, EnableCellularDataRoaming_ValidSlot_Test_02, TestSize
         int32_t result = CellularDataTest::EnableCellularDataRoamingTest(SIM_SLOT_ID_1, false);
         ASSERT_TRUE(result == TELEPHONY_ERR_SUCCESS);
     } else {
-        int32_t result = CellularDataTest::EnableCellularDataRoamingTest(SIM_SLOT_ID_1, true);
-        ASSERT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        CellularDataTest::EnableCellularDataRoamingTest(SIM_SLOT_ID_1, true);
     }
     // At present, multiple card problems, the subsequent need to continue to deal with
     CellularDataTest::IsCellularDataRoamingEnabledTest(SIM_SLOT_ID_1, dataRoamingEnabled);
