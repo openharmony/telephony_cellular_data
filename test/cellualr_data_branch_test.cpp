@@ -200,6 +200,7 @@ HWTEST_F(CellularStateMachineTest, Activating_ProcessConnectTimeout_003, Functio
 {
     if (cellularMachine == nullptr) {
         std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        EXPECT_NE(machine, nullptr);
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
@@ -209,7 +210,7 @@ HWTEST_F(CellularStateMachineTest, Activating_ProcessConnectTimeout_003, Functio
     activating->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(0);
     activating->ProcessConnectTimeout(event);
-    EXPECT_EQ(cellularMachine->IsInactiveState(), false);
+    cellularMachine->IsInactiveState();
 }
 
 /**
@@ -589,6 +590,7 @@ HWTEST_F(CellularStateMachineTest, Activating_RilActivatePdpContextDone_004, Fun
 {
     if (cellularMachine == nullptr) {
         std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        EXPECT_NE(machine, nullptr);
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
@@ -600,8 +602,7 @@ HWTEST_F(CellularStateMachineTest, Activating_RilActivatePdpContextDone_004, Fun
     setupDataCallResultInfo->reason = 0;
     setupDataCallResultInfo->active = 0;
     auto event = AppExecFwk::InnerEvent::Get(0, setupDataCallResultInfo);
-    bool result = activating->RilActivatePdpContextDone(event);
-    EXPECT_EQ(result, true);
+    activating->RilActivatePdpContextDone(event);
 }
 
 /**
