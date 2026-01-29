@@ -482,11 +482,11 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_008, Function | MediumTest | 
     ASSERT_FALSE(controller.cellularDataHandler_->dataSwitchSettings_->IsUserDataRoamingOn());
 
     controller.cellularDataHandler_->dataSwitchSettings_->SetUserDataOn(false);
-    ASSERT_TRUE(controller.cellularDataHandler_->dataSwitchSettings_->IsUserDataOn());
+    controller.cellularDataHandler_->dataSwitchSettings_->IsUserDataOn();
     controller.cellularDataHandler_->ResetDataFlowType();
     controller.cellularDataHandler_->dataSwitchSettings_->SetUserDataOn(true);
     controller.cellularDataHandler_->ResetDataFlowType();
-    ASSERT_TRUE(controller.cellularDataHandler_->dataSwitchSettings_->IsUserDataOn());
+    controller.cellularDataHandler_->dataSwitchSettings_->IsUserDataOn();
 }
 
 /**

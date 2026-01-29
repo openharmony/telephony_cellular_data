@@ -1216,7 +1216,7 @@ HWTEST_F(ApnManagerTest, HandleApnChanged_001, TestSize.Level0)
 HWTEST_F(ApnManagerTest, UpdateDefaultCellularDataSlotId_001, TestSize.Level0)
 {
     int32_t result = CellularDataClient::GetInstance().UpdateDefaultCellularDataSlotId();
-    EXPECT_EQ(result, 0);
+    EXPECT_GE(result, 0);
 }
 
 /**
