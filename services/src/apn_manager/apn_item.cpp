@@ -47,7 +47,7 @@ bool ApnItem::CanDealWithType(const std::string &type) const
             return true;
         }
         if ((type != DATA_CONTEXT_ROLE_IA) && (apnType == DATA_CONTEXT_ROLE_ALL)) {
-            return true;
+            return false;
         }
     }
     return false;
