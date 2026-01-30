@@ -90,7 +90,7 @@ HWTEST_F(CellularStateMachineTest, Active_RefreshTcpBufferSizes_001, Function | 
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     active->stateMachine_ = cellularMachine;
     active->RefreshTcpBufferSizes();
     ASSERT_TRUE(cellularMachine != nullptr);
@@ -108,7 +108,7 @@ HWTEST_F(CellularStateMachineTest, Activating_StateBegin_001, Function | MediumT
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    auto activating = std::static_pointer_cast<Activating>(cellularMachine->activatingState_);
     activating->stateMachine_ = cellularMachine;
     activating->StateBegin();
     EXPECT_EQ(activating->isActive_, true);
@@ -126,7 +126,7 @@ HWTEST_F(CellularStateMachineTest, Activating_StateProcess_001, Function | Mediu
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    auto activating = std::static_pointer_cast<Activating>(cellularMachine->activatingState_);
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DRS_OR_RAT_CHANGED);
     bool result = activating->StateProcess(event);
     EXPECT_EQ(result, true);
@@ -162,7 +162,7 @@ HWTEST_F(CellularStateMachineTest, Activating_ProcessConnectTimeout_001, Functio
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    auto activating = std::static_pointer_cast<Activating>(cellularMachine->activatingState_);
     cellularMachine->connectId_ = 1;
     activating->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_CONNECT, 1);
@@ -182,7 +182,7 @@ HWTEST_F(CellularStateMachineTest, Activating_ProcessConnectTimeout_002, Functio
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    auto activating = std::static_pointer_cast<Activating>(cellularMachine->activatingState_);
     cellularMachine->TransitionTo(cellularMachine->disconnectingState_);
     cellularMachine = nullptr;
     activating->stateMachine_ = cellularMachine;
@@ -204,7 +204,7 @@ HWTEST_F(CellularStateMachineTest, Activating_ProcessConnectTimeout_003, Functio
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    auto activating = std::static_pointer_cast<Activating>(cellularMachine->activatingState_);
     cellularMachine->connectId_ = 1;
     cellularMachine->TransitionTo(cellularMachine->disconnectingState_);
     activating->stateMachine_ = cellularMachine;
@@ -225,7 +225,7 @@ HWTEST_F(CellularStateMachineTest, Activating_CellularDataStateMachine_001, Func
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    auto activating = std::static_pointer_cast<Activating>(cellularMachine->activatingState_);
     cellularMachine = nullptr;
     activating->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(0);
@@ -249,7 +249,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_StateBegin_001, Function | Medi
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
+    auto disconnecting = std::static_pointer_cast<Disconnecting>(cellularMachine->disconnectingState_);
     disconnecting->stateMachine_ = cellularMachine;
     disconnecting->StateBegin();
     EXPECT_EQ(disconnecting->isActive_, true);
@@ -267,7 +267,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessConnectTimeout_001, Func
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
+    auto disconnecting = std::static_pointer_cast<Disconnecting>(cellularMachine->disconnectingState_);
     cellularMachine->connectId_ = 1;
     disconnecting->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT);
@@ -287,7 +287,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessConnectTimeout_002, Func
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
+    auto disconnecting = std::static_pointer_cast<Disconnecting>(cellularMachine->disconnectingState_);
     cellularMachine->connectId_ = 1;
     disconnecting->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT);
@@ -307,7 +307,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilAdapterHostDied_001, 
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
+    auto disconnecting = std::static_pointer_cast<Disconnecting>(cellularMachine->disconnectingState_);
     disconnecting->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT);
     disconnecting->ProcessRilAdapterHostDied(event);
@@ -326,7 +326,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilDeactivateDataCall_00
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
+    auto disconnecting = std::static_pointer_cast<Disconnecting>(cellularMachine->disconnectingState_);
     disconnecting->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT);
     disconnecting->ProcessRilDeactivateDataCall(event);
@@ -345,7 +345,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilDeactivateDataCall_00
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
+    auto disconnecting = std::static_pointer_cast<Disconnecting>(cellularMachine->disconnectingState_);
     cellularMachine->TransitionTo(cellularMachine->defaultState_);
     cellularMachine->stateMachineEventHandler_ = nullptr;
     disconnecting->stateMachine_ = cellularMachine;
@@ -366,7 +366,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilDeactivateDataCall_00
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
+    auto disconnecting = std::static_pointer_cast<Disconnecting>(cellularMachine->disconnectingState_);
     cellularMachine->TransitionTo(cellularMachine->defaultState_);
     disconnecting->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT);
@@ -387,7 +387,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilDeactivateDataCall_00
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
+    auto disconnecting = std::static_pointer_cast<Disconnecting>(cellularMachine->disconnectingState_);
     disconnecting->stateMachine_ = cellularMachine;
     cellularMachine->connectId_ = 1;
     std::shared_ptr<RadioResponseInfo> radioResponseInfo = std::make_shared<RadioResponseInfo>();
@@ -410,7 +410,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_StateProcess_001, Function | Me
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
+    auto disconnecting = std::static_pointer_cast<Disconnecting>(cellularMachine->disconnectingState_);
     auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_RIL_DEACTIVATE_DATA_CALL);
     bool result = disconnecting->StateProcess(event);
     EXPECT_EQ(result, true);
@@ -440,7 +440,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_StateProcess_002, Function | Me
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
+    auto disconnecting = std::static_pointer_cast<Disconnecting>(cellularMachine->disconnectingState_);
     cellularMachine = nullptr;
     disconnecting->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_RIL_DEACTIVATE_DATA_CALL);
@@ -460,7 +460,7 @@ HWTEST_F(CellularStateMachineTest, InactiveStateProcess_001, Function | MediumTe
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto inactive = static_cast<Inactive *>(cellularMachine->inActiveState_.GetRefPtr());
+    auto inactive = std::static_pointer_cast<Inactive>(cellularMachine->inActiveState_);
     inactive->stateMachine_ = cellularMachine;
     sptr<ApnHolder> apnHolder;
     int32_t profileId = 0;
@@ -487,7 +487,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessDisconnectTimeout_001, F
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
+    auto disconnecting = std::static_pointer_cast<Disconnecting>(cellularMachine->disconnectingState_);
     cellularMachine = nullptr;
     disconnecting->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT, 0);
@@ -508,7 +508,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilAdapterHostDied_002, 
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
+    auto disconnecting = std::static_pointer_cast<Disconnecting>(cellularMachine->disconnectingState_);
     cellularMachine->inActiveState_ = nullptr;
     disconnecting->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT, 0);
@@ -528,7 +528,7 @@ HWTEST_F(CellularStateMachineTest, Activating_RilActivatePdpContextDone_001, Fun
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    auto activating = std::static_pointer_cast<Activating>(cellularMachine->activatingState_);
     cellularMachine = nullptr;
     activating->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(0);
@@ -548,7 +548,7 @@ HWTEST_F(CellularStateMachineTest, Activating_RilActivatePdpContextDone_002, Fun
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    auto activating = std::static_pointer_cast<Activating>(cellularMachine->activatingState_);
     cellularMachine->connectId_ = 1;
     activating->stateMachine_ = cellularMachine;
     std::shared_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_shared<SetupDataCallResultInfo>();
@@ -570,7 +570,7 @@ HWTEST_F(CellularStateMachineTest, Activating_RilActivatePdpContextDone_003, Fun
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    auto activating = std::static_pointer_cast<Activating>(cellularMachine->activatingState_);
     cellularMachine->connectId_ = 1;
     activating->stateMachine_ = cellularMachine;
     std::shared_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_shared<SetupDataCallResultInfo>();
@@ -594,7 +594,7 @@ HWTEST_F(CellularStateMachineTest, Activating_RilActivatePdpContextDone_004, Fun
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    auto activating = std::static_pointer_cast<Activating>(cellularMachine->activatingState_);
     cellularMachine->connectId_ = 1;
     activating->stateMachine_ = cellularMachine;
     std::shared_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_shared<SetupDataCallResultInfo>();
@@ -617,7 +617,7 @@ HWTEST_F(CellularStateMachineTest, Activating_RilActivatePdpContextDone_005, Fun
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    auto activating = std::static_pointer_cast<Activating>(cellularMachine->activatingState_);
     cellularMachine->connectId_ = 1;
     activating->stateMachine_ = cellularMachine;
     std::shared_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_shared<SetupDataCallResultInfo>();
@@ -642,7 +642,7 @@ HWTEST_F(CellularStateMachineTest, Activating_RilErrorResponse_001, Function | M
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    auto activating = std::static_pointer_cast<Activating>(cellularMachine->activatingState_);
     cellularMachine->connectId_ = 1;
     activating->stateMachine_ = cellularMachine;
     std::shared_ptr<RadioResponseInfo> radioResponseInfo = std::make_shared<RadioResponseInfo>();
@@ -664,7 +664,7 @@ HWTEST_F(CellularStateMachineTest, Activating_RilErrorResponse_002, Function | M
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    auto activating = std::static_pointer_cast<Activating>(cellularMachine->activatingState_);
     cellularMachine->connectId_ = 1;
     activating->stateMachine_ = cellularMachine;
     std::shared_ptr<RadioResponseInfo> radioResponseInfo = std::make_shared<RadioResponseInfo>();
@@ -687,7 +687,7 @@ HWTEST_F(CellularStateMachineTest, Activating_RilErrorResponse_003, Function | M
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    auto activating = std::static_pointer_cast<Activating>(cellularMachine->activatingState_);
     cellularMachine->connectId_ = 1;
     activating->stateMachine_ = cellularMachine;
     std::shared_ptr<RadioResponseInfo> radioResponseInfo = std::make_shared<RadioResponseInfo>();
@@ -710,7 +710,7 @@ HWTEST_F(CellularStateMachineTest, Activating_RilErrorResponse_004, Function | M
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    auto activating = std::static_pointer_cast<Activating>(cellularMachine->activatingState_);
     cellularMachine->connectId_ = 1;
     activating->stateMachine_ = cellularMachine;
     std::shared_ptr<RadioResponseInfo> radioResponseInfo = std::make_shared<RadioResponseInfo>();
@@ -733,7 +733,7 @@ HWTEST_F(CellularStateMachineTest, Activating_RilErrorResponse_005, Function | M
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    auto activating = std::static_pointer_cast<Activating>(cellularMachine->activatingState_);
     cellularMachine = nullptr;
     activating->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(0);
@@ -753,7 +753,7 @@ HWTEST_F(CellularStateMachineTest, Active_CellularDataStateMachine_001, Function
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     cellularMachine = nullptr;
     active->stateMachine_ = cellularMachine;
     active->StateBegin();

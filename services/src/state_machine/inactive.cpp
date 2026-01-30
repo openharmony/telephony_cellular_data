@@ -58,7 +58,7 @@ void Inactive::StateBegin()
         deActiveApnTypeId_ = ERROR_APN_ID;
         resultInfo_ = nullptr;
     }
-    stateMachine->SetCurrentState(sptr<State>(this));
+    stateMachine->SetCurrentState(shared_from_this());
 }
 
 void Inactive::StateEnd()

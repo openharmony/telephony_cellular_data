@@ -1579,7 +1579,7 @@ HWTEST_F(BranchTest, Active_Test_01, Function | MediumTest | Level3)
     std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
-    auto active = static_cast<Active *>(cellularMachine->activeState_.GetRefPtr());
+    auto active = std::static_pointer_cast<Active>(cellularMachine->activeState_);
     std::weak_ptr<CellularDataStateMachine> stateMachine1;
     active->stateMachine_ = stateMachine1;
     active->StateBegin();
@@ -1613,7 +1613,7 @@ HWTEST_F(BranchTest, Activating_Test_02, Function | MediumTest | Level3)
     std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
-    auto activating = static_cast<Activating *>(cellularMachine->activatingState_.GetRefPtr());
+    auto activating = std::static_pointer_cast<Activating>(cellularMachine->activatingState_);
     std::weak_ptr<CellularDataStateMachine> stateMachine1;
     activating->stateMachine_ = stateMachine1;
     activating->StateBegin();
@@ -1643,7 +1643,7 @@ HWTEST_F(BranchTest, Inactive_Test_01, Function | MediumTest | Level3)
     std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
-    auto inactive = static_cast<Inactive *>(cellularMachine->inActiveState_.GetRefPtr());
+    auto inactive = std::static_pointer_cast<Inactive>(cellularMachine->inActiveState_);
     std::weak_ptr<CellularDataStateMachine> stateMachine1;
     inactive->SetStateMachine(stateMachine1);
     auto event = AppExecFwk::InnerEvent::Get(0);
@@ -1664,7 +1664,7 @@ HWTEST_F(BranchTest, Disconnecting_Test_01, Function | MediumTest | Level3)
     std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
-    auto disconnecting = static_cast<Disconnecting *>(cellularMachine->disconnectingState_.GetRefPtr());
+    auto disconnecting = std::static_pointer_cast<Disconnecting>(cellularMachine->disconnectingState_);
     std::weak_ptr<CellularDataStateMachine> stateMachine1;
     disconnecting->stateMachine_ = stateMachine1;
     auto event = AppExecFwk::InnerEvent::Get(0);
@@ -1686,7 +1686,7 @@ HWTEST_F(BranchTest, Default_Test_01, Function | MediumTest | Level3)
     std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
     std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
     cellularMachine->Init();
-    auto mDefault = static_cast<Default *>(cellularMachine->defaultState_.GetRefPtr());
+    auto mDefault = std::static_pointer_cast<Default>(cellularMachine->defaultState_);
     std::weak_ptr<CellularDataStateMachine> stateMachine1;
     mDefault->stateMachine_ = stateMachine1;
     auto event = AppExecFwk::InnerEvent::Get(0);
@@ -1798,7 +1798,7 @@ HWTEST_F(BranchTest, Idle_Test_01, Function | MediumTest | Level3)
     incallStateMachine->IsIncallDataSwitchOn();
     incallStateMachine->IsSecondaryCanActiveData();
     incallStateMachine->CanActiveDataByRadioTech();
-    auto idleState = static_cast<IdleState *>(incallStateMachine->idleState_.GetRefPtr());
+    auto idleState = std::static_pointer_cast<IdleState>(incallStateMachine->idleState_);
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
     idleState->StateBegin();
@@ -1823,7 +1823,7 @@ HWTEST_F(BranchTest, Idle_Test_02, Function | MediumTest | Level3)
     if (incallStateMachineTest->Init(TelCallStatus::CALL_STATUS_DIALING, 0) < 0) {
         incallStateMachine = nullptr;
     }
-    auto idleState = static_cast<IdleState *>(incallStateMachine->idleState_.GetRefPtr());
+    auto idleState = std::static_pointer_cast<IdleState>(incallStateMachine->idleState_);
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
     idleState->StateBegin();
@@ -1858,9 +1858,9 @@ HWTEST_F(BranchTest, ActivatingSecondaryState_Test_01, Function | MediumTest | L
     }
     incallStateMachine->TransitionTo(incallStateMachine->activatingSecondaryState_);
     auto activatingSecondaryState =
-        static_cast<ActivatingSecondaryState *>(incallStateMachine->activatingSecondaryState_.GetRefPtr());
+        std::static_pointer_cast<ActivatingSecondaryState>(incallStateMachine->activatingSecondaryState_);
     auto secondaryActiveState =
-        static_cast<SecondaryActiveState *>(incallStateMachine->secondaryActiveState_.GetRefPtr());
+        std::static_pointer_cast<SecondaryActiveState>(incallStateMachine->secondaryActiveState_);
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
     secondaryActiveState->StateBegin();
@@ -1891,9 +1891,9 @@ HWTEST_F(BranchTest, ActivatedSecondaryState_Test_01, Function | MediumTest | Le
     incallStateMachine->TransitionTo(incallStateMachine->activatingSecondaryState_);
     incallStateMachine->TransitionTo(incallStateMachine->activatedSecondaryState_);
     auto activatedSecondaryState =
-        static_cast<ActivatedSecondaryState *>(incallStateMachine->activatedSecondaryState_.GetRefPtr());
+        std::static_pointer_cast<ActivatedSecondaryState>(incallStateMachine->activatedSecondaryState_);
     auto secondaryActiveState =
-        static_cast<SecondaryActiveState *>(incallStateMachine->secondaryActiveState_.GetRefPtr());
+        std::static_pointer_cast<SecondaryActiveState>(incallStateMachine->secondaryActiveState_);
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
     secondaryActiveState->StateBegin();
@@ -1923,7 +1923,7 @@ HWTEST_F(BranchTest, DeactivatingSecondaryState_Test_01, Function | MediumTest |
     incallStateMachine->TransitionTo(incallStateMachine->activatedSecondaryState_);
     incallStateMachine->TransitionTo(incallStateMachine->deactivatingSecondaryState_);
     auto deactivatingSecondaryState =
-        static_cast<DeactivatingSecondaryState *>(incallStateMachine->deactivatingSecondaryState_.GetRefPtr());
+        std::static_pointer_cast<DeactivatingSecondaryState>(incallStateMachine->deactivatingSecondaryState_);
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
     deactivatingSecondaryState->StateBegin();
