@@ -236,16 +236,16 @@ bool CellularDataStateMachine::operator==(const CellularDataStateMachine &stateM
 
 void CellularDataStateMachine::Init()
 {
-    activeState_ = std::make_unique<Active>(
-        std::weak_ptr<CellularDataStateMachine>(shared_from_this()), "Active").release();
-    inActiveState_ = std::make_unique<Inactive>(
-        std::weak_ptr<CellularDataStateMachine>(shared_from_this()), "Inactive").release();
-    activatingState_ = std::make_unique<Activating>(
-        std::weak_ptr<CellularDataStateMachine>(shared_from_this()), "Activating").release();
-    disconnectingState_ = std::make_unique<Disconnecting>(
-        std::weak_ptr<CellularDataStateMachine>(shared_from_this()), "Disconnecting").release();
-    defaultState_ = std::make_unique<Default>(
-        std::weak_ptr<CellularDataStateMachine>(shared_from_this()), "Default").release();
+    activeState_ = std::make_shared<Active>(
+        std::weak_ptr<CellularDataStateMachine>(shared_from_this()), "Active");
+    inActiveState_ = std::make_shared<Inactive>(
+        std::weak_ptr<CellularDataStateMachine>(shared_from_this()), "Inactive");
+    activatingState_ = std::make_shared<Activating>(
+        std::weak_ptr<CellularDataStateMachine>(shared_from_this()), "Activating");
+    disconnectingState_ = std::make_shared<Disconnecting>(
+        std::weak_ptr<CellularDataStateMachine>(shared_from_this()), "Disconnecting");
+    defaultState_ = std::make_shared<Default>(
+        std::weak_ptr<CellularDataStateMachine>(shared_from_this()), "Default");
     netSupplierInfo_ = std::make_unique<NetSupplierInfo>().release();
     netLinkInfo_ = std::make_unique<NetLinkInfo>().release();
     if (activeState_ == nullptr || inActiveState_ == nullptr || activatingState_ == nullptr ||
@@ -267,12 +267,12 @@ void CellularDataStateMachine::Init()
     StateMachine::Start();
 }
 
-void CellularDataStateMachine::SetCurrentState(const sptr<State> &&state)
+void CellularDataStateMachine::SetCurrentState(std::shared_ptr<State> state)
 {
-    currentState_ = std::move(state);
+    currentState_ = state;
 }
 
-sptr<State> CellularDataStateMachine::GetCurrentState() const
+std::shared_ptr<State> CellularDataStateMachine::GetCurrentState() const
 {
     return currentState_;
 }

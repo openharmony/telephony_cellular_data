@@ -67,7 +67,7 @@ private:
     std::mutex activeConnectionMutex_;
     std::mutex tcpBufferConfigMutex_;
     std::mutex bandwidthConfigMutex_;
-    sptr<State> ccmDefaultState_;
+    std::shared_ptr<State> ccmDefaultState_ = nullptr;
     const int32_t slotId_;
     std::map<std::string, LinkBandwidthInfo> bandwidthConfigMap_;
     std::map<std::string, std::string> tcpBufferConfigMap_;

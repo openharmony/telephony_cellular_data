@@ -33,7 +33,7 @@ void Activating::StateBegin()
         return;
     }
     isActive_ = true;
-    stateMachine->SetCurrentState(sptr<State>(this));
+    stateMachine->SetCurrentState(shared_from_this());
 }
 
 void Activating::StateEnd()
@@ -65,7 +65,7 @@ bool Activating::RilActivatePdpContextDone(const AppExecFwk::InnerEvent::Pointer
         TELEPHONY_LOGE("connectId is %{public}d, flag is %{public}d", stateMachine->connectId_, resultInfo->flag);
         return false;
     }
-    Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+    auto inActive = std::static_pointer_cast<Inactive>(stateMachine->inActiveState_);
     if (inActive == nullptr) {
         TELEPHONY_LOGE("Inactive is null");
         return false;
@@ -105,7 +105,7 @@ bool Activating::RilErrorResponse(const AppExecFwk::InnerEvent::Pointer &event)
         return false;
     }
     TELEPHONY_LOGI("RadioResponseInfo flag:%{public}d error:%{public}d", rilInfo->flag, rilInfo->error);
-    Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+    auto inActive = std::static_pointer_cast<Inactive>(stateMachine->inActiveState_);
     if (inActive == nullptr) {
         TELEPHONY_LOGE("Inactive is null");
         return false;
@@ -148,7 +148,7 @@ void Activating::ProcessConnectTimeout(const AppExecFwk::InnerEvent::Pointer &ev
             static_cast<long long>(currentTime - stateMachine->startTimeConnectTimeoutTask_));
         return;
     }
-    Inactive *inActive = static_cast<Inactive *>(stateMachine->inActiveState_.GetRefPtr());
+    auto inActive = std::static_pointer_cast<Inactive>(stateMachine->inActiveState_);
     if (inActive == nullptr) {
         TELEPHONY_LOGE("Inactive is null");
         return;

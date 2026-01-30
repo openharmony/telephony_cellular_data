@@ -44,8 +44,7 @@ void UpdateActiveMachineFuzz(const uint8_t *data, size_t size)
     if (cellularMachine == nullptr) {
         return;
     }
-    sptr<Active> active =
-        std::make_unique<Active>(std::weak_ptr<CellularDataStateMachine>(cellularMachine), "Active").release();
+    auto active = std::make_shared<Active>(std::weak_ptr<CellularDataStateMachine>(cellularMachine), "Active");
     if (active == nullptr) {
         return;
     }

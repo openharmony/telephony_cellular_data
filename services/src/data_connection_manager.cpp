@@ -40,7 +40,7 @@ DataConnectionManager::~DataConnectionManager()
 
 void DataConnectionManager::Init()
 {
-    ccmDefaultState_ = std::make_unique<CcmDefaultState>(*this, "CcmDefaultState").release();
+    ccmDefaultState_ = std::make_shared<CcmDefaultState>(*this, "CcmDefaultState");
     if (ccmDefaultState_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: ccmDefaultState_ is null", slotId_);
         return;
