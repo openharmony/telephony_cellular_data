@@ -445,6 +445,7 @@ int32_t CellularDataService::AddUid(const NetRequest &request)
     return static_cast<int32_t>(result ? RequestNetCode::REQUEST_SUCCESS : RequestNetCode::REQUEST_FAILED);
 }
 
+__attribute__((no_sanitize("cfi")))
 int32_t CellularDataService::RequestNet(const NetRequest &request)
 {
     size_t identPreLen = strlen(IDENT_PREFIX);

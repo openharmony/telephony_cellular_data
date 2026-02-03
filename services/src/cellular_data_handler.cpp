@@ -155,6 +155,7 @@ bool CellularDataHandler::RemoveUid(const NetRequest &request)
     return true;
 }
 
+__attribute__((no_sanitize("cfi")))
 int32_t CellularDataHandler::SetCellularDataEnable(bool userDataOn)
 {
     if (dataSwitchSettings_ == nullptr) {
@@ -622,6 +623,7 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
     return isEmergencyApn || isSimStateReadyOrLoaded;
 }
 
+__attribute__((no_sanitize("cfi")))
 bool CellularDataHandler::CheckRoamingState(sptr<ApnHolder> &apnHolder)
 {
     if (dataSwitchSettings_ == nullptr || apnHolder == nullptr) {
