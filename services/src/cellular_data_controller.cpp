@@ -17,7 +17,7 @@
 
 #include "core_manager_inner.h"
 #include "network_search_callback.h"
-
+static const int32_t SIM_ACCOUNT_LOADED_REGISTER = 0;
 namespace OHOS {
 namespace Telephony {
 using namespace NetManagerStandard;
@@ -212,6 +212,7 @@ void CellularDataController::RegisterEvents()
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_SIM_STATE_CHANGE, nullptr);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_SIM_RECORDS_LOADED, nullptr);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_SIM_ACCOUNT_LOADED, nullptr);
+    coreInner.SendSimAccountLoadedInfo(slotId_, SIM_ACCOUNT_LOADED_REGISTER);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_CONNECTION_ATTACHED, nullptr);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_CONNECTION_DETACHED, nullptr);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_PS_ROAMING_OPEN, nullptr);
