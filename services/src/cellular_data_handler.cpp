@@ -37,6 +37,7 @@ using namespace AppExecFwk;
 using namespace OHOS::EventFwk;
 using namespace NetManagerStandard;
 static const int32_t ESM_FLAG_INVALID = -1;
+static const int32_t SIM_ACCOUNT_LOADED_RECEIVE = 2;
 const std::string DEFAULT_DATA_ROAMING = "persist.telephony.defaultdataroaming";
 #ifdef BASE_POWER_IMPROVEMENT
 constexpr const char *PERMISSION_STARTUP_COMPLETED = "ohos.permission.RECEIVER_STARTUP_COMPLETED";
@@ -1809,6 +1810,7 @@ void CellularDataHandler::HandleSimAccountLoaded()
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     isSimAccountLoaded_ = true;
+    coreInner.SendSimAccountLoadedInfo(slotId_, SIM_ACCOUNT_LOADED_RECEIVE);
     CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
         CellularDataErrorCode::DATA_ERROR_RECEIVE_SIM_ACCOUNT_READY,
         "receive sim account ready");
