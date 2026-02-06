@@ -17,7 +17,7 @@
 
 #include "core_manager_inner.h"
 #include "network_search_callback.h"
-static const int32_t SIM_ACCOUNT_LOADED_REGISTER = 0;
+static constexpr int32_t SIM_ACCOUNT_LOADED_REGISTER = 0;
 namespace OHOS {
 namespace Telephony {
 using namespace NetManagerStandard;
