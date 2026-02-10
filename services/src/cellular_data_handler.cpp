@@ -1823,7 +1823,6 @@ void CellularDataHandler::HandleSimAccountLoaded()
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     isSimAccountLoaded_ = true;
     ReportEventToChr(slotId_, SIM_ACCOUNT_LOADED, SIM_ACCOUNT_LOADED_RECEIVE);
-    coreInner.SendSimAccountLoadedInfo(slotId_, SIM_ACCOUNT_LOADED_RECEIVE);
     CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
         CellularDataErrorCode::DATA_ERROR_RECEIVE_SIM_ACCOUNT_READY,
         "receive sim account ready");
