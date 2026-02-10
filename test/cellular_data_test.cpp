@@ -1129,6 +1129,70 @@ HWTEST_F(CellularDataTest, Telephony_Cellulardata_InitTelephonyExtService_0104, 
 }
 
 /**
+ * @tc.number   InitIsVirtualModemConnectedWhenParaFalse
+ * @tc.name     Init Telephony Ext Service.
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, InitIsVirtualModemConnectedWhenParaFalse, Function | MediumTest | Level1)
+{
+    mockGetBoolParameter = new NiceMock<MockGetBoolParameter>();
+    EXPECT_CALL(*mockGetBoolParameter, GetBoolParameter(_, _)).WillRepeatedly(Return(false));
+    TELEPHONY_EXT_WRAPPER.InitIsVirtualModemConnected();
+    ASSERT_EQ(TELEPHONY_EXT_WRAPPER.isVirtualModemConnected_, nullptr);
+    delete mockGetBoolParameter;
+    mockGetBoolParameter = nullptr;
+}
+ 
+/**
+ * @tc.number   InitIsVirtualModemConnectedWhenParaTrue
+ * @tc.name     Init Telephony Ext Service.
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, InitIsVirtualModemConnectedWhenParaTrue, Function | MediumTest | Level1)
+{
+    mockGetBoolParameter = new NiceMock<MockGetBoolParameter>();
+    EXPECT_CALL(*mockGetBoolParameter, GetBoolParameter(_, _)).WillRepeatedly(Return(true));
+    mockDlsym = new NiceMock<MockDlsym>();
+    EXPECT_CALL(*mockDlsym, dlopen(_, _)).WillRepeatedly(Return(nullptr));
+    TELEPHONY_EXT_WRAPPER.InitIsVirtualModemConnected();
+    ASSERT_EQ(TELEPHONY_EXT_WRAPPER.isVirtualModemConnected_, nullptr);
+    delete mockGetBoolParameter;
+    mockGetBoolParameter = nullptr;
+}
+ 
+/**
+ * @tc.number   InitIsDcCellularDataAllowedWhenParaFalse
+ * @tc.name     Init Telephony Ext Service.
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, InitIsDcCellularDataAllowedWhenParaFalse, Function | MediumTest | Level1)
+{
+    mockGetBoolParameter = new NiceMock<MockGetBoolParameter>();
+    EXPECT_CALL(*mockGetBoolParameter, GetBoolParameter(_, _)).WillRepeatedly(Return(false));
+    TELEPHONY_EXT_WRAPPER.InitIsDcCellularDataAllowed();
+    ASSERT_EQ(TELEPHONY_EXT_WRAPPER.isDcCellularDataAllowed_, nullptr);
+    delete mockGetBoolParameter;
+    mockGetBoolParameter = nullptr;
+}
+ 
+/**
+ * @tc.number   InitIsDcCellularDataAllowedWhenParaTrue
+ * @tc.name     Init Telephony Ext Service.
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, InitIsDcCellularDataAllowedWhenParaTrue, Function | MediumTest | Level1)
+{
+    mockGetBoolParameter = new NiceMock<MockGetBoolParameter>();
+    EXPECT_CALL(*mockGetBoolParameter, GetBoolParameter(_, _)).WillRepeatedly(Return(true));
+    mockDlsym = new NiceMock<MockDlsym>();
+    EXPECT_CALL(*mockDlsym, dlopen(_, _)).WillRepeatedly(Return(nullptr));
+    TELEPHONY_EXT_WRAPPER.InitIsDcCellularDataAllowed();
+    ASSERT_EQ(TELEPHONY_EXT_WRAPPER.isDcCellularDataAllowed_, nullptr);
+    delete mockGetBoolParameter;
+    mockGetBoolParameter = nullptr;
+}
+
+/**
  * @tc.number   GetDataConnApnAttr_Test_01
  * @tc.name     Test the GetDataConnApnAttr function
  * @tc.desc     Function test
