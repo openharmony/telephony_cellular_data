@@ -74,6 +74,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCellularData()
     InitReregisterNetwork();
     InitIsVirtualModemConnected();
     InitIsDcCellularDataAllowed();
+    InitReportEventToChr();
 }
 
 void TelephonyExtWrapper::InitJudgeOtherRequestHolding()
@@ -275,6 +276,16 @@ void TelephonyExtWrapper::InitIsDcCellularDataAllowed()
         return;
     }
     TELEPHONY_LOGI("telephony ext wrapper init IsDcCellularDataAllowed success");
+}
+
+void TelephonyExtWrapper::InitReportEventToChr()
+{
+    reportEventToChr_ = (REPORT_EVENT_TO_CHR)dlsym(telephonyExtWrapperHandle_, "ReportEventToChr");
+    if (reportEventToChr_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol ReportEventToChr failed, error: %{public}s", dlerror());
+        return;
+    }
+    TELEPHONY_LOGD("telephony ext wrapper init ReportEventToChr success");
 }
 } // namespace Telephony
 } // namespace OHOS
