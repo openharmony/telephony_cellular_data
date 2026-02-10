@@ -83,7 +83,7 @@ public:
     void ReleaseCellularDataConnection();
     bool UpdateNetworkInfo();
     bool IsSupportDunApn();
-    void ReportEventToChr(int32_t slotId, const char* scenario ,int32_t cause);
+    void ReportEventToChr(int32_t slotId, const char* scenario, int32_t cause);
     void ConnectIfNeed(
         const AppExecFwk::InnerEvent::Pointer &event, sptr<ApnHolder> apnHolder, const NetRequest &request);
 #ifdef BASE_POWER_IMPROVEMENT
