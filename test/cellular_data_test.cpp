@@ -150,6 +150,22 @@ void *dlsym(void *handle, const char *symbol)
 }
 }
 
+class MockGetBoolParameter {
+public:
+    MOCK_METHOD(bool, GetBoolParameter, (const std::string& key, bool def));
+};
+ 
+NiceMock<MockGetBoolParameter> *mockGetBoolParameter;
+ 
+// mock GetBoolParameter
+bool GetBoolParameter(const std::string& key, bool def)
+{
+    if (mockGetBoolParameter == nullptr) {
+        mockGetBoolParameter = new NiceMock<MockGetBoolParameter>();
+    }
+    return mockGetBoolParameter->GetBoolParameter(key, def);
+}
+
 class CellularDataTest : public testing::Test {
 public:
     static void SetUpTestCase();
