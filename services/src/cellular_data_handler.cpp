@@ -37,6 +37,7 @@ using namespace AppExecFwk;
 using namespace OHOS::EventFwk;
 using namespace NetManagerStandard;
 static const int32_t ESM_FLAG_INVALID = -1;
+static constexpr int32_t SIM_ACCOUNT_LOADED_RECEIVE = 2;
 const std::string DEFAULT_DATA_ROAMING = "persist.telephony.defaultdataroaming";
 #ifdef BASE_POWER_IMPROVEMENT
 constexpr const char *PERMISSION_STARTUP_COMPLETED = "ohos.permission.RECEIVER_STARTUP_COMPLETED";
@@ -44,6 +45,7 @@ constexpr const char *PERMISSION_STARTUP_COMPLETED = "ohos.permission.RECEIVER_S
 constexpr const char *PERSIST_EDM_MOBILE_DATA_POLICY = "persist.edm.mobile_data_policy";
 constexpr const char *MOBILE_DATA_POLICY_FORCE_OPEN = "force_open";
 constexpr const char *MOBILE_DATA_POLICY_DISALLOW = "disallow";
+constexpr const char *SIM_ACCOUNT_LOADED = "SIM_ACCOUNT_LOADED";
 CellularDataHandler::CellularDataHandler(int32_t slotId)
     : TelEventHandler("CellularDataHandler"), slotId_(slotId)
 {}
@@ -1788,6 +1790,17 @@ void CellularDataHandler::HandleEstablishAllApnsIfConnectable(const AppExecFwk::
     EstablishAllApnsIfConnectable();
 }
 
+void CellularDataHandler::ReportEventToChr(int32_t slotId, const char* scenario, int32_t cause)
+{
+    #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+        if (TELEPHONY_EXT_WRAPPER.reportEventToChr_) {
+            TELEPHONY_EXT_WRAPPER.reportEventToChr_(slotId, scenario, cause);
+        }
+    #else
+        TELEPHONY_LOGE("not support telephony ext");
+    #endif
+}
+
 void CellularDataHandler::HandleSimAccountLoaded()
 {
     CellularDataNetAgent::GetInstance().UnregisterNetSupplierForSimUpdate(slotId_);
@@ -1809,6 +1822,7 @@ void CellularDataHandler::HandleSimAccountLoaded()
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     isSimAccountLoaded_ = true;
+    ReportEventToChr(slotId_, SIM_ACCOUNT_LOADED, SIM_ACCOUNT_LOADED_RECEIVE);
     CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
         CellularDataErrorCode::DATA_ERROR_RECEIVE_SIM_ACCOUNT_READY,
         "receive sim account ready");

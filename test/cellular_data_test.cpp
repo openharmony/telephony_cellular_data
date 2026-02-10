@@ -1209,6 +1209,22 @@ HWTEST_F(CellularDataTest, InitIsDcCellularDataAllowedWhenParaTrue, Function | M
 }
 
 /**
+ * @tc.number   InitReportEventToChr
+ * @tc.name     Init Telephony Ext Service.
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, InitReportEventToChr, Function | MediumTest | Level1)
+{
+    TELEPHONY_EXT_WRAPPER.InitReportEventToChr();
+    if (TELEPHONY_EXT_WRAPPER.reportEventToChr_ == nullptr) {
+        TELEPHONY_LOGI("reportEventToChr_ null");
+    } else {
+        TELEPHONY_LOGI("reportEventToChr_ not null");
+        EXPECT_EQ(TELEPHONY_EXT_WRAPPER.reportEventToChr_ != nullptr, true);
+    }
+}
+
+/**
  * @tc.number   GetDataConnApnAttr_Test_01
  * @tc.name     Test the GetDataConnApnAttr function
  * @tc.desc     Function test
