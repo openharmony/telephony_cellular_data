@@ -1790,7 +1790,7 @@ void CellularDataHandler::HandleEstablishAllApnsIfConnectable(const AppExecFwk::
     EstablishAllApnsIfConnectable();
 }
 
-void CellularDataHandler::ReportEventToChr(int32_t slotId, const char* scenario ,int32_t cause)
+void CellularDataHandler::ReportEventToChr(int32_t slotId, const char* scenario, int32_t cause)
 {
     #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
         if (TELEPHONY_EXT_WRAPPER.reportEventToChr_) {
