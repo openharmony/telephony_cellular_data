@@ -250,7 +250,7 @@ bool DataSwitchSettings::IsAllowActiveData() const
         TELEPHONY_LOGD("dc cellular data is not allowed");
         return false;
     }
-
+    std::lock_guard<std::mutex> lock(userDataOnMutex_);
     if (userDataOn_ && policyDataOn_ && internalDataOn_) {
         return true;
     } else {
