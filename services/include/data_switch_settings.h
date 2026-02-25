@@ -17,6 +17,7 @@
 #define DATA_SWITCH_SETTINGS_H
 
 #include <stdint.h>
+#include <mutex>
 
 namespace OHOS {
 namespace Telephony {
@@ -54,6 +55,7 @@ private:
     bool intelliSwitchOn_ = false;
     const int32_t slotId_;
     int32_t lastQryRet_ = -1;
+    std::mutex userDataOnMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
