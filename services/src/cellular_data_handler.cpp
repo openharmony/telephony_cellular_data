@@ -1716,6 +1716,9 @@ void CellularDataHandler::HandleSimStateChanged()
         if (lastIccId_ != u"" && lastIccId_ == iccId) {
             EstablishAllApnsIfConnectable();
         }
+        if (!isSimAccountLoaded_ && !HasInnerEvent(RadioEvent::RADIO_SIM_ACCOUNT_LOADED)) {
+            StartLoadSimAccountTimer();
+        }
     } else if (simState != SimState::SIM_STATE_LOADED) {
         isSimAccountLoaded_ = false;
         isRilApnAttached_ = false;
@@ -1803,6 +1806,7 @@ void CellularDataHandler::ReportEventToChr(int32_t slotId, const char* scenario,
 
 void CellularDataHandler::HandleSimAccountLoaded()
 {
+    StopLoadSimAccountTimer();
     CellularDataNetAgent::GetInstance().UnregisterNetSupplierForSimUpdate(slotId_);
     bool registerRes = CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
     if (!registerRes) {
@@ -1836,6 +1840,28 @@ void CellularDataHandler::HandleSimAccountLoaded()
     } else {
         ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
     }
+}
+
+void CellularDataHandler::HandleRetryLoadSimAccount(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (!isSimAccountLoaded_ && !HasInnerEvent(RadioEvent::RADIO_SIM_ACCOUNT_LOADED)) {
+        HandleSimAccountLoaded();
+    }
+}
+
+void CellularDataHandler::StartLoadSimAccountTimer()
+{
+    TELEPHONY_LOGD("Start load sim account retry detection");
+    if (!HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT)) {
+        auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT);
+        SendEvent(event, LOAD_RETRY_DELAY_TIME);
+    }
+}
+
+void CellularDataHandler::StopLoadSimAccountTimer()
+{
+    TELEPHONY_LOGD("Stop load sim account retry detection");
+    RemoveEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT);
 }
 
 void CellularDataHandler::CreateApnItem()

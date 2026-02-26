@@ -352,6 +352,7 @@ static constexpr const char *PROTOCOL_IPV4V6 = "IPV4V6";
 static constexpr const char *NOT_FILLED_IN = "not-filled-in";
 static const int32_t APN_CREATE_RETRY_TIMES = 3;
 static const int32_t RETRY_DELAY_TIME = 5 * 1000;
+static const int32_t LOAD_RETRY_DELAY_TIME = 10 * 1000;
 } // namespace Telephony
 } // namespace OHOS
 #endif // CELLULAR_DATA_CONSTANT_H

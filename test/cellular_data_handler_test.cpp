@@ -1228,5 +1228,37 @@ HWTEST_F(CellularDataHandlerTest, CheckMultiApnState005, Function | MediumTest |
         EXPECT_EQ(result, false);
     }
 }
+
+HWTEST_F(CellularDataHandlerTest, HandleRetryLoadSimAccount001, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
+    auto event0 = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT);
+    auto event1 = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
+
+    // false false
+    cellularDataHandler->isSimAccountLoaded_ = false;
+    cellularDataHandler->HandleRetryLoadSimAccount(event0);
+    EXPECT_TRUE(cellularDataHandler->isSimAccountLoaded_);
+
+    // true false
+    cellularDataHandler->StartLoadSimAccountTimer();
+    cellularDataHandler->HandleRetryLoadSimAccount(event0);
+    EXPECT_TRUE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT));
+    cellularDataHandler->StopLoadSimAccountTimer();
+
+    // false true
+    cellularDataHandler->isSimAccountLoaded_ = false;
+    cellularDataHandler->SendEvent(event1, 5000);
+    cellularDataHandler->HandleRetryLoadSimAccount(event0);
+    EXPECT_TRUE(cellularDataHandler->HasInnerEvent(RadioEvent::RADIO_SIM_ACCOUNT_LOADED));
+    cellularDataHandler->RemoveEvent(RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
+
+    // true true
+    cellularDataHandler->isSimAccountLoaded_ = true;
+    cellularDataHandler->SendEvent(event1, 5000);
+    cellularDataHandler->HandleRetryLoadSimAccount(event0);
+    EXPECT_FALSE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT));
+    cellularDataHandler->RemoveEvent(RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
+}
 } // namespace Telephony
 } // namespace OHOS

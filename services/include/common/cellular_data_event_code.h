@@ -81,6 +81,7 @@ public:
 #ifdef BASE_POWER_IMPROVEMENT
     static const uint32_t MSG_TIMEOUT_TO_REPLY_COMMON_EVENT = BASE + 54;
 #endif
+    static const uint32_t MSG_RETRY_TO_LOAD_SIM_ACCOUNT = BASE + 55;
 };
 } // namespace Telephony
 } // namespace OHOS

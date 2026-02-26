@@ -86,6 +86,9 @@ public:
     void ReportEventToChr(int32_t slotId, const char* scenario, int32_t cause);
     void ConnectIfNeed(
         const AppExecFwk::InnerEvent::Pointer &event, sptr<ApnHolder> apnHolder, const NetRequest &request);
+    void HandleRetryLoadSimAccount(const AppExecFwk::InnerEvent::Pointer &event);
+    void StartLoadSimAccountTimer();
+    void StopLoadSimAccountTimer();
 #ifdef BASE_POWER_IMPROVEMENT
     void SubscribeTelePowerEvent();
 #endif
@@ -308,6 +311,8 @@ private:
             [this](const AppExecFwk::InnerEvent::Pointer &event) { ResumeDataPermittedTimerOut(event); } },
         { CellularDataEventCode::MSG_RETRY_TO_CREATE_APN,
             [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleApnChanged(event); } },
+        { CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleRetryLoadSimAccount(event); } },
 #ifdef BASE_POWER_IMPROVEMENT
         { CellularDataEventCode::MSG_TIMEOUT_TO_REPLY_COMMON_EVENT,
             [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleReplyCommonEvent(event); } },
