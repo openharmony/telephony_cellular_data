@@ -103,6 +103,10 @@ public:
     MOCK_METHOD2(IsCdma, int32_t(int32_t slotId, bool &isCdma));
     MOCK_METHOD1(UpdateOperatorName, int32_t(int32_t slotId));
     MOCK_METHOD3(UpdateDeviceState, void(int32_t slotId, bool isEnterStrMode, bool isNeedUpdateNetworkState));
+    MOCK_METHOD(int32_t, GetManualNetworkScanState, (int32_t slotId, NSCALLBACK &callback), (override));
+    MOCK_METHOD(int32_t, StartManualNetworkScanCallback, (int32_t slotId,
+        const sptr<INetworkSearchCallback> &callback), (override));
+    MOCK_METHOD(int32_t, StopManualNetworkScanCallback, (int32_t slotId), (override));
 };
 
 }  // namespace Telephony
