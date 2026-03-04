@@ -96,7 +96,7 @@ public:
     MOCK_METHOD(int32_t, GetSlotType, (std::string & type));
     MOCK_METHOD(int32_t, FactoryResetNetwork, ());
     MOCK_METHOD(int32_t, RegisterNetFactoryResetCallback, (const sptr<INetFactoryResetCallback> &callback));
-    MOCK_METHOD(int32_t, IsPreferCellularUrl, (const std::string &url, bool &preferCellular));
+    MOCK_METHOD(int32_t, IsPreferCellularUrl, (const std::string &url, PreferCellularType &preferCellular));
     MOCK_METHOD(int32_t, RegisterPreAirplaneCallback, (const sptr<IPreAirplaneCallback> callback));
     MOCK_METHOD(int32_t, UnregisterPreAirplaneCallback, (const sptr<IPreAirplaneCallback> callback));
     MOCK_METHOD(
