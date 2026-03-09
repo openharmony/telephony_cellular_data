@@ -124,7 +124,7 @@ public:
     MOCK_METHOD(int32_t, DelStaticIpv6Addr, (const std::string &ipAddr, const std::string &macAddr,
         const std::string &ifName));
     MOCK_METHOD(int32_t, QueryTraceRoute, (const std::string &destination, int32_t maxJumpNumber,
-        int32_t packetsType, std::string &traceRouteInfo));
+        int32_t packetsType, std::string &traceRouteInfo, bool isCallerNative));
     MOCK_METHOD(int32_t, SetPacFileUrl, (const std::string &pacUrl));
     MOCK_METHOD(int32_t, SetProxyMode, (const OHOS::NetManagerStandard::ProxyModeType mode));
     MOCK_METHOD(int32_t, GetProxyMode, (OHOS::NetManagerStandard::ProxyModeType &mode));
