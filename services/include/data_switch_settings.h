@@ -34,6 +34,7 @@ public:
     void SetCarrierDataOn(bool carrierDataOn);
     bool IsAllowActiveData() const;
     bool IsUserDataOn();
+    void SetInnerUserDataOn(bool value);
     bool IsUserDataRoamingOn();
     void UpdateUserDataRoamingOn(bool dataRoaming);
     int32_t SetUserDataOn(bool userDataOn);
