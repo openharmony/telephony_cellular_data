@@ -17,7 +17,6 @@
 #define DATA_SWITCH_SETTINGS_H
 
 #include <stdint.h>
-#include <mutex>
 
 namespace OHOS {
 namespace Telephony {
@@ -34,7 +33,6 @@ public:
     void SetCarrierDataOn(bool carrierDataOn);
     bool IsAllowActiveData() const;
     bool IsUserDataOn();
-    void SetInnerUserDataOn(bool value);
     bool IsUserDataRoamingOn();
     void UpdateUserDataRoamingOn(bool dataRoaming);
     int32_t SetUserDataOn(bool userDataOn);
@@ -56,7 +54,6 @@ private:
     bool intelliSwitchOn_ = false;
     const int32_t slotId_;
     int32_t lastQryRet_ = -1;
-    mutable std::mutex userDataOnMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
