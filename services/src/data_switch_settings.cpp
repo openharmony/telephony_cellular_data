@@ -59,12 +59,12 @@ int32_t DataSwitchSettings::SetUserDataOn(bool userDataOn)
     int value = (userDataOn ? static_cast<int>(DataSwitchCode::CELLULAR_DATA_ENABLED)
                             : static_cast<int>(DataSwitchCode::CELLULAR_DATA_DISABLED));
     HILOG_COMM_IMPL(LOG_INFO, LOG_DOMAIN, TELEPHONY_LOG_TAG, "value:%{public}d", value);
-    bool userDataOnTmp = IsUserDataOn();
-    SetInnerUserDataOn(userDataOn);
+    bool userDataOnTmp = userDataOn_;
+    userDataOn_ = userDataOn;
     Uri userDataEnableUri(CELLULAR_DATA_SETTING_DATA_ENABLE_URI);
     int32_t result = settingsRdbHelper->PutValue(userDataEnableUri, CELLULAR_DATA_COLUMN_ENABLE, value);
     if (result != TELEPHONY_ERR_SUCCESS) {
-        SetInnerUserDataOn(userDataOnTmp);
+        userDataOn_ = userDataOnTmp;
     }
     return result;
 }
@@ -120,7 +120,6 @@ int32_t DataSwitchSettings::QueryUserDataStatus(bool &dataEnabled)
         TELEPHONY_LOGE("Slot%{public}d: Get data Value failed!", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::lock_guard<std::mutex> lock(userDataOnMutex_);
     userDataOn_ = (userDataEnable == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED));
     dataEnabled = userDataOn_;
     return TELEPHONY_ERR_SUCCESS;
@@ -249,7 +248,6 @@ bool DataSwitchSettings::IsAllowActiveData() const
         TELEPHONY_LOGD("dc cellular data is not allowed");
         return false;
     }
-    std::lock_guard<std::mutex> lock(userDataOnMutex_);
     if (userDataOn_ && policyDataOn_ && internalDataOn_) {
         return true;
     } else {
@@ -261,14 +259,7 @@ bool DataSwitchSettings::IsAllowActiveData() const
 
 bool DataSwitchSettings::IsUserDataOn()
 {
-    std::lock_guard<std::mutex> lock(userDataOnMutex_);
     return userDataOn_;
-}
-
-void DataSwitchSettings::SetInnerUserDataOn(bool value)
-{
-    std::lock_guard<std::mutex> lock(userDataOnMutex_);
-    userDataOn_ = value;
 }
 
 bool DataSwitchSettings::IsUserDataRoamingOn()
