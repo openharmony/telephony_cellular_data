@@ -2518,7 +2518,7 @@ void CellularDataHandler::HandleDBSettingEnableChanged(const AppExecFwk::InnerEv
         return;
     }
     bool dataEnabled = true;
-    dataSwitchSettings_->QueryUserDataStatus(dataEnabled);
+    dataEnabled = dataSwitchSettings_->IsUserDataOn();
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     std::string dataPolicy = system::GetParameter(PERSIST_EDM_MOBILE_DATA_POLICY, "");
