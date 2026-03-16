@@ -1508,6 +1508,10 @@ void CellularDataHandler::OnScreenOff()
 void CellularDataHandler::OnDataShareReady()
 {
     RegisterDataSettingObserver();
+    if (!isSimAccountLoaded_ && !HasInnerEvent(RadioEvent::RADIO_SIM_ACCOUNT_LOADED)) {
+        StopLoadSimAccountTimer();
+        StartLoadSimAccountTimer(LOAD_RETRY_TIMES);
+    }
 }
 
 void CellularDataHandler::HandleScreenStateChanged(bool isScreenOn) const
@@ -1716,9 +1720,6 @@ void CellularDataHandler::HandleSimStateChanged()
         if (lastIccId_ != u"" && lastIccId_ == iccId) {
             EstablishAllApnsIfConnectable();
         }
-        if (!isSimAccountLoaded_ && !HasInnerEvent(RadioEvent::RADIO_SIM_ACCOUNT_LOADED)) {
-            StartLoadSimAccountTimer();
-        }
     } else if (simState != SimState::SIM_STATE_LOADED) {
         isSimAccountLoaded_ = false;
         isRilApnAttached_ = false;
@@ -1844,17 +1845,32 @@ void CellularDataHandler::HandleSimAccountLoaded()
 
 void CellularDataHandler::HandleRetryLoadSimAccount(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (!isSimAccountLoaded_ && !HasInnerEvent(RadioEvent::RADIO_SIM_ACCOUNT_LOADED)) {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d: get retry load sim account event is null", slotId_);
+        return;
+    }
+    int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId_);
+    if (simId <= INVALID_SIM_ID) {
+        int32_t times = event->GetParam();
+        TELEPHONY_LOGE("RetryLoadSimAccount Slot%{public}d Invalid simId: %{public}d, Retry times: %{public}d",
+            slotId_, simId, times - 1);
+        StopLoadSimAccountTimer();
+        StartLoadSimAccountTimer(times - 1);
+    } else if (!isSimAccountLoaded_ && !HasInnerEvent(RadioEvent::RADIO_SIM_ACCOUNT_LOADED)) {
+        TELEPHONY_LOGI("RetryLoadSimAccount Slot%{public}d simId: %{public}d", slotId_, simId);
         HandleSimAccountLoaded();
     }
 }
 
-void CellularDataHandler::StartLoadSimAccountTimer()
+void CellularDataHandler::StartLoadSimAccountTimer(int32_t times)
 {
+    if (times <= 0) {
+        TELEPHONY_LOGE("Start load sim account retry failed finally");
+        return;
+    }
     TELEPHONY_LOGD("Start load sim account retry detection");
     if (!HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT)) {
-        auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT);
-        SendEvent(event, LOAD_RETRY_DELAY_TIME);
+        SendEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT, times, LOAD_RETRY_DELAY_TIME);
     }
 }
 
