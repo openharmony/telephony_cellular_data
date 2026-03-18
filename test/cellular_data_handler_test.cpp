@@ -1241,7 +1241,7 @@ HWTEST_F(CellularDataHandlerTest, HandleRetryLoadSimAccount001, Function | Mediu
     EXPECT_TRUE(cellularDataHandler->isSimAccountLoaded_);
 
     // true false
-    cellularDataHandler->StartLoadSimAccountTimer();
+    cellularDataHandler->StartLoadSimAccountTimer(1);
     cellularDataHandler->HandleRetryLoadSimAccount(event0);
     EXPECT_TRUE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT));
     cellularDataHandler->StopLoadSimAccountTimer();

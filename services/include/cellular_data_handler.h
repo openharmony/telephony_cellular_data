@@ -87,7 +87,7 @@ public:
     void ConnectIfNeed(
         const AppExecFwk::InnerEvent::Pointer &event, sptr<ApnHolder> apnHolder, const NetRequest &request);
     void HandleRetryLoadSimAccount(const AppExecFwk::InnerEvent::Pointer &event);
-    void StartLoadSimAccountTimer();
+    void StartLoadSimAccountTimer(int32_t times);
     void StopLoadSimAccountTimer();
 #ifdef BASE_POWER_IMPROVEMENT
     void SubscribeTelePowerEvent();
