@@ -175,10 +175,14 @@ HWTEST_F(CellularDataServiceTest, DataConnectionMonitor_OnStallDetectionTimer_00
 HWTEST_F(CellularDataServiceTest, DataConnectionMonitor_OnStallDetectionTimer_002, TestSize.Level1)
 {
     std::shared_ptr<DataConnectionMonitor> dataConnectionMonitor = std::make_shared<DataConnectionMonitor>(0);
-    dataConnectionMonitor->noRecvPackets_ = 10;
-    dataConnectionMonitor->dataRecoveryState_ = RecoveryState::STATE_RADIO_STATUS_RESTART;
+    dataConnectionMonitor->noRecvPackets_ = 0;
     dataConnectionMonitor->stallDetectionEnabled_ = true;
+    dataConnectionMonitor->dataRecoveryState_ = RecoveryState::STATE_REQUEST_CONTEXT_LIST;
     dataConnectionMonitor->OnStallDetectionTimer();
+    ASSERT_EQ(dataConnectionMonitor->dataRecoveryState_, RecoveryState::STATE_REQUEST_CONTEXT_LIST);
+    dataConnectionMonitor->dataRecoveryState_ = RecoveryState::STATE_RADIO_STATUS_RESTART;
+    dataConnectionMonitor->OnStallDetectionTimer();
+    dataConnectionMonitor->dataRecoveryState_ = RecoveryState::STATE_RADIO_STATUS_RESTART;
     dataConnectionMonitor->HandleRecovery();
     ASSERT_EQ(dataConnectionMonitor->dataRecoveryState_, RecoveryState::STATE_REQUEST_CONTEXT_LIST);
 }
