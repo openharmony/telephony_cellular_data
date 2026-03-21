@@ -100,8 +100,8 @@ __attribute__((no_sanitize("cfi"))) void DataConnectionMonitor::OnStallDetection
     int32_t dataState = static_cast<int32_t>(DataConnectState::DATA_STATE_UNKNOWN);
     DelayedRefSingleton<CellularDataService>::GetInstance().GetCellularDataState(dataState);
     if (noRecvPackets_ > RECOVERY_TRIGGER_PACKET ||
-        (dataRecoveryState_ == RecoveryState::STATE_RADIO_STATUS_RESTART &&
-        dataState != static_cast<int32_t>(DataConnectionStatus::DATA_STATE_CONNECTED))) {
+        (dataState != static_cast<int32_t>(DataConnectionStatus::DATA_STATE_CONNECTED) &&
+        dataRecoveryState_ == RecoveryState::STATE_RADIO_STATUS_RESTART)) {
         HandleRecovery();
         noRecvPackets_ = 0;
     }
