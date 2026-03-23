@@ -130,6 +130,31 @@ void CellularDataHiSysEvent::WriteApnInfoBehaviorEvent(const int32_t slotId, str
         SERVER_KEY, apnData.server);
 }
 
+void CellularDataHiSysEvent::WriteApnInfoBehaviorEvent(const int32_t slotId, sptr<ApnItem> &apnItem)
+{
+    if (apnItem == nullptr) {
+        return;
+    }
+    int32_t apnHasPsd = strlen(apnItem->attr_.password_) == 0 ? 0 : 1;
+    HiWriteBehaviorEvent(APN_INFO_EVENT,
+        CARDID_KEY, slotId,
+        CARRIER_KEY, apnItem->attr_.apnName_,
+        APN_KEY, apnItem->attr_.apn_,
+        PROXY_KEY, apnItem->attr_.proxyIpAddress_,
+        MMSPROXY_KEY, apnItem->attr_.mmsIpAddress_,
+        NUMERIC_KEY, apnItem->attr_.numeric_,
+        AUTHTYPE_KEY, apnItem->attr_.authType_,
+        APNTYPES_KEY, apnItem->attr_.types_,
+        PROTOCOL_KEY, apnItem->attr_.protocol_,
+        ROAMINGPROTOCOL_KEY, apnItem->attr_.roamingProtocol_,
+        BEARER_KEY, "",
+        MVNOTYPE_KEY, "",
+        MVNOMATCHDATA_KEY, "",
+        ISCREATEDAPN_KEY, apnItem->attr_.isEdited_,
+        HASUSERPSD_KEY, apnHasPsd,
+        SERVER_KEY, "");
+}
+
 void CellularDataHiSysEvent::SetCellularDataActivateStartTime()
 {
     dataActivateStartTime_ =

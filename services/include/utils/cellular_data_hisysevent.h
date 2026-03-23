@@ -44,6 +44,7 @@ public:
     static void WriteDataActivateFaultEvent(const int32_t slotId, const int32_t switchState,
         const CellularDataErrorCode errorType, const std::string &errorMsg);
     static void WriteApnInfoBehaviorEvent(const int32_t slotId, struct PdpProfile &apnData);
+    static void WriteApnInfoBehaviorEvent(const int32_t slotId, sptr<ApnItem> &apnItem);
     void SetCellularDataActivateStartTime();
     void JudgingDataActivateTimeOut(const int32_t slotId, const int32_t switchState);
 

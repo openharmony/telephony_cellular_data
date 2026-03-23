@@ -1728,5 +1728,32 @@ HWTEST_F(ApnManagerTest, ApnItem_CreateAllApnItemByDatabaseTest_002, TestSize.Le
     int32_t result = apnManager->CreateAllApnItemByDatabase(0);
     EXPECT_EQ(result, 1);
 }
+
+HWTEST_F(ApnManagerTest, ApnItem_ReportApnCreateFailEvent_001, TestSize.Level0)
+{
+    auto apnManager = std::make_shared<ApnManager>();
+    int32_t slotId = 0;
+    apnManager->ReportApnCreateFailEvent(slotId, "test");
+    EXPECT_NE(apnManager, nullptr);
+}
+ 
+HWTEST_F(ApnManagerTest, ApnItem_PushApnItem_001, TestSize.Level0)
+{
+    auto apnManager = std::make_shared<ApnManager>();
+    int32_t slotId = 0;
+    sptr<ApnItem> defaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
+    int32_t ret = apnManager->PushApnItem(0, slotId, defaultApnItem);
+    sptr<ApnItem> defaultApnItem2;
+    ret = apnManager->PushApnItem(0, slotId, defaultApnItem2);
+    EXPECT_EQ(ret, 1);
+}
+ 
+HWTEST_F(ApnManagerTest, ApnItem_GetPreferId_001, TestSize.Level0)
+{
+    auto apnManager = std::make_shared<ApnManager>();
+    int32_t slotId = -1;
+    bool ret = apnManager->GetPreferId(slotId);
+    EXPECT_FALSE(ret);
+}
 } // namespace Telephony
 } // namespace OHOS
