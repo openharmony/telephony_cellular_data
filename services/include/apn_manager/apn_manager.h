@@ -59,7 +59,8 @@ private:
     void TryMergeSimilarPdpProfile(std::vector<PdpProfile> &apnVec);
     void MergePdpProfile(PdpProfile &newProfile, PdpProfile &oldProfile);
     bool GetPreferId(int32_t slotId);
-    int32_t PushApnItem(int32_t count, sptr<ApnItem> extraApnItem);
+    void ReportApnCreateFailEvent(int32_t slotId, std::string msg);
+    int32_t PushApnItem(int32_t count, int32_t slotId, sptr<ApnItem> extraApnItem);
 
 private:
     static const std::map<std::string, int32_t> apnIdApnNameMap_;

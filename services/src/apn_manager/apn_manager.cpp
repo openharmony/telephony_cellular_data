@@ -288,12 +288,19 @@ std::vector<sptr<ApnHolder>> ApnManager::GetSortApnHolder() const
     return sortedApnHolders_;
 }
 
-int32_t ApnManager::PushApnItem(int32_t count, sptr<ApnItem> extraApnItem)
+int32_t ApnManager::PushApnItem(int32_t count, int32_t slotId, sptr<ApnItem> extraApnItem)
 {
     std::unique_lock<std::shared_mutex> lock(mutex_);
     allApnItem_.clear();
     allApnItem_.push_back(extraApnItem);
+    CellularDataHiSysEvent::WriteApnInfoBehaviorEvent(slotId, extraApnItem);
     return ++count;
+}
+
+void ApnManager::ReportApnCreateFailEvent(int32_t slotId, std::string msg)
+{
+    CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId, SWITCH_ON,
+        CellularDataErrorCode::DATA_ERROR_APN_QUERY_FAIL, msg);
 }
 
 int32_t ApnManager::CreateAllApnItemByDatabase(int32_t slotId)
@@ -302,22 +309,25 @@ int32_t ApnManager::CreateAllApnItemByDatabase(int32_t slotId)
     sptr<ApnItem> extraApnItem = ApnItem::MakeDefaultApn("default");
     if (TELEPHONY_EXT_WRAPPER.createAllApnItemExt_) {
         if (TELEPHONY_EXT_WRAPPER.createAllApnItemExt_(slotId, extraApnItem)) {
-            return PushApnItem(count, extraApnItem);
+            return PushApnItem(count, slotId, extraApnItem);
         }
     }
     if (TELEPHONY_EXT_WRAPPER.createDcApnItemExt_ &&
         TELEPHONY_EXT_WRAPPER.createDcApnItemExt_(slotId, extraApnItem)) {
         TELEPHONY_LOGI("create extra apn item");
-        return PushApnItem(count, extraApnItem);
+        return PushApnItem(count, slotId, extraApnItem);
     }
     std::u16string operatorNumeric;
     CoreManagerInner::GetInstance().GetSimOperatorNumeric(slotId, operatorNumeric);
     std::string numeric = Str16ToStr8(operatorNumeric);
     GetCTOperator(slotId, numeric);
+    // LCOV_EXCL_START
     if (numeric.empty()) {
         TELEPHONY_LOGE("numeric is empty!!!");
+        ReportApnCreateFailEvent(slotId, "CreateAllApnItemByDatabase numeric is empty");
         return count;
     }
+    // LCOV_EXCL_STOP
     TELEPHONY_LOGI("current slotId = %{public}d, numeric = %{public}s", slotId, numeric.c_str());
     preferId_ = INVALID_PROFILE_ID;
     if (!GetPreferId(slotId)) {
@@ -325,10 +335,14 @@ int32_t ApnManager::CreateAllApnItemByDatabase(int32_t slotId)
         return count;
     }
     auto helper = CellularDataRdbHelper::GetInstance();
+    // LCOV_EXCL_START
     if (helper == nullptr) {
         TELEPHONY_LOGE("get cellularDataRdbHelper failed");
+        ReportApnCreateFailEvent(slotId,
+            "CreateAllApnItemByDatabase get cellularDataRdbHelper failed");
         return count;
     }
+    // LCOV_EXCL_STOP
     std::string mcc = numeric.substr(0, DEFAULT_MCC_SIZE);
     std::string mnc = numeric.substr(mcc.size(), numeric.size() - mcc.size());
     int32_t mvnoCount = CreateMvnoApnItems(slotId, mcc, mnc);
@@ -425,8 +439,8 @@ int32_t ApnManager::MakeSpecificApnItem(std::vector<PdpProfile> &apnVec, int32_t
     TryMergeSimilarPdpProfile(apnVec);
     int32_t count = 0;
     for (PdpProfile &apnData : apnVec) {
-        TELEPHONY_LOGI("profileId = %{public}d, profileName = %{public}s, mvnoType = %{public}s",
-            apnData.profileId, apnData.profileName.c_str(), apnData.mvnoType.c_str());
+        TELEPHONY_LOGI("profileId = %{public}d, profileName = %{public}s, mvnoType = %{public}s, apnType = %{public}s",
+            apnData.profileId, apnData.profileName.c_str(), apnData.mvnoType.c_str(), apnData.apnTypes.c_str());
         if (apnData.profileId == preferId_ && apnData.apnTypes.empty()) {
             apnData.apnTypes = DATA_CONTEXT_ROLE_DEFAULT;
         }
@@ -761,13 +775,17 @@ bool ApnManager::GetPreferId(int32_t slotId)
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
     if (simId <= INVALID_SIM_ID) {
         TELEPHONY_LOGE("Slot%{public}d: failed due to invalid sim id %{public}d", slotId, simId);
+        ReportApnCreateFailEvent(slotId, "GetPreferId create failed due to invalid sim id");
         return false;
     }
     auto helper = CellularDataRdbHelper::GetInstance();
+    // LCOV_EXCL_START
     if (helper == nullptr) {
         TELEPHONY_LOGE("get cellularDataRdbHelper failed");
+        ReportApnCreateFailEvent(slotId, "GetPreferId get cellularDataRdbHelper failed");
         return false;
     }
+    // LCOV_EXCL_STOP
     std::vector<PdpProfile> preferApnVec;
     if (helper->QueryPreferApn(slotId, preferApnVec, DB_CONNECT_MAX_WAIT_TIME)) {
         if (preferApnVec.size() > 0) {
@@ -778,6 +796,7 @@ bool ApnManager::GetPreferId(int32_t slotId)
         }
         return true;
     }
+    ReportApnCreateFailEvent(slotId, "GetPreferId query prefer apn fail");
     TELEPHONY_LOGE("query prefer apn fail");
     return false;
 }
