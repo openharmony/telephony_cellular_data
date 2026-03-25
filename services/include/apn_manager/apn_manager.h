@@ -49,6 +49,8 @@ public:
     static int32_t FindApnTypeByApnName(const std::string &apnName);
     void ClearAllApnBad();
     static uint64_t FindCapabilityByApnId(int32_t apnId);
+    void ClearApnCreateErrors();
+    std::string GetCreateApnErrorStr();
 
 private:
     void ReportApnInfo(int32_t slotId, PdpProfile &apnData);
@@ -59,7 +61,7 @@ private:
     void TryMergeSimilarPdpProfile(std::vector<PdpProfile> &apnVec);
     void MergePdpProfile(PdpProfile &newProfile, PdpProfile &oldProfile);
     bool GetPreferId(int32_t slotId);
-    void ReportApnCreateFailEvent(int32_t slotId, std::string msg);
+    void RecordApnCreateErrors(std::string msg);
     int32_t PushApnItem(int32_t count, int32_t slotId, sptr<ApnItem> extraApnItem);
 
 private:
@@ -72,6 +74,8 @@ private:
     std::vector<sptr<ApnHolder>> sortedApnHolders_;
     std::shared_mutex mutex_;
     int32_t preferId_ = -1;
+    std::shared_mutex apnCreateErrorsMutex_;
+    std::vector<std::string> apnCreateErrors_;
 };
 } // namespace Telephony
 } // namespace OHOS
