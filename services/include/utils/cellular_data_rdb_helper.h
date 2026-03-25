@@ -35,7 +35,8 @@ class CellularDataRdbHelper : public DelayedSingleton<CellularDataRdbHelper> {
     DECLARE_DELAYED_SINGLETON(CellularDataRdbHelper);
 
 public:
-    bool QueryApns(const std::string &mcc, const std::string &mnc, std::vector<PdpProfile> &apnVec, int32_t slotId);
+    bool QueryApns(const std::string &mcc, const std::string &mnc, std::vector<PdpProfile> &apnVec, int32_t slotId,
+        std::string &errMsg);
     bool QueryMvnoApnsByType(const std::string &mcc, const std::string &mnc, const std::string &mvnoType,
         const std::string &mvnoDataFromSim, std::vector<PdpProfile> &mvnoApnVec, int32_t slotId);
     bool QueryPreferApn(int32_t slotId, std::vector<PdpProfile> &apnVec, const int waitTime = 2);

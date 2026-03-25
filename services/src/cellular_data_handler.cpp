@@ -38,6 +38,7 @@ using namespace OHOS::EventFwk;
 using namespace NetManagerStandard;
 static const int32_t ESM_FLAG_INVALID = -1;
 static constexpr int32_t SIM_ACCOUNT_LOADED_RECEIVE = 2;
+static constexpr int32_t APN_CREATE_ERROR_FIRST_CNT = 3;
 const std::string DEFAULT_DATA_ROAMING = "persist.telephony.defaultdataroaming";
 #ifdef BASE_POWER_IMPROVEMENT
 constexpr const char *PERMISSION_STARTUP_COMPLETED = "ohos.permission.RECEIVER_STARTUP_COMPLETED";
@@ -1894,6 +1895,12 @@ void CellularDataHandler::CreateApnItem()
         }
     }
     if (result == 0 && !HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_CREATE_APN)) {
+        if (retryCreateApnTimes_ == APN_CREATE_ERROR_FIRST_CNT) {
+            CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
+                CellularDataErrorCode::DATA_ERROR_CREATE_APN_EMPTY,
+                apnManager_->GetCreateApnErrorStr());
+            apnManager_->ClearApnCreateErrors();
+        }
         if (retryCreateApnTimes_ < APN_CREATE_RETRY_TIMES) {
             retryCreateApnTimes_++;
             auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_RETRY_TO_CREATE_APN);
@@ -1903,11 +1910,13 @@ void CellularDataHandler::CreateApnItem()
             if (isSimAccountLoaded_) {
                 CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
                     CellularDataErrorCode::DATA_ERROR_CREATE_APN_EMPTY,
-                    "create apn is null");
+                    apnManager_->GetCreateApnErrorStr());
             }
+            apnManager_->GetCreateApnErrorStr());
         }
     } else if (result != 0) {
         retryCreateApnTimes_ = 0;
+        apnManager_->ClearApnCreateErrors();
         if (HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_CREATE_APN)) {
             RemoveEvent(CellularDataEventCode::MSG_RETRY_TO_CREATE_APN);
         }

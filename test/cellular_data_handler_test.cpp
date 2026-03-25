@@ -1021,6 +1021,20 @@ HWTEST_F(CellularDataHandlerTest, CreateApnItemTest001, Function | MediumTest | 
     EXPECT_FALSE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_CREATE_APN));
 }
 
+HWTEST_F(CellularDataHandlerTest, CreateApnItemTest002, Function | MediumTest | Level1)
+{
+    int32_t slotId = 2;
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(slotId);
+ 
+    cellularDataHandler->Init();
+    cellularDataHandler->retryCreateApnTimes_ = 3;
+    cellularDataHandler->CreateApnItem();
+    cellularDataHandler->RemoveEvent(CellularDataEventCode::MSG_RETRY_TO_CREATE_APN);
+    cellularDataHandler->retryCreateApnTimes_ = 2;
+    cellularDataHandler->CreateApnItem();
+    EXPECT_NE(cellularDataHandler->apnManager_, nullptr);
+}
+
 /**
 @tc.number Telephony_IsCellularDataEnabled
 @tc.name IsCellularDataEnabled

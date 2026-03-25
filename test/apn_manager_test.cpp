@@ -1728,14 +1728,6 @@ HWTEST_F(ApnManagerTest, ApnItem_CreateAllApnItemByDatabaseTest_002, TestSize.Le
     int32_t result = apnManager->CreateAllApnItemByDatabase(0);
     EXPECT_EQ(result, 1);
 }
-
-HWTEST_F(ApnManagerTest, ApnItem_ReportApnCreateFailEvent_001, TestSize.Level0)
-{
-    auto apnManager = std::make_shared<ApnManager>();
-    int32_t slotId = 0;
-    apnManager->ReportApnCreateFailEvent(slotId, "test");
-    EXPECT_NE(apnManager, nullptr);
-}
  
 HWTEST_F(ApnManagerTest, ApnItem_PushApnItem_001, TestSize.Level0)
 {
@@ -1754,6 +1746,18 @@ HWTEST_F(ApnManagerTest, ApnItem_GetPreferId_001, TestSize.Level0)
     int32_t slotId = -1;
     bool ret = apnManager->GetPreferId(slotId);
     EXPECT_FALSE(ret);
+}
+
+HWTEST_F(ApnManagerTest, ApnItem_ApnCreateErrors_001, TestSize.Level0)
+{
+    auto apnManager = std::make_shared<ApnManager>();
+    apnManager->RecordApnCreateErrors("test1");
+    apnManager->RecordApnCreateErrors("test2");
+    apnManager->RecordApnCreateErrors("test3");
+    apnManager->GetCreateApnErrorStr();
+    apnManager->ClearApnCreateErrors();
+    apnManager->GetCreateApnErrorStr();
+    EXPECT_EQ(apnManager->apnCreateErrors_.size(), 0);
 }
 } // namespace Telephony
 } // namespace OHOS

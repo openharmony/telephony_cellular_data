@@ -95,14 +95,14 @@ bool CellularDataRdbHelper::ResetApns(int32_t slotId)
 }
 
 bool CellularDataRdbHelper::QueryApns(
-    const std::string &mcc, const std::string &mnc, std::vector<PdpProfile> &apnVec, int32_t slotId)
+    const std::string &mcc, const std::string &mnc, std::vector<PdpProfile> &apnVec, int32_t slotId,
+    std::string &errMsg)
 {
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataAbilityHelper(DB_CONNECT_MAX_WAIT_TIME);
     // LCOV_EXCL_START
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("dataShareHelper is null");
-        CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId, SWITCH_ON,
-            CellularDataErrorCode::DATA_ERROR_APN_QUERY_FAIL, "QueryApns dataShareHelper is null");
+        errMsg = "dataShareHelper is null";
         return false;
     }
     // LCOV_EXCL_STOP
@@ -117,8 +117,7 @@ bool CellularDataRdbHelper::QueryApns(
     if (result == nullptr) {
         TELEPHONY_LOGE("query apns error");
         dataShareHelper->Release();
-        CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId, SWITCH_ON,
-            CellularDataErrorCode::DATA_ERROR_APN_QUERY_FAIL, "QueryApns query apns error");
+        errMsg = "query apns error";
         return false;
     }
     // LCOV_EXCL_STOP
@@ -126,8 +125,7 @@ bool CellularDataRdbHelper::QueryApns(
     // LCOV_EXCL_START
     if (apnVec.size() == 0) {
         TELEPHONY_LOGE("read apn result empty");
-        CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId, SWITCH_ON,
-            CellularDataErrorCode::DATA_ERROR_APN_QUERY_FAIL, "QueryApns read apn result empty");
+        errMsg = "read apn result empty";
     }
     // LCOV_EXCL_STOP
     result->Close();
