@@ -217,6 +217,7 @@ ohos_static_library("tel_cellular_data_static") {
     "services/include/apn_manager",
     "interfaces/innerkits",
   ]
+  branch_protector_ret = "pac_ret"
 
   deps = [ "frameworks/native:cellulardata_interface_stub" ]
 
