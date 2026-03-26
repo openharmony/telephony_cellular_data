@@ -1912,7 +1912,7 @@ void CellularDataHandler::CreateApnItem()
                     CellularDataErrorCode::DATA_ERROR_CREATE_APN_EMPTY,
                     apnManager_->GetCreateApnErrorStr());
             }
-            apnManager_->GetCreateApnErrorStr());
+            apnManager_->ClearApnCreateErrors();
         }
     } else if (result != 0) {
         retryCreateApnTimes_ = 0;
