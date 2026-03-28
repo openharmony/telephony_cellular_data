@@ -27,6 +27,7 @@ ohos_unittest("tel_cellular_data_ext_test") {
     "$SOURCE_DIR/test/zero_branch_test.cpp",
     "$SOURCE_DIR/test/net_manager_call_back_test.cpp",
     "$SOURCE_DIR/test/cellular_data_power_save_mode_subscriber_test.cpp",
+    "$SOURCE_DIR/test/cellular_data_rdb_helper_test.cpp",
   ]
 
   include_dirs = [
