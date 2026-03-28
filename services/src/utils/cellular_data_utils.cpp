@@ -107,21 +107,6 @@ std::vector<std::string> CellularDataUtils::Split(const std::string &input, cons
     return vec;
 }
 
-std::string CellularDataUtils::JoinVecStr(std::vector<std::string> strVec, const std::string &flag)
-{
-    std::string result = "";
-    if (strVec.size() == 0) {
-        return result;
-    }
-    for (size_t i = 0; i < strVec.size(); ++i) {
-        result += strVec[i];
-        if (i < strVec.size() - 1) {
-            result += flag;
-        }
-    }
-    return result;
-}
-
 int32_t CellularDataUtils::GetPrefixLen(const std::string &netmask, const std::string& flag)
 {
     std::vector<std::string> mask = Split(netmask, flag);

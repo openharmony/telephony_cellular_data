@@ -1710,8 +1710,9 @@ HWTEST_F(BranchTest, Default_Test_01, Function | MediumTest | Level3)
 HWTEST_F(BranchTest, ApnManager_Test_01, Function | MediumTest | Level3)
 {
     auto apnManager = std::make_shared<ApnManager>();
-    EXPECT_GE(apnManager->CreateAllApnItemByDatabase(0), 0);
-    EXPECT_GE(apnManager->CreateAllApnItemByDatabase(0), 0);
+    std::string errMsg = "";
+    EXPECT_GE(apnManager->CreateAllApnItemByDatabase(0, errMsg), 0);
+    EXPECT_GE(apnManager->CreateAllApnItemByDatabase(0, errMsg), 0);
     apnManager->ResetApns(0);
     std::string operatorNumeric = "46011";
     apnManager->GetCTOperator(0, operatorNumeric);

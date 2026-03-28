@@ -34,7 +34,6 @@ public:
     static bool GetDefaultPreferApnConfig();
     static bool GetDefaultMultipleConnectionsConfig();
     static std::string ConvertRadioTechToRadioName(const int32_t radioTech);
-    static std::string JoinVecStr(std::vector<std::string> strVec, const std::string &flag);
 
 private:
     CellularDataUtils() = default;

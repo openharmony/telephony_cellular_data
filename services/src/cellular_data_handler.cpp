@@ -1888,8 +1888,10 @@ void CellularDataHandler::CreateApnItem()
         return;
     }
     int32_t result = 0;
+    std::string errMsg = "";
     for (int32_t i = 0; i < DEFAULT_READ_APN_TIME; ++i) {
-        result = apnManager_->CreateAllApnItemByDatabase(slotId_);
+        errMsg = "";
+        result = apnManager_->CreateAllApnItemByDatabase(slotId_, errMsg);
         if (result != 0) {
             break;
         }
@@ -1898,8 +1900,7 @@ void CellularDataHandler::CreateApnItem()
         if (retryCreateApnTimes_ == APN_CREATE_ERROR_FIRST_CNT) {
             CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
                 CellularDataErrorCode::DATA_ERROR_CREATE_APN_EMPTY,
-                apnManager_->GetCreateApnErrorStr());
-            apnManager_->ClearApnCreateErrors();
+                errMsg);
         }
         if (retryCreateApnTimes_ < APN_CREATE_RETRY_TIMES) {
             retryCreateApnTimes_++;
@@ -1910,13 +1911,11 @@ void CellularDataHandler::CreateApnItem()
             if (isSimAccountLoaded_) {
                 CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
                     CellularDataErrorCode::DATA_ERROR_CREATE_APN_EMPTY,
-                    apnManager_->GetCreateApnErrorStr());
+                    errMsg);
             }
-            apnManager_->ClearApnCreateErrors();
         }
     } else if (result != 0) {
         retryCreateApnTimes_ = 0;
-        apnManager_->ClearApnCreateErrors();
         if (HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_CREATE_APN)) {
             RemoveEvent(CellularDataEventCode::MSG_RETRY_TO_CREATE_APN);
         }
