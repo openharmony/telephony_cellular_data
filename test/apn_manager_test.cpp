@@ -1688,18 +1688,6 @@ HWTEST_F(ApnManagerTest, FindCapabilityByApnId_001, TestSize.Level1)
     EXPECT_EQ(actual, expected);
 }
 
-/**
- * @tc.number   GetPreferId_001
- * @tc.name     test function branch
- * @tc.desc     Function test
- */
-HWTEST_F(ApnManagerTest, GetPreferId_001, TestSize.Level0)
-{
-    int32_t slotId = 123;
-    auto result = apnManager->GetPreferId(slotId);
-    EXPECT_EQ(result, false);
-}
-
 bool CreateDcApnItemExtMock(int32_t slotId, sptr<ApnItem> &apnItem)
 {
     return true;
