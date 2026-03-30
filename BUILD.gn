@@ -159,6 +159,7 @@ ohos_shared_library("tel_cellular_data") {
 }
 
 ohos_static_library("tel_cellular_data_static") {
+  branch_protector_ret = "pac_ret"
   use_exceptions = true
   sources = [
     "$DATA_SERVICE_EXT_WRAPPER_ROOT/src/data_service_ext_wrapper.cpp",
