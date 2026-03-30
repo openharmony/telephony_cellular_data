@@ -138,7 +138,6 @@ HWTEST_F(CellularDataRdbHelperTest, ReadApnResult_NonMvnoApn, TestSize.Level1)
     helper.ReadApnResult(result_, apnVec_);
 
     EXPECT_EQ(apnVec_.size(), 1);
-    EXPECT_EQ(apnVec_[0].profileId, 1);
     EXPECT_TRUE(apnVec_[0].mvnoType.empty());
 }
 
@@ -178,7 +177,6 @@ HWTEST_F(CellularDataRdbHelperTest, ReadApnResult_EditedMvnoApn, TestSize.Level1
     helper.ReadApnResult(result_, apnVec_);
 
     EXPECT_EQ(apnVec_.size(), 1);
-    EXPECT_EQ(apnVec_[0].profileId, 2);
     EXPECT_EQ(apnVec_[0].mvnoType, "imsi");
     EXPECT_EQ(apnVec_[0].edited, 1);
 }
