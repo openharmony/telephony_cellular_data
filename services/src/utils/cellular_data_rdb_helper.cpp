@@ -212,8 +212,12 @@ void CellularDataRdbHelper::ReadApnResult(
     for (int i = 0; i < rowCnt; ++i) {
         PdpProfile apnBean;
         MakePdpProfile(result, i, apnBean);
-        if (apnBean.mvnoType.empty()) {
+        // 对于非MVNO类型或用户编辑的MVNO类型，都添加到列表
+        if (apnBean.mvnoType.empty() || apnBean.edited != 0) {
             apnVec.push_back(apnBean);
+        } else {
+            TELEPHONY_LOGD("Skip mvno apn: profileId=%{public}d, mvnoType=%{public}s",
+                apnBean.profileId, apnBean.mvnoType.c_str());
         }
     }
 }
