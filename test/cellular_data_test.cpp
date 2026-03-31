@@ -1895,8 +1895,9 @@ HWTEST_F(CellularDataTest, QueryApns_001, TestSize.Level3)
     std::vector<PdpProfile> apnVec;
     int32_t slotId = 0;
     CellularDataRdbHelper cellularDataRdbHelper;
-    bool result = cellularDataRdbHelper.QueryApns(mcc, mnc, apnVec, slotId);
-    ASSERT_FALSE(result);
+    std::string errMsg = "";
+    bool result = cellularDataRdbHelper.QueryApns(mcc, mnc, apnVec, slotId, errMsg);
+    EXPECT_FALSE(result);
 }
 
 

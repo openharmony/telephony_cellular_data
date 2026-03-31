@@ -36,7 +36,7 @@ public:
     static int32_t FindApnIdByCapability(const uint64_t capabilities);
     static NetManagerStandard::NetCap FindBestCapability(const uint64_t capabilities);
     bool IsDataConnectionNotUsed(const std::shared_ptr<CellularDataStateMachine> &stateMachine) const;
-    int32_t CreateAllApnItemByDatabase(int32_t slotId);
+    int32_t CreateAllApnItemByDatabase(int32_t slotId, std::string &errMsg);
     bool HasAnyConnectedState() const;
     ApnProfileState GetOverallApnState() const;
     ApnProfileState GetOverallDefaultApnState() const;
@@ -58,8 +58,7 @@ private:
     void GetCTOperator(int32_t slotId, std::string &numeric);
     void TryMergeSimilarPdpProfile(std::vector<PdpProfile> &apnVec);
     void MergePdpProfile(PdpProfile &newProfile, PdpProfile &oldProfile);
-    bool GetPreferId(int32_t slotId);
-    void ReportApnCreateFailEvent(int32_t slotId, std::string msg);
+    bool GetPreferId(int32_t slotId, std::string &errMsg);
     int32_t PushApnItem(int32_t count, int32_t slotId, sptr<ApnItem> extraApnItem);
 
 private:
