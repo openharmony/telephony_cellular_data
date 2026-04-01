@@ -150,6 +150,7 @@ ohos_shared_library("tel_cellular_data") {
   cflags_cc = [
     "-O2",
     "-D_FORTIFY_SOURCE=2",
+    "-fvisibility=hidden",
   ]
 
   defines += telephony_extra_defines

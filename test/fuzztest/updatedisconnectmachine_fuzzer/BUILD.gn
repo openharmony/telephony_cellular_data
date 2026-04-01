@@ -32,7 +32,7 @@ ohos_fuzztest("UpdateDisconnectMachineFuzzTest") {
   ]
 
   deps = [
-    "$SOURCE_DIR:tel_cellular_data",
+    "$SOURCE_DIR:tel_cellular_data_static",
     "$SOURCE_DIR/frameworks/native:tel_cellular_data_api",
   ]
 
