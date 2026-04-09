@@ -19,6 +19,7 @@ declare_args() {
     telephony_cellular_data_hicollie_able = false
   }
   cellular_data_feature_base_power_improvement = false
+  cellular_data_feature_single_card = false
 }
 
 telephony_extra_defines = []
