@@ -144,7 +144,7 @@ ohos_shared_library("tel_cellular_data") {
   }
 
   if (cellular_data_feature_single_card) {
-    defines += [ "SINGLE_CARD" ]
+    defines += [ "FEATURE_SINGLE_CARD" ]
   }
 
   if (defined(global_parts_info) &&
