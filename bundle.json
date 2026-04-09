@@ -24,7 +24,8 @@
         ],
         "features": [
             "cellular_data_dynamic_start",
-            "cellular_data_feature_base_power_improvement"
+            "cellular_data_feature_base_power_improvement",
+            "cellular_data_feature_single_card "
         ],
         "adapted_system_type": [
             "standard"
