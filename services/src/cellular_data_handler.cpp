@@ -2542,7 +2542,7 @@ void CellularDataHandler::HandleDBSettingEnableChanged(const AppExecFwk::InnerEv
         return;
     }
     bool dataEnabled = true;
-#ifdef SINGLE_CARD
+#ifdef FEATURE_SINGLE_CARD
     dataEnabled = dataSwitchSettings_->IsUserDataOn();
 #else
     dataSwitchSettings_->QueryUserDataStatus(dataEnabled);
