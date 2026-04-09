@@ -143,6 +143,10 @@ ohos_shared_library("tel_cellular_data") {
     defines += [ "BASE_POWER_IMPROVEMENT" ]
   }
 
+  if (cellular_data_feature_single_card) {
+    defines += [ "SINGLE_CARD" ]
+  }
+
   if (defined(global_parts_info) &&
       defined(global_parts_info.communication_netmanager_enhanced)) {
     defines += [ "OHOS_BUILD_ENABLE_DATA_SERVICE_EXT" ]
