@@ -19,7 +19,6 @@ declare_args() {
     telephony_cellular_data_hicollie_able = false
   }
   cellular_data_feature_base_power_improvement = false
-  cellular_data_feature_single_card = false
 }
 
 telephony_extra_defines = []
@@ -141,10 +140,6 @@ ohos_shared_library("tel_cellular_data") {
 
   if (cellular_data_feature_base_power_improvement ) {
     defines += [ "BASE_POWER_IMPROVEMENT" ]
-  }
-
-  if (cellular_data_feature_single_card) {
-    defines += [ "FEATURE_SINGLE_CARD" ]
   }
 
   if (defined(global_parts_info) &&
