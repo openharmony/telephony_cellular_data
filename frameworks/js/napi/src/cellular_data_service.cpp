@@ -990,30 +990,50 @@ int32_t CellularDataService::QueryAllApnInfo(std::vector<ApnInfo> &allApnInfoLis
 
 int32_t CellularDataService::SendUrspDecodeResult(int32_t slotId, const std::vector<uint8_t>& buffer)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     int32_t eventid = static_cast<int32_t>(CellularDataEventCode::MSG_SEND_UEPOLICY_COMMAND_REJECT);
     return CoreManagerInner::GetInstance().SendUrspDecodeResult(slotId, buffer, eventid);
 }
 
 int32_t CellularDataService::SendUePolicySectionIdentifier(int32_t slotId, const std::vector<uint8_t>& buffer)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     int32_t eventid = static_cast<int32_t>(CellularDataEventCode::MSG_SEND_UE_STATE_INDICATION);
     return CoreManagerInner::GetInstance().SendUePolicySectionIdentifier(slotId, buffer, eventid);
 }
 
 int32_t CellularDataService::SendImsRsdList(int32_t slotId, const std::vector<uint8_t>& buffer)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     int32_t eventid = static_cast<int32_t>(CellularDataEventCode::MSG_SEND_IMS_RSDLIST);
     return CoreManagerInner::GetInstance().SendImsRsdList(slotId, buffer, eventid);
 }
 
 int32_t CellularDataService::GetNetworkSliceAllowedNssai(int32_t slotId, const std::vector<uint8_t>& buffer)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     int32_t eventid = static_cast<int32_t>(CellularDataEventCode::MSG_SYNC_ALLOWED_NSSAI_WITH_MODEM);
     return CoreManagerInner::GetInstance().GetNetworkSliceAllowedNssai(slotId, buffer, eventid);
 }
 
 int32_t CellularDataService::GetNetworkSliceEhplmn(int32_t slotId)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     int32_t eventid = static_cast<int32_t>(CellularDataEventCode::MSG_SYNC_EHPLMN_WITH_MODEM);
     return CoreManagerInner::GetInstance().GetNetworkSliceEhplmn(slotId, eventid);
 }
