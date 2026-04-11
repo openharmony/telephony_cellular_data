@@ -125,16 +125,33 @@ HWTEST_F(CellularDataServiceTest, CellularDataService_002, TestSize.Level1)
     ASSERT_EQ(TELEPHONY_ERR_PERMISSION_ERR, service->EstablishAllApnsIfConnectable(DEFAULT_SIM_SLOT_ID));
     int32_t slotId = 0;
     std::vector<uint8_t> buffer = {};
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, service->SendUrspDecodeResult(slotId, buffer));
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, service->SendUePolicySectionIdentifier(slotId, buffer));
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, service->SendImsRsdList(slotId, buffer));
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, service->GetNetworkSliceAllowedNssai(slotId, buffer));
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, service->GetNetworkSliceEhplmn(slotId));
+    ASSERT_EQ(TELEPHONY_ERR_PERMISSION_ERR, service->SendUrspDecodeResult(slotId, buffer));
+    ASSERT_EQ(TELEPHONY_ERR_PERMISSION_ERR, service->SendUePolicySectionIdentifier(slotId, buffer));
+    ASSERT_EQ(TELEPHONY_ERR_PERMISSION_ERR, service->SendImsRsdList(slotId, buffer));
+    ASSERT_EQ(TELEPHONY_ERR_PERMISSION_ERR, service->GetNetworkSliceAllowedNssai(slotId, buffer));
+    ASSERT_EQ(TELEPHONY_ERR_PERMISSION_ERR, service->GetNetworkSliceEhplmn(slotId));
     int32_t regState = -1;
     service->GetSupplierRegisterState(supplierId, regState);
     bool isSupportDun = false;
     EXPECT_EQ(TELEPHONY_ERR_PERMISSION_ERR, service->GetIfSupportDunApn(isSupportDun));
     service->OnStop();
+}
+
+/**
+ * @tc.number   NetworkSliceTest001
+ * @tc.name     test function branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, NetworkSliceTest001, TestSize.Level1)
+{
+    DataAccessToken token;
+    int32_t slotId = 0;
+    std::vector<uint8_t> buffer = {};
+    EXPECT_NE(service->SendUrspDecodeResult(slotId, buffer), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(service->SendUePolicySectionIdentifier(slotId, buffer), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(service->SendImsRsdList(slotId, buffer), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(service->GetNetworkSliceAllowedNssai(slotId, buffer), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(service->GetNetworkSliceEhplmn(slotId), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -617,5 +634,6 @@ HWTEST_F(CellularDataServiceTest, GetCellularDataControllerForce005, TestSize.Le
     std::shared_ptr<CellularDataController> cellularDataController = dataService->GetCellularDataControllerForce(1);
     EXPECT_EQ(cellularDataController, nullptr);
 }
+
 } // namespace Telephony
 } // namespace OHOS
