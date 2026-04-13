@@ -19,12 +19,6 @@
 
 namespace OHOS {
 namespace Telephony {
-namespace {
-    constexpr int32_t SYSTEM_UID = 1e4;
-    constexpr int32_t NETMANAGER_UID = 1099;
-    std::shared_mutex reqUidsMutex_;
-    std::mutex netRequestMutex_;
-}
 const std::map<std::string, int32_t> ApnHolder::apnTypeDataProfileMap_ {
     {DATA_CONTEXT_ROLE_DEFAULT, DATA_PROFILE_DEFAULT},
     {DATA_CONTEXT_ROLE_MMS, DATA_PROFILE_MMS},
@@ -68,57 +62,6 @@ void ApnHolder::SetCurrentApn(sptr<ApnItem> &apnItem)
 sptr<ApnItem> ApnHolder::GetCurrentApn() const
 {
     return apnItem_;
-}
-
-bool ApnHolder::IsReqUidsEmpty()
-{
-    std::shared_lock<std::shared_mutex> lock(reqUidsMutex_);
-    return reqUids_.empty() && netMgrReqList_.empty();
-}
-
-void ApnHolder::AddUid(const NetRequest &netRequest)
-{
-    std::unique_lock<std::shared_mutex> lock(reqUidsMutex_);
-    uint32_t uid = netRequest.uid;
-    uint32_t requestId = netRequest.requestId;
-    if (uid == NETMANAGER_UID) {
-        if (netMgrReqList_.find(requestId) == netMgrReqList_.end()) {
-            netMgrReqList_.insert(requestId);
-            TELEPHONY_LOGD("netMgrReqList add reqId %{public}u", requestId);
-        }
-    }
-    if (reqUids_.find(uid) != reqUids_.end()) {
-        TELEPHONY_LOGD("apnholder add uid %{public}u", uid);
-        return;
-    }
-    reqUids_.insert(uid);
-}
-
-void ApnHolder::RemoveUid(const NetRequest &netRequest)
-{
-    std::unique_lock<std::shared_mutex> lock(reqUidsMutex_);
-    uint32_t uid = netRequest.uid;
-    uint32_t requestId = netRequest.requestId;
-    if (uid == NETMANAGER_UID) {
-        auto netIt = netMgrReqList_.find(requestId);
-        if (netIt != netMgrReqList_.end()) {
-            netMgrReqList_.erase(netIt);
-            TELEPHONY_LOGD("netMgrReqList remove reqId %{public}u", requestId);
-        }
-    }
-    auto it = reqUids_.find(uid);
-    if (it != reqUids_.end()) {
-        reqUids_.erase(it);
-        TELEPHONY_LOGD("apnholder erase uid %{public}u", uid);
-        return;
-    }
-}
-
-void ApnHolder::ReleaseAllUids()
-{
-    std::unique_lock<std::shared_mutex> lock(reqUidsMutex_);
-    reqUids_.clear();
-    netMgrReqList_.clear();
 }
 
 void ApnHolder::SetApnState(ApnProfileState state)
@@ -194,58 +137,15 @@ int32_t ApnHolder::GetPriority() const
     return priority_;
 }
 
-HasSystemUse ApnHolder::GetUidStatus() const
-{
-    std::unique_lock<std::shared_mutex> lock(reqUidsMutex_);
-    if (!netMgrReqList_.empty()) {
-        return HasSystemUse::HAS;
-    }
-    for (auto item : reqUids_) {
-        if (item < SYSTEM_UID) {
-            return HasSystemUse::HAS;
-        }
-    }
-    return HasSystemUse::NOT_HAS;
-}
-
 void ApnHolder::RequestCellularData(const NetRequest &netRequest)
 {
-    std::unique_lock<std::mutex> lock(netRequestMutex_);
-    for (const NetRequest &request : netRequests_) {
-        if ((netRequest.capability == request.capability) && (netRequest.ident == request.ident)) {
-            return;
-        }
-    }
-    netRequests_.push_back(netRequest);
     capability_ = netRequest.capability;
     dataCallEnabled_ = true;
 }
 
-bool ApnHolder::ReleaseCellularData(const NetRequest &netRequest)
-{
-    std::unique_lock<std::mutex> lock(netRequestMutex_);
-    for (std::vector<NetRequest>::const_iterator it = netRequests_.begin(); it != netRequests_.end();) {
-        if ((netRequest.capability == it->capability) && (netRequest.ident == it->ident)) {
-            it = netRequests_.erase(it);
-            if (netRequests_.empty()) {
-                dataCallEnabled_ = false;
-                return true;
-            }
-        } else {
-            it++;
-        }
-    }
-    return false;
-}
-
 void ApnHolder::ReleaseAllCellularData()
 {
-    std::unique_lock<std::mutex> lock(netRequestMutex_);
-    TELEPHONY_LOGD("clear all cellular data");
-    netRequests_.clear();
-    if (netRequests_.empty()) {
-        dataCallEnabled_ = false;
-    }
+    dataCallEnabled_ = false;
 }
 
 bool ApnHolder::IsEmergencyType() const

@@ -225,27 +225,6 @@ void HasInternetCapability(const uint8_t *data, size_t size)
     DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
 }
 
-void ClearCellularDataConnections(const uint8_t *data, size_t size)
-{
-    if (!IsServiceInited()) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
-    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
-    MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
-        return;
-    }
-    dataMessageParcel.WriteInt32(slotId);
-    dataMessageParcel.WriteBuffer(data, size);
-    dataMessageParcel.RewindRead(0);
-    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_CLEAR_CELLULAR_DATA_CONNECTIONS);
-    MessageParcel reply;
-    MessageOption option(MessageOption::TF_SYNC);
-    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
-}
-
 void GetCellularDataFlowType(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -372,30 +351,6 @@ void GetDefaultCellularDataSimId(const uint8_t *data, size_t size)
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_GET_DEFAULT_CELLULAR_DATA_SIM_ID);
-    MessageParcel reply;
-    MessageOption option(MessageOption::TF_SYNC);
-    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
-}
-
-void ClearAllConnections(const uint8_t *data, size_t size)
-{
-    if (!IsServiceInited()) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
-    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
-    int32_t reason = fdp.ConsumeIntegralInRange<int32_t>(
-        0, static_cast<int32_t>(DisConnectionReason::REASON_PERMANENT_REJECT));
-    MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
-        return;
-    }
-    dataMessageParcel.WriteInt32(slotId);
-    dataMessageParcel.WriteInt32(reason);
-    dataMessageParcel.WriteBuffer(data, size);
-    dataMessageParcel.RewindRead(0);
-    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_CLEAR_ALL_CONNECTIONS);
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
     DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
@@ -649,27 +604,6 @@ void EstablishAllApnsIfConnectable(const uint8_t *data, size_t size)
     DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
 }
 
-void ReleaseCellularDataConnection(const uint8_t *data, size_t size)
-{
-    if (!IsServiceInited()) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
-    int32_t slotId = fdp.ConsumeIntegralInRange<uint32_t>(0, SLOT_NUM_MAX);
-    MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(GetDescriptor())) {
-        return;
-    }
-    dataMessageParcel.WriteInt32(slotId);
-    dataMessageParcel.WriteBuffer(data, size);
-    dataMessageParcel.RewindRead(0);
-    uint32_t code = static_cast<uint32_t>(ICellularDataManagerIpcCode::COMMAND_RELEASE_CELLULAR_DATA_CONNECTION);
-    MessageParcel reply;
-    MessageOption option(MessageOption::TF_SYNC);
-    DelayedSingleton<CellularDataService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
-}
-
 void GetSupplierRegisterState(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -701,8 +635,6 @@ void ReleaseNetFuzzTest(const uint8_t *data, size_t size)
     OHOS::Telephony::NetRequest request;
     request.ident = fdp.ConsumeRandomLengthString(APN_ID_MAX + 1);
     DelayedSingleton<CellularDataService>::GetInstance()->ReleaseNet(request);
-    DelayedSingleton<CellularDataService>::GetInstance()->RemoveUid(request);
-    DelayedSingleton<CellularDataService>::GetInstance()->AddUid(request);
     DelayedSingleton<CellularDataService>::GetInstance()->RequestNet(request);
 }
 
@@ -809,14 +741,12 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     EnableCellularDataRoaming(data, size);
     SetDefaultCellularDataSlotId(data, size);
     HasInternetCapability(data, size);
-    ClearCellularDataConnections(data, size);
     RegisterSimAccountCallback(data, size);
     UnregisterSimAccountCallback(data, size);
     GetDefaultActReportInfo(data, size);
     GetInternalActReportInfo(data, size);
     HandleApnChanged(data, size);
     GetDefaultCellularDataSimId(data, size);
-    ClearAllConnections(data, size);
     GetDataConnApnAttr(data, size);
     GetDataConnIpType(data, size);
     GetApnState(data, size);
@@ -824,7 +754,6 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     IsNeedDoRecovery(data, size);
     InitCellularDataController(data, size);
     EstablishAllApnsIfConnectable(data, size);
-    ReleaseCellularDataConnection(data, size);
     GetSupplierRegisterState(data, size);
     GetCellularDataSupplierId(data, size);
     CorrectNetSupplierNoAvailable(data, size);

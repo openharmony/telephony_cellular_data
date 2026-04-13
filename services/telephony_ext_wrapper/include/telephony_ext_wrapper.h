@@ -40,15 +40,12 @@ public:
     typedef bool (*IS_VSIM_IN_DISABLE_PROCESS)(void);
     /* add for vsim end */
     typedef void (*SEND_DATA_SWITCH_CHANGE_INFO)(const char*, int32_t, bool);
-    typedef bool (*IS_ALL_CELLULAR_DATA_ALLOWED)(
-        const NetRequest &, const HasSystemUse hasSystemUse);
     typedef bool (*IS_DUAL_CELLULAR_CARD_ALLOWED)();
     typedef int64_t (*HANDLE_DEND_FAILCAUSE)(int32_t, int64_t);
     typedef int32_t (*CONVERT_PDP_ERROR)(int32_t);
     typedef void (*RESTART_RADIO_IF_RQUIRED)(int32_t, int32_t);
     typedef bool (*GET_USER_DATA_ROAMING_EXPEND)(int32_t, bool);
     typedef void (*SEND_APN_NEED_RETRY_INFO)(int32_t);
-    typedef bool (*JUDGE_OTHER_REQUEST_HOLDING)(const NetRequest &, const HasSystemUse hasSystemUse);
     typedef void (*DynamicLoadInit)(void);
     typedef void (*NotifyReqCellularData)(bool isReqCellularData);
     typedef bool (*CREATE_DC_APN_ITEM_EXT)(int32_t slotId, sptr<ApnItem> &apnItem);
@@ -65,14 +62,12 @@ public:
     IS_VSIM_ENABLED isVSimEnabled_ = nullptr;
     IS_VSIM_IN_DISABLE_PROCESS isVSimInDisableProcess_ = nullptr;
     SEND_DATA_SWITCH_CHANGE_INFO sendDataSwitchChangeInfo_ = nullptr;
-    IS_ALL_CELLULAR_DATA_ALLOWED isAllCellularDataAllowed_ = nullptr;
     IS_DUAL_CELLULAR_CARD_ALLOWED isDualCellularCardAllowed_ = nullptr;
     GET_USER_DATA_ROAMING_EXPEND getUserDataRoamingExpend_ = nullptr;
     SEND_APN_NEED_RETRY_INFO sendApnNeedRetryInfo_ = nullptr;
     HANDLE_DEND_FAILCAUSE handleDendFailcause_ = nullptr;
     CONVERT_PDP_ERROR convertPdpError_ = nullptr;
     RESTART_RADIO_IF_RQUIRED restartRadioIfRequired_ = nullptr;
-    JUDGE_OTHER_REQUEST_HOLDING judgeOtherRequestHolding_ = nullptr;
     DynamicLoadInit dynamicLoadInit_ = nullptr;
     NotifyReqCellularData dynamicLoadNotifyReqCellularDataStatus_ = nullptr;
     CREATE_DC_APN_ITEM_EXT createDcApnItemExt_ = nullptr;
@@ -91,13 +86,11 @@ private:
     void InitTelephonyExtForCustomization();
     void InitTelephonyExtWrapperForVSim();
     void InitSendDataSwitchChangeInfo();
-    void InitIsAllCellularDataAllowed();
     void InitIsDualCellularCardAllowed();
     void InitHandleDendFailcause();
     void InitConvertPdpError();
     void InitRestartRadioIfRequired();
     void InitSendApnNeedRetryInfo();
-    void InitJudgeOtherRequestHolding();
     void InitTelephonyExtWrapperForDynamicLoad();
     void InitCreateDcApnItemExt();
     void InitIsVirtualModemConnected();
