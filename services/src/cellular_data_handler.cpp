@@ -2542,11 +2542,11 @@ void CellularDataHandler::HandleDBSettingEnableChanged(const AppExecFwk::InnerEv
         return;
     }
     bool dataEnabled = true;
-    if (SIM_SLOT_COUNT == 1) {
-        dataEnabled = dataSwitchSettings_->IsUserDataOn();
-    } else {
-        dataSwitchSettings_->QueryUserDataStatus(dataEnabled);
-    }
+#ifdef FEATURE_SINGLE_CARD
+    dataEnabled = dataSwitchSettings_->IsUserDataOn();
+#else
+    dataSwitchSettings_->QueryUserDataStatus(dataEnabled);
+#endif
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     std::string dataPolicy = system::GetParameter(PERSIST_EDM_MOBILE_DATA_POLICY, "");
