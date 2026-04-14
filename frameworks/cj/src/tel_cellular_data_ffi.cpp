@@ -38,11 +38,17 @@ extern "C" {
 
     bool FfiCellularDataIsCellularDataEnabled(int32_t *errCode)
     {
+        if (errCode == nullptr) {
+            return false;
+        }
         return CellularDataImpl::IsCellularDataEnabled(*errCode);
     }
 
     bool FfiCellularDataIsCellularDataRoamingEnabled(int32_t slotId, int32_t *errCode)
     {
+        if (errCode == nullptr) {
+            return false;
+        }
         return CellularDataImpl::IsCellularDataRoamingEnabled(slotId, *errCode);
     }
 
