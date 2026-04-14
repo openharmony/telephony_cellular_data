@@ -19,6 +19,7 @@ declare_args() {
     telephony_cellular_data_hicollie_able = false
   }
   cellular_data_feature_base_power_improvement = false
+  cellular_data_feature_single_card = true
 }
 
 telephony_extra_defines = []
@@ -86,6 +87,10 @@ ohos_shared_library("tel_cellular_data") {
     sources += [
       "services/src/cellular_data_power_save_mode_subscriber.cpp",
     ]
+  }
+
+  if (cellular_data_feature_single_card) {
+    defines += [ "FEATURE_SINGLE_CARD" ]
   }
 
   include_dirs = [
