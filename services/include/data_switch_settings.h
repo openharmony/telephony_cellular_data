@@ -47,7 +47,7 @@ public:
 
 private:
     bool internalDataOn_ = true;
-    static inline bool userDataOn_ = true;
+    bool userDataOn_ = true;
     bool userDataRoaming_ = false;
     bool policyDataOn_ = true;
     bool carrierDataOn_ = false;
