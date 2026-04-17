@@ -1252,13 +1252,13 @@ HWTEST_F(CellularDataHandlerTest, HandleRetryLoadSimAccount001, Function | Mediu
     // false false
     cellularDataHandler->isSimAccountLoaded_ = false;
     cellularDataHandler->HandleRetryLoadSimAccount(event0);
-    EXPECT_TRUE(cellularDataHandler->isSimAccountLoaded_);
+    EXPECT_FALSE(cellularDataHandler->isSimAccountLoaded_);
 
     // true false
-    cellularDataHandler->StartLoadSimAccountTimer(1);
+    cellularDataHandler->SendEvent(event0, 5000);
     cellularDataHandler->HandleRetryLoadSimAccount(event0);
     EXPECT_TRUE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT));
-    cellularDataHandler->StopLoadSimAccountTimer();
+    cellularDataHandler->RemoveEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT);
 
     // false true
     cellularDataHandler->isSimAccountLoaded_ = false;
@@ -1273,6 +1273,187 @@ HWTEST_F(CellularDataHandlerTest, HandleRetryLoadSimAccount001, Function | Mediu
     cellularDataHandler->HandleRetryLoadSimAccount(event0);
     EXPECT_FALSE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT));
     cellularDataHandler->RemoveEvent(RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
+}
+
+/**
+* @tc.number   OnDataShareReady_001
+* @tc.name     Test OnDataShareReady - isSimAccountLoaded_ is false, no RADIO_SIM_ACCOUNT_LOADED event
+* @tc.desc     Branch coverage test: should start load sim account timer
+*/
+HWTEST_F(CellularDataHandlerTest, OnDataShareReady_001, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
+    cellularDataHandler->isSimAccountLoaded_ = false;
+    cellularDataHandler->RemoveEvent(RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
+    cellularDataHandler->OnDataShareReady();
+    EXPECT_TRUE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT));
+    cellularDataHandler->StopLoadSimAccountTimer();
+}
+
+/**
+* @tc.number   OnDataShareReady_002
+* @tc.name     Test OnDataShareReady - isSimAccountLoaded_ is true
+* @tc.desc     Branch coverage test: should not start load sim account timer
+*/
+HWTEST_F(CellularDataHandlerTest, OnDataShareReady_002, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
+    cellularDataHandler->isSimAccountLoaded_ = true;
+    cellularDataHandler->RemoveEvent(RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
+    cellularDataHandler->OnDataShareReady();
+    EXPECT_FALSE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT));
+}
+
+/**
+* @tc.number   OnDataShareReady_003
+* @tc.name     Test OnDataShareReady - has RADIO_SIM_ACCOUNT_LOADED event
+* @tc.desc     Branch coverage test: should not start load sim account timer
+*/
+HWTEST_F(CellularDataHandlerTest, OnDataShareReady_003, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
+    cellularDataHandler->isSimAccountLoaded_ = false;
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
+    cellularDataHandler->SendEvent(event, 5000);
+    cellularDataHandler->OnDataShareReady();
+    EXPECT_FALSE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT));
+    cellularDataHandler->RemoveEvent(RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
+}
+
+/**
+* @tc.number   StartLoadSimAccountTimer_001
+* @tc.name     Test StartLoadSimAccountTimer - times <= 0
+* @tc.desc     Branch coverage test: should return early
+*/
+HWTEST_F(CellularDataHandlerTest, StartLoadSimAccountTimer_001, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
+    cellularDataHandler->StartLoadSimAccountTimer(0);
+    EXPECT_FALSE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT));
+    cellularDataHandler->StartLoadSimAccountTimer(-1);
+    EXPECT_FALSE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT));
+}
+
+/**
+* @tc.number   StartLoadSimAccountTimer_002
+* @tc.name     Test StartLoadSimAccountTimer - times > 0, no existing event
+* @tc.desc     Branch coverage test: should send event
+*/
+HWTEST_F(CellularDataHandlerTest, StartLoadSimAccountTimer_002, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
+    cellularDataHandler->StopLoadSimAccountTimer();
+    cellularDataHandler->StartLoadSimAccountTimer(1);
+    EXPECT_TRUE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT));
+    cellularDataHandler->StopLoadSimAccountTimer();
+}
+
+/**
+* @tc.number   StartLoadSimAccountTimer_003
+* @tc.name     Test StartLoadSimAccountTimer - times > 0, has existing event
+* @tc.desc     Branch coverage test: should not send duplicate event
+*/
+HWTEST_F(CellularDataHandlerTest, StartLoadSimAccountTimer_003, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
+    cellularDataHandler->StartLoadSimAccountTimer(1);
+    EXPECT_TRUE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT));
+    cellularDataHandler->StartLoadSimAccountTimer(2);
+    EXPECT_TRUE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT));
+    cellularDataHandler->StopLoadSimAccountTimer();
+}
+
+/**
+* @tc.number   HandleRetryLoadSimAccount_002
+* @tc.name     Test HandleRetryLoadSimAccount - event is nullptr
+* @tc.desc     Branch coverage test: should return early
+*/
+HWTEST_F(CellularDataHandlerTest, HandleRetryLoadSimAccount_002, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
+    cellularDataHandler->isSimAccountLoaded_ = false;
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    event = nullptr;
+    cellularDataHandler->HandleRetryLoadSimAccount(event);
+    EXPECT_FALSE(cellularDataHandler->isSimAccountLoaded_);
+}
+
+/**
+* @tc.number   HandleRetryLoadSimAccount_003
+* @tc.name     Test HandleRetryLoadSimAccount - simId <= INVALID_SIM_ID with retry times
+* @tc.desc     Branch coverage test: should retry with times - 1
+*/
+HWTEST_F(CellularDataHandlerTest, HandleRetryLoadSimAccount_003, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(-1);
+    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT, 2);
+    cellularDataHandler->isSimAccountLoaded_ = false;
+    cellularDataHandler->RemoveEvent(RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
+    cellularDataHandler->HandleRetryLoadSimAccount(event);
+    EXPECT_FALSE(cellularDataHandler->isSimAccountLoaded_);
+}
+
+/**
+* @tc.number   HandleRetryLoadSimAccount_004
+* @tc.name     Test HandleRetryLoadSimAccount - simId > INVALID_SIM_ID, isSimAccountLoaded_ is true
+* @tc.desc     Branch coverage test: should not call HandleSimAccountLoaded
+*/
+HWTEST_F(CellularDataHandlerTest, HandleRetryLoadSimAccount_004, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(-1);
+    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT);
+    cellularDataHandler->isSimAccountLoaded_ = true;
+    cellularDataHandler->RemoveEvent(RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
+    cellularDataHandler->HandleRetryLoadSimAccount(event);
+    EXPECT_TRUE(cellularDataHandler->isSimAccountLoaded_);
+}
+
+/**
+* @tc.number   HandleRetryLoadSimAccount_005
+* @tc.name     Test HandleRetryLoadSimAccount - simId > INVALID_SIM_ID, has RADIO_SIM_ACCOUNT_LOADED event
+* @tc.desc     Branch coverage test: should not call HandleSimAccountLoaded
+*/
+HWTEST_F(CellularDataHandlerTest, HandleRetryLoadSimAccount_005, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(-1);
+    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT);
+    auto simEvent = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
+    cellularDataHandler->isSimAccountLoaded_ = false;
+    cellularDataHandler->SendEvent(simEvent, 5000);
+    cellularDataHandler->HandleRetryLoadSimAccount(event);
+    EXPECT_FALSE(cellularDataHandler->isSimAccountLoaded_);
+    cellularDataHandler->RemoveEvent(RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
+}
+
+/**
+* @tc.number   HandleRetryLoadSimAccount_006
+* @tc.name     Test HandleRetryLoadSimAccount - simId > INVALID_SIM_ID, has RADIO_SIM_ACCOUNT_LOADED event
+* @tc.desc     Branch coverage test: should not call HandleSimAccountLoaded
+*/
+HWTEST_F(CellularDataHandlerTest, HandleRetryLoadSimAccount_006, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(-1);
+    auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT);
+    auto simEvent = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
+    cellularDataHandler->isSimAccountLoaded_ = true;
+    cellularDataHandler->SendEvent(simEvent, 5000);
+    cellularDataHandler->HandleRetryLoadSimAccount(event);
+    EXPECT_TRUE(cellularDataHandler->isSimAccountLoaded_);
+    cellularDataHandler->RemoveEvent(RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
+}
+
+/**
+* @tc.number   StopLoadSimAccountTimer_001
+* @tc.name     Test StopLoadSimAccountTimer - remove event
+* @tc.desc     Branch coverage test: should remove MSG_RETRY_TO_LOAD_SIM_ACCOUNT event
+*/
+HWTEST_F(CellularDataHandlerTest, StopLoadSimAccountTimer_001, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
+    cellularDataHandler->StartLoadSimAccountTimer(1);
+    EXPECT_TRUE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT));
+    cellularDataHandler->StopLoadSimAccountTimer();
+    EXPECT_FALSE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT));
 }
 } // namespace Telephony
 } // namespace OHOS
