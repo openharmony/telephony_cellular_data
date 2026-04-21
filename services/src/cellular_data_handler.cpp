@@ -1322,6 +1322,7 @@ void CellularDataHandler::SetDataPermittedForSlotId(const int32_t slotId)
     SetDataPermitted(CELLULAR_DATA_VSIM_SLOT_ID, slotId == CELLULAR_DATA_VSIM_SLOT_ID);
 }
 
+// LCOV_EXCL_START
 bool CellularDataHandler::NotifyReqCellularData(bool isCellularDataRequested)
 {
     if (TELEPHONY_EXT_WRAPPER.dynamicLoadNotifyReqCellularDataStatus_) {
@@ -1331,6 +1332,7 @@ bool CellularDataHandler::NotifyReqCellularData(bool isCellularDataRequested)
     }
     return false;
 }
+// LCOV_EXCL_STOP
 #endif
 
 void CellularDataHandler::SetNetRequest(NetRequest &request, const std::unique_ptr<NetRequest> &netRequest)
