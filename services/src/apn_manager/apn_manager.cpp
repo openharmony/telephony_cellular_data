@@ -20,6 +20,8 @@
 #include "telephony_ext_wrapper.h"
 #include "pdp_profile_data.h"
 
+#include <algorithm>
+#include <cctype>
 namespace OHOS {
 namespace Telephony {
 const std::map<std::string, int32_t> ApnManager::apnIdApnNameMap_ {
@@ -77,7 +79,39 @@ constexpr const char *MO_ICCID_1 = "8985302";
 constexpr const char *MO_ICCID_2 = "8985307";
 constexpr const char *MO_UNICOM_MCCMNC = "46001";
 constexpr int32_t ICCID_LEN_MINIMUM = 7;
-
+constexpr int32_t APN_MATCH_SCORE_NONE = 0;
+constexpr int32_t APN_MATCH_SCORE_WILDCARD = 1;
+constexpr int32_t APN_MATCH_SCORE_ALIAS = 2;
+constexpr int32_t APN_MATCH_SCORE_EXACT = 3;
+ 	 
+std::string ToLowerCase(std::string value)
+{
+ 	std::transform(value.begin(), value.end(), value.begin(),
+ 	    [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+ 	return value;
+}
+ 	 
+int32_t GetApnMatchScore(const sptr<ApnItem> &apnItem, const std::string &requestApnType)
+{
+ 	if (apnItem == nullptr) {
+ 	    return APN_MATCH_SCORE_NONE;
+ 	}
+ 	int32_t maxScore = APN_MATCH_SCORE_NONE;
+ 	for (std::string apnType : apnItem->GetApnTypes()) {
+ 	    apnType = ToLowerCase(apnType);
+ 	    if (requestApnType == apnType) {
+ 	        return APN_MATCH_SCORE_EXACT;
+ 	    }
+ 	    if (requestApnType == DATA_CONTEXT_ROLE_INTERNAL_DEFAULT && apnType == DATA_CONTEXT_ROLE_DEFAULT) {
+ 	        maxScore = std::max(maxScore, APN_MATCH_SCORE_ALIAS);
+ 	        continue;
+ 	    }
+ 	    if (requestApnType != DATA_CONTEXT_ROLE_IA && apnType == DATA_CONTEXT_ROLE_ALL) {
+ 	        maxScore = std::max(maxScore, APN_MATCH_SCORE_WILDCARD);
+ 	    }
+ 	}
+ 	return maxScore;
+}
 ApnManager::ApnManager() = default;
 
 ApnManager::~ApnManager() = default;
@@ -458,12 +492,18 @@ std::vector<sptr<ApnItem>> ApnManager::FilterMatchedApns(const std::string &requ
         FetchBipApns(matchApnItemList);
         return matchApnItemList;
     }
+    std::vector<std::pair<int32_t, sptr<ApnItem>>> scoredApnItems;
     std::shared_lock<std::shared_mutex> lock(mutex_);
     for (const sptr<ApnItem> &apnItem : allApnItem_) {
-        if (apnItem->CanDealWithType(requestApnType)) {
-            matchApnItemList.push_back(apnItem);
+        if (apnItem != nullptr && apnItem->CanDealWithType(requestApnType)) {
+ 	            scoredApnItems.emplace_back(GetApnMatchScore(apnItem, requestApnType), apnItem);
         }
     }
+    std::stable_sort(scoredApnItems.begin(), scoredApnItems.end(),
+ 	    [](const auto &left, const auto &right) { return left.first > right.first; });
+ 	for (const auto &item : scoredApnItems) {
+ 	    matchApnItemList.emplace_back(item.second);
+ 	}
     TELEPHONY_LOGD("apn size is :%{public}zu", matchApnItemList.size());
     return matchApnItemList;
 }
