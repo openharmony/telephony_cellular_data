@@ -1818,6 +1818,9 @@ void CellularDataHandler::HandleSimAccountLoaded()
         CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
             CellularDataErrorCode::DATA_ERROR_REGISTER_SUPPLIERID_FAIL,
             "register supplierid fail");
+        isSimAccountLoaded_ = false;
+    } else {
+        isSimAccountLoaded_ = true;
     }
     if (slotId_ == 0) {
         CellularDataNetAgent::GetInstance().UnregisterPolicyCallback();
@@ -1829,7 +1832,6 @@ void CellularDataHandler::HandleSimAccountLoaded()
     }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
-    isSimAccountLoaded_ = true;
     ReportEventToChr(slotId_, SIM_ACCOUNT_LOADED, SIM_ACCOUNT_LOADED_RECEIVE);
     CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
         CellularDataErrorCode::DATA_ERROR_RECEIVE_SIM_ACCOUNT_READY,
