@@ -37,7 +37,8 @@ using namespace AppExecFwk;
 using namespace OHOS::EventFwk;
 using namespace NetManagerStandard;
 static const int32_t ESM_FLAG_INVALID = -1;
-static constexpr int32_t SIM_ACCOUNT_LOADED_RECEIVE = 2;
+static constexpr int32_t SIM_ACCOUNT_LOADED_BUT_SIMID_INVALID = 2;
+static constexpr int32_t SIM_ACCOUNT_LOADED_RECEIVE = 3;
 static constexpr int32_t APN_CREATE_ERROR_FIRST_CNT = 3;
 const std::string DEFAULT_DATA_ROAMING = "persist.telephony.defaultdataroaming";
 #ifdef BASE_POWER_IMPROVEMENT
@@ -1812,6 +1813,10 @@ void CellularDataHandler::HandleSimAccountLoaded()
 {
     StopLoadSimAccountTimer();
     CellularDataNetAgent::GetInstance().UnregisterNetSupplierForSimUpdate(slotId_);
+    int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId_);
+    if (simId <= INVALID_SIM_ID) {
+        ReportEventToChr(slotId_, SIM_ACCOUNT_LOADED, SIM_ACCOUNT_LOADED_BUT_SIMID_INVALID);
+    }
     bool registerRes = CellularDataNetAgent::GetInstance().RegisterNetSupplier(slotId_);
     if (!registerRes) {
         TELEPHONY_LOGE("Slot%{public}d register supplierid fail", slotId_);
