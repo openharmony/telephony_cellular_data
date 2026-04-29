@@ -408,6 +408,18 @@ HWTEST_F(CellularDataHandlerBranchTest, UnRegisterDataSettingObserver, Function 
     UnmockManager();
 }
 
+HWTEST_F(CellularDataHandlerBranchTest, HandleSimAccountLoaded, Function | MediumTest | Level3)
+{
+    InitCellularDataHandler();
+    InitMockManager();
+    EXPECT_CALL(*mockSimManager, GetSimId(_)).WillOnce(Return(1));
+    cellularDataHandler_->HandleSimAccountLoaded();
+    EXPECT_CALL(*mockSimManager, GetSimId(_)).WillOnce(Return(-1));
+    cellularDataHandler_->HandleSimAccountLoaded();
+    EXPECT_TRUE(cellularDataHandler_->isSimAccountLoaded_);
+    UnmockManager();
+}
+
 HWTEST_F(CellularDataHandlerBranchTest, CheckForCompatibleDataConnection, Function | MediumTest | Level3)
 {
     auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
