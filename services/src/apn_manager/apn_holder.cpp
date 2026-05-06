@@ -24,6 +24,7 @@ namespace {
     constexpr int32_t NETMANAGER_UID = 1099;
     std::shared_mutex reqUidsMutex_;
     std::mutex netRequestMutex_;
+    std::mutex apnItemMutex_;
 }
 const std::map<std::string, int32_t> ApnHolder::apnTypeDataProfileMap_ {
     {DATA_CONTEXT_ROLE_DEFAULT, DATA_PROFILE_DEFAULT},
@@ -62,11 +63,13 @@ int64_t ApnHolder::GetRetryDelay(int32_t cause, int32_t suggestTime, RetryScene 
 
 void ApnHolder::SetCurrentApn(sptr<ApnItem> &apnItem)
 {
+    std::shared_lock<std::shared_mutex> lock(apnItemMutex_);
     apnItem_ = apnItem;
 }
 
 sptr<ApnItem> ApnHolder::GetCurrentApn() const
 {
+    std::shared_lock<std::shared_mutex> lock(apnItemMutex_);
     return apnItem_;
 }
 
@@ -350,6 +353,7 @@ bool ApnHolder::IsCompatibleApnItem(const sptr<ApnItem> &newApnItem, const sptr<
 
 void ApnHolder::SetApnBadState(bool isBad)
 {
+    std::shared_lock<std::shared_mutex> lock(apnItemMutex_);
     if (apnItem_ != nullptr) {
         apnItem_->MarkBadApn(isBad);
     }
