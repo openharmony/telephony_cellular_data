@@ -344,12 +344,7 @@ int32_t CellularDataClient::HasInternetCapability(int32_t slotId, int32_t cid)
 
 int32_t CellularDataClient::ClearCellularDataConnections(int32_t slotId)
 {
-    sptr<ICellularDataManager> proxy = GetProxy();
-    if (proxy == nullptr) {
-        TELEPHONY_LOGE("proxy is null");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    return proxy->ClearCellularDataConnections(slotId);
+    return ClearAllConnections(slotId, DisConnectionReason::REASON_CLEAR_CONNECTION);
 }
 
 int32_t CellularDataClient::GetDataConnApnAttr(int32_t slotId, ApnItem::Attribute &apnAttr)
@@ -450,16 +445,6 @@ int32_t CellularDataClient::EstablishAllApnsIfConnectable(int32_t slotId)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return proxy->EstablishAllApnsIfConnectable(slotId);
-}
-
-int32_t CellularDataClient::ReleaseCellularDataConnection(int32_t slotId)
-{
-    sptr<ICellularDataManager> proxy = GetProxy();
-    if (proxy == nullptr) {
-        TELEPHONY_LOGE("proxy is null");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    return proxy->ReleaseCellularDataConnection(slotId);
 }
 
 int32_t CellularDataClient::GetCellularDataSupplierId(int32_t slotId, uint64_t capability, uint32_t &supplierId)

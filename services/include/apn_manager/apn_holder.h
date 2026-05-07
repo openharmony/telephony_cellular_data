@@ -50,7 +50,6 @@ public:
     uint64_t GetCapability() const;
     int32_t GetPriority() const;
     void RequestCellularData(const NetRequest &netRequest);
-    bool ReleaseCellularData(const NetRequest &netRequest);
     void ReleaseAllCellularData();
     bool IsEmergencyType() const;
     bool IsMmsType() const;
@@ -60,12 +59,7 @@ public:
     static bool IsSameApnItem(const sptr<ApnItem> &newApnItem, const sptr<ApnItem> &oldApnItem, bool roamingState);
     static bool IsCompatibleApnItem(const sptr<ApnItem> &newApnItem, const sptr<ApnItem> &oldApnItem,
         bool roamingState);
-    void AddUid(const NetRequest &netRequest);
-    void RemoveUid(const NetRequest &netRequest);
-    void ReleaseAllUids();
-    HasSystemUse GetUidStatus() const;
     void SetApnBadState(bool isBad);
-    bool IsReqUidsEmpty();
 
 private:
     ApnHolder(ApnHolder &apnHolder) = default;
@@ -81,9 +75,6 @@ private:
     std::string apnType_;
     int32_t priority_;
     std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine_;
-    std::vector<NetRequest> netRequests_;
-    std::set<uint32_t> reqUids_;
-    std::set<uint32_t> netMgrReqList_;
 };
 } // namespace Telephony
 } // namespace OHOS

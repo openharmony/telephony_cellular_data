@@ -56,18 +56,11 @@ struct NetSupplier {
     int32_t simId = 0;
     int32_t regState = -1;
 };
-enum RegisterType {
-    RELEASE,
-    REGISTER,
-    REQUEST
-};
+
 struct NetRequest {
     uint64_t capability = 0;
     std::string ident = "";
-    int32_t registerType = RELEASE;
     uint64_t bearTypes = 0;
-    uint32_t uid = 0;
-    uint32_t requestId = 0;
 };
 
 static const uint32_t DEFAULT_BANDWIDTH = 14;
