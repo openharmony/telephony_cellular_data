@@ -84,6 +84,7 @@ private:
     std::vector<NetRequest> netRequests_;
     std::set<uint32_t> reqUids_;
     std::set<uint32_t> netMgrReqList_;
+    std::mutex apnItemMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
