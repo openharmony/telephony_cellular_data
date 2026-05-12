@@ -19,6 +19,12 @@
 
 namespace OHOS {
 namespace Telephony {
+namespace { 
+     constexpr int32_t SYSTEM_UID = 1e4; 
+     constexpr int32_t NETMANAGER_UID = 1099; 
+     std::shared_mutex reqUidsMutex_; 
+     std::mutex netRequestMutex_; 
+}
 const std::map<std::string, int32_t> ApnHolder::apnTypeDataProfileMap_ {
     {DATA_CONTEXT_ROLE_DEFAULT, DATA_PROFILE_DEFAULT},
     {DATA_CONTEXT_ROLE_MMS, DATA_PROFILE_MMS},
