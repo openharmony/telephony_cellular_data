@@ -445,7 +445,7 @@ bool CellularDataController::EstablishAllApnsIfConnectable() const
         return false;
     }
     TELEPHONY_LOGI("EstablishAllApnsIfConnectable slot%{public}d", slotId_);
-    cellularDataHandler_->EstablishAllApnsIfConnectable();
+    cellularDataHandler_->SendEvent(CellularDataEventCode::MSG_ESTABLISH_ALL_APNS_IF_CONNECTABLE);
     return true;
 }
 
