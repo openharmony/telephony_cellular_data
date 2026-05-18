@@ -547,9 +547,6 @@ bool CellularDataHandler::CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder)
 
     if (defSlotId != slotId_ && !apnType.compare(DATA_CONTEXT_ROLE_DEFAULT)) {
         TELEPHONY_LOGD("Slot%{public}d: default:%{public}d, current:%{public}d", slotId_, defSlotId, slotId_);
-        CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
-            CellularDataErrorCode::DATA_ERROR_CELLULAR_DATA_SLOT_ID_MISMATCH,
-            "Default cellular data slot id is not current slot id");
         return false;
     }
     return true;
@@ -576,13 +573,9 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
     }
     bool isEmergencyApn = apnHolder->IsEmergencyType();
     if (!isEmergencyApn && !attached) {
-        CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
-            CellularDataErrorCode::DATA_ERROR_PS_NOT_ATTACH, "It is not emergencyApn and not attached");
         return false;
     }
     if (!isEmergencyApn && !isSimStateReadyOrLoaded) {
-        CellularDataHiSysEvent::WriteDataActivateFaultEvent(slotId_, SWITCH_ON,
-            CellularDataErrorCode::DATA_ERROR_SIM_NOT_READY, "It is not emergencyApn and sim not ready");
         return false;
     }
     return isEmergencyApn || isSimStateReadyOrLoaded;
@@ -2824,7 +2817,7 @@ ApnActivateReportInfo CellularDataHandler::GetApnActReportInfo(uint32_t apnId)
     uint32_t topReason = 0;
     uint32_t topReasonCnt = 0;
     std::map<uint32_t, uint32_t> errorMap;
-    std::lock_guard<std::mutex> lock(apnActivateListMutex_);
+    std::unique_lock<std::mutex> lock(apnActivateListMutex_);
     EraseApnActivateList();
     for (uint32_t i = 0; i < apnActivateChrList_.size(); i++) {
         ApnActivateInfo info = apnActivateChrList_[i];
@@ -2843,7 +2836,7 @@ ApnActivateReportInfo CellularDataHandler::GetApnActReportInfo(uint32_t apnId)
             errorMap[info.reason] = 1;
         }
     }
-    apnActivateListMutex_.unlock();
+    lock.unlock();
     info.actTimes = totalActTimes;
     info.actSuccTimes = totalActSuccTimes;
     info.averDuration = totalActSuccTimes == 0 ? 0 : totalDuration / totalActSuccTimes;
