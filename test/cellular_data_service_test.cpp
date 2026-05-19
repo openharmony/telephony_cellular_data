@@ -369,99 +369,6 @@ HWTEST_F(CellularDataServiceTest, CellularDataController_OnAddSystemAbility_001,
     ASSERT_EQ(cellularDataController->cellularDataHandler_, nullptr);
 }
 
-/**
- * @tc.number   RemoveUid_ShouldReturnInvalidParam_WhenIdentLengthLessThanIdentPreLen
- * @tc.name     test function branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataServiceTest, RemoveUid_WhenIdentLengthLessThanIdentPreLen, TestSize.Level1)
-{
-    NetRequest request;
-    request.ident = "";
-    int32_t result = service->RemoveUid(request);
-    EXPECT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
-}
-
-/**
- * @tc.number   RemoveUid_ShouldReturnInvalidParam_WhenIdentIsNotValidDecValue
- * @tc.name     test function branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataServiceTest, RemoveUid_WhenIdentIsNotValidDecValue, TestSize.Level1)
-{
-    NetRequest request;
-    request.ident = "simIdABC";
-    int32_t result = service->RemoveUid(request);
-    EXPECT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
-}
-
-/**
- * @tc.number   RemoveUid_ShouldReturnInvalidParam_WhenCellularDataControllerIsNull
- * @tc.name     test function branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataServiceTest, RemoveUid_WhenCellularDataControllerIsNull, TestSize.Level1)
-{
-    NetRequest request;
-    request.ident = "simId1";
-    int32_t result = service->RemoveUid(request);
-    EXPECT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
-}
-
-/**
- * @tc.number   AddUid_ShouldReturnInvalidParam_WhenIdentLengthLessThanIdentPreLen
- * @tc.name     test function branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataServiceTest, AddUid_WhenIdentLengthLessThanIdentPreLen, TestSize.Level1)
-{
-    NetRequest request;
-    request.ident = "";
-    int32_t result = service->AddUid(request);
-    EXPECT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
-}
-
-/**
- * @tc.number   AddUid_ShouldReturnInvalidParam_WhenIdentIsNotValidDecValue
- * @tc.name     test function branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataServiceTest, AddUid_WhenIdentIsNotValidDecValue, TestSize.Level1)
-{
-    NetRequest request;
-    request.ident = "simIdABC";
-    int32_t result = service->AddUid(request);
-    EXPECT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
-}
-
-/**
- * @tc.number   AddUid_ShouldReturnInvalidParam_WhenCellularDataControllerIsNull
- * @tc.name     test function branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataServiceTest, AddUid_WhenCellularDataControllerIsNull, TestSize.Level1)
-{
-    NetRequest request;
-    request.ident = "simId1";
-    int32_t result = service->AddUid(request);
-    EXPECT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
-}
-
-/**
- * @tc.number   RemoveOrAddUidTest001
- * @tc.name     test function branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataServiceTest, RemoveOrAddUidTest001, TestSize.Level0)
-{
-    NetRequest request;
-    request.ident = "simId123456789123";
-    EXPECT_EQ(service->AddUid(request), CELLULAR_DATA_INVALID_PARAM);
-    EXPECT_EQ(service->RemoveUid(request), CELLULAR_DATA_INVALID_PARAM);
-    request.ident = "simId12";
-    EXPECT_EQ(service->AddUid(request), CELLULAR_DATA_INVALID_PARAM);
-    EXPECT_EQ(service->RemoveUid(request), CELLULAR_DATA_INVALID_PARAM);
-}
 
 /**
  * @tc.number   EstablishAllApnsIfConnectableTest001
@@ -472,7 +379,6 @@ HWTEST_F(CellularDataServiceTest, EstablishAllApnsIfConnectableTest001, TestSize
 {
     int32_t slotId = -1;
     EXPECT_EQ(service->EstablishAllApnsIfConnectable(slotId), TELEPHONY_ERR_PERMISSION_ERR);
-    EXPECT_EQ(service->ReleaseCellularDataConnection(slotId), TELEPHONY_ERR_PERMISSION_ERR);
 }
 
 /**
@@ -484,8 +390,7 @@ HWTEST_F(CellularDataServiceTest, EstablishAllApnsIfConnectableTest002, TestSize
 {
     DataAccessToken token;
     int32_t slotId = -1;
-    EXPECT_EQ(service->EstablishAllApnsIfConnectable(slotId), CELLULAR_DATA_INVALID_PARAM);
-    EXPECT_EQ(service->ReleaseCellularDataConnection(slotId), CELLULAR_DATA_INVALID_PARAM);
+    EXPECT_NE(service->EstablishAllApnsIfConnectable(slotId), TELEPHONY_ERR_FAIL);
 }
 
 /**

@@ -206,14 +206,6 @@ public:
     int32_t EstablishAllApnsIfConnectable(int32_t slotId);
 
     /**
-     * @brief Release cellular data connection.
-     *
-     * @param slotId Card slot identification.
-     * @return 1 set success, 0 set fail
-     */
-    int32_t ReleaseCellularDataConnection(int32_t slotId);
-
-    /**
      * @brief Get cellular data supplierId.
      *
      * @param slotId Card slot identification.

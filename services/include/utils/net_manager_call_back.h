@@ -26,7 +26,6 @@ public:
     int32_t RequestNetwork(const std::string &ident, const std::set<NetManagerStandard::NetCap> &netCaps,
         const NetManagerStandard::NetRequest &netrequest = {}) override;
     int32_t ReleaseNetwork(const NetManagerStandard::NetRequest &netrequest) override;
-    int32_t AddRequest(const NetManagerStandard::NetRequest &netrequest) override;
 };
 } // namespace Telephony
 } // namespace OHOS

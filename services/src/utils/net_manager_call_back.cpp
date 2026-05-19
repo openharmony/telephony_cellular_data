@@ -31,8 +31,6 @@ int32_t NetManagerCallBack::RequestNetwork(const std::string &ident,
         request.capability |= 1L << netCap;
     }
     request.ident = ident;
-    request.registerType = netrequest.registerType;
-    request.uid = netrequest.uid;
     for (const auto &netBearType : netrequest.bearTypes) {
         request.bearTypes |= 1L << netBearType;
     }
@@ -50,37 +48,14 @@ int32_t NetManagerCallBack::ReleaseNetwork(const NetManagerStandard::NetRequest 
     for (const auto &netCap : netrequest.netCaps) {
         request.capability |= 1L << netCap;
     }
-    request.uid = netrequest.uid;
     request.ident = netrequest.ident;
     if (netrequest.bearTypes.find(NetBearType::BEARER_WIFI) != netrequest.bearTypes.end()) {
         request.bearTypes = NetBearType::BEARER_WIFI;
     } else {
         request.bearTypes = NetBearType::BEARER_DEFAULT;
     }
-    request.requestId = netrequest.requestId;
-    int32_t result = DelayedRefSingleton<CellularDataService>::GetInstance().RemoveUid(request);
-    if (result != static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)) {
-        TELEPHONY_LOGD("RemoveUid Request Fail");
-        return result;
-    }
-    if (netrequest.isRemoveUid != 0) {
-        return result;
-    }
-    result = DelayedRefSingleton<CellularDataService>::GetInstance().ReleaseNet(request);
+    int32_t result = DelayedRefSingleton<CellularDataService>::GetInstance().ReleaseNet(request);
     return result;
 }
-
-int32_t NetManagerCallBack::AddRequest(const NetManagerStandard::NetRequest &netrequest)
-{
-    NetRequest request;
-    request.ident = netrequest.ident;
-    for (const auto &netCap : netrequest.netCaps) {
-        request.capability |= 1L << netCap;
-    }
-    request.uid = netrequest.uid;
-    request.requestId = netrequest.requestId;
-    return DelayedRefSingleton<CellularDataService>::GetInstance().AddUid(request);
-}
-
 } // namespace Telephony
 } // namespace OHOS

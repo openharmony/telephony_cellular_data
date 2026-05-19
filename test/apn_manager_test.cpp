@@ -733,7 +733,6 @@ HWTEST_F(ApnManagerTest, RequestCellularData_002, TestSize.Level0)
     netRequest1.capability = 0;
     netRequest1.ident = "abc";
     sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
-    apnHolder->netRequests_.push_back(netRequest1);
     apnHolder->RequestCellularData(netRequest);
     ASSERT_EQ(apnHolder->dataCallEnabled_, true);
 }
@@ -752,7 +751,6 @@ HWTEST_F(ApnManagerTest, RequestCellularData_003, TestSize.Level0)
     netRequest1.capability = 1;
     netRequest1.ident = "ident";
     sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
-    apnHolder->netRequests_.push_back(netRequest1);
     apnHolder->RequestCellularData(netRequest);
     ASSERT_EQ(apnHolder->dataCallEnabled_, true);
 }
@@ -768,10 +766,8 @@ HWTEST_F(ApnManagerTest, RequestCellularData_004, TestSize.Level0)
     netRequest.capability = 1;
     netRequest.ident = "ident";
     sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
-    apnHolder->netRequests_.push_back(netRequest);
-    int size = apnHolder->netRequests_.size();
     apnHolder->RequestCellularData(netRequest);
-    ASSERT_EQ(size, apnHolder->netRequests_.size());
+    ASSERT_EQ(apnHolder->dataCallEnabled_, true);
 }
 
 /**
@@ -1280,41 +1276,6 @@ HWTEST_F(ApnManagerTest, ApnManager_FindApnHolderById_001, TestSize.Level0)
     EXPECT_EQ(apnManager->FindApnHolderById(0), nullptr);
     apnManager->AddApnHolder("default", 10);
     EXPECT_EQ(apnManager->FindApnTypeByApnName("abc"), static_cast<uint64_t>(ApnTypes::NONETYPE));
-}
-
-HWTEST_F(ApnManagerTest, ApnHolderAddUid001, TestSize.Level0)
-{
-    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
-    EXPECT_TRUE(apnHolder != nullptr);
-    NetRequest request;
-    request.uid = 1;
-    request.requestId = 1;
-    apnHolder->AddUid(request);
-    request.uid = 1099;
-    request.requestId = 2;
-    apnHolder->AddUid(request);
-}
-
-HWTEST_F(ApnManagerTest, ApnHolderRemoveUid001, TestSize.Level0)
-{
-    sptr<ApnHolder> apnHolder = new ApnHolder("", 0);
-    EXPECT_TRUE(apnHolder != nullptr);
-    NetRequest request;
-    request.uid = 1;
-    request.requestId = 1;
-    apnHolder->AddUid(request);
-    request.uid = 1099;
-    request.requestId = 2;
-    apnHolder->AddUid(request);
-    EXPECT_TRUE(apnHolder->netMgrReqList_.size() == 1);
-    request.uid = 1;
-    request.requestId = 1;
-    apnHolder->RemoveUid(request);
-    EXPECT_TRUE(apnHolder->netMgrReqList_.size() == 1);
-    request.uid = 1099;
-    request.requestId = 2;
-    apnHolder->RemoveUid(request);
-    EXPECT_TRUE(apnHolder->netMgrReqList_.size() == 0);
 }
 
 /**

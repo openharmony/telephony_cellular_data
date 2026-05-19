@@ -18,6 +18,7 @@
 #include "cellular_data_error.h"
 #include "cellular_data_hisysevent.h"
 #include "telephony_log_wrapper.h"
+#include "cellular_data_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -118,11 +119,10 @@ int32_t CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &col
     result->Close();
     settingHelper->Release();
     TELEPHONY_LOGD("Query end resultValue is %{public}s", resultValue.c_str());
-    if (resultValue.empty()) {
-        TELEPHONY_LOGD("resultValue is empty");
+    if (!CellularDataUtils::ConvertStrToInt(resultValue, value)) {
+        TELEPHONY_LOGD("ConvertStrToInt fail");
         return TELEPHONY_ERR_DATABASE_READ_EMPTY;
     }
-    value = atoi(resultValue.c_str());
     return TELEPHONY_ERR_SUCCESS;
 }
 

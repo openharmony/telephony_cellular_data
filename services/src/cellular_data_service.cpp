@@ -402,49 +402,6 @@ int32_t CellularDataService::ReleaseNet(const NetRequest &request)
     return static_cast<int32_t>(result ? RequestNetCode::REQUEST_SUCCESS : RequestNetCode::REQUEST_FAILED);
 }
 
-int32_t CellularDataService::RemoveUid(const NetRequest &request)
-{
-    size_t identPreLen = strlen(IDENT_PREFIX);
-    if (request.ident.length() < identPreLen) {
-        return CELLULAR_DATA_INVALID_PARAM;
-    }
-    std::string requestIdent = request.ident.substr(identPreLen);
-    if (!IsValidDecValue(requestIdent)) {
-        return CELLULAR_DATA_INVALID_PARAM;
-    }
-    int32_t simId = atoi(requestIdent.c_str());
-    int32_t slotId = CoreManagerInner::GetInstance().GetSlotId(simId);
-    std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
-    if (cellularDataController == nullptr) {
-        cellularDataController = GetCellularDataControllerForce(simId);
-    }
-    if (cellularDataController == nullptr) {
-        return CELLULAR_DATA_INVALID_PARAM;
-    }
-    bool result = cellularDataController->RemoveUid(request);
-    return static_cast<int32_t>(result ? RequestNetCode::REQUEST_SUCCESS : RequestNetCode::REQUEST_FAILED);
-}
-
-int32_t CellularDataService::AddUid(const NetRequest &request)
-{
-    size_t identPreLen = strlen(IDENT_PREFIX);
-    if (request.ident.length() < identPreLen) {
-        return CELLULAR_DATA_INVALID_PARAM;
-    }
-    std::string requestIdent = request.ident.substr(identPreLen);
-    if (!IsValidDecValue(requestIdent)) {
-        return CELLULAR_DATA_INVALID_PARAM;
-    }
-    int32_t simId = atoi(requestIdent.c_str());
-    int32_t slotId = CoreManagerInner::GetInstance().GetSlotId(simId);
-    std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
-    if (cellularDataController == nullptr) {
-        return CELLULAR_DATA_INVALID_PARAM;
-    }
-    bool result = cellularDataController->AddUid(request);
-    return static_cast<int32_t>(result ? RequestNetCode::REQUEST_SUCCESS : RequestNetCode::REQUEST_FAILED);
-}
-
 __attribute__((no_sanitize("cfi")))
 int32_t CellularDataService::RequestNet(const NetRequest &request)
 {
@@ -457,10 +414,6 @@ int32_t CellularDataService::RequestNet(const NetRequest &request)
         return CELLULAR_DATA_INVALID_PARAM;
     }
     int32_t simId = std::stoi(requestIdent);
-    if (TELEPHONY_EXT_WRAPPER.isCardAllowData_ &&
-        !TELEPHONY_EXT_WRAPPER.isCardAllowData_(simId, request.capability)) {
-        return static_cast<int32_t>(RequestNetCode::REQUEST_FAILED);
-    }
     int32_t slotId = CoreManagerInner::GetInstance().GetSlotId(simId);
     if (slotId >= 0 && slotId <= MAX_SLOT_NUM) {
         slotIdSimId_[slotId] = simId;
@@ -652,15 +605,6 @@ int32_t CellularDataService::HasInternetCapability(const int32_t slotId, const i
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t CellularDataService::ClearCellularDataConnections(const int32_t slotId)
-{
-    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
-        TELEPHONY_LOGE("Permission denied!");
-        return TELEPHONY_ERR_PERMISSION_ERR;
-    }
-    return ClearAllConnections(slotId, (int32_t) DisConnectionReason::REASON_CLEAR_CONNECTION);
-}
-
 int32_t CellularDataService::ClearAllConnections(const int32_t slotId, const int32_t reason)
 {
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
@@ -822,33 +766,6 @@ int32_t CellularDataService::EstablishAllApnsIfConnectable(const int32_t slotId)
 
     bool result = cellularDataController->EstablishAllApnsIfConnectable();
     return result ? TELEPHONY_ERR_SUCCESS : TELEPHONY_ERR_FAIL;
-}
-
-int32_t CellularDataService::ReleaseCellularDataConnection(int32_t slotId)
-{
-    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
-        TELEPHONY_LOGE("Permission denied!");
-        return TELEPHONY_ERR_PERMISSION_ERR;
-    }
-
-    std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
-    if (cellularDataController == nullptr) {
-        TELEPHONY_LOGE("slot%{public}d cellularDataControllers is null", slotId);
-        return CELLULAR_DATA_INVALID_PARAM;
-    }
-
-    bool hasSim = false;
-    CoreManagerInner::GetInstance().HasSimCard(slotId, hasSim);
-    if (!hasSim) {
-        TELEPHONY_LOGE("slot%{public}d has no sim", slotId);
-        return TELEPHONY_ERR_NO_SIM_CARD;
-    }
-    if (!CoreManagerInner::GetInstance().IsSimActive(slotId)) {
-        TELEPHONY_LOGE("slot%{public}d sim not active", slotId);
-        return TELEPHONY_ERR_SLOTID_INVALID;
-    }
-
-    return cellularDataController->ReleaseCellularDataConnection() ? TELEPHONY_ERR_SUCCESS : TELEPHONY_ERR_FAIL;
 }
 
 int32_t CellularDataService::GetCellularDataSupplierId(int32_t slotId, uint64_t capability, uint32_t &supplierId)

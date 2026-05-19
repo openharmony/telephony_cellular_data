@@ -30,7 +30,6 @@ interface OHOS.Telephony.ICellularDataManager {
     void SetDefaultCellularDataSlotId([in] int slotId);
     void GetCellularDataFlowType([out] int type);
     void HasInternetCapability([in] int slotId, [in] int cid, [out] int capability);
-    void ClearCellularDataConnections([in] int slotId);
     void ClearAllConnections([in] int slotId, [in] int reason);
     void RegisterSimAccountCallback([in] SimAccountCallback callbackparam);
     void UnregisterSimAccountCallback([in] SimAccountCallback callbackparam);
@@ -41,7 +40,6 @@ interface OHOS.Telephony.ICellularDataManager {
     void IsNeedDoRecovery([in] int slotId, [in] boolean needDoRecovery);
     void InitCellularDataController([in] int slotId);
     void EstablishAllApnsIfConnectable([in] int slotId);
-    void ReleaseCellularDataConnection([in] int slotId);
     void GetCellularDataSupplierId([in] int slotId, [in] unsigned long capability, [out] unsigned int supplierId);
     void CorrectNetSupplierNoAvailable([in] int slotId);
     void GetSupplierRegisterState([in] unsigned int supplierId, [out] int regState);

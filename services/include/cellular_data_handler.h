@@ -42,8 +42,6 @@ public:
     void Init();
     bool ReleaseNet(const NetRequest &request);
     bool RequestNet(const NetRequest &request);
-    bool AddUid(const NetRequest &request);
-    bool RemoveUid(const NetRequest &request);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     void OnCallStateChanged(int32_t slotId, int32_t state) override;
     void OnSimCardDefaultDataSubscriptionChanged(int32_t simId) override;
@@ -80,12 +78,9 @@ public:
     void UnRegisterDataSettingObserver();
     int32_t GetIntelligenceSwitchState(bool &switchState);
     void HandleUpdateNetInfo(const AppExecFwk::InnerEvent::Pointer &event);
-    void ReleaseCellularDataConnection();
     bool UpdateNetworkInfo();
     bool IsSupportDunApn();
     void ReportEventToChr(int32_t slotId, const char* scenario, int32_t cause);
-    void ConnectIfNeed(
-        const AppExecFwk::InnerEvent::Pointer &event, sptr<ApnHolder> apnHolder, const NetRequest &request);
     void HandleRetryLoadSimAccount(const AppExecFwk::InnerEvent::Pointer &event);
     void StartLoadSimAccountTimer(int32_t times);
     void StopLoadSimAccountTimer();

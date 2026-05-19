@@ -51,9 +51,6 @@ public:
     bool ChangeConnectionForDsds(bool enable) const;
     int32_t GetIntelligenceSwitchState(bool &switchState);
     bool EstablishAllApnsIfConnectable() const;
-    bool AddUid(const NetRequest &request);
-    bool RemoveUid(const NetRequest &request);
-    bool ReleaseCellularDataConnection() const;
     bool UpdateNetworkInfo();
     bool IsSupportDunApn();
     bool GetDefaultActReportInfo(ApnActivateReportInfo &info);

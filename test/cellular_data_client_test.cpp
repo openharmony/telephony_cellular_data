@@ -180,17 +180,6 @@ HWTEST_F(CellularDataClientTest, EstablishAllApnsIfConnectable_001, TestSize.Lev
 }
 
 /**
- * @tc.number   ReleaseCellularDataConnection_001
- * @tc.name     test function branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataClientTest, ReleaseCellularDataConnection_001, TestSize.Level0)
-{
-    int32_t result = CellularDataClient::GetInstance().ReleaseCellularDataConnection(0);
-    EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
-}
-
-/**
  * @tc.number   GetCellularDataSupplierId_001
  * @tc.name     test function branch
  * @tc.desc     Function test

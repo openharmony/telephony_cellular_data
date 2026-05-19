@@ -430,17 +430,6 @@ HWTEST_F(CellularDataHandlerBranchTest, CheckForCompatibleDataConnection, Functi
     ASSERT_EQ(apnHolder->GetApnType(), DATA_CONTEXT_ROLE_DUN);
 }
 
-HWTEST_F(CellularDataHandlerBranchTest, ReleaseCellularDataConnection, Function | MediumTest | Level3)
-{
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
-
-    cellularDataHandler->ReleaseCellularDataConnection();
-    ASSERT_EQ(cellularDataHandler->apnManager_, nullptr);
-    cellularDataHandler->Init();
-    cellularDataHandler->ReleaseCellularDataConnection();
-    ASSERT_NE(cellularDataHandler->apnManager_, nullptr);
-}
-
 HWTEST_F(CellularDataHandlerBranchTest, CheckCellularDataSlotId, Function | MediumTest | Level3)
 {
     auto cellularDataHandler = std::make_shared<CellularDataHandler>(2); // 2: vsim slot id

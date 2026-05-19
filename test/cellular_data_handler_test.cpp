@@ -365,24 +365,6 @@ HWTEST_F(CellularDataHandlerTest, ClearConnectionsOnUpdateApns_002, Function | M
 }
 
 /**
- * @tc.number   CellularDataHandler_Uid_Test001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataHandlerTest, CellularDataHandler_Uid_Test001, Function | MediumTest | Level3)
-{
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
-    NetRequest netRequest;
-    netRequest.capability = 1;
-    netRequest.ident = "ident";
-    EXPECT_FALSE(cellularDataHandler->AddUid(netRequest));
-    EXPECT_FALSE(cellularDataHandler->RemoveUid(netRequest));
-    cellularDataHandler->Init();
-    EXPECT_TRUE(cellularDataHandler->AddUid(netRequest));
-    EXPECT_TRUE(cellularDataHandler->RemoveUid(netRequest));
-}
-
-/**
  * @tc.number   SetCellularDataRoamingEnabledTest001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -776,23 +758,6 @@ HWTEST_F(CellularDataHandlerTest, CheckForCompatibleDataConnectionTest001, Funct
 }
 
 /**
- * @tc.number   ReleaseCellularDataConnectionTest001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataHandlerTest, ReleaseCellularDataConnectionTest001, Function | MediumTest | Level3)
-{
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
-    cellularDataHandler->Init();
-    std::set<uint32_t> reqUids = {1};
-    sptr<ApnHolder> apnHolder = std::make_unique<ApnHolder>("default", static_cast<int32_t>(0)).release();
-    apnHolder->reqUids_ = reqUids;
-    cellularDataHandler->apnManager_->apnIdApnHolderMap_[1] = apnHolder;
-    cellularDataHandler->ReleaseCellularDataConnection();
-    EXPECT_NE(cellularDataHandler->apnManager_->apnIdApnHolderMap_[1]->apnState_, 3);
-}
-
-/**
  * @tc.number   UpdateNetworkInfo_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -818,97 +783,6 @@ HWTEST_F(CellularDataHandlerTest, UpdateNetworkInfo_002, Function | MediumTest |
 }
 
 /**
- * @tc.number   AddUid001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataHandlerTest, AddUid001, Function | MediumTest | Level3)
-{
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
-    cellularDataHandler->Init();
-    NetRequest request;
-    request.uid = 1;
-    EXPECT_FALSE(cellularDataHandler->AddUid(request));
-    cellularDataHandler->apnManager_ = nullptr;
-    EXPECT_FALSE(cellularDataHandler->AddUid(request));
-}
-
-/**
- * @tc.number   RemoveUid001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataHandlerTest, RemoveUid001, Function | MediumTest | Level3)
-{
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
-    cellularDataHandler->Init();
-    NetRequest request;
-    request.uid = 1;
-    EXPECT_FALSE(cellularDataHandler->RemoveUid(request));
-    cellularDataHandler->apnManager_ = nullptr;
-    EXPECT_FALSE(cellularDataHandler->RemoveUid(request));
-}
-
-/**
- * @tc.number   Telephony_GetCurrentApnId_Test_01
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataHandlerTest, GetCurrentApnId_Test_01, Function | MediumTest | Level1)
-{
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
-    cellularDataHandler->Init();
-    int32_t profileId = cellularDataHandler->GetCurrentApnId();
-    EXPECT_NE(profileId, 0);
-}
-
-/**
- * @tc.number   Telephony_FindApnHolderById_Test_01
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataHandlerTest, FindApnHolderById_Test_01, Function | MediumTest | Level1)
-{
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
-    cellularDataHandler->Init();
-    int32_t profileId = cellularDataHandler->GetCurrentApnId();
-    EXPECT_NE(profileId, 0);
-    EXPECT_NE(cellularDataHandler->apnManager_->FindApnHolderById(profileId), nullptr);
-}
-
-/**
- * @tc.number   Telephony_CellularDataHandler_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataHandlerTest, Telephony_CellularDataHandler_001, Function | MediumTest | Level1)
-{
-    CellularDataController controller {0};
-    controller.Init();
-    NetRequest request;
-    request.ident = "simId1";
-    EXPECT_FALSE(controller.AddUid(request));
-    controller.cellularDataHandler_ = nullptr;
-    EXPECT_FALSE(controller.AddUid(request));
-}
-
-/**
- * @tc.number   Telephony_CellularDataHandler_002
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(CellularDataHandlerTest, Telephony_CellularDataHandler_002, Function | MediumTest | Level1)
-{
-    CellularDataController controller {0};
-    controller.Init();
-    NetRequest request;
-    request.ident = "simId1";
-    EXPECT_FALSE(controller.RemoveUid(request));
-    controller.cellularDataHandler_ = nullptr;
-    EXPECT_FALSE(controller.RemoveUid(request));
-}
-
-/**
  * @tc.number   Telephony_MsgRequest
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -919,12 +793,10 @@ HWTEST_F(CellularDataHandlerTest, Telephony_MsgRequest, Function | MediumTest | 
     cellularDataHandler->Init();
     NetRequest request1;
     request1.capability = NetManagerStandard::NET_CAPABILITY_INTERNET;
-    request1.registerType = REGISTER;
 
     EXPECT_TRUE(cellularDataHandler->RequestNet(request1));
     NetRequest request2;
     request2.capability = NetManagerStandard::NET_CAPABILITY_INTERNET;
-    request2.registerType = REQUEST;
     EXPECT_TRUE(cellularDataHandler->RequestNet(request2));
     sleep(2);
 }
@@ -941,15 +813,10 @@ HWTEST_F(CellularDataHandlerTest, Telephony_ConnectIfNeed, Function | MediumTest
 
     NetRequest request1;
     request1.capability = NetManagerStandard::NET_CAPABILITY_INTERNET;
-    request1.registerType = REQUEST;
     EXPECT_TRUE(cellularDataHandler->RequestNet(request1));
     auto event1 = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_REQUEST_NETWORK, TYPE_REQUEST_NET);
     auto apnHolder =
         cellularDataHandler->apnManager_->FindApnHolderById(ApnManager::FindApnIdByCapability(request1.capability));
-    cellularDataHandler->ConnectIfNeed(event1, apnHolder, request1);
-    auto event2 = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_REQUEST_NETWORK, TYPE_RELEASE_NET);
-    cellularDataHandler->ConnectIfNeed(event2, apnHolder, request1);
-    cellularDataHandler->ConnectIfNeed(event2, nullptr, request1);
 }
 
 HWTEST_F(CellularDataHandlerTest, Telephony_CellularDataHandler_003, Function | MediumTest | Level1)
@@ -1454,6 +1321,22 @@ HWTEST_F(CellularDataHandlerTest, StopLoadSimAccountTimer_001, Function | Medium
     EXPECT_TRUE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT));
     cellularDataHandler->StopLoadSimAccountTimer();
     EXPECT_FALSE(cellularDataHandler->HasInnerEvent(CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT));
+}
+
+HWTEST_F(CellularDataHandlerTest, MsgRequestNetwork001, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
+    cellularDataHandler->apnManager_ = sptr<ApnManager>::MakeSptr();
+    cellularDataHandler->apnManager_->InitApnHolders();
+    std::unique_ptr<NetRequest> netRequest = std::make_unique<NetRequest>();
+    netRequest->capability = NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET;
+    sptr<ApnHolder> apnHolder = cellularDataHandler->apnManager_->FindApnHolderById(DATA_CONTEXT_ROLE_DEFAULT_ID);
+    ASSERT_NE(apnHolder, nullptr);
+    apnHolder->dataCallEnabled_ = true;
+    AppExecFwk::InnerEvent::Pointer event =
+        AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_REQUEST_NETWORK, netRequest, TYPE_RELEASE_NET);
+    cellularDataHandler->MsgRequestNetwork(event);
+    EXPECT_FALSE(apnHolder->dataCallEnabled_);
 }
 } // namespace Telephony
 } // namespace OHOS

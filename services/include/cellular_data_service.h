@@ -60,14 +60,11 @@ public:
     int32_t GetCellularDataFlowType(int32_t &type) override;
     void DispatchEvent(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
     int32_t HasInternetCapability(const int32_t slotId, const int32_t cid, int32_t &capability) override;
-    int32_t ClearCellularDataConnections(const int32_t slotId) override;
     int32_t ClearAllConnections(const int32_t slotId, const int32_t reason) override;
     int32_t ChangeConnectionForDsds(const int32_t slotId, bool enable);
     int32_t StrategySwitch(int32_t slotId, bool enable);
     int32_t RequestNet(const NetRequest &request);
     int32_t ReleaseNet(const NetRequest &request);
-    int32_t AddUid(const NetRequest &request);
-    int32_t RemoveUid(const NetRequest &request);
     int32_t GetServiceRunningState();
     int64_t GetSpendTime();
     int32_t GetApnState(int32_t slotId, const std::string &apnType, int &state) override;
@@ -81,7 +78,6 @@ public:
     int32_t InitCellularDataController(int32_t slotId) override;
     int32_t GetIntelligenceSwitchState(bool &switchState) override;
     int32_t EstablishAllApnsIfConnectable(int32_t slotId) override;
-    int32_t ReleaseCellularDataConnection(int32_t slotId) override;
     int32_t GetCellularDataSupplierId(int32_t slotId, uint64_t capability, uint32_t &supplierId) override;
     int32_t CorrectNetSupplierNoAvailable(int32_t slotId) override;
     int32_t GetSupplierRegisterState(uint32_t supplierId, int32_t &regState) override;
