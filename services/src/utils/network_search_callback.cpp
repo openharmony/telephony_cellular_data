@@ -32,7 +32,8 @@ bool NetworkSearchCallback::HasInternetCapability(int32_t slotId, int32_t cId)
 
 void NetworkSearchCallback::ClearCellularDataConnections(int32_t slotId)
 {
-    int32_t result = DelayedRefSingleton<CellularDataService>::GetInstance().ClearCellularDataConnections(slotId);
+    int32_t result = DelayedRefSingleton<CellularDataService>::GetInstance().ClearAllConnections(slotId,
+        (int32_t) DisConnectionReason::REASON_CLEAR_CONNECTION);
     if (result != static_cast<int32_t>(RequestNetCode::REQUEST_SUCCESS)) {
         TELEPHONY_LOGE("slot:%{public}d failed %{public}d", slotId, result);
     }

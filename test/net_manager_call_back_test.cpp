@@ -76,25 +76,7 @@ HWTEST_F(NetManagerCallBackTest, ReleaseNetwork_002, TestSize.Level3)
     request.ident = "testIdent";
     request.bearTypes.insert(NetManagerStandard::NetBearType::BEARER_WIFI);
     request.netCaps.insert(NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET);
-    request.isRemoveUid = 255;
     int32_t result = netManagerCallBack->ReleaseNetwork(request);
-    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
-}
-
-/**
- * @tc.number   AddRequest_001
- * @tc.name     Test NetManagerCallBack AddRequest
- * @tc.desc     Add Request and uid
- */
-HWTEST_F(NetManagerCallBackTest, AddRequest_001, TestSize.Level3)
-{
-    auto netManagerCallBack = std::make_shared<NetManagerCallBack>();
-    NetManagerStandard::NetRequest request;
-    request.ident = "testIdent";
-    int32_t result = netManagerCallBack->AddRequest(request);
-    ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
-    request.netCaps.insert(NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET);
-    result = netManagerCallBack->AddRequest(request);
     ASSERT_EQ(result, CELLULAR_DATA_INVALID_PARAM);
 }
 }

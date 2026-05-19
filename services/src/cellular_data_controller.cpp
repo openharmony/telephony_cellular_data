@@ -156,24 +156,6 @@ bool CellularDataController::RequestNet(const NetRequest &request)
     return cellularDataHandler_->RequestNet(request);
 }
 
-bool CellularDataController::AddUid(const NetRequest &request)
-{
-    if (cellularDataHandler_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler_ is null", slotId_);
-        return false;
-    }
-    return cellularDataHandler_->AddUid(request);
-}
-
-bool CellularDataController::RemoveUid(const NetRequest &request)
-{
-    if (cellularDataHandler_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler_ is null", slotId_);
-        return false;
-    }
-    return cellularDataHandler_->RemoveUid(request);
-}
-
 void CellularDataController::AsynchronousRegister()
 {
     if (CoreManagerInner::GetInstance().IsInitFinished()) {
@@ -463,18 +445,7 @@ bool CellularDataController::EstablishAllApnsIfConnectable() const
         return false;
     }
     TELEPHONY_LOGI("EstablishAllApnsIfConnectable slot%{public}d", slotId_);
-    cellularDataHandler_->EstablishAllApnsIfConnectable();
-    return true;
-}
-
-bool CellularDataController::ReleaseCellularDataConnection() const
-{
-    if (cellularDataHandler_ == nullptr) {
-        TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler is null", slotId_);
-        return false;
-    }
-    TELEPHONY_LOGD("ReleaseCellularDataConnection slot%{public}d", slotId_);
-    cellularDataHandler_->ReleaseCellularDataConnection();
+    cellularDataHandler_->SendEvent(CellularDataEventCode::MSG_ESTABLISH_ALL_APNS_IF_CONNECTABLE);
     return true;
 }
 

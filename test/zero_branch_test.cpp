@@ -808,8 +808,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_001, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetCellularDataFlowType(type));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HasInternetCapability(INVALID_SLOTID, 0, capability));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HasInternetCapability(DEFAULT_SIM_SLOT_ID, 0, capability));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearCellularDataConnections(INVALID_SLOTID));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearCellularDataConnections(DEFAULT_SIM_SLOT_ID));
     int32_t reason = static_cast<int32_t>(DisConnectionReason::REASON_NORMAL);
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearAllConnections(INVALID_SLOTID, reason));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearAllConnections(DEFAULT_SIM_SLOT_ID, reason));
@@ -860,7 +858,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_002, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.SetDefaultCellularDataSlotId(INVALID_SLOTID));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.GetCellularDataFlowType(type));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.HasInternetCapability(INVALID_SLOTID, 0, capability));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearCellularDataConnections(INVALID_SLOTID));
     int32_t reason = static_cast<int32_t>(DisConnectionReason::REASON_NORMAL);
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearAllConnections(INVALID_SLOTID, reason));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ChangeConnectionForDsds(INVALID_SLOTID, false));
@@ -915,8 +912,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_003, Function | MediumTest | 
     ASSERT_EQ(TELEPHONY_ERR_SUCCESS, service.GetDefaultCellularDataSlotId(slotId));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.StrategySwitch(INVALID_SLOTID, false));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.StrategySwitch(DEFAULT_SIM_SLOT_ID, false));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearCellularDataConnections(INVALID_SLOTID));
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearCellularDataConnections(DEFAULT_SIM_SLOT_ID));
     int32_t reason = static_cast<int32_t>(DisConnectionReason::REASON_NORMAL);
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearAllConnections(INVALID_SLOTID, reason));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.ClearAllConnections(DEFAULT_SIM_SLOT_ID, reason));
@@ -1496,9 +1491,7 @@ HWTEST_F(BranchTest, Telephony_ApnHolder_001, Function | MediumTest | Level3)
     request.ident = "test";
     request.capability = -1;
     apnHolder->RequestCellularData(request);
-    apnHolder->ReleaseCellularData(request);
     apnHolder->RequestCellularData(request);
-    apnHolder->ReleaseCellularData(request);
     ASSERT_FALSE(apnHolder->IsEmergencyType());
     ASSERT_FALSE(apnHolder->IsMmsType());
     EXPECT_GE(apnHolder->GetProfileId(DATA_CONTEXT_ROLE_DEFAULT), DATA_PROFILE_DEFAULT);
@@ -2087,10 +2080,6 @@ HWTEST_F(BranchTest, CellularDataUtils_Test_03, Function | MediumTest | Level3)
     EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
         ICellularDataManagerIpcCode::COMMAND_HAS_INTERNET_CAPABILITY), data, reply, option), 0);
     EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
-        ICellularDataManagerIpcCode::COMMAND_CLEAR_CELLULAR_DATA_CONNECTIONS), data, reply, option), 0);
-    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
-        ICellularDataManagerIpcCode::COMMAND_CLEAR_ALL_CONNECTIONS), data, reply, option), 0);
-    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
         ICellularDataManagerIpcCode::COMMAND_GET_DATA_CONN_APN_ATTR), data, reply, option), 0);
     EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
         ICellularDataManagerIpcCode::COMMAND_GET_DATA_CONN_IP_TYPE), data, reply, option), 0);
@@ -2104,8 +2093,6 @@ HWTEST_F(BranchTest, CellularDataUtils_Test_03, Function | MediumTest | Level3)
         ICellularDataManagerIpcCode::COMMAND_INIT_CELLULAR_DATA_CONTROLLER), data, reply, option), 0);
     EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
         ICellularDataManagerIpcCode::COMMAND_ESTABLISH_ALL_APNS_IF_CONNECTABLE), data, reply, option), 0);
-    EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
-        ICellularDataManagerIpcCode::COMMAND_RELEASE_CELLULAR_DATA_CONNECTION), data, reply, option), 0);
     EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
         ICellularDataManagerIpcCode::COMMAND_GET_CELLULAR_DATA_SUPPLIER_ID), data, reply, option), 0);
     EXPECT_GE(cellularDataService->OnRemoteRequest(static_cast<uint32_t>(
@@ -2464,31 +2451,6 @@ HWTEST_F(BranchTest, MakePdpProfile_002, TestSize.Level3)
     cellularDataRdbHelper.MakePdpProfile(result, i, apnBean);
     ASSERT_EQ("ABC", apnBean.pdpProtocol);
     ASSERT_EQ("abc", apnBean.roamPdpProtocol);
-}
-
-/**
- * @tc.number   WriteEventCellularRequest_Test_01
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, WriteEventCellularRequest_Test_01, TestSize.Level3)
-{
-    CellularDataUtils::ParseNormalIpAddr(ADDRESS);
-    CellularDataUtils::ParseRoute(ADDRESS);
-    CellularDataUtils::GetPrefixLen(ADDRESS, FLAG);
-    auto cellularDataHiSysEvent = DelayedSingleton<CellularDataHiSysEvent>::GetInstance();
-    cellularDataHiSysEvent->WriteCellularRequestBehaviorEvent(1, "abc", 1, 1);
-    CellularDataController controller { 0 };
-    controller.Init();
-    NetRequest request;
-    int32_t state = 0;
-    ASSERT_FALSE(controller.cellularDataHandler_->WriteEventCellularRequest(request, state));
-    request.capability = NetCap::NET_CAPABILITY_INTERNET;
-    ASSERT_FALSE(controller.cellularDataHandler_->WriteEventCellularRequest(request, state));
-    request.bearTypes |= (1ULL << NetBearType::BEARER_CELLULAR);
-    ASSERT_TRUE(controller.cellularDataHandler_->WriteEventCellularRequest(request, state));
-    request.capability = NetCap::NET_CAPABILITY_END;
-    ASSERT_FALSE(controller.cellularDataHandler_->WriteEventCellularRequest(request, state));
 }
 
 /**

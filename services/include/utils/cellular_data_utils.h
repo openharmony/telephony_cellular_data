@@ -34,11 +34,11 @@ public:
     static bool GetDefaultPreferApnConfig();
     static bool GetDefaultMultipleConnectionsConfig();
     static std::string ConvertRadioTechToRadioName(const int32_t radioTech);
+    static bool ConvertStrToInt(const std::string& str, int32_t& value);
 
 private:
     CellularDataUtils() = default;
     ~CellularDataUtils() = default;
-    static bool ConvertStrToInt(const std::string& str, int32_t& value);
     static bool ConvertStrToUint(const std::string& str, uint8_t& value);
 };
 } // namespace Telephony

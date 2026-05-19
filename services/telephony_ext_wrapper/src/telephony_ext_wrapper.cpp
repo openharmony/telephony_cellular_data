@@ -63,29 +63,16 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCellularData()
     InitDataEndSelfCure();
     InitTelephonyExtForCustomization();
     InitSendDataSwitchChangeInfo();
-    InitIsAllCellularDataAllowed();
     InitIsDualCellularCardAllowed();
     InitHandleDendFailcause();
     InitConvertPdpError();
     InitRestartRadioIfRequired();
     InitSendApnNeedRetryInfo();
-    InitJudgeOtherRequestHolding();
     InitCreateDcApnItemExt();
     InitReregisterNetwork();
     InitIsVirtualModemConnected();
     InitIsDcCellularDataAllowed();
     InitReportEventToChr();
-}
-
-void TelephonyExtWrapper::InitJudgeOtherRequestHolding()
-{
-    judgeOtherRequestHolding_ =
-        (JUDGE_OTHER_REQUEST_HOLDING)dlsym(telephonyExtWrapperHandle_, "JudgeOtherRequestHolding");
-    if (judgeOtherRequestHolding_ == nullptr) {
-        TELEPHONY_LOGE("telephony ext wrapper symbol JudgeOtherRequestHolding failed, error: %{public}s", dlerror());
-        return;
-    }
-    TELEPHONY_LOGD("telephony ext wrapper init JudgeOtherRequestHolding success");
 }
 
 void TelephonyExtWrapper::InitDataEndSelfCure()
@@ -152,17 +139,6 @@ void TelephonyExtWrapper::InitSendDataSwitchChangeInfo()
         return;
     }
     TELEPHONY_LOGD("telephony ext wrapper init SendDataSwitchChangeInfo success");
-}
-
-void TelephonyExtWrapper::InitIsAllCellularDataAllowed()
-{
-    isAllCellularDataAllowed_ =
-        (IS_ALL_CELLULAR_DATA_ALLOWED)dlsym(telephonyExtWrapperHandle_, "IsAllCellularDataAllowed");
-    if (isAllCellularDataAllowed_ == nullptr) {
-        TELEPHONY_LOGE("telephony ext wrapper symbol IsAllCellularDataAllowed failed, error: %{public}s", dlerror());
-        return;
-    }
-    TELEPHONY_LOGD("telephony ext wrapper init IsAllCellularDataAllowed success");
 }
 
 void TelephonyExtWrapper::InitIsDualCellularCardAllowed()
