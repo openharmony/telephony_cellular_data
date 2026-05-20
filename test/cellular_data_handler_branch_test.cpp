@@ -206,7 +206,7 @@ HWTEST_F(CellularDataHandlerBranchTest, DisconnectDataComplete_002, Function | M
     resultInfo->flag = 2;
     auto event = AppExecFwk::InnerEvent::Get(0, resultInfo);
     sptr<ApnHolder> apnHolder = cellularDataHandler->apnManager_->FindApnHolderById(2);
-    sptr<DataConnectionManager> connectionManager = std::make_unique<DataConnectionManager>(0).release();
+    auto connectionManager = std::make_shared<DataConnectionManager>(0);
     if (connectionManager == nullptr) {
         return;
     }

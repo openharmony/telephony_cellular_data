@@ -46,8 +46,8 @@ public:
     private:
         std::weak_ptr<CellularDataStateMachine> cellularDataStateMachine_;
     };
-    CellularDataStateMachine(
-        sptr<DataConnectionManager> &cdConnectionManager, std::shared_ptr<TelEventHandler> &&cellularDataHandler)
+    CellularDataStateMachine(std::shared_ptr<DataConnectionManager> &cdConnectionManager,
+        std::shared_ptr<TelEventHandler> &&cellularDataHandler)
         : StateMachine("CellularDataStateMachine"), cdConnectionManager_(cdConnectionManager),
           cellularDataHandler_(std::move(cellularDataHandler)), cid_(0), capability_(0),
           rilRat_(RadioTech::RADIO_TECHNOLOGY_UNKNOWN), apnId_(0)
@@ -88,7 +88,7 @@ protected:
     std::shared_ptr<State> disconnectingState_;
     std::shared_ptr<State> defaultState_;
     std::shared_ptr<State> currentState_;
-    sptr<DataConnectionManager> cdConnectionManager_;
+    std::shared_ptr<DataConnectionManager> cdConnectionManager_ = nullptr;
     std::shared_ptr<TelEventHandler> cellularDataHandler_;
     sptr<NetManagerStandard::NetLinkInfo> netLinkInfo_;
     sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo_;

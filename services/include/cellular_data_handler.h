@@ -201,7 +201,7 @@ private:
 private:
     sptr<ApnManager> apnManager_;
     std::unique_ptr<DataSwitchSettings> dataSwitchSettings_;
-    sptr<DataConnectionManager> connectionManager_;
+    std::shared_ptr<DataConnectionManager> connectionManager_ = nullptr;
     std::u16string lastIccId_;
     int32_t lastCallState_ = (int32_t)TelCallStatus::CALL_STATUS_IDLE;
     const int32_t slotId_;

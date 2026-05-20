@@ -18,6 +18,7 @@ import("//build/test.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("UpdateDisconnectMachineFuzzTest") {
+  branch_protector_ret = "pac_ret"
   module_output_path = "cellular_data/cellular_data"
   module_out_path = module_output_path
   SOURCE_DIR = "../../.."
@@ -68,15 +69,11 @@ ohos_fuzztest("UpdateDisconnectMachineFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
     "-fvisibility=hidden",
   ]
 
   ldflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
   ]
 
   sources = [

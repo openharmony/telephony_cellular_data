@@ -57,7 +57,7 @@ void CellularDataHandler::Init()
     lastApnItem_ = new ApnItem();
     apnManager_ = std::make_unique<ApnManager>().release();
     dataSwitchSettings_ = std::make_unique<DataSwitchSettings>(slotId_);
-    connectionManager_ = std::make_unique<DataConnectionManager>(slotId_).release();
+    connectionManager_ = std::make_shared<DataConnectionManager>(slotId_);
     settingObserver_ = new (std::nothrow) CellularDataSettingObserver(
         std::weak_ptr<TelEventHandler>(std::static_pointer_cast<TelEventHandler>(shared_from_this())));
     roamingObserver_ = new (std::nothrow) CellularDataRoamingObserver(

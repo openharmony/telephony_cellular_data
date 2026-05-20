@@ -18,6 +18,7 @@ import("//build/test.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("GetCellularDataStateFuzzTest") {
+  branch_protector_ret = "pac_ret"
   module_output_path = "cellular_data/cellular_data"
   module_out_path = module_output_path
   SOURCE_DIR = "../../.."

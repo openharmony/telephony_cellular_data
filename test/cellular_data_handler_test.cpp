@@ -131,7 +131,7 @@ HWTEST_F(CellularDataHandlerTest, HandleUpdateNetInfo_005, Function | MediumTest
         cellularDataHandler->apnManager_->FindApnNameByApnId(netInfo->flag));
     EXPECT_NE(apnHolder, nullptr);
     apnHolder->SetApnState(PROFILE_STATE_CONNECTED);
-    sptr<DataConnectionManager> connectionManager = std::make_unique<DataConnectionManager>(0).release();
+    auto connectionManager = std::make_shared<DataConnectionManager>(0);
     EXPECT_NE(connectionManager, nullptr);
     connectionManager->Init();
     auto sm = std::make_shared<CellularDataStateMachine>(
@@ -407,7 +407,7 @@ HWTEST_F(CellularDataHandlerTest, AttemptEstablishDataConnectionTest001, Functio
 HWTEST_F(CellularDataHandlerTest, AttemptEstablishDataConnectionTest002, Function | MediumTest | Level3)
 {
     auto cellularDataHandler = std::make_shared<CellularDataHandler>(1);
-    sptr<DataConnectionManager> connectionManager = std::make_unique<DataConnectionManager>(0).release();
+    auto connectionManager = std::make_shared<DataConnectionManager>(0);
     std::shared_ptr<CellularDataStateMachine> cellularMachine = std::make_shared<CellularDataStateMachine>(
         connectionManager, nullptr);
     cellularDataHandler->connectionManager_ = connectionManager;
@@ -652,7 +652,7 @@ HWTEST_F(CellularDataHandlerTest, HasInternetCapabilityTest001, Function | Mediu
 {
     auto cellularDataHandler = std::make_shared<CellularDataHandler>(1);
     cellularDataHandler->Init();
-    sptr<DataConnectionManager> connectionManager = std::make_unique<DataConnectionManager>(0).release();
+    auto connectionManager = std::make_shared<DataConnectionManager>(0);
     std::shared_ptr<CellularDataStateMachine> cellularMachine = std::make_shared<CellularDataStateMachine>(
         connectionManager, nullptr);
     cellularMachine->capability_ = NetCap::NET_CAPABILITY_INTERNET;
@@ -670,7 +670,7 @@ HWTEST_F(CellularDataHandlerTest, HasInternetCapabilityTest002, Function | Mediu
 {
     auto cellularDataHandler = std::make_shared<CellularDataHandler>(1);
     cellularDataHandler->Init();
-    sptr<DataConnectionManager> connectionManager = std::make_unique<DataConnectionManager>(0).release();
+    auto connectionManager = std::make_shared<DataConnectionManager>(0);
     std::shared_ptr<CellularDataStateMachine> cellularMachine = std::make_shared<CellularDataStateMachine>(
         connectionManager, nullptr);
     cellularMachine->capability_ = NetCap::NET_CAPABILITY_MMS;
@@ -731,7 +731,7 @@ HWTEST_F(CellularDataHandlerTest, GetDataConnIpTypeTest001, Function | MediumTes
     apnHolder1->dataCallEnabled_ = true;
     cellularDataHandler->apnManager_->apnHolders_.push_back(apnHolder1);
     sptr<ApnHolder> apnHolder2 = std::make_unique<ApnHolder>("default", static_cast<int32_t>(0)).release();
-    sptr<DataConnectionManager> connectionManager = std::make_unique<DataConnectionManager>(0).release();
+    auto connectionManager = std::make_shared<DataConnectionManager>(0);
     std::shared_ptr<CellularDataStateMachine> cellularMachine = std::make_shared<CellularDataStateMachine>(
         connectionManager, nullptr);
     cellularMachine->ipType_ = "IPV4";
@@ -846,7 +846,7 @@ HWTEST_F(CellularDataHandlerTest, DataConnCompleteUpdateStateTest001, Function |
     cellularDataHandler->DataConnCompleteUpdateState(apnHolder, resultInfo);
     EXPECT_FALSE(cellularDataHandler->isRilApnAttached_);
 
-    sptr<DataConnectionManager> cdConnectionManager = nullptr;
+    std::shared_ptr<DataConnectionManager> cdConnectionManager = nullptr;
     std::shared_ptr<TelEventHandler> telEventHandler = nullptr;
     apnHolder->cellularDataStateMachine_ = std::make_shared<CellularDataStateMachine>
         (cdConnectionManager, std::move(telEventHandler));
@@ -854,7 +854,7 @@ HWTEST_F(CellularDataHandlerTest, DataConnCompleteUpdateStateTest001, Function |
     apnHolder->cellularDataStateMachine_->netSupplierInfo_ = nullptr;
     cellularDataHandler->apnManager_ = std::make_unique<ApnManager>().release();
     cellularDataHandler->apnManager_->allApnItem_.clear();
-    cellularDataHandler->connectionManager_ = std::make_unique<DataConnectionManager>(slotId).release();
+    cellularDataHandler->connectionManager_ = std::make_shared<DataConnectionManager>(slotId);
     cellularDataHandler->physicalConnectionActiveState_ = false;
     cellularDataHandler->incallDataStateMachine_ =
         cellularDataHandler->CreateIncallDataStateMachine(TelCallStatus::CALL_STATUS_DIALING);
