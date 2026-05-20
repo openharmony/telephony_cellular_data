@@ -56,13 +56,13 @@ int64_t ApnHolder::GetRetryDelay(int32_t cause, int32_t suggestTime, RetryScene 
 
 void ApnHolder::SetCurrentApn(sptr<ApnItem> &apnItem)
 {
-    std::shared_lock<std::shared_mutex> lock(apnItemMutex_);
+    std::lock_guard<std::mutex> lock(apnItemMutex_);
     apnItem_ = apnItem;
 }
 
 sptr<ApnItem> ApnHolder::GetCurrentApn() const
 {
-    std::shared_lock<std::shared_mutex> lock(apnItemMutex_);
+    std::lock_guard<std::mutex> lock(apnItemMutex_);
     return apnItem_;
 }
 
@@ -252,7 +252,7 @@ bool ApnHolder::IsCompatibleApnItem(const sptr<ApnItem> &newApnItem, const sptr<
 
 void ApnHolder::SetApnBadState(bool isBad)
 {
-    std::shared_lock<std::shared_mutex> lock(apnItemMutex_);
+    std::lock_guard<std::mutex> lock(apnItemMutex_);
     if (apnItem_ != nullptr) {
         apnItem_->MarkBadApn(isBad);
     }
