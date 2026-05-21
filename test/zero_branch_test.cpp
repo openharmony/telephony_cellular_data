@@ -109,7 +109,7 @@ std::shared_ptr<CellularDataStateMachine> StateMachineTest::CreateCellularDataCo
     if (cellularDataStateMachine_ != nullptr) {
         return cellularDataStateMachine_;
     }
-    sptr<DataConnectionManager> connectionManager = std::make_unique<DataConnectionManager>(slotId).release();
+    auto connectionManager = std::make_shared<DataConnectionManager>(slotId);
     if (connectionManager == nullptr) {
         return nullptr;
     }
@@ -266,7 +266,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_003, Function | MediumTest | 
     cellularDataHandler.ClearAllConnections(reason);
     cellularDataHandler.ChangeConnectionForDsds(false);
     cellularDataHandler.ChangeConnectionForDsds(true);
-    cellularDataHandler.connectionManager_ = std::make_unique<DataConnectionManager>(INVALID_SLOTID).release();
+    cellularDataHandler.connectionManager_ = std::make_shared<DataConnectionManager>(INVALID_SLOTID);
     cellularDataHandler.ClearAllConnections(reason);
     cellularDataHandler.EstablishAllApnsIfConnectable();
     cellularDataHandler.UpdatePhysicalConnectionState(true);
@@ -280,7 +280,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_003, Function | MediumTest | 
     event = nullptr;
     cellularDataHandler.MsgEstablishDataConnection(event);
     ASSERT_FALSE(cellularDataHandler.HasAnyHigherPriorityConnection(apnHolder));
-    cellularDataHandler.connectionManager_ = std::make_unique<DataConnectionManager>(INVALID_SLOTID).release();
+    cellularDataHandler.connectionManager_ = std::make_shared<DataConnectionManager>(INVALID_SLOTID);
     ASSERT_FALSE(cellularDataHandler.HasInternetCapability(INVALID_CID));
     ASSERT_EQ(cellularDataHandler.GetDataRecoveryState(), 0);
     cellularDataHandler.DisconnectDataComplete(event);

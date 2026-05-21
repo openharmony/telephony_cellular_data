@@ -24,7 +24,7 @@ std::shared_ptr<CellularDataStateMachine> StateMachineFuzzer::CreateCellularData
     if (cellularDataStateMachine_ != nullptr) {
         return cellularDataStateMachine_;
     }
-    sptr<DataConnectionManager> connectionManager = std::make_unique<DataConnectionManager>(slotId).release();
+    auto connectionManager = std::make_shared<DataConnectionManager>(slotId);
     if (connectionManager == nullptr) {
         return nullptr;
     }

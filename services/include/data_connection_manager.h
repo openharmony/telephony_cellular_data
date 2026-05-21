@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace Telephony {
 class CellularDataStateMachine;
-class DataConnectionManager : public StateMachine, public RefBase {
+class DataConnectionManager : public StateMachine {
 public:
     explicit DataConnectionManager(int32_t slotId);
     ~DataConnectionManager();
