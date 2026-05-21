@@ -2881,7 +2881,6 @@ void CellularDataHandler::SetApnActivateEnd(const std::shared_ptr<SetupDataCallR
     std::lock_guard<std::mutex> lock(apnActivateListMutex_);
     EraseApnActivateList();
     apnActivateChrList_.push_back(info);
-    apnActivateListMutex_.unlock();
 }
 
 void CellularDataHandler::EraseApnActivateList()
