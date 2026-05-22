@@ -773,6 +773,55 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_016, Function | MediumTest | 
 }
 
 /**
+ * @tc.number   Telephony_CellularDataHandler_017
+ * @tc.name     test non-mms apn all states call ClearConnection
+ * @tc.desc     DT test cover all ApnProfileState for non-MMS
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataHandler_017, Function | MediumTest | Level1)
+{
+    CellularDataController controller{0};
+    controller.Init();
+    ASSERT_FALSE(controller.cellularDataHandler_ == nullptr);
+    
+    std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> stateMachine = machine->CreateCellularDataConnect(0);
+    
+    sptr<ApnHolder> defaultApn = controller.cellularDataHandler_->apnManager_->GetApnHolder(DATA_CONTEXT_ROLE_DEFAULT);
+    ASSERT_FALSE(defaultApn == nullptr);
+    defaultApn->SetCellularDataStateMachine(stateMachine);
+    
+    DisConnectionReason reason = DisConnectionReason::REASON_CLEAR_CONNECTION;
+    defaultApn->SetApnState(PROFILE_STATE_CONNECTED);
+    controller.cellularDataHandler_->ClearAllConnections(reason);
+    ASSERT_EQ(defaultApn->GetApnState(), PROFILE_STATE_DISCONNECTING);
+}
+
+/**
+ * @tc.number   Telephony_CellularDataHandler_018
+ * @tc.name     test mms apn clear when not connected (cover all_STATES)
+ * @tc.desc     DT test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataHandler_018, Function | MediumTest | Level1)
+{
+    CellularDataController controller{0};
+    controller.Init();
+    ASSERT_FALSE(controller.cellularDataHandler_ == nullptr);
+    
+    sptr<ApnHolder> mmsApn = controller.cellularDataHandler_->apnManager_->GetApnHolder(DATA_CONTEXT_ROLE_MMS);
+    ASSERT_FALSE(mmsApn == nullptr);
+    
+    std::shared_ptr<StateMachineTest> machine = std::make_shared<StateMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> stateMachine = machine->CreateCellularDataConnect(0);
+    mmsApn->SetCellularDataStateMachine(stateMachine);
+    
+    DisConnectionReason reason = DisConnectionReason::REASON_CLEAR_CONNECTION;
+    
+    mmsApn->SetApnState(PROFILE_STATE_CONNECTED);
+    controller.cellularDataHandler_->ClearAllConnections(reason);
+    ASSERT_EQ(mmsApn->GetApnState(), PROFILE_STATE_CONNECTED);
+}
+
+/**
  * @tc.number   Telephony_CellularDataService_001
  * @tc.name     test error branch
  * @tc.desc     Function test
