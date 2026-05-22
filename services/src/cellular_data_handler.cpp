@@ -260,6 +260,10 @@ void CellularDataHandler::ClearAllConnections(DisConnectionReason reason)
         return;
     }
     for (const sptr<ApnHolder> &apn : apnManager_->GetAllApnHolder()) {
+        if (apn->IsMmsType()) {
+            TELEPHONY_LOGE("Slot%{public}d: apn is mms type", slotId_);
+            continue;
+        }
         ClearConnection(apn, reason);
     }
 
