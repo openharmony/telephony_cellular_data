@@ -20,6 +20,7 @@
 #include "napi_parameter_util.h"
 #include "napi_util.h"
 #include "telephony_log_wrapper.h"
+#include "show_system_apn_settings.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1502,6 +1503,7 @@ napi_value RegistCellularData(napi_env env, napi_value exports)
         DECLARE_NAPI_WRITABLE_FUNCTION("setPreferredApn", SetPreferredApn),
         DECLARE_NAPI_WRITABLE_FUNCTION("queryAllApns", QueryAllApns),
         DECLARE_NAPI_WRITABLE_FUNCTION("getActiveApnName", GetActiveApnName),
+        DECLARE_NAPI_WRITABLE_FUNCTION("showSystemApnSettings", ShowSystemApnSettings),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     CreateDataConnectState(env, exports);
