@@ -25,7 +25,10 @@ ohos_shared_library("data") {
     "$SUBSYSTEM_DIR/cellular_data/interfaces/innerkits",
   ]
 
-  sources = [ "$SUBSYSTEM_DIR/cellular_data/frameworks/js/napi/src/napi_cellular_data.cpp" ]
+  sources = [
+    "$SUBSYSTEM_DIR/cellular_data/frameworks/js/napi/src/napi_cellular_data.cpp",
+    "$SUBSYSTEM_DIR/cellular_data/frameworks/js/napi/src/show_system_apn_settings.cpp",
+  ]
 
   deps =
       [ "$SUBSYSTEM_DIR/cellular_data/frameworks/native:tel_cellular_data_api" ]
@@ -33,11 +36,21 @@ ohos_shared_library("data") {
   external_deps = [
     "c_utils:utils",
     "core_service:libtel_common",
+    "core_service:tel_core_service_api",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
-    "telephony_data:tel_telephony_data"
+    "telephony_data:tel_telephony_data",
+    "ability_base:configuration",
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_context_native",
+    "ability_runtime:ability_manager",
+    "ability_runtime:napi_base_context",
+    "ability_runtime:runtime",
+    "ability_runtime:ui_extension",
+    "ace_engine:ace_uicontent",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CellularDataJsApi\"",
