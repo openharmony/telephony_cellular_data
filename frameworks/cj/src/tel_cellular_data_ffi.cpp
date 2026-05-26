@@ -28,11 +28,17 @@ extern "C" {
 
     int32_t FfiCellularDataGetCellularDataFlowType(int32_t *errCode)
     {
+        if (errCode == nullptr) {
+            return -1;
+        }
         return CellularDataImpl::GetCellularDataFlowType(*errCode);
     }
 
     int32_t FfiCellularDataGetCellularDataState(int32_t *errCode)
     {
+        if (errCode == nullptr) {
+            return -1;
+        }
         return CellularDataImpl::GetCellularDataState(*errCode);
     }
 
