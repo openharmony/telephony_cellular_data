@@ -75,6 +75,7 @@ public:
     MOCK_METHOD(int32_t, SetGlobalHttpProxy, (const HttpProxy &httpProxy));
     MOCK_METHOD(int32_t, GetGlobalHttpProxy, (HttpProxy & httpProxy));
     MOCK_METHOD(int32_t, GetDefaultHttpProxy, (int32_t bindNetId, HttpProxy &httpProxy));
+    MOCK_METHOD(int32_t, RefreshGlobalHttpProxy, (const sptr<IRefreshHttpProxyCallback> &callback));
     MOCK_METHOD(int32_t, GetNetIdByIdentifier, (const std::string &ident, std::list<int32_t> &netIdList));
     MOCK_METHOD(int32_t, SetAppNet, (int32_t netId));
     MOCK_METHOD(int32_t, RegisterNetInterfaceCallback, (const sptr<INetInterfaceStateCallback> &callback));
