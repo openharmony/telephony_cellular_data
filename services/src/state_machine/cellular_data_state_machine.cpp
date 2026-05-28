@@ -584,8 +584,9 @@ void CellularDataStateMachine::GetNetworkSlicePara(const DataConnectionParams& c
         apn->attr_.sscMode_ = sscMode;
         if (!snssai.empty()) {
             std::fill(apn->attr_.snssai_, apn->attr_.snssai_ + ApnItem::ALL_APN_ITEM_CHAR_LENGTH, '\0');
-            std::copy(snssai.begin(), snssai.end(), apn->attr_.snssai_);
-            apn->attr_.snssai_[std::min((int)snssai.size(), ApnItem::ALL_APN_ITEM_CHAR_LENGTH - 1)] = '\0';
+            size_t len = std::min(snssai.size(), static_cast<size_t>(ApnItem::ALL_APN_ITEM_CHAR_LENGTH - 1));
+            std::copy(snssai.begin(), snssai.begin() + len, apn->attr_.snssai_);
+            apn->attr_.snssai_[len] = '\0';
         }
         TELEPHONY_LOGI("GetRouteSelectionDescriptorByDNN snssai = %{public}s, sscmode = %{public}d",
             snssai.c_str(), sscMode);
@@ -601,23 +602,30 @@ void CellularDataStateMachine::FillRSDFromNetCap(
             networkSliceParas["sscmode"].size(), sscMode);
         apn->attr_.sscMode_ = sscMode;
     }
+
+    constexpr size_t BUF_SIZE = ApnItem::ALL_APN_ITEM_CHAR_LENGTH;
+    constexpr size_t MAX_COPY = BUF_SIZE - 1;
+
     if (networkSliceParas["snssai"] != "") {
         std::string snssai = networkSliceParas["snssai"];
-        std::fill(apn->attr_.snssai_, apn->attr_.snssai_ + ApnItem::ALL_APN_ITEM_CHAR_LENGTH, '\0');
-        std::copy(snssai.begin(), snssai.end(), apn->attr_.snssai_);
-        apn->attr_.snssai_[std::min((int)snssai.size(), ApnItem::ALL_APN_ITEM_CHAR_LENGTH - 1)] = '\0';
+        std::fill(apn->attr_.snssai_, apn->attr_.snssai_ + BUF_SIZE, '\0');
+        size_t len = std::min(snssai.size(), MAX_COPY);
+        std::copy(snssai.begin(), snssai.begin() + len, apn->attr_.snssai_);
+        apn->attr_.snssai_[len] = '\0';
     }
     if (networkSliceParas["dnn"] != "") {
         std::string dnn = networkSliceParas["dnn"];
-        std::fill(apn->attr_.apn_, apn->attr_.apn_ + ApnItem::ALL_APN_ITEM_CHAR_LENGTH, '\0');
-        std::copy(dnn.begin(), dnn.end(), apn->attr_.apn_);
-        apn->attr_.apn_[std::min((int)dnn.size(), ApnItem::ALL_APN_ITEM_CHAR_LENGTH - 1)] = '\0';
+        std::fill(apn->attr_.apn_, apn->attr_.apn_ + BUF_SIZE, '\0');
+        size_t len = std::min(dnn.size(), MAX_COPY);
+        std::copy(dnn.begin(), dnn.begin() + len, apn->attr_.apn_);
+        apn->attr_.apn_[len] = '\0';
     }
     if (networkSliceParas["pdusessiontype"] != "0") {
         std::string pdusessiontype = networkSliceParas["pdusessiontype"];
-        std::fill(apn->attr_.protocol_, apn->attr_.protocol_ + ApnItem::ALL_APN_ITEM_CHAR_LENGTH, '\0');
-        std::copy(pdusessiontype.begin(), pdusessiontype.end(), apn->attr_.protocol_);
-        apn->attr_.apn_[std::min((int)pdusessiontype.size(), ApnItem::ALL_APN_ITEM_CHAR_LENGTH - 1)] = '\0';
+        std::fill(apn->attr_.protocol_, apn->attr_.protocol_ + BUF_SIZE, '\0');
+        size_t len = std::min(pdusessiontype.size(), MAX_COPY);
+        std::copy(pdusessiontype.begin(), pdusessiontype.begin() + len, apn->attr_.protocol_);
+        apn->attr_.protocol_[len] = '\0';
     }
     TELEPHONY_LOGI("FillRSD: snssai = %{public}s, sscmode = %{public}s, dnn = %{public}s, pdusession = %{public}s",
         networkSliceParas["snssai"].c_str(), networkSliceParas["sscmode"].c_str(), networkSliceParas["dnn"].c_str(),
