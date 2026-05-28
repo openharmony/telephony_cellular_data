@@ -16,6 +16,8 @@
 #ifndef CELLULAR_DATA_NET_AGENT_H
 #define CELLULAR_DATA_NET_AGENT_H
 
+#include <shared_mutex>
+
 #include "i_net_conn_service.h"
 
 #include "net_manager_call_back.h"
@@ -105,7 +107,11 @@ public:
 
     bool GetSupplierRegState(uint32_t supplierId, int32_t &regState);
 
+    int32_t GetSlotId(int32_t simId);
+
 private:
+    std::shared_mutex slotIdSimIdMutex_;
+    std::map <int32_t, int32_t> slotIdSimId_;
     std::vector<NetSupplier> netSuppliers_;
     sptr<NetManagerCallBack> callBack_;
     sptr<NetManagerTacticsCallBack> tacticsCallBack_;

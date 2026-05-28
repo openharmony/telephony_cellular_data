@@ -141,11 +141,13 @@ void ApnHolder::RequestCellularData(const NetRequest &netRequest)
 {
     capability_ = netRequest.capability;
     dataCallEnabled_ = true;
+    TELEPHONY_LOGI("RequestCellularData, capability[%{public}lu]", capability_);
 }
 
 void ApnHolder::ReleaseAllCellularData()
 {
     dataCallEnabled_ = false;
+    TELEPHONY_LOGI("ReleaseAllCellularData, capability[%{public}lu]", capability_);
 }
 
 bool ApnHolder::IsEmergencyType() const
