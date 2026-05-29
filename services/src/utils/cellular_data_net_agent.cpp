@@ -55,6 +55,9 @@ bool CellularDataNetAgent::RegisterNetSupplier(const int32_t slotId)
             TELEPHONY_LOGE("Slot%{public}d Invalid simId: %{public}d", slotId, simId);
             continue;
         }
+        std::unique_lock<std::shared_mutex> lock(slotIdSimIdMutex_);
+        slotIdSimId_[slotId] = simId;
+        lock.unlock();
         std::set<NetCap> netCap { static_cast<NetCap>(netSupplier.capability) };
         uint32_t supplierId = 0;
         int32_t result = netManager.RegisterNetSupplier(
@@ -219,5 +222,15 @@ void CellularDataNetAgent::SetReuseSupplierId(int32_t supplierId, int32_t reuseS
     TELEPHONY_LOGI("result:%{public}d", result);
 }
 
+int32_t CellularDataNetAgent::GetSlotId(int32_t simId)
+{
+    std::shared_lock<std::shared_mutex> lock(slotIdSimIdMutex_);
+    for (auto &item : slotIdSimId_) {
+        if (item.second == simId) {
+            return item.first;
+        }
+    }
+    return -1;
+}
 } // namespace Telephony
 } // namespace OHOS
