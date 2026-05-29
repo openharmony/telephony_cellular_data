@@ -2023,5 +2023,20 @@ HWTEST_F(CellularDataTest, CreateDataAbilityHelper_Test_01, TestSize.Level3)
     std::vector<PdpProfile> apnVec;
     ASSERT_FALSE(cellularDataRdbHelper.QueryPreferApn(-1, apnVec, 5));
 }
+
+HWTEST_F(CellularDataTest, CellularDataNetAgentGetSlotId001, TestSize.Level3)
+{
+    auto agent = std::make_shared<CellularDataNetAgent>();
+    auto slotId = agent->GetSlotId(100);
+    EXPECT_EQ(slotId, -1);
+    agent->slotIdSimId_[0] = 101;
+    slotId = agent->GetSlotId(100);
+    EXPECT_EQ(slotId, -1);
+    agent->slotIdSimId_[1] = 100;
+    slotId = agent->GetSlotId(100);
+    EXPECT_EQ(slotId, 1);
+    slotId = agent->GetSlotId(101);
+    EXPECT_EQ(slotId, 0);
+}
 } // namespace Telephony
 } // namespace OHOS
