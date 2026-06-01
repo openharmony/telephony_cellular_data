@@ -1217,7 +1217,7 @@ void CellularDataHandler::MsgEstablishDataConnection(const InnerEvent::Pointer &
         TELEPHONY_LOGE("Slot%{public}d: apnHolder is null", slotId_);
         return;
     }
-    TELEPHONY_LOGD("Slot%{public}d: APN holder type:%{public}s call:%{public}d", slotId_,
+    TELEPHONY_LOGI("Slot%{public}d: APN holder type:%{public}s call:%{public}d", slotId_,
         apnHolder->GetApnType().c_str(), apnHolder->IsDataCallEnabled());
     bool isCardAllowData = true;
     int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId_);
@@ -1230,7 +1230,7 @@ void CellularDataHandler::MsgEstablishDataConnection(const InnerEvent::Pointer &
     if (isCardAllowData && apnHolder->IsDataCallEnabled()) {
         AttemptEstablishDataConnection(apnHolder);
     } else {
-        TELEPHONY_LOGD("MsgEstablishDataConnection IsDataCallEnabled is false");
+        TELEPHONY_LOGI("MsgEstablishDataConnection IsDataCallEnabled is false");
         DisConnectionReason reason = DisConnectionReason::REASON_CHANGE_CONNECTION;
         std::unique_ptr<uint64_t> disconnectBearType = event->GetUniqueObject<uint64_t>();
         int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
@@ -1341,6 +1341,7 @@ void CellularDataHandler::SubscribeTelePowerEvent()
 
 void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
 {
+    TELEPHONY_LOGI("Slot%{public}d: MsgRequestNetwork", slotId_);
     if (apnManager_ == nullptr || event == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: apnManager_ or event is null", slotId_);
         return;
@@ -1359,7 +1360,6 @@ void CellularDataHandler::MsgRequestNetwork(const InnerEvent::Pointer &event)
         return;
     }
 
-    TELEPHONY_LOGD("allow cellular data");
     if (event->GetParam() == TYPE_REQUEST_NET) {
         apnHolder->RequestCellularData(request);
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
