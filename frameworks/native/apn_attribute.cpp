@@ -151,20 +151,20 @@ void ApnAttribute::TransferApnAttributeBeforeIpc(ApnItem::Attribute &apnAttr, Ap
 
 void ApnAttribute::TransferApnAttributeAfterIpc(ApnItem::Attribute &apnAttr, ApnAttribute &apnAfterTrans)
 {
-    apnAfterTrans.types_ = apnAttr.types_;
-    apnAfterTrans.numeric_ = apnAttr.numeric_;
+    apnAfterTrans.types_.copy(apnAttr.types_, ApnItem::ALL_APN_ITEM_CHAR_LENGTH - 1, 0);
+    apnAfterTrans.numeric_.copy(apnAttr.numeric_, ApnItem::ALL_APN_ITEM_CHAR_LENGTH - 1, 0);
     apnAttr.profileId_ = apnAfterTrans.profileId_;
-    apnAfterTrans.protocol_ = apnAttr.protocol_;
-    apnAfterTrans.roamingProtocol_ = apnAttr.roamingProtocol_;
+    apnAfterTrans.protocol_.copy(apnAttr.protocol_, ApnItem::ALL_APN_ITEM_CHAR_LENGTH - 1, 0);
+    apnAfterTrans.roamingProtocol_.copy(apnAttr.roamingProtocol_, ApnItem::ALL_APN_ITEM_CHAR_LENGTH - 1, 0);
     apnAttr.authType_ = apnAfterTrans.authType_;
-    apnAfterTrans.apn_ = apnAttr.apn_;
-    apnAfterTrans.apnName_ = apnAttr.apnName_;
-    apnAfterTrans.user_ = apnAttr.user_;
-    apnAfterTrans.password_ = apnAttr.password_;
+    apnAfterTrans.apn_.copy(apnAttr.apn_, ApnItem::ALL_APN_ITEM_CHAR_LENGTH - 1, 0);
+    apnAfterTrans.apnName_.copy(apnAttr.apnName_, ApnItem::ALL_APN_ITEM_CHAR_LENGTH - 1, 0);
+    apnAfterTrans.user_.copy(apnAttr.user_, ApnItem::ALL_APN_ITEM_CHAR_LENGTH - 1, 0);
+    apnAfterTrans.password_.copy(apnAttr.password_, ApnItem::ALL_APN_ITEM_CHAR_LENGTH - 1, 0);
     apnAttr.isRoamingApn_ = apnAfterTrans.isRoamingApn_;
-    apnAfterTrans.homeUrl_ = apnAttr.homeUrl_;
-    apnAfterTrans.proxyIpAddress_ = apnAttr.proxyIpAddress_;
-    apnAfterTrans.mmsIpAddress_ = apnAttr.mmsIpAddress_;
+    apnAfterTrans.homeUrl_.copy(apnAttr.homeUrl_, ApnItem::ALL_APN_ITEM_CHAR_LENGTH - 1, 0);
+    apnAfterTrans.proxyIpAddress_.copy(apnAttr.proxyIpAddress_, ApnItem::ALL_APN_ITEM_CHAR_LENGTH - 1, 0);
+    apnAfterTrans.mmsIpAddress_.copy(apnAttr.mmsIpAddress_, ApnItem::ALL_APN_ITEM_CHAR_LENGTH - 1, 0);
     apnAttr.isEdited_ = apnAfterTrans.isEdited_;
 }
 }
