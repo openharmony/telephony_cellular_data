@@ -48,6 +48,8 @@ constexpr const char *PERSIST_EDM_MOBILE_DATA_POLICY = "persist.edm.mobile_data_
 constexpr const char *MOBILE_DATA_POLICY_FORCE_OPEN = "force_open";
 constexpr const char *MOBILE_DATA_POLICY_DISALLOW = "disallow";
 constexpr const char *SIM_ACCOUNT_LOADED = "SIM_ACCOUNT_LOADED";
+constexpr const char *GCF_LAST_PLMN = "00101";
+constexpr const char *GCF_CUR_PLMN = "24681";
 CellularDataHandler::CellularDataHandler(int32_t slotId)
     : TelEventHandler("CellularDataHandler"), slotId_(slotId)
 {}
@@ -2117,6 +2119,12 @@ bool CellularDataHandler::GetEsmFlagFromOpCfg()
 
 void CellularDataHandler::SetRilAttachApn()
 {
+    // LCOV_EXCL_START
+    if (IsBlockSetRilAttachApn()) {
+        TELEPHONY_LOGE("Slot%{public}d: block set attach apn", slotId_);
+        return;
+    }
+    // LCOV_EXCL_STOP
     if (!IsSimStateReadyOrLoaded()) {
         TELEPHONY_LOGE("Slot%{public}d: sim not ready", slotId_);
         return;
@@ -2898,6 +2906,22 @@ void CellularDataHandler::EraseApnActivateList()
             iter++;
         }
     }
+}
+
+bool CellularDataHandler::IsBlockSetRilAttachApn()
+{
+    std::u16string operatorNumeric;
+    CoreManagerInner::GetInstance().GetSimOperatorNumeric(slotId_, operatorNumeric);
+    std::string currentNumeric = Str16ToStr8(operatorNumeric);
+    // LCOV_EXCL_START
+    if (lastNumeric_ == GCF_LAST_PLMN && currentNumeric == GCF_CUR_PLMN) {
+        int32_t psRadioTech = 0;
+        CoreManagerInner::GetInstance().GetPsRadioTech(slotId_, psRadioTech);
+        return (psRadioTech == static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_NR));
+    }
+    // LCOV_EXCL_STOP
+    lastNumeric_ = currentNumeric;
+    return false;
 }
 
 int64_t CellularDataHandler::GetCurTime()
