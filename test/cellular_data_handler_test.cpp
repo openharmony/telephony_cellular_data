@@ -1338,5 +1338,17 @@ HWTEST_F(CellularDataHandlerTest, MsgRequestNetwork001, Function | MediumTest | 
     cellularDataHandler->MsgRequestNetwork(event);
     EXPECT_FALSE(apnHolder->dataCallEnabled_);
 }
+
+HWTEST_F(CellularDataHandlerTest, IsBlockSetRilAttachApn_001, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
+    cellularDataHandler->Init();
+    cellularDataHandler->lastNumeric_ = "00101";
+    EXPECT_FALSE(cellularDataHandler->IsBlockSetRilAttachApn());
+ 
+    cellularDataHandler->lastNumeric_ = "99999";
+    EXPECT_FALSE(cellularDataHandler->IsBlockSetRilAttachApn());
+}
+
 } // namespace Telephony
 } // namespace OHOS
