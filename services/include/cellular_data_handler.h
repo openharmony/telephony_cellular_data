@@ -197,12 +197,14 @@ private:
     void SetApnActivateEnd(const std::shared_ptr<SetupDataCallResultInfo> &resultInfo);
     void EraseApnActivateList();
     ApnActivateReportInfo GetApnActReportInfo(uint32_t apnId);
+    bool IsBlockSetRilAttachApn();
 
 private:
     sptr<ApnManager> apnManager_;
     std::unique_ptr<DataSwitchSettings> dataSwitchSettings_;
     std::shared_ptr<DataConnectionManager> connectionManager_ = nullptr;
     std::u16string lastIccId_;
+    std::string lastNumeric_;
     int32_t lastCallState_ = (int32_t)TelCallStatus::CALL_STATUS_IDLE;
     const int32_t slotId_;
     DisConnectionReason disconnectionReason_ = DisConnectionReason::REASON_NORMAL;
