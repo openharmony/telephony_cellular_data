@@ -19,6 +19,9 @@
 
 namespace OHOS {
 namespace Telephony {
+namespace {
+    std::shared_mutex apnItemMutex_;
+}
 const std::map<std::string, int32_t> ApnHolder::apnTypeDataProfileMap_ {
     {DATA_CONTEXT_ROLE_DEFAULT, DATA_PROFILE_DEFAULT},
     {DATA_CONTEXT_ROLE_MMS, DATA_PROFILE_MMS},
