@@ -75,7 +75,6 @@ private:
     std::string apnType_;
     int32_t priority_;
     std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine_;
-    mutable std::shared_mutex apnItemMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
