@@ -252,7 +252,7 @@ bool ApnHolder::IsCompatibleApnItem(const sptr<ApnItem> &newApnItem, const sptr<
 
 void ApnHolder::SetApnBadState(bool isBad)
 {
-    std::unique_lock<std::shared_mutex> lock(apnItemMutex_);
+    std::shared_lock<std::shared_mutex> lock(apnItemMutex_);
     if (apnItem_ != nullptr) {
         apnItem_->MarkBadApn(isBad);
     }
