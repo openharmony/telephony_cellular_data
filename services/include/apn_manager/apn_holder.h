@@ -62,8 +62,8 @@ public:
     void SetApnBadState(bool isBad);
 
 private:
-    ApnHolder(ApnHolder &apnHolder) = default;
-    ApnHolder &operator=(ApnHolder &apnHolder) = default;
+    ApnHolder(ApnHolder &apnHolder) = delete;
+    ApnHolder &operator=(ApnHolder &apnHolder) = delete;
 
 private:
     static const std::map<std::string, int32_t> apnTypeDataProfileMap_;
@@ -75,6 +75,7 @@ private:
     std::string apnType_;
     int32_t priority_;
     std::shared_ptr<CellularDataStateMachine> cellularDataStateMachine_;
+    mutable std::shared_mutex apnItemMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
