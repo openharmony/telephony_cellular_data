@@ -416,6 +416,7 @@ int32_t CellularDataService::RequestNet(const NetRequest &request)
 {
     size_t identPreLen = strlen(IDENT_PREFIX);
     if (request.ident.length() < identPreLen) {
+        TELEPHONY_LOGE("request.ident.length() < identPreLen");
         return CELLULAR_DATA_INVALID_PARAM;
     }
     std::string requestIdent = request.ident.substr(identPreLen);
@@ -427,6 +428,7 @@ int32_t CellularDataService::RequestNet(const NetRequest &request)
     int32_t slotId = CellularDataNetAgent::GetInstance().GetSlotId(simId);
     std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
     if (cellularDataController == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d, simId%{public}d: cellularDataController == nullptr", slotId, simId);
         return CELLULAR_DATA_INVALID_PARAM;
     }
     bool result = cellularDataController->RequestNet(request);

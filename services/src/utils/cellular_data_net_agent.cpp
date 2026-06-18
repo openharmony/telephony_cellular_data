@@ -114,6 +114,9 @@ void CellularDataNetAgent::UnregisterNetSupplierForSimUpdate(const int32_t slotI
         if (netSupplier.slotId != slotId || netSupplier.simId <= INVALID_SIM_ID) {
             continue;
         }
+        std::unique_lock<std::shared_mutex> lock(slotIdSimIdMutex_);
+        slotIdSimId_.erase(slotId);
+        lock.unlock();
         auto& netManager = NetConnClient::GetInstance();
         int32_t result = netManager.UnregisterNetSupplier(netSupplier.supplierId);
         TELEPHONY_LOGI("Slot%{public}d unregister network result:%{public}d", slotId, result);
