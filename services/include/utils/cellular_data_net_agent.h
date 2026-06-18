@@ -101,7 +101,7 @@ public:
      * @param capability a network capability
      * @return unique identify
      */
-    int32_t GetSupplierId(const int32_t slotId, uint64_t capability) const;
+    int32_t GetSupplierId(const int32_t slotId, uint64_t capability);
 
     void RegisterSlotType(int32_t supplierId, int32_t radioTech);
 
@@ -110,6 +110,7 @@ public:
     int32_t GetSlotId(int32_t simId);
 
 private:
+    std::shared_mutex netSupplierMutex_;
     std::shared_mutex slotIdSimIdMutex_;
     std::map <int32_t, int32_t> slotIdSimId_;
     std::vector<NetSupplier> netSuppliers_;
