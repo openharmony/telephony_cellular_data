@@ -488,5 +488,74 @@ HWTEST_F(CellularDataServiceTest, ReleaseNet_001, TestSize.Level1)
     ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service->RequestNet(request));
     ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service->ReleaseNet(request));
 }
+
+/**
+ * @tc.number   GetDataConnIpType_PermissionTest_001
+ * @tc.name     test GetDataConnIpType without permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, GetDataConnIpType_PermissionTest_001, TestSize.Level0)
+{
+    std::string ipType;
+    EXPECT_EQ(service->GetDataConnIpType(DEFAULT_SIM_SLOT_ID, ipType), TELEPHONY_ERR_PERMISSION_ERR);
+}
+
+/**
+ * @tc.number   GetDataConnIpType_PermissionTest_002
+ * @tc.name     test GetDataConnIpType with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, GetDataConnIpType_PermissionTest_002, TestSize.Level0)
+{
+    DataAccessToken token;
+    std::string ipType;
+    EXPECT_NE(service->GetDataConnIpType(DEFAULT_SIM_SLOT_ID, ipType), TELEPHONY_ERR_FAIL);
+}
+
+/**
+ * @tc.number   GetDataRecoveryState_PermissionTest_001
+ * @tc.name     test GetDataRecoveryState without permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, GetDataRecoveryState_PermissionTest_001, TestSize.Level0)
+{
+    int32_t state = 0;
+    EXPECT_EQ(service->GetDataRecoveryState(state), TELEPHONY_ERR_PERMISSION_ERR);
+}
+
+/**
+ * @tc.number   GetDataRecoveryState_PermissionTest_002
+ * @tc.name     test GetDataRecoveryState with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, GetDataRecoveryState_PermissionTest_002, TestSize.Level0)
+{
+    DataAccessToken token;
+    int32_t state = 0;
+    EXPECT_NE(service->GetDataRecoveryState(state), TELEPHONY_ERR_FAIL);
+}
+
+/**
+ * @tc.number   GetApnState_PermissionTest_001
+ * @tc.name     test GetApnState without permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, GetApnState_PermissionTest_001, TestSize.Level0)
+{
+    int32_t state = 0;
+    EXPECT_EQ(service->GetApnState(DEFAULT_SIM_SLOT_ID, std::string(), state), TELEPHONY_ERR_PERMISSION_ERR);
+}
+
+/**
+ * @tc.number   GetApnState_PermissionTest_002
+ * @tc.name     test GetApnState with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataServiceTest, GetApnState_PermissionTest_002, TestSize.Level0)
+{
+    DataAccessToken token;
+    int32_t state = 0;
+    EXPECT_NE(service->GetApnState(DEFAULT_SIM_SLOT_ID, std::string(), state), TELEPHONY_ERR_FAIL);
+}
 } // namespace Telephony
 } // namespace OHOS

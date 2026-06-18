@@ -408,6 +408,10 @@ void DataConnectionManager::GetDefaultTcpBufferConfig()
     tcpBufferConfigMap_.clear();
     for (std::string tcpBuffer : tcpBufferVec) {
         std::vector<std::string> str = CellularDataUtils::Split(tcpBuffer, ":");
+        if (str.size() < VALID_VECTOR_SIZE) {
+            TELEPHONY_LOGE("Invalid tcp buffer config format: %{public}s", tcpBuffer.c_str());
+            continue;
+        }
         tcpBufferConfigMap_.emplace(str.front(), str.back());
     }
     TELEPHONY_LOGI("Slot%{public}d: TCP_BUFFER_CONFIG_MAP size is %{public}zu", slotId_, tcpBufferConfigMap_.size());
