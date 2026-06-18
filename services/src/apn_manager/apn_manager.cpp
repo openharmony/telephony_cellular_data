@@ -291,6 +291,10 @@ std::vector<sptr<ApnHolder>> ApnManager::GetSortApnHolder() const
 
 int32_t ApnManager::PushApnItem(int32_t count, int32_t slotId, sptr<ApnItem> extraApnItem)
 {
+    if (extraApnItem == nullptr) {
+        TELEPHONY_LOGE("extraApnItem is null");
+        return count;
+    }
     std::unique_lock<std::shared_mutex> lock(mutex_);
     allApnItem_.clear();
     allApnItem_.push_back(extraApnItem);

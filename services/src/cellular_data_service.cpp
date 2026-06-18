@@ -239,6 +239,12 @@ int32_t CellularDataService::GetCellularDataState(int32_t &state)
 
 int32_t CellularDataService::GetApnState(int32_t slotId, const std::string &apnType, int &state)
 {
+    // LCOV_EXCL_START
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    // LCOV_EXCL_END
     std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
     if (cellularDataController == nullptr) {
         TELEPHONY_LOGE("cellularDataControllers is null, slotId=%{public}d", slotId);
@@ -250,6 +256,12 @@ int32_t CellularDataService::GetApnState(int32_t slotId, const std::string &apnT
 
 int32_t CellularDataService::GetDataRecoveryState(int32_t &state)
 {
+    // LCOV_EXCL_START
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    // LCOV_EXCL_END
     std::lock_guard<std::mutex> guard(mapLock_);
     for (const auto &controller : cellularDataControllers_) {
         auto cellularDataController = controller.second;
@@ -408,6 +420,7 @@ int32_t CellularDataService::RequestNet(const NetRequest &request)
     }
     std::string requestIdent = request.ident.substr(identPreLen);
     if (!IsValidDecValue(requestIdent)) {
+        TELEPHONY_LOGE("ident: %{public}s.IsValidDecValue failed", requestIdent.c_str());
         return CELLULAR_DATA_INVALID_PARAM;
     }
     int32_t simId = std::stoi(requestIdent);
@@ -666,6 +679,12 @@ int32_t CellularDataService::GetDataConnApnAttr(int32_t slotId, ApnAttribute &ap
 
 int32_t CellularDataService::GetDataConnIpType(int32_t slotId, std::string &ipType)
 {
+    // LCOV_EXCL_START
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    // LCOV_EXCL_END
     std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
     if (cellularDataController == nullptr) {
         TELEPHONY_LOGE("cellularDataControllers is null, slotId=%{public}d", slotId);

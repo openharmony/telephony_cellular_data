@@ -41,6 +41,7 @@ CellularDataNetAgent::~CellularDataNetAgent() = default;
 bool CellularDataNetAgent::RegisterNetSupplier(const int32_t slotId)
 {
     bool flag = false;
+    std::unique_lock<std::shared_mutex> lock(netSupplierMutex_);
     for (NetSupplier &netSupplier : netSuppliers_) {
         if (netSupplier.slotId != slotId) {
             continue;
@@ -73,8 +74,10 @@ bool CellularDataNetAgent::RegisterNetSupplier(const int32_t slotId)
             sptr<NetSupplierInfo> netSupplierInfo = new (std::nothrow) NetSupplierInfo();
             if (netSupplierInfo != nullptr) {
                 netSupplierInfo->isAvailable_ = false;
-                int32_t updateResult = UpdateNetSupplierInfo(netSupplier.supplierId, netSupplierInfo);
+                int32_t updateResult = NetConnClient::GetInstance().UpdateNetSupplierInfo(
+                    netSupplier.supplierId, netSupplierInfo);
                 TELEPHONY_LOGI("Update network result:%{public}d", updateResult);
+                netSupplier.regState = updateResult;
             }
             int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
             CoreManagerInner::GetInstance().GetPsRadioTech(slotId, radioTech);
@@ -93,6 +96,7 @@ void CellularDataNetAgent::UnregisterNetSupplier(const int32_t slotId)
         TELEPHONY_LOGE("Slot%{public}d Invalid simId: %{public}d", slotId, simId);
         return;
     }
+    std::shared_lock<std::shared_mutex> lock(netSupplierMutex_);
     for (const NetSupplier &netSupplier : netSuppliers_) {
         if (netSupplier.simId != simId) {
             continue;
@@ -105,6 +109,7 @@ void CellularDataNetAgent::UnregisterNetSupplier(const int32_t slotId)
 
 void CellularDataNetAgent::UnregisterNetSupplierForSimUpdate(const int32_t slotId)
 {
+    std::unique_lock<std::shared_mutex> lock(netSupplierMutex_);
     for (NetSupplier &netSupplier : netSuppliers_) {
         if (netSupplier.slotId != slotId || netSupplier.simId <= INVALID_SIM_ID) {
             continue;
@@ -120,6 +125,7 @@ void CellularDataNetAgent::UnregisterNetSupplierForSimUpdate(const int32_t slotI
 
 void CellularDataNetAgent::UnregisterAllNetSupplier()
 {
+    std::unique_lock<std::shared_mutex> lock(netSupplierMutex_);
     for (const NetSupplier &netSupplier : netSuppliers_) {
         int32_t result = NetConnClient::GetInstance().UnregisterNetSupplier(netSupplier.supplierId);
         TELEPHONY_LOGI("Unregister network result:%{public}d", result);
@@ -160,6 +166,7 @@ int32_t CellularDataNetAgent::UpdateNetSupplierInfo(
     if (result != NETMANAGER_SUCCESS) {
         TELEPHONY_LOGE("Update network fail, result:%{public}d", result);
     }
+    std::unique_lock<std::shared_mutex> lock(netSupplierMutex_);
     for (NetSupplier &netSupplier : netSuppliers_) {
         if (netSupplier.supplierId == supplierId) {
             netSupplier.regState = result;
@@ -176,16 +183,19 @@ void CellularDataNetAgent::UpdateNetLinkInfo(int32_t supplierId, sptr<NetManager
 
 void CellularDataNetAgent::AddNetSupplier(const NetSupplier &netSupplier)
 {
+    std::unique_lock<std::shared_mutex> lock(netSupplierMutex_);
     netSuppliers_.push_back(netSupplier);
 }
 
 void CellularDataNetAgent::ClearNetSupplier()
 {
+    std::unique_lock<std::shared_mutex> lock(netSupplierMutex_);
     netSuppliers_.clear();
 }
 
-int32_t CellularDataNetAgent::GetSupplierId(const int32_t slotId, uint64_t capability) const
+int32_t CellularDataNetAgent::GetSupplierId(const int32_t slotId, uint64_t capability)
 {
+    std::shared_lock<std::shared_mutex> lock(netSupplierMutex_);
     for (const NetSupplier &netSupplier : netSuppliers_) {
         if (netSupplier.slotId == slotId && netSupplier.capability == capability) {
             TELEPHONY_LOGD(
@@ -204,6 +214,7 @@ void CellularDataNetAgent::RegisterSlotType(int32_t supplierId, int32_t radioTec
 
 bool CellularDataNetAgent::GetSupplierRegState(uint32_t supplierId, int32_t &regState)
 {
+    std::shared_lock<std::shared_mutex> lock(netSupplierMutex_);
     auto it = std::find_if(netSuppliers_.begin(), netSuppliers_.end(), [supplierId](const auto &netSupplier) {
         return netSupplier.supplierId == supplierId;
     });

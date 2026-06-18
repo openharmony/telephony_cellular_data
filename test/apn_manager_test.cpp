@@ -1686,9 +1686,10 @@ HWTEST_F(ApnManagerTest, ApnItem_PushApnItem_001, TestSize.Level0)
     int32_t slotId = 0;
     sptr<ApnItem> defaultApnItem = ApnItem::MakeDefaultApn(DATA_CONTEXT_ROLE_DEFAULT);
     int32_t ret = apnManager->PushApnItem(0, slotId, defaultApnItem);
-    sptr<ApnItem> defaultApnItem2;
-    ret = apnManager->PushApnItem(0, slotId, defaultApnItem2);
     EXPECT_EQ(ret, 1);
+    sptr<ApnItem> defaultApnItem2 = nullptr;
+    ret = apnManager->PushApnItem(0, slotId, defaultApnItem2);
+    EXPECT_EQ(ret, 0);
 }
  
 HWTEST_F(ApnManagerTest, ApnItem_GetPreferId_001, TestSize.Level0)

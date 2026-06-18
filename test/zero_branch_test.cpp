@@ -2700,5 +2700,56 @@ HWTEST_F(BranchTest, MarshallingTest001, Function | MediumTest | Level0)
     auto result = apnAttr.Marshalling(parcel);
     EXPECT_TRUE(result);
 }
+
+/**
+ * @tc.number   GetDefaultTcpBufferConfig_001
+ * @tc.name     test GetDefaultTcpBufferConfig with invalid config format
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, GetDefaultTcpBufferConfig_001, Function | MediumTest | Level3)
+{
+    DataConnectionManager con { 0 };
+    con.Init();
+    system::SetParameter(CONFIG_TCP_BUFFER, "INVALID_CONFIG");
+    con.GetDefaultTcpBufferConfig();
+    ASSERT_EQ(con.tcpBufferConfigMap_.size(), 0);
+    system::SetParameter(CONFIG_TCP_BUFFER, DEFAULT_TCP_BUFFER_CONFIG);
+    con.GetDefaultTcpBufferConfig();
+    ASSERT_GT(con.tcpBufferConfigMap_.size(), 0);
+}
+
+/**
+ * @tc.number   GetDefaultTcpBufferConfig_002
+ * @tc.name     test GetDefaultTcpBufferConfig with empty config
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, GetDefaultTcpBufferConfig_002, Function | MediumTest | Level3)
+{
+    DataConnectionManager con { 0 };
+    con.Init();
+    system::SetParameter(CONFIG_TCP_BUFFER, "");
+    con.GetDefaultTcpBufferConfig();
+    ASSERT_EQ(con.tcpBufferConfigMap_.size(), 0);
+    system::SetParameter(CONFIG_TCP_BUFFER, DEFAULT_TCP_BUFFER_CONFIG);
+    con.GetDefaultTcpBufferConfig();
+    ASSERT_GT(con.tcpBufferConfigMap_.size(), 0);
+}
+
+/**
+ * @tc.number   GetDefaultTcpBufferConfig_003
+ * @tc.name     test GetDefaultTcpBufferConfig with key only no value
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, GetDefaultTcpBufferConfig_003, Function | MediumTest | Level3)
+{
+    DataConnectionManager con { 0 };
+    con.Init();
+    system::SetParameter(CONFIG_TCP_BUFFER, "UMTS;HSPA");
+    con.GetDefaultTcpBufferConfig();
+    ASSERT_EQ(con.tcpBufferConfigMap_.size(), 0);
+    system::SetParameter(CONFIG_TCP_BUFFER, DEFAULT_TCP_BUFFER_CONFIG);
+    con.GetDefaultTcpBufferConfig();
+    ASSERT_GT(con.tcpBufferConfigMap_.size(), 0);
+}
 } // namespace Telephony
 } // namespace OHOS
