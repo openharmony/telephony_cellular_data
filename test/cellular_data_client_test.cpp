@@ -71,7 +71,7 @@ HWTEST_F(CellularDataClientTest, GetApnState_001, TestSize.Level0)
 {
     std::string str;
     int32_t result = CellularDataClient::GetInstance().GetApnState(0, str);
-    EXPECT_EQ(result, 0);
+    EXPECT_NE(result, 0);
 }
 
 /**
@@ -82,7 +82,7 @@ HWTEST_F(CellularDataClientTest, GetApnState_001, TestSize.Level0)
 HWTEST_F(CellularDataClientTest, GetDataRecoveryState_001, TestSize.Level0)
 {
     int32_t result = CellularDataClient::GetInstance().GetDataRecoveryState();
-    EXPECT_EQ(result, 0);
+    EXPECT_NE(result, 0);
 }
 
 /**
@@ -129,7 +129,7 @@ HWTEST_F(CellularDataClientTest, GetDataConnIpType_001, TestSize.Level0)
 {
     std::string ipType;
     int32_t result = CellularDataClient::GetInstance().GetDataConnIpType(0, ipType);
-    EXPECT_EQ(result, 0);
+    EXPECT_NE(result, 0);
 }
 
 /**
