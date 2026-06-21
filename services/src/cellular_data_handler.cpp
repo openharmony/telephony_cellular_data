@@ -653,14 +653,14 @@ bool CellularDataHandler::CheckApnState(sptr<ApnHolder> &apnHolder)
         return false;
     }
     if (apnHolder->GetApnState() == PROFILE_STATE_RETRYING) {
-        TELEPHONY_LOGD("during retry, check state fail");
+        TELEPHONY_LOGE("during retry, check state fail");
         return false;
     }
     if (apnHolder->GetApnState() == PROFILE_STATE_FAILED) {
         apnHolder->SetApnState(PROFILE_STATE_IDLE);
     }
     if (apnHolder->GetApnState() != PROFILE_STATE_IDLE) {
-        TELEPHONY_LOGD("Slot%{public}d: APN holder is not idle, apn state is %{public}d",
+        TELEPHONY_LOGE("Slot%{public}d: APN holder is not idle, apn state is %{public}d",
             slotId_, apnHolder->GetApnState());
         return false;
     }
@@ -717,9 +717,11 @@ void CellularDataHandler::AttemptEstablishDataConnection(sptr<ApnHolder> &apnHol
     }
 #endif
     if ((airplaneObserver_ != nullptr) && (airplaneObserver_->IsAirplaneModeOn())) {
+        TELEPHONY_LOGE("Slot%{public}d: IsAirplaneModeOn", slotId_);
         return;
     }
     if (!CheckCellularDataSlotId(apnHolder) || !CheckAttachAndSimState(apnHolder) || !CheckRoamingState(apnHolder)) {
+        TELEPHONY_LOGE("Slot%{public}d: Check apnHolder failed", slotId_);
         return;
     }
     DelayedSingleton<CellularDataHiSysEvent>::GetInstance()->SetCellularDataActivateStartTime();
@@ -808,6 +810,7 @@ bool CellularDataHandler::EstablishDataConnection(sptr<ApnHolder> &apnHolder, in
             if (apnState == ApnProfileState::PROFILE_STATE_CONNECTING ||
                 apnState == ApnProfileState::PROFILE_STATE_CONNECTED) {
                 ClearAllConnections(DisConnectionReason::REASON_CHANGE_CONNECTION);
+                TELEPHONY_LOGE("Slot%{public}d: EstablishDataConnection apnState connect", slotId_);
                 return false;
             }
         }
@@ -1120,6 +1123,7 @@ void CellularDataHandler::RetryOrClearConnection(const sptr<ApnHolder> &apnHolde
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
         NotifyReqCellularData(false);
 #endif
+        EstablishAllApnsIfConnectable();
     } else if (reason == DisConnectionReason::REASON_PERMANENT_REJECT) {
         TELEPHONY_LOGI("permannent reject, mark bad and clear connection");
         apnHolder->SetApnBadState(true);
@@ -1232,7 +1236,8 @@ void CellularDataHandler::MsgEstablishDataConnection(const InnerEvent::Pointer &
     if (isCardAllowData && apnHolder->IsDataCallEnabled()) {
         AttemptEstablishDataConnection(apnHolder);
     } else {
-        TELEPHONY_LOGI("MsgEstablishDataConnection IsDataCallEnabled is false");
+        TELEPHONY_LOGI("Slot%{public}d, MsgEstablishDataConnection IsDataCallEnabled is false,"
+            "apnType: %{public}s", slotId_, apnHolder->GetApnType().c_str());
         DisConnectionReason reason = DisConnectionReason::REASON_CHANGE_CONNECTION;
         std::unique_ptr<uint64_t> disconnectBearType = event->GetUniqueObject<uint64_t>();
         int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
@@ -1861,6 +1866,7 @@ bool CellularDataHandler::HandleApnChanged()
 
 void CellularDataHandler::HandleApnChanged(const InnerEvent::Pointer &event)
 {
+    TELEPHONY_LOGI("Slot%{public}d: HandleApnChanged with event", slotId_);
     if (apnManager_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: apnManager_ is null", slotId_);
         return;
