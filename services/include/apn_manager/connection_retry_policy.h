@@ -17,6 +17,7 @@
 #define CONNECTION_RETRY_POLICY_H
 
 #include "apn_item.h"
+#include <shared_mutex>
 
 namespace OHOS {
 namespace Telephony {
@@ -51,6 +52,7 @@ private:
     std::vector<sptr<ApnItem>> matchedApns_;
     static inline int32_t defaultSetupFailDelay_ = DEFAULT_DELAY_FOR_SETUP_FAIL;
     static inline int32_t defaultModemDendDelay_ = DEFAULT_DELAY_FOR_MODEM_DEND;
+    static std::shared_mutex defaultModemDendDelayMutex_;
     mutable int32_t tryCount_ = 0;
     int32_t maxCount_ = 5;
     mutable int32_t currentApnIndex_ = 0;
