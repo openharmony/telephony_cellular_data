@@ -33,6 +33,7 @@ static constexpr int64_t DEFAULT_DELAY_FOR_INTERNAL_DEFAULT_APN_S = 5 * 1000;
 static constexpr int64_t DEFAULT_DELAY_FOR_OTHER_APN = 2 * 1000;
 static constexpr int32_t MIN_RANDOM_DELAY = 0;
 static constexpr int32_t MAX_RANDOM_DELAY = 2000;
+std::shared_mutex ConnectionRetryPolicy::defaultModemDendDelayMutex_;
 
 ConnectionRetryPolicy::ConnectionRetryPolicy()
 {
