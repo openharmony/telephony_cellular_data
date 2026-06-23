@@ -46,9 +46,11 @@ ConnectionRetryPolicy::ConnectionRetryPolicy()
     }
     char modemDendDelay[SYSPARA_SIZE] = { 0 };
     GetParameter(PROP_MODEM_DEND_DELAY, DEFAULT_DELAY, modemDendDelay, SYSPARA_SIZE);
+    std::unique_lock<std::shared_mutex> lock(defaultModemDendDelayMutex_);
     if (!ConvertStrToInt(modemDendDelay, defaultModemDendDelay_)) {
         TELEPHONY_LOGE("modemDendDelay is invalid: %{public}s", modemDendDelay);
     }
+    lock.unlock();
     WatchParameter(PROP_RETRY_STRATEGY_ALLOW, OnPropChanged, this);
     WatchParameter(PROP_SETUP_FAIL_DELAY, OnPropChanged, this);
     WatchParameter(PROP_MODEM_DEND_DELAY, OnPropChanged, this);
@@ -112,6 +114,7 @@ int64_t ConnectionRetryPolicy::GetNextRetryDelay(std::string apnType, int32_t ca
             DEFAULT_DELAY_FOR_INTERNAL_DEFAULT_APN_S;
     } else if (apnType == DATA_CONTEXT_ROLE_DEFAULT) {
         if (scene == RetryScene::RETRY_SCENE_MODEM_DEACTIVATE) {
+            std::shared_lock<std::shared_mutex> lock(defaultModemDendDelayMutex_);
             retryDelay += defaultModemDendDelay_;
         } else {
             retryDelay += defaultSetupFailDelay_;
@@ -160,12 +163,15 @@ void ConnectionRetryPolicy::OnPropChanged(const char *key, const char *value, vo
             TELEPHONY_LOGE("invalid value: %{public}s", value);
         }
     } else if ((strcmp(key, PROP_MODEM_DEND_DELAY) == 0)) {
+        std::unique_lock<std::shared_mutex> lock(defaultModemDendDelayMutex_);
         if (!ConvertStrToInt(value, defaultModemDendDelay_)) {
             TELEPHONY_LOGE("invalid value: %{public}s", value);
         }
+        lock.unlock();
     } else {
         TELEPHONY_LOGI("invalid key: %{public}s", key);
     }
+    std::unique_lock<std::shared_mutex> lock1(defaultModemDendDelayMutex_);
     TELEPHONY_LOGI("prop change: allow=%{public}d, delay=%{public}d,%{public}d", isPropOn_, defaultSetupFailDelay_,
         defaultModemDendDelay_);
 }
