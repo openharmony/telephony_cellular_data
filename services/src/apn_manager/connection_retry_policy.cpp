@@ -171,7 +171,7 @@ void ConnectionRetryPolicy::OnPropChanged(const char *key, const char *value, vo
     } else {
         TELEPHONY_LOGI("invalid key: %{public}s", key);
     }
-    std::unique_lock<std::shared_mutex> lock1(defaultModemDendDelayMutex_);
+    std::shared_lock<std::shared_mutex> lock1(defaultModemDendDelayMutex_);
     TELEPHONY_LOGI("prop change: allow=%{public}d, delay=%{public}d,%{public}d", isPropOn_, defaultSetupFailDelay_,
         defaultModemDendDelay_);
 }
