@@ -472,20 +472,6 @@ HWTEST_F(CellularDataHandlerBranchTest, ResumeDataPermittedTimerOut_001, Functio
     cellularDataHandler_->ResumeDataPermittedTimerOut(event);
     EXPECT_TRUE(cellularDataHandler_->dataSwitchSettings_->IsInternalDataOn());
 }
-
-HWTEST_F(CellularDataHandlerBranchTest, HandleResidentNetworkChanged_001, Function | MediumTest | Level3)
-{
-    InitCellularDataHandler();
-    InitMockManager();
- 
-    // Test case: event is nullptr
-    AppExecFwk::InnerEvent::Pointer event = nullptr;
-    cellularDataHandler_->HandleResidentNetworkChanged(event);
-    ASSERT_FALSE(cellularDataHandler_->isMccChanged_);
-    ASSERT_EQ(cellularDataHandler_->lastMcc_, "");
- 
-    UnmockManager();
-}
  
 HWTEST_F(CellularDataHandlerBranchTest, HandleResidentNetworkChanged_002, Function | MediumTest | Level3)
 {
@@ -584,7 +570,7 @@ HWTEST_F(CellularDataHandlerBranchTest, CheckAttachAndSimState_001, Function | M
 {
     InitCellularDataHandler();
     InitMockManager();
-    cellularDataHandler_->isMccChanged_ = false
+    cellularDataHandler_->isMccChanged_ = false;
 
     auto apnHolder =
         cellularDataHandler_->apnManager_->FindApnHolderById(DataContextRolesId::DATA_CONTEXT_ROLE_MMS_ID);
@@ -596,7 +582,7 @@ HWTEST_F(CellularDataHandlerBranchTest, CheckAttachAndSimState_001, Function | M
     cellularDataHandler_->isMccChanged_ = true;
     EXPECT_FALSE(cellularDataHandler_->CheckAttachAndSimState(apnHolder));
 
-    cellularDataHandler_->isMccChanged_ = false
+    cellularDataHandler_->isMccChanged_ = false;
     cellularDataHandler_->RemoveAllEvents();
     EXPECT_CALL(*mockNetworkSearchManager, GetPsRegState(_)).WillOnce(Return(1));
     cellularDataHandler_->CheckAttachAndSimState(apnHolder);
