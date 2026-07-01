@@ -40,6 +40,7 @@ static const int32_t ESM_FLAG_INVALID = -1;
 static constexpr int32_t SIM_ACCOUNT_LOADED_BUT_SIMID_INVALID = 2;
 static constexpr int32_t SIM_ACCOUNT_LOADED_RECEIVE = 3;
 static constexpr int32_t APN_CREATE_ERROR_FIRST_CNT = 3;
+static constexpr uint32_t MCC_CHANGE_ACTIVATE_DELAY_MS = 35 * 1000;
 const std::string DEFAULT_DATA_ROAMING = "persist.telephony.defaultdataroaming";
 #ifdef BASE_POWER_IMPROVEMENT
 constexpr const char *PERMISSION_STARTUP_COMPLETED = "ohos.permission.RECEIVER_STARTUP_COMPLETED";
@@ -50,6 +51,8 @@ constexpr const char *MOBILE_DATA_POLICY_DISALLOW = "disallow";
 constexpr const char *SIM_ACCOUNT_LOADED = "SIM_ACCOUNT_LOADED";
 constexpr const char *GCF_LAST_PLMN = "00101";
 constexpr const char *GCF_CUR_PLMN = "24681";
+constexpr const char *CN_MCC = "460";
+constexpr const char *OUT_BORDER_MCC = "454";
 CellularDataHandler::CellularDataHandler(int32_t slotId)
     : TelEventHandler("CellularDataHandler"), slotId_(slotId)
 {}
@@ -381,6 +384,7 @@ void CellularDataHandler::RadioPsConnectionAttached(const InnerEvent::Pointer &e
         TELEPHONY_LOGE("Slot%{public}d: event or apnManager_ is null", slotId_);
         return;
     }
+    isMccChanged_ = false;
     EstablishAllApnsIfConnectable();
 }
 
@@ -562,6 +566,9 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
 {
     if (apnHolder == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: apnHolder is null", slotId_);
+        return false;
+    }
+    if (isMccChanged_) {
         return false;
     }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
@@ -2961,6 +2968,34 @@ void CellularDataHandler::HandleReplyCommonEvent(const AppExecFwk::InnerEvent::P
     TELEPHONY_LOGI("Recv timeout event");
     // 接收到事件后事件被移除，HasInnerEvent无事件
     ReplyCommonEvent(strEnterSubscriber_, false);
+}
+
+void CellularDataHandler::HandleMccChangeDelay(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    isMccChanged_ = false;
+    EstablishAllApnsIfConnectable();
+}
+ 
+void CellularDataHandler::HandleResidentNetworkChanged(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        return;
+    }
+    auto object = event->GetSharedObject<std::string>();
+    if (object == nullptr) {
+        return;
+    }
+    std::string plmn = *object;
+    if (plmn.length() < DEFAULT_MCC_SIZE) {
+        return;
+    }
+    std::string currentMcc = plmn.substr(0, DEFAULT_MCC_SIZE);
+    if (lastMcc_ == CN_MCC && currentMcc == OUT_BORDER_MCC) {
+        TELEPHONY_LOGI("Slot%{public}d: mcc changed", slotId_);
+        isMccChanged_ = true;
+        SendEvent(CellularDataEventCode::MSG_MCC_CHANGE_ACTIVATE_DELAY, 0, MCC_CHANGE_ACTIVATE_DELAY_MS);
+    }
+    lastMcc_ = currentMcc;
 }
 
 void CellularDataHandler::ReplyCommonEvent(std::shared_ptr<CellularDataPowerSaveModeSubscriber> &subscriber,
