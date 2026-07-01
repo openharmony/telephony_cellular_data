@@ -36,11 +36,11 @@ namespace Telephony {
 using namespace AppExecFwk;
 using namespace OHOS::EventFwk;
 using namespace NetManagerStandard;
+static constexpr uint32_t MCC_CHANGE_ACTIVATE_DELAY_MS = 35 * 1000;
 static const int32_t ESM_FLAG_INVALID = -1;
 static constexpr int32_t SIM_ACCOUNT_LOADED_BUT_SIMID_INVALID = 2;
 static constexpr int32_t SIM_ACCOUNT_LOADED_RECEIVE = 3;
 static constexpr int32_t APN_CREATE_ERROR_FIRST_CNT = 3;
-static constexpr uint32_t MCC_CHANGE_ACTIVATE_DELAY_MS = 35 * 1000;
 const std::string DEFAULT_DATA_ROAMING = "persist.telephony.defaultdataroaming";
 #ifdef BASE_POWER_IMPROVEMENT
 constexpr const char *PERMISSION_STARTUP_COMPLETED = "ohos.permission.RECEIVER_STARTUP_COMPLETED";
@@ -2970,6 +2970,27 @@ void CellularDataHandler::HandleReplyCommonEvent(const AppExecFwk::InnerEvent::P
     ReplyCommonEvent(strEnterSubscriber_, false);
 }
 
+void CellularDataHandler::ReplyCommonEvent(std::shared_ptr<CellularDataPowerSaveModeSubscriber> &subscriber,
+    bool isNeedCheck)
+{
+    if (isNeedCheck) {
+        ApnProfileState apnState = apnManager_->GetOverallDefaultApnState();
+        if (apnState == PROFILE_STATE_CONNECTED || apnState == PROFILE_STATE_DISCONNECTING) {
+            TELEPHONY_LOGE("Disconnecting apn profile");
+            return;
+        }
+        if (!HasInnerEvent(CellularDataEventCode::MSG_TIMEOUT_TO_REPLY_COMMON_EVENT)) {
+            TELEPHONY_LOGE("Not in power save mode");
+            return;
+        }
+    }
+    if (subscriber != nullptr) {
+        subscriber->FinishTelePowerCommonEvent();
+    }
+    RemoveEvent(CellularDataEventCode::MSG_TIMEOUT_TO_REPLY_COMMON_EVENT);
+}
+#endif
+
 void CellularDataHandler::HandleMccChangeDelay(const AppExecFwk::InnerEvent::Pointer &event)
 {
     isMccChanged_ = false;
@@ -2997,26 +3018,5 @@ void CellularDataHandler::HandleResidentNetworkChanged(const AppExecFwk::InnerEv
     }
     lastMcc_ = currentMcc;
 }
-
-void CellularDataHandler::ReplyCommonEvent(std::shared_ptr<CellularDataPowerSaveModeSubscriber> &subscriber,
-    bool isNeedCheck)
-{
-    if (isNeedCheck) {
-        ApnProfileState apnState = apnManager_->GetOverallDefaultApnState();
-        if (apnState == PROFILE_STATE_CONNECTED || apnState == PROFILE_STATE_DISCONNECTING) {
-            TELEPHONY_LOGE("Disconnecting apn profile");
-            return;
-        }
-        if (!HasInnerEvent(CellularDataEventCode::MSG_TIMEOUT_TO_REPLY_COMMON_EVENT)) {
-            TELEPHONY_LOGE("Not in power save mode");
-            return;
-        }
-    }
-    if (subscriber != nullptr) {
-        subscriber->FinishTelePowerCommonEvent();
-    }
-    RemoveEvent(CellularDataEventCode::MSG_TIMEOUT_TO_REPLY_COMMON_EVENT);
-}
-#endif
 } // namespace Telephony
 } // namespace OHOS
