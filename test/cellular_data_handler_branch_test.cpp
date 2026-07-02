@@ -566,6 +566,40 @@ HWTEST_F(CellularDataHandlerBranchTest, HandleResidentNetworkChanged_007, Functi
     UnmockManager();
 }
 
+HWTEST_F(CellularDataHandlerBranchTest, HandleResidentNetworkChanged_008, Function | MediumTest | Level3)
+{
+    InitCellularDataHandler();
+    InitMockManager();
+
+    // Test case: User data roaming is on
+    cellularDataHandler_->dataSwitchSettings_->UpdateUserDataRoamingOn(true);
+    cellularDataHandler_->lastMcc_ = "460";
+    std::string plmn = "45401";
+    auto event = AppExecFwk::InnerEvent::Get(0, std::make_shared<std::string>(plmn));
+    cellularDataHandler_->HandleResidentNetworkChanged(event);
+    ASSERT_FALSE(cellularDataHandler_->isMccChanged_);
+    ASSERT_EQ(cellularDataHandler_->lastMcc_, "460");
+
+    UnmockManager();
+}
+
+HWTEST_F(CellularDataHandlerBranchTest, HandleResidentNetworkChanged_009, Function | MediumTest | Level3)
+{
+    InitCellularDataHandler();
+    InitMockManager();
+
+    // Test case: User data roaming is off
+    cellularDataHandler_->dataSwitchSettings_->UpdateUserDataRoamingOn(false);
+    cellularDataHandler_->lastMcc_ = "460";
+    std::string plmn = "45401";
+    auto event = AppExecFwk::InnerEvent::Get(0, std::make_shared<std::string>(plmn));
+    cellularDataHandler_->HandleResidentNetworkChanged(event);
+    ASSERT_TRUE(cellularDataHandler_->isMccChanged_);
+    ASSERT_EQ(cellularDataHandler_->lastMcc_, "454");
+
+    UnmockManager();
+}
+
 HWTEST_F(CellularDataHandlerBranchTest, CheckAttachAndSimState_001, Function | MediumTest | Level3)
 {
     InitCellularDataHandler();
