@@ -578,7 +578,7 @@ HWTEST_F(CellularDataHandlerBranchTest, HandleResidentNetworkChanged_008, Functi
     auto event = AppExecFwk::InnerEvent::Get(0, std::make_shared<std::string>(plmn));
     cellularDataHandler_->HandleResidentNetworkChanged(event);
     ASSERT_FALSE(cellularDataHandler_->isMccChanged_);
-    ASSERT_EQ(cellularDataHandler_->lastMcc_, "460");
+    EXPECT_EQ(cellularDataHandler_->lastMcc_, "460");
 
     UnmockManager();
 }
