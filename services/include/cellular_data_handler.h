@@ -161,6 +161,7 @@ private:
     void HandleFactoryReset(const AppExecFwk::InnerEvent::Pointer &event);
     void OnCleanAllDataConnectionsDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ResumeDataPermittedTimerOut(const AppExecFwk::InnerEvent::Pointer &event);
+    void HandleResidentNetworkChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void CreateApnItem();
     void UpdatePhysicalConnectionState(bool noActiveConnection);
     bool IsVSimSlotId(int32_t slotId);
@@ -169,6 +170,7 @@ private:
     bool IsCdma();
     void HandleScreenStateChanged(bool isScreenOn) const;
     void HandleEstablishAllApnsIfConnectable(const AppExecFwk::InnerEvent::Pointer &event);
+    void HandleMccChangeDelay(const AppExecFwk::InnerEvent::Pointer &event);
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     bool IsSimRequestNetOnVSimEnabled(int32_t reqType, bool isMmsType) const;
     void HandleMmsRequestOnVsimEnabled(int32_t reqType, bool isMmsType);
@@ -205,6 +207,7 @@ private:
     std::shared_ptr<DataConnectionManager> connectionManager_ = nullptr;
     std::u16string lastIccId_;
     std::string lastNumeric_;
+    std::string lastMcc_;
     int32_t lastCallState_ = (int32_t)TelCallStatus::CALL_STATUS_IDLE;
     const int32_t slotId_;
     DisConnectionReason disconnectionReason_ = DisConnectionReason::REASON_NORMAL;
@@ -223,6 +226,7 @@ private:
     bool isRilApnAttached_ = false;
     bool isSimAccountLoaded_ = false;
     bool isHandoverOccurred_ = false;
+    bool isMccChanged_ = false;
     std::mutex mtx_;
     std::mutex apnActivateListMutex_;
     std::mutex initMutex_;
@@ -310,6 +314,10 @@ private:
             [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleApnChanged(event); } },
         { CellularDataEventCode::MSG_RETRY_TO_LOAD_SIM_ACCOUNT,
             [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleRetryLoadSimAccount(event); } },
+        { RadioEvent::RADIO_RESIDENT_NETWORK_CHANGE,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleResidentNetworkChanged(event); } },
+        { CellularDataEventCode::MSG_MCC_CHANGE_ACTIVATE_DELAY,
+            [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleMccChangeDelay(event); } },
 #ifdef BASE_POWER_IMPROVEMENT
         { CellularDataEventCode::MSG_TIMEOUT_TO_REPLY_COMMON_EVENT,
             [this](const AppExecFwk::InnerEvent::Pointer &event) { HandleReplyCommonEvent(event); } },
