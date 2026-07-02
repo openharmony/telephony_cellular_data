@@ -211,6 +211,7 @@ void CellularDataController::RegisterEvents()
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_RIL_ADAPTER_HOST_DIED, nullptr);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_FACTORY_RESET, nullptr);
     coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_NV_REFRESH_FINISHED, nullptr);
+    coreInner.RegisterCoreNotify(slotId_, cellularDataHandler_, RadioEvent::RADIO_RESIDENT_NETWORK_CHANGE, nullptr);
     
     if (slotId_ == 0) {
         sptr<NetworkSearchCallback> networkSearchCallback = sptr<NetworkSearchCallback>::MakeSptr();

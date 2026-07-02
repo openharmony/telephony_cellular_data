@@ -36,6 +36,7 @@ namespace Telephony {
 using namespace AppExecFwk;
 using namespace OHOS::EventFwk;
 using namespace NetManagerStandard;
+static constexpr uint32_t MCC_CHANGE_ACTIVATE_DELAY_MS = 35 * 1000;
 static const int32_t ESM_FLAG_INVALID = -1;
 static constexpr int32_t SIM_ACCOUNT_LOADED_BUT_SIMID_INVALID = 2;
 static constexpr int32_t SIM_ACCOUNT_LOADED_RECEIVE = 3;
@@ -50,6 +51,8 @@ constexpr const char *MOBILE_DATA_POLICY_DISALLOW = "disallow";
 constexpr const char *SIM_ACCOUNT_LOADED = "SIM_ACCOUNT_LOADED";
 constexpr const char *GCF_LAST_PLMN = "00101";
 constexpr const char *GCF_CUR_PLMN = "24681";
+constexpr const char *CN_MCC = "460";
+constexpr const char *OUT_BORDER_MCC = "454";
 CellularDataHandler::CellularDataHandler(int32_t slotId)
     : TelEventHandler("CellularDataHandler"), slotId_(slotId)
 {}
@@ -381,6 +384,7 @@ void CellularDataHandler::RadioPsConnectionAttached(const InnerEvent::Pointer &e
         TELEPHONY_LOGE("Slot%{public}d: event or apnManager_ is null", slotId_);
         return;
     }
+    isMccChanged_ = false;
     EstablishAllApnsIfConnectable();
 }
 
@@ -391,6 +395,7 @@ void CellularDataHandler::RoamingStateOn(const InnerEvent::Pointer &event)
         TELEPHONY_LOGE("Slot%{public}d: event or dataSwitchSettings_ or apnManager_ is null", slotId_);
         return;
     }
+    isMccChanged_ = false;
     bool roamingState = false;
     if (CoreManagerInner::GetInstance().GetPsRoamingState(slotId_) > 0) {
         roamingState = true;
@@ -562,6 +567,9 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
 {
     if (apnHolder == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: apnHolder is null", slotId_);
+        return false;
+    }
+    if (isMccChanged_) {
         return false;
     }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
@@ -2983,5 +2991,34 @@ void CellularDataHandler::ReplyCommonEvent(std::shared_ptr<CellularDataPowerSave
     RemoveEvent(CellularDataEventCode::MSG_TIMEOUT_TO_REPLY_COMMON_EVENT);
 }
 #endif
+
+void CellularDataHandler::HandleMccChangeDelay(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    isMccChanged_ = false;
+    EstablishAllApnsIfConnectable();
+}
+ 
+void CellularDataHandler::HandleResidentNetworkChanged(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        return;
+    }
+    auto object = event->GetSharedObject<std::string>();
+    if (object == nullptr) {
+        return;
+    }
+    std::string plmn = *object;
+    if (plmn.length() < DEFAULT_MCC_SIZE) {
+        return;
+    }
+    bool userDataRoamingOn = dataSwitchSettings_->IsUserDataRoamingOn();
+    std::string currentMcc = plmn.substr(0, DEFAULT_MCC_SIZE);
+    if (lastMcc_ == CN_MCC && currentMcc == OUT_BORDER_MCC && !userDataRoamingOn) {
+        TELEPHONY_LOGI("Slot%{public}d: mcc changed", slotId_);
+        isMccChanged_ = true;
+        SendEvent(CellularDataEventCode::MSG_MCC_CHANGE_ACTIVATE_DELAY, 0, MCC_CHANGE_ACTIVATE_DELAY_MS);
+    }
+    lastMcc_ = currentMcc;
+}
 } // namespace Telephony
 } // namespace OHOS
