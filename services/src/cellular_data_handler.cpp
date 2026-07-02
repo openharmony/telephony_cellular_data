@@ -395,6 +395,7 @@ void CellularDataHandler::RoamingStateOn(const InnerEvent::Pointer &event)
         TELEPHONY_LOGE("Slot%{public}d: event or dataSwitchSettings_ or apnManager_ is null", slotId_);
         return;
     }
+    isMccChanged_ = false;
     bool roamingState = false;
     if (CoreManagerInner::GetInstance().GetPsRoamingState(slotId_) > 0) {
         roamingState = true;
