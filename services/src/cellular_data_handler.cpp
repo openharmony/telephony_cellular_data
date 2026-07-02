@@ -3010,6 +3010,10 @@ void CellularDataHandler::HandleResidentNetworkChanged(const AppExecFwk::InnerEv
     if (plmn.length() < DEFAULT_MCC_SIZE) {
         return;
     }
+    bool userDataRoamingOn = dataSwitchSettings_->IsUserDataRoamingOn();
+    if (userDataRoamingOn) {
+        return;
+    }
     std::string currentMcc = plmn.substr(0, DEFAULT_MCC_SIZE);
     if (lastMcc_ == CN_MCC && currentMcc == OUT_BORDER_MCC) {
         TELEPHONY_LOGI("Slot%{public}d: mcc changed", slotId_);
