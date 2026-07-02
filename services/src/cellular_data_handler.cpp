@@ -3012,11 +3012,8 @@ void CellularDataHandler::HandleResidentNetworkChanged(const AppExecFwk::InnerEv
         return;
     }
     bool userDataRoamingOn = dataSwitchSettings_->IsUserDataRoamingOn();
-    if (userDataRoamingOn) {
-        return;
-    }
     std::string currentMcc = plmn.substr(0, DEFAULT_MCC_SIZE);
-    if (lastMcc_ == CN_MCC && currentMcc == OUT_BORDER_MCC) {
+    if (lastMcc_ == CN_MCC && currentMcc == OUT_BORDER_MCC && !userDataRoamingOn) {
         TELEPHONY_LOGI("Slot%{public}d: mcc changed", slotId_);
         isMccChanged_ = true;
         SendEvent(CellularDataEventCode::MSG_MCC_CHANGE_ACTIVATE_DELAY, 0, MCC_CHANGE_ACTIVATE_DELAY_MS);
