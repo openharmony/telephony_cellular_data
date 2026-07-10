@@ -244,7 +244,7 @@ int32_t CellularDataService::GetApnState(int32_t slotId, const std::string &apnT
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    // LCOV_EXCL_END
+    // LCOV_EXCL_STOP
     std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
     if (cellularDataController == nullptr) {
         TELEPHONY_LOGE("cellularDataControllers is null, slotId=%{public}d", slotId);
@@ -261,7 +261,7 @@ int32_t CellularDataService::GetDataRecoveryState(int32_t &state)
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    // LCOV_EXCL_END
+    // LCOV_EXCL_STOP
     std::lock_guard<std::mutex> guard(mapLock_);
     for (const auto &controller : cellularDataControllers_) {
         auto cellularDataController = controller.second;
@@ -686,7 +686,7 @@ int32_t CellularDataService::GetDataConnIpType(int32_t slotId, std::string &ipTy
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    // LCOV_EXCL_END
+    // LCOV_EXCL_STOP
     std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
     if (cellularDataController == nullptr) {
         TELEPHONY_LOGE("cellularDataControllers is null, slotId=%{public}d", slotId);
