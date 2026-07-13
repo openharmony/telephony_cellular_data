@@ -152,13 +152,13 @@ HWTEST_F(DataSwitchSettingTest, DataSwitchSetting_08, Function | MediumTest | Le
 {
     DataSwitchSettings sets(0);
     std::cout << "DataSwitchSetting_08 slotId: " << sets.slotId_ << std::endl;
-    TELEPHONY_EXT_WRAPPER.isVirtualModemConnected_ = IsVirtualModemConnected;
+    TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_ = IsVirtualModemConnected;
     EXPECT_EQ(sets.IsAllowActiveData(), false);
 
     TELEPHONY_EXT_WRAPPER.isDcCellularDataAllowed_ = IsDcCellularDataAllowed;
     EXPECT_EQ(sets.IsAllowActiveData(), true);
 
-    TELEPHONY_EXT_WRAPPER.isVirtualModemConnected_ = nullptr;
+    TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_ = nullptr;
     TELEPHONY_EXT_WRAPPER.isDcCellularDataAllowed_ = nullptr;
 }
 }  // namespace Telephony
