@@ -72,6 +72,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCellularData()
     InitReregisterNetwork();
     InitIsVirtualModemConnected();
     InitIsDcCellularDataAllowed();
+    InitIsVirtualModemSlot();
     InitReportEventToChr();
 }
 
@@ -252,6 +253,22 @@ void TelephonyExtWrapper::InitIsDcCellularDataAllowed()
         return;
     }
     TELEPHONY_LOGI("telephony ext wrapper init IsDcCellularDataAllowed success");
+}
+
+void TelephonyExtWrapper::InitIsVirtualModemSlot()
+{
+    auto virtualModemSwitch = system::GetBoolParameter("const.booster.virtual_modem_switch", false);
+    if (!virtualModemSwitch) {
+        isVirtualModemSlot_ = nullptr;
+        return;
+    }
+    isVirtualModemSlot_ =
+        (IsVirtualModemSlotType)dlsym(telephonyExtWrapperHandle_, "IsVirtualModemSlot");
+    if (isVirtualModemSlot_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol IsVirtualModemSlot failed, error: %{public}s", dlerror());
+        return;
+    }
+    TELEPHONY_LOGI("telephony ext wrapper init IsVirtualModemSlot success");
 }
 
 void TelephonyExtWrapper::InitReportEventToChr()
