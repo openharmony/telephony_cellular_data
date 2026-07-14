@@ -138,7 +138,7 @@ HWTEST_F(DataSwitchSettingTest, DataSwitchSetting_07, Function | MediumTest | Le
     ASSERT_TRUE(sets1.QueryAnySimDetectedStatus(simDetected) == TELEPHONY_ERR_SUCCESS);
 }
 
-static bool IsVirtualModemConnected()
+static bool IsVirtualModemSlot(int32_t slotId)
 {
     return true;
 }
@@ -152,7 +152,7 @@ HWTEST_F(DataSwitchSettingTest, DataSwitchSetting_08, Function | MediumTest | Le
 {
     DataSwitchSettings sets(0);
     std::cout << "DataSwitchSetting_08 slotId: " << sets.slotId_ << std::endl;
-    TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_ = IsVirtualModemConnected;
+    TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_ = IsVirtualModemSlot;
     EXPECT_EQ(sets.IsAllowActiveData(), false);
 
     TELEPHONY_EXT_WRAPPER.isDcCellularDataAllowed_ = IsDcCellularDataAllowed;
