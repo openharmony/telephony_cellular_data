@@ -52,6 +52,7 @@ public:
     typedef int32_t (*REPORT_EVENT_TO_CHR)(int32_t, const char*, int32_t);
     using IsVirtualModemConnectedType = bool(*)();
     using IsDcCellularDataAllowedType = bool(*)();
+    using IsVirtualModemSlotType = bool(*)(int32_t);
 
     DATA_EDN_SELF_CURE dataEndSelfCure_ = nullptr;
     ReRegisterNetwork reRegisterNetwork_ = nullptr;
@@ -73,6 +74,7 @@ public:
     CREATE_DC_APN_ITEM_EXT createDcApnItemExt_ = nullptr;
     IsVirtualModemConnectedType isVirtualModemConnected_ = nullptr;
     IsDcCellularDataAllowedType isDcCellularDataAllowed_ = nullptr;
+    IsVirtualModemSlotType isVirtualModemSlot_ = nullptr;
     REPORT_EVENT_TO_CHR reportEventToChr_ = nullptr;
 
 private:
@@ -95,6 +97,7 @@ private:
     void InitCreateDcApnItemExt();
     void InitIsVirtualModemConnected();
     void InitIsDcCellularDataAllowed();
+    void InitIsVirtualModemSlot();
     void InitReportEventToChr();
 };
 
