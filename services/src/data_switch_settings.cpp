@@ -240,7 +240,7 @@ void DataSwitchSettings::SetCarrierDataOn(bool carrierDataOn)
 
 bool DataSwitchSettings::IsAllowActiveData() const
 {
-    if (TELEPHONY_EXT_WRAPPER.isVirtualModemConnected_ && TELEPHONY_EXT_WRAPPER.isVirtualModemConnected_()) {
+    if (TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_ && TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_(slotId_)) {
         if (TELEPHONY_EXT_WRAPPER.isDcCellularDataAllowed_ && TELEPHONY_EXT_WRAPPER.isDcCellularDataAllowed_()) {
             TELEPHONY_LOGD("dc cellular data is allowed");
             return true;
