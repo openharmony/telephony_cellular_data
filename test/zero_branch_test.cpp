@@ -2553,6 +2553,13 @@ HWTEST_F(BranchTest, Telephony_CellularDataConnectionManager_003, Function | Med
     ASSERT_TRUE(ccmDefaultState.StateProcess(event));
     event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_NETWORKSLICE_EHPLMN_RPT);
     ASSERT_TRUE(ccmDefaultState.StateProcess(event));
+    system::SetParameter("persist.netmgr_ext.networkslice", "true");
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_NETWORKSLICE_URSP_RPT);
+    ASSERT_TRUE(ccmDefaultState.StateProcess(event));
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_NETWORKSLICE_ALLOWEDNSSAI_RPT);
+    ASSERT_TRUE(ccmDefaultState.StateProcess(event));
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_NETWORKSLICE_EHPLMN_RPT);
+    ASSERT_TRUE(ccmDefaultState.StateProcess(event));
     event = AppExecFwk::InnerEvent::Get(0);
     ASSERT_FALSE(ccmDefaultState.StateProcess(event));
     ccmDefaultState.RadioDataCallListChanged(event);
