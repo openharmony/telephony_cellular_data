@@ -15,11 +15,25 @@
 
 #include "incall_data_state_machine.h"
 
+#include "cellular_data_constant.h"
 #include "cellular_data_settings_rdb_helper.h"
+#include "cellular_data_utils.h"
 #include "core_manager_inner.h"
 
 namespace OHOS {
 namespace Telephony {
+
+int32_t IncallDataStateMachine::GetTargetDataSlotId(int32_t defSlotId)
+{
+    // slotId=3 特殊处理（仅当 TSTS 模式启用时）
+    if (slotId_ == CELLDATA_SLOT_ID_3 && CellularDataUtils::IsTstsModeEnabled()) {
+        TELEPHONY_LOGI("Slot%{public}d: TSTS mode enabled, def slotId=%{public}d", slotId_, defSlotId);
+        return defSlotId == CELLDATA_SLOT_ID_1 ? CELLDATA_SLOT_ID_0 : CELLDATA_SLOT_ID_1;
+    }
+    // 其他副卡，保持原有逻辑，激活自己的数据
+    return slotId_;
+}
+
 void IncallDataStateMachine::UpdateCallState(int32_t state)
 {
     callState_ = state;
@@ -76,14 +90,15 @@ bool IncallDataStateMachine::IsIncallDataSwitchOn()
 
 bool IncallDataStateMachine::IsSecondaryCanActiveData()
 {
-    int32_t dsdsMode = DSDS_MODE_V2;
-    CoreManagerInner::GetInstance().GetDsdsMode(dsdsMode);
+    int32_t dsdsModeValue = DSDS_MODE_V2;
+    CoreManagerInner::GetInstance().GetDsdsMode(dsdsModeValue);
+    int32_t primarySlotId = INVALID_SLOT_ID;
+    CoreManagerInner::GetInstance().GetPrimarySlotId(primarySlotId);
+    int32_t dsdsMode = CellularDataUtils::GetDsdsModeForSlots(primarySlotId, slotId_, dsdsModeValue);
     if (dsdsMode >= DSDS_MODE_V3) {
         TELEPHONY_LOGI("Slot%{public}d: not dsds 2.0", slotId_);
         return false;
     }
-    int32_t primarySlotId = INVALID_SLOT_ID;
-    CoreManagerInner::GetInstance().GetPrimarySlotId(primarySlotId);
     if (primarySlotId == INVALID_SLOT_ID || primarySlotId == slotId_) {
         TELEPHONY_LOGI("Slot%{public}d: not secondary sim card", slotId_);
         return false;
@@ -243,10 +258,13 @@ bool IdleState::ProcessCallStarted(const AppExecFwk::InnerEvent::Pointer &event)
     }
     if (stateMachine->IsIncallDataSwitchOn() && stateMachine->IsSecondaryCanActiveData()) {
         int32_t defaultSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
-        if (defaultSlotId != stateMachine->GetSlotId()) {
+        // LCOV_EXCL_START
+        int32_t targetSlotId = stateMachine->GetTargetDataSlotId(defaultSlotId);
+        if (defaultSlotId != targetSlotId) {
             stateMachine->TransitionTo(stateMachine->activatingSecondaryState_);
-            CoreManagerInner::GetInstance().SetDefaultCellularDataSlotId(stateMachine->GetSlotId());
+            CoreManagerInner::GetInstance().SetDefaultCellularDataSlotId(targetSlotId);
         }
+        // LCOV_EXCL_STOP
     }
     return PROCESSED;
 }
@@ -284,10 +302,13 @@ bool IdleState::ProcessSettingsOn(const AppExecFwk::InnerEvent::Pointer &event)
     }
     if (stateMachine->IsIncallDataSwitchOn() && stateMachine->IsSecondaryCanActiveData()) {
         int32_t defaultSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
-        if (defaultSlotId != stateMachine->GetSlotId()) {
+        // LCOV_EXCL_START
+        int32_t targetSlotId = stateMachine->GetTargetDataSlotId(defaultSlotId);
+        if (defaultSlotId != targetSlotId) {
             stateMachine->TransitionTo(stateMachine->activatingSecondaryState_);
-            CoreManagerInner::GetInstance().SetDefaultCellularDataSlotId(stateMachine->GetSlotId());
+            CoreManagerInner::GetInstance().SetDefaultCellularDataSlotId(targetSlotId);
         }
+        // LCOV_EXCL_STOP
     }
     return PROCESSED;
 }
@@ -302,10 +323,13 @@ bool IdleState::ProcessDsdsChanged(const AppExecFwk::InnerEvent::Pointer &event)
     }
     if (stateMachine->IsIncallDataSwitchOn() && stateMachine->IsSecondaryCanActiveData()) {
         int32_t defaultSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
-        if (defaultSlotId != stateMachine->GetSlotId()) {
+        // LCOV_EXCL_START
+        int32_t targetSlotId = stateMachine->GetTargetDataSlotId(defaultSlotId);
+        if (defaultSlotId != targetSlotId) {
             stateMachine->TransitionTo(stateMachine->activatingSecondaryState_);
-            CoreManagerInner::GetInstance().SetDefaultCellularDataSlotId(stateMachine->GetSlotId());
+            CoreManagerInner::GetInstance().SetDefaultCellularDataSlotId(targetSlotId);
         }
+        // LCOV_EXCL_STOP
     }
     return PROCESSED;
 }
