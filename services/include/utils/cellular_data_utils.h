@@ -35,6 +35,8 @@ public:
     static bool GetDefaultMultipleConnectionsConfig();
     static std::string ConvertRadioTechToRadioName(const int32_t radioTech);
     static bool ConvertStrToInt(const std::string& str, int32_t& value);
+    static bool IsTstsModeEnabled();
+    static int32_t GetDsdsModeForSlots(int32_t slotId1, int32_t slotId2, int32_t dsdsModeValue);
 
 private:
     CellularDataUtils() = default;

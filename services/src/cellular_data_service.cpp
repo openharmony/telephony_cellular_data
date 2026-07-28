@@ -20,6 +20,7 @@
 #include "cellular_data_dump_helper.h"
 #include "cellular_data_error.h"
 #include "cellular_data_hisysevent.h"
+#include "cellular_data_utils.h"
 #include "core_manager_inner.h"
 #include "telephony_ext_wrapper.h"
 #include "telephony_common_utils.h"
@@ -336,7 +337,15 @@ void CellularDataService::InitModule()
     netCapabilities.push_back(NetCap::NET_CAPABILITY_SNSSAI6);
     int32_t simNum = SIM_SLOT_COUNT_MD;
     for (int32_t i = 0; i < simNum; ++i) {
+        // Skip VSIM slot (slotId=2), it has separate initialization logic
+        if (i == CELLULAR_DATA_VSIM_SLOT_ID) {
+            continue;
+        }
         AddNetSupplier(i, netAgent, netCapabilities);
+    }
+    // Initialize slotId=3 (third card) when TSTS mode is enabled
+    if (CellularDataUtils::IsTstsModeEnabled()) {
+        AddNetSupplier(CELLDATA_SLOT_ID_3, netAgent, netCapabilities);
     }
 }
 

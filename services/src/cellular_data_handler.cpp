@@ -488,6 +488,11 @@ bool CellularDataHandler::SetDataPermittedForMms(bool dataPermittedForMms)
         TELEPHONY_LOGI("Slot%{public}d: incall data active", slotId_);
         return false;
     }
+    // For slotId=3 in TSTS mode, do not send SetDataPermitted to slot0 or slot3
+    if (slotId_ == CELLDATA_SLOT_ID_3 && CellularDataUtils::IsTstsModeEnabled()) {
+        TELEPHONY_LOGI("Slot%{public}d: TSTS mode, skip SetDataPermitted for MMS", slotId_);
+        return true;
+    }
     if (CheckDataPermittedByDsds()) {
         TELEPHONY_LOGI("Slot%{public}d: data permitted", slotId_);
         return false;
@@ -516,8 +521,9 @@ bool CellularDataHandler::CheckDataPermittedByDsds()
     }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
-    int32_t dsdsMode = DSDS_MODE_V2;
-    coreInner.GetDsdsMode(dsdsMode);
+    int32_t dsdsModeValue = DSDS_MODE_V2;
+    coreInner.GetDsdsMode(dsdsModeValue);
+    int32_t dsdsMode = CellularDataUtils::GetDsdsModeForSlots(defSlotId, slotId_, dsdsModeValue);
     if (defSlotId != slotId_ && dsdsMode == DSDS_MODE_V2) {
         TELEPHONY_LOGI("Slot%{public}d: default:%{public}d, current:%{public}d, dsdsMode:%{public}d", slotId_,
             defSlotId, slotId_, dsdsMode);
@@ -1294,9 +1300,17 @@ void CellularDataHandler::HandleMmsRequestOnVsimEnabled(int32_t reqType, bool is
 void CellularDataHandler::SetDataPermittedForSlotId(const int32_t slotId)
 {
     TELEPHONY_LOGI("SetDataPermittedForSlotId slotId %{public}d", slotId);
+    // For slotId=3 in TSTS mode, do not send SetDataPermitted to any slot
+    if (slotId == CELLDATA_SLOT_ID_3 && CellularDataUtils::IsTstsModeEnabled()) {
+        TELEPHONY_LOGI("TSTS mode, skip SetDataPermitted for slotId=3");
+        return;
+    }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     int32_t count = coreInner.GetMaxSimCount();
     for (auto id = 0; id < count; id++) {
+        if (id == CELLULAR_DATA_VSIM_SLOT_ID) {
+            continue;
+        }
         SetDataPermitted(id, id == slotId);
     }
     SetDataPermitted(CELLULAR_DATA_VSIM_SLOT_ID, slotId == CELLULAR_DATA_VSIM_SLOT_ID);
@@ -1603,10 +1617,15 @@ void CellularDataHandler::HandleVoiceCallChanged(int32_t state)
 void CellularDataHandler::HandleDefaultDataSubscriptionChanged()
 {
     TELEPHONY_LOGI("Slot%{public}d", slotId_);
-    if (CheckDataPermittedByDsds()) {
-        SetDataPermitted(slotId_, true);
+    // For slotId=3 in TSTS mode, do not send SetDataPermitted
+    if (slotId_ == CELLDATA_SLOT_ID_3 && CellularDataUtils::IsTstsModeEnabled()) {
+        TELEPHONY_LOGI("TSTS mode, skip SetDataPermitted for slotId=3");
     } else {
-        SetDataPermitted(slotId_, false);
+        if (CheckDataPermittedByDsds()) {
+            SetDataPermitted(slotId_, true);
+        } else {
+            SetDataPermitted(slotId_, false);
+        }
     }
     if (dataSwitchSettings_ != nullptr) {
         dataSwitchSettings_->LoadSwitchValue();
@@ -1948,23 +1967,32 @@ void CellularDataHandler::HandleDsdsModeChanged(const AppExecFwk::InnerEvent::Po
         return;
     }
     TELEPHONY_LOGD("Slot%{public}d: DSDS changed with mode: %{public}d", slotId_, object->data);
-    int32_t dsdsMode = DSDS_MODE_V2;
-    CoreManagerInner::GetInstance().GetDsdsMode(dsdsMode);
-    if (object->data == dsdsMode) {
+    int32_t dsdsModeValue = DSDS_MODE_V2;
+    CoreManagerInner::GetInstance().GetDsdsMode(dsdsModeValue);
+    if (object->data == dsdsModeValue) {
         TELEPHONY_LOGD("Slot%{public}d: DSDS mode is the same!", slotId_);
         return;
     }
-    if (object->data < DSDS_MODE_V2) {
+    int32_t defSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
+    int32_t dsdsMode = CellularDataUtils::GetDsdsModeForSlots(defSlotId, slotId_, object->data);
+    if (dsdsMode < DSDS_MODE_V2) {
         TELEPHONY_LOGE("Slot%{public}d: DSDS mode is illegal!", slotId_);
         return;
     }
     CoreManagerInner::GetInstance().SetDsdsMode(object->data);
-    int32_t defaultSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
     int32_t simNum = CoreManagerInner::GetInstance().GetMaxSimCount();
     bool dataEnableStatus = true;
     IsCellularDataEnabled(dataEnableStatus);
     for (int32_t i = 0; i < simNum; ++i) {
-        if (defaultSlotId != i && object->data == DSDS_MODE_V2) {
+        if (i == CELLULAR_DATA_VSIM_SLOT_ID) {
+            continue;
+        }
+        // In TSTS mode, do not send SetDataPermitted to CELLDATA_SLOT_ID_3
+        if (CellularDataUtils::IsTstsModeEnabled() && i == CELLDATA_SLOT_ID_3) {
+            continue;
+        }
+        int32_t slotDsdsMode = CellularDataUtils::GetDsdsModeForSlots(defSlotId, i, object->data);
+        if (defSlotId != i && slotDsdsMode == DSDS_MODE_V2) {
             SetDataPermitted(i, false);
         } else {
             if (dataEnableStatus) {

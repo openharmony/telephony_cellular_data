@@ -1124,6 +1124,32 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_008, Function | MediumTest | 
 }
 
 /**
+ * @tc.number   Telephony_CellularDataService_009
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularDataService_009, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    CellularDataService service;
+    std::vector<std::u16string> strV;
+    ASSERT_EQ(TELEPHONY_ERR_FAIL, service.Dump(INVALID_FD, strV));
+    service.state_ = ServiceRunningState::STATE_RUNNING;
+    service.OnStart();
+    service.InitModule();
+    system::SetParameter("persist.edm.mobile_data_policy", "none");
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(false));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(true));
+    system::SetParameter("persist.edm.mobile_data_policy", "disallow");
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(false));
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.EnableCellularData(true));
+    service.GetFlowDataInfoDump();
+    service.OnStop();
+    system::SetParameter("persist.edm.mobile_data_policy", "none");
+    system::SetParameter(PERSIST_TSTS_MODE, "0");
+}
+
+/**
  * @tc.number  CellularDataController_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -2758,6 +2784,326 @@ HWTEST_F(BranchTest, GetDefaultTcpBufferConfig_003, Function | MediumTest | Leve
     system::SetParameter(CONFIG_TCP_BUFFER, DEFAULT_TCP_BUFFER_CONFIG);
     con.GetDefaultTcpBufferConfig();
     ASSERT_GT(con.tcpBufferConfigMap_.size(), 0);
+}
+
+HWTEST_F(BranchTest, CellularDataUtils_IsTstsModeEnabled_001, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "0");
+    bool result = CellularDataUtils::IsTstsModeEnabled();
+    ASSERT_FALSE(result);
+}
+
+HWTEST_F(BranchTest, CellularDataUtils_IsTstsModeEnabled_002, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    bool result = CellularDataUtils::IsTstsModeEnabled();
+    ASSERT_TRUE(result);
+}
+
+HWTEST_F(BranchTest, CellularDataUtils_IsTstsModeEnabled_003, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "abc");
+    bool result = CellularDataUtils::IsTstsModeEnabled();
+    ASSERT_FALSE(result);
+}
+
+HWTEST_F(BranchTest, CellularDataUtils_IsTstsModeEnabled_004, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "-1");
+    bool result = CellularDataUtils::IsTstsModeEnabled();
+    ASSERT_FALSE(result);
+}
+
+HWTEST_F(BranchTest, CellularDataUtils_GetDsdsModeForSlots_001, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "0");
+    int32_t dsdsMode = CellularDataUtils::GetDsdsModeForSlots(0, 1, 0x12);
+    ASSERT_EQ(dsdsMode, 0x2);
+}
+
+HWTEST_F(BranchTest, CellularDataUtils_GetDsdsModeForSlots_002, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    int32_t dsdsMode = CellularDataUtils::GetDsdsModeForSlots(0, 1, 0x12);
+    ASSERT_EQ(dsdsMode, 0x1);
+}
+
+HWTEST_F(BranchTest, CellularDataUtils_GetDsdsModeForSlots_003, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    int32_t dsdsMode = CellularDataUtils::GetDsdsModeForSlots(0, 3, 0x123);
+    ASSERT_EQ(dsdsMode, 0x1);
+}
+
+HWTEST_F(BranchTest, CellularDataUtils_GetDsdsModeForSlots_004, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    int32_t dsdsMode = CellularDataUtils::GetDsdsModeForSlots(1, 3, 0x1234);
+    ASSERT_EQ(dsdsMode, 0x1);
+}
+
+HWTEST_F(BranchTest, CellularDataUtils_GetDsdsModeForSlots_005, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    int32_t dsdsMode = CellularDataUtils::GetDsdsModeForSlots(0, 2, 0x1234);
+    ASSERT_EQ(dsdsMode, 0x3);
+}
+
+HWTEST_F(BranchTest, CellularDataUtils_GetDsdsModeForSlots_006, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    int32_t dsdsMode = CellularDataUtils::GetDsdsModeForSlots(3, 0, 0x1234);
+    ASSERT_EQ(dsdsMode, 0x2);
+}
+
+HWTEST_F(BranchTest, CellularDataUtils_GetDsdsModeForSlots_007, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    int32_t dsdsMode = CellularDataUtils::GetDsdsModeForSlots(3, 1, 0x1234);
+    ASSERT_EQ(dsdsMode, 0x1);
+}
+
+HWTEST_F(BranchTest, IncallDataStateMachine_GetTargetDataSlotId_001, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "0");
+    auto handler = std::make_shared<StateMachineTest>();
+    auto stateMachine = std::make_shared<IncallDataStateMachine>();
+    sptr<ApnManager> apnManager = nullptr;
+    stateMachine->Init(0, CELLDATA_SLOT_ID_3, handler, apnManager);
+    int32_t targetSlotId = stateMachine->GetTargetDataSlotId(CELLDATA_SLOT_ID_0);
+    ASSERT_EQ(targetSlotId, CELLDATA_SLOT_ID_3);
+}
+
+HWTEST_F(BranchTest, IncallDataStateMachine_GetTargetDataSlotId_002, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    auto handler = std::make_shared<StateMachineTest>();
+    auto stateMachine = std::make_shared<IncallDataStateMachine>();
+    sptr<ApnManager> apnManager = nullptr;
+    stateMachine->Init(0, CELLDATA_SLOT_ID_3, handler, apnManager);
+    int32_t targetSlotId = stateMachine->GetTargetDataSlotId(CELLDATA_SLOT_ID_0);
+    ASSERT_EQ(targetSlotId, CELLDATA_SLOT_ID_1);
+}
+
+HWTEST_F(BranchTest, IncallDataStateMachine_GetTargetDataSlotId_003, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    auto handler = std::make_shared<StateMachineTest>();
+    auto stateMachine = std::make_shared<IncallDataStateMachine>();
+    sptr<ApnManager> apnManager = nullptr;
+    stateMachine->Init(0, CELLDATA_SLOT_ID_0, handler, apnManager);
+    int32_t targetSlotId = stateMachine->GetTargetDataSlotId(CELLDATA_SLOT_ID_1);
+    ASSERT_EQ(targetSlotId, CELLDATA_SLOT_ID_0);
+}
+
+HWTEST_F(BranchTest, IncallDataStateMachine_GetTargetDataSlotId_004, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    auto handler = std::make_shared<StateMachineTest>();
+    auto stateMachine = std::make_shared<IncallDataStateMachine>();
+    sptr<ApnManager> apnManager = nullptr;
+    stateMachine->Init(0, CELLDATA_SLOT_ID_1, handler, apnManager);
+    int32_t targetSlotId = stateMachine->GetTargetDataSlotId(CELLDATA_SLOT_ID_0);
+    ASSERT_EQ(targetSlotId, CELLDATA_SLOT_ID_1);
+}
+
+HWTEST_F(BranchTest, IncallDataStateMachine_GetTargetDataSlotId_005, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    auto handler = std::make_shared<StateMachineTest>();
+    auto stateMachine = std::make_shared<IncallDataStateMachine>();
+    sptr<ApnManager> apnManager = nullptr;
+    stateMachine->Init(0, CELLDATA_SLOT_ID_3, handler, apnManager);
+    int32_t targetSlotId = stateMachine->GetTargetDataSlotId(CELLDATA_SLOT_ID_1);
+    ASSERT_EQ(targetSlotId, CELLDATA_SLOT_ID_0);
+}
+
+HWTEST_F(BranchTest, CellularDataUtils_GetDsdsModeForSlots_008, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    int32_t dsdsMode = CellularDataUtils::GetDsdsModeForSlots(2, 0, 0x1234);
+    ASSERT_EQ(dsdsMode, 0x3);
+}
+
+HWTEST_F(BranchTest, CellularDataUtils_GetDsdsModeForSlots_009, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    int32_t dsdsMode = CellularDataUtils::GetDsdsModeForSlots(2, 1, 0x1234);
+    ASSERT_EQ(dsdsMode, 0x3);
+}
+
+HWTEST_F(BranchTest, CellularDataUtils_GetDsdsModeForSlots_010, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    int32_t dsdsMode = CellularDataUtils::GetDsdsModeForSlots(2, 3, 0x1234);
+    ASSERT_EQ(dsdsMode, 0x3);
+}
+
+HWTEST_F(BranchTest, CellularDataUtils_IsTstsModeEnabled_005, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "");
+    bool result = CellularDataUtils::IsTstsModeEnabled();
+    ASSERT_FALSE(result);
+}
+
+HWTEST_F(BranchTest, CellularDataUtils_IsTstsModeEnabled_006, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "100");
+    bool result = CellularDataUtils::IsTstsModeEnabled();
+    ASSERT_TRUE(result);
+}
+
+HWTEST_F(BranchTest, CellularDataUtils_IsTstsModeEnabled_007, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "2147483647");
+    bool result = CellularDataUtils::IsTstsModeEnabled();
+    ASSERT_TRUE(result);
+}
+
+HWTEST_F(BranchTest, CheckDataPermittedByDsds_TSTS_001, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "0");
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLDATA_SLOT_ID_3);
+    cellularDataHandler->Init();
+    bool result = cellularDataHandler->CheckDataPermittedByDsds();
+    ASSERT_FALSE(result);
+}
+
+HWTEST_F(BranchTest, CheckDataPermittedByDsds_TSTS_002, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLDATA_SLOT_ID_0);
+    cellularDataHandler->Init();
+    bool result = cellularDataHandler->CheckDataPermittedByDsds();
+    ASSERT_FALSE(result);
+}
+
+HWTEST_F(BranchTest, SetDataPermittedForSlotId_TSTS_001, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "0");
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLDATA_SLOT_ID_0);
+    cellularDataHandler->Init();
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    cellularDataHandler->SetDataPermittedForSlotId(CELLDATA_SLOT_ID_3);
+    EXPECT_NE(controller.cellularDataHandler_->slotId_, 1);
+#endif
+}
+
+HWTEST_F(BranchTest, SetDataPermittedForSlotId_TSTS_002, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLDATA_SLOT_ID_0);
+    cellularDataHandler->Init();
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    cellularDataHandler->SetDataPermittedForSlotId(CELLDATA_SLOT_ID_3);
+    EXPECT_NE(controller.cellularDataHandler_->slotId_, 1);
+#endif
+}
+
+HWTEST_F(BranchTest, HandleDsdsModeChanged_TSTS_001, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "0");
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLDATA_SLOT_ID_0);
+    cellularDataHandler->Init();
+    auto int32Parcel = std::make_shared<Int32Parcel>();
+    int32Parcel->data = DSDS_MODE_V2;
+    auto event = AppExecFwk::InnerEvent::Get(0, int32Parcel);
+    cellularDataHandler->HandleDsdsModeChanged(event);
+    EXPECT_EQ(cellularDataHandler->slotId_, CELLDATA_SLOT_ID_0);
+}
+
+HWTEST_F(BranchTest, HandleDsdsModeChanged_TSTS_002, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLDATA_SLOT_ID_0);
+    cellularDataHandler->Init();
+    auto int32Parcel = std::make_shared<Int32Parcel>();
+    int32Parcel->data = DSDS_MODE_V3;
+    auto event = AppExecFwk::InnerEvent::Get(0, int32Parcel);
+    cellularDataHandler->HandleDsdsModeChanged(event);
+    EXPECT_EQ(cellularDataHandler->slotId_, CELLDATA_SLOT_ID_0);
+}
+
+HWTEST_F(BranchTest, HandleDsdsModeChanged_TSTS_003, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLDATA_SLOT_ID_3);
+    cellularDataHandler->Init();
+    auto int32Parcel = std::make_shared<Int32Parcel>();
+    int32Parcel->data = DSDS_MODE_V2;
+    auto event = AppExecFwk::InnerEvent::Get(0, int32Parcel);
+    cellularDataHandler->HandleDsdsModeChanged(event);
+    EXPECT_EQ(cellularDataHandler->slotId_, CELLDATA_SLOT_ID_3);
+}
+
+HWTEST_F(BranchTest, HandleDsdsModeChanged_TSTS_004, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLDATA_SLOT_ID_1);
+    cellularDataHandler->Init();
+    auto int32Parcel = std::make_shared<Int32Parcel>();
+    int32Parcel->data = DSDS_MODE_V2;
+    auto event = AppExecFwk::InnerEvent::Get(0, int32Parcel);
+    cellularDataHandler->HandleDsdsModeChanged(event);
+    EXPECT_EQ(cellularDataHandler->slotId_, CELLDATA_SLOT_ID_1);
+}
+
+HWTEST_F(BranchTest, HandleDsdsModeChanged_TSTS_005, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLDATA_SLOT_ID_0);
+    cellularDataHandler->Init();
+    auto int32Parcel = std::make_shared<Int32Parcel>();
+    int32Parcel->data = 1;
+    auto event = AppExecFwk::InnerEvent::Get(0, int32Parcel);
+    cellularDataHandler->HandleDsdsModeChanged(event);
+    EXPECT_EQ(cellularDataHandler->slotId_, CELLDATA_SLOT_ID_0);
+}
+
+HWTEST_F(BranchTest, SetDataPermittedForMms_TSTS_001, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "0");
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLDATA_SLOT_ID_3);
+    cellularDataHandler->Init();
+    bool result = cellularDataHandler->SetDataPermittedForMms(true);
+    ASSERT_FALSE(result);
+}
+
+HWTEST_F(BranchTest, SetDataPermittedForMms_TSTS_002, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLDATA_SLOT_ID_3);
+    cellularDataHandler->Init();
+    bool result = cellularDataHandler->SetDataPermittedForMms(true);
+    ASSERT_TRUE(result);
+}
+
+
+HWTEST_F(BranchTest, HandleDefaultDataSubscriptionChanged_TSTS_001, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "0");
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLDATA_SLOT_ID_3);
+    cellularDataHandler->Init();
+    cellularDataHandler->HandleDefaultDataSubscriptionChanged();
+    EXPECT_EQ(cellularDataHandler->slotId_, CELLDATA_SLOT_ID_3);
+}
+
+HWTEST_F(BranchTest, HandleDefaultDataSubscriptionChanged_TSTS_002, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLDATA_SLOT_ID_3);
+    cellularDataHandler->Init();
+    cellularDataHandler->HandleDefaultDataSubscriptionChanged();
+    EXPECT_EQ(cellularDataHandler->slotId_, CELLDATA_SLOT_ID_3);
+}
+
+HWTEST_F(BranchTest, HandleDefaultDataSubscriptionChanged_TSTS_003, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLDATA_SLOT_ID_0);
+    cellularDataHandler->Init();
+    cellularDataHandler->HandleDefaultDataSubscriptionChanged();
+    EXPECT_EQ(cellularDataHandler->slotId_, CELLDATA_SLOT_ID_0);
 }
 } // namespace Telephony
 } // namespace OHOS

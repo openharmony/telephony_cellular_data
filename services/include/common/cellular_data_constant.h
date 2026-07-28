@@ -292,6 +292,22 @@ static constexpr const char *CONFIG_PREFERAPN = "persist.sys.data.preferapn";
 static constexpr const char *CONFIG_MOBILE_MTU = "persist.sys.data.mobilemtu";
 static constexpr const char *CONFIG_DATA_SERVICE_EXT_PATH = "persist.sys.data.dataextpath";
 static constexpr const char *CONFIG_MULTIPLE_CONNECTIONS = "persist.sys.data.multiple.connections";
+static constexpr const char *PERSIST_TSTS_MODE = "persist.telephony.tsts_mode";
+static constexpr const char *TSTS_MODE_DEFAULT_VALUE = "0";
+static constexpr int32_t SYS_PARAMETER_SIZE = 128;
+
+// TSTS mode DSDS mode bit layout (for 3-card support)
+// bits 0-3: two-card mode dsdsMode (legacy)
+// bits 4-7: slot0 and slot1 dsdsMode
+// bits 8-11: slot0 and slot3 dsdsMode
+// bits 12-15: slot1 and slot3 dsdsMode
+static constexpr int32_t DSDS_MODE_BIT_WIDTH = 4;
+static constexpr int32_t DSDS_MODE_SLOT01_SHIFT = 4;
+static constexpr int32_t DSDS_MODE_SLOT03_SHIFT = 8;
+static constexpr int32_t DSDS_MODE_SLOT13_SHIFT = 12;
+static constexpr int32_t DSDS_MODE_SLOT01_MASK = 0xF0;
+static constexpr int32_t DSDS_MODE_SLOT03_MASK = 0xF00;
+static constexpr int32_t DSDS_MODE_SLOT13_MASK = 0xF000;
 static constexpr const char *CAPACITY_THRESHOLDS_FOR_DOWNLINK = "100,500,1000,5000,10000,20000,50000,75000,"
                                                                 "100000,200000,500000,1000000,1500000,2000000";
 static constexpr const char *CAPACITY_THRESHOLDS_FOR_UPLINK = "100,500,1000,5000,10000,20000,50000,75000,"
@@ -336,7 +352,11 @@ static constexpr const char *CELLULAR_DATA_COLUMN_KEYWORD = "KEYWORD";
 static constexpr const char *CELLULAR_DATA_COLUMN_VALUE = "VALUE";
 static const int32_t INVALID_SIM_ID = 0;
 static const int32_t INVALID_SLOT_ID = -1;
-static const int32_t CELLULAR_DATA_VSIM_SLOT_ID = 2;
+static const int32_t CELLDATA_SLOT_ID_0 = 0;
+static const int32_t CELLDATA_SLOT_ID_1 = 1;
+static const int32_t CELLDATA_SLOT_ID_2 = 2;
+static const int32_t CELLDATA_SLOT_ID_3 = 3;
+static const int32_t CELLULAR_DATA_VSIM_SLOT_ID = CELLDATA_SLOT_ID_2;
 static const int32_t SUPPLIER_INVALID_REG_STATE = -1;
 static const int32_t MAX_SLOT_NUM = 2;
 static constexpr const char *PROTOCOL_IPV4 = "IP";

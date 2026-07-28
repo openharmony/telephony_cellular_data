@@ -50,6 +50,7 @@ private:
     bool IsIncallDataSwitchOn();
     bool IsSecondaryCanActiveData();
     bool CanActiveDataByRadioTech();
+    int32_t GetTargetDataSlotId(int32_t defSlotId);
 
 private:
     friend class IdleState;

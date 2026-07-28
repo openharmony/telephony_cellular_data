@@ -15,6 +15,7 @@
 
 #include "cellular_data_utils.h"
 
+#include "cellular_data_constant.h"
 #include "telephony_common_utils.h"
 #include <charconv>
 
@@ -218,6 +219,44 @@ bool CellularDataUtils::ConvertStrToInt(const std::string& str, int32_t& value)
         TELEPHONY_LOGE("ConvertStrToInt failed: str: %{public}s", str.c_str());
     }
     return succ;
+}
+
+bool CellularDataUtils::IsTstsModeEnabled()
+{
+    char param[SYS_PARAMETER_SIZE] = {0};
+    int32_t code = GetParameter(PERSIST_TSTS_MODE, TSTS_MODE_DEFAULT_VALUE, param, SYS_PARAMETER_SIZE);
+    if (code <= 0) {
+        return false;
+    }
+    std::string value = param;
+    int32_t mode = 0;
+    auto [ptr, ec] = std::from_chars(value.data(), value.data() + value.size(), mode);
+    if (ec == std::errc{} && ptr == value.data() + value.size()) {
+        return mode > 0;
+    }
+    return false;
+}
+
+int32_t CellularDataUtils::GetDsdsModeForSlots(int32_t slotId1, int32_t slotId2, int32_t dsdsModeValue)
+{
+    // For TSTS mode, use the specific slot combination's dsdsMode
+    if (IsTstsModeEnabled()) {
+        // Normalize slot order (smaller first)
+        int32_t minSlot = std::min(slotId1, slotId2);
+        int32_t maxSlot = std::max(slotId1, slotId2);
+        
+        if (minSlot == CELLDATA_SLOT_ID_0 && maxSlot == CELLDATA_SLOT_ID_1) {
+            return (dsdsModeValue & DSDS_MODE_SLOT01_MASK) >> DSDS_MODE_SLOT01_SHIFT;
+        } else if (minSlot == CELLDATA_SLOT_ID_0 && maxSlot == CELLDATA_SLOT_ID_3) {
+            return (dsdsModeValue & DSDS_MODE_SLOT03_MASK) >> DSDS_MODE_SLOT03_SHIFT;
+        } else if (minSlot == CELLDATA_SLOT_ID_1 && maxSlot == CELLDATA_SLOT_ID_3) {
+            return (dsdsModeValue & DSDS_MODE_SLOT13_MASK) >> DSDS_MODE_SLOT13_SHIFT;
+        }
+        // For other slot combinations (e.g., slot0-slot2, slot1-slot2), use slot0-slot1 mode as fallback
+        return (dsdsModeValue & DSDS_MODE_SLOT01_MASK) >> DSDS_MODE_SLOT01_SHIFT;
+    }
+    // For non-TSTS mode, use low 4 bits
+    return dsdsModeValue & 0x0F;
 }
 			 
 bool CellularDataUtils::ConvertStrToUint(const std::string& str, uint8_t& value)
