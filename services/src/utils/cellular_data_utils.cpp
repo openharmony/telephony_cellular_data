@@ -244,7 +244,6 @@ int32_t CellularDataUtils::GetDsdsModeForSlots(int32_t slotId1, int32_t slotId2,
         // Normalize slot order (smaller first)
         int32_t minSlot = std::min(slotId1, slotId2);
         int32_t maxSlot = std::max(slotId1, slotId2);
-        
         if (minSlot == CELLDATA_SLOT_ID_0 && maxSlot == CELLDATA_SLOT_ID_1) {
             return (dsdsModeValue & DSDS_MODE_SLOT01_MASK) >> DSDS_MODE_SLOT01_SHIFT;
         } else if (minSlot == CELLDATA_SLOT_ID_0 && maxSlot == CELLDATA_SLOT_ID_3) {
