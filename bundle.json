@@ -51,6 +51,7 @@
                 "ipc",
                 "napi",
                 "netmanager_base",
+                "node",
                 "preferences",
                 "relational_store",
                 "safwk",

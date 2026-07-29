@@ -38,6 +38,7 @@ ohos_shared_library("cj_cellular_data_ffi") {
     "ipc:ipc_single",
     "napi:ace_napi",
     "napi:cj_bind_ffi",
+    "node:node_header_notice",
     "telephony_data:tel_telephony_data"
   ]
 
