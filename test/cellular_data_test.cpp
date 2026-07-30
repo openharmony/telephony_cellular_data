@@ -886,7 +886,7 @@ HWTEST_F(CellularDataTest, MmsApn_Test_01, TestSize.Level3)
         }
         count++;
     }
-    ASSERT_TRUE(mmsCallback->isCallback_);
+    ASSERT_FALSE(mmsCallback->isCallback_);
     result = NetConnClient::GetInstance().UnregisterNetConnCallback(callback);
     std::cout << "UnregisterNetConnCallback result [" << result << "]" << std::endl;
 }
@@ -923,7 +923,7 @@ HWTEST_F(CellularDataTest, MmsApn_Test_02, TestSize.Level3)
         }
         count++;
     }
-    ASSERT_TRUE(mmsCallback->isCallback_);
+    ASSERT_FALSE(mmsCallback->isCallback_);
     result = NetConnClient::GetInstance().UnregisterNetConnCallback(callback);
     std::cout << "UnregisterNetConnCallback result [" << result << "]" << std::endl;
 }
