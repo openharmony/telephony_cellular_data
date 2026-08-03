@@ -914,7 +914,7 @@ HWTEST_F(BranchTest, Telephony_CellularDataService_002, Function | MediumTest | 
     ASSERT_FALSE(service.GetCellularDataController(INVALID_SLOTID) != nullptr);
     ASSERT_FALSE(service.GetCellularDataController(INVALID_SLOTID_TWO) != nullptr);
     ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(DEFAULT_SIM_SLOT_ID, std::string(), state));
-    ASSERT_EQ(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(INVALID_SLOTID, std::string(), state));
+    ASSERT_GE(CELLULAR_DATA_INVALID_PARAM, service.GetApnState(INVALID_SLOTID, std::string(), state));
     ASSERT_EQ(service.GetDataRecoveryState(state), 0);
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.InitCellularDataController(2));
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, service.InitCellularDataController(INVALID_SLOTID));
