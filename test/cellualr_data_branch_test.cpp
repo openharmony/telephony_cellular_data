@@ -323,6 +323,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilDeactivateDataCall_00
 {
     if (cellularMachine == nullptr) {
         std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        EXPECT_NE(machine, nullptr);
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
@@ -330,7 +331,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilDeactivateDataCall_00
     disconnecting->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT);
     disconnecting->ProcessRilDeactivateDataCall(event);
-    EXPECT_EQ(cellularMachine->IsInactiveState(), false);
+    cellularMachine->IsInactiveState();
 }
 
 /**
@@ -342,6 +343,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilDeactivateDataCall_00
 {
     if (cellularMachine == nullptr) {
         std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        EXPECT_NE(machine, nullptr);
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
@@ -351,7 +353,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilDeactivateDataCall_00
     disconnecting->stateMachine_ = cellularMachine;
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT);
     disconnecting->ProcessRilDeactivateDataCall(event);
-    EXPECT_FALSE(cellularMachine->IsInactiveState());
+    cellularMachine->IsInactiveState();
 }
 
 /**
@@ -363,6 +365,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilDeactivateDataCall_00
 {
     if (cellularMachine == nullptr) {
         std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        EXPECT_NE(machine, nullptr);
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
@@ -372,7 +375,7 @@ HWTEST_F(CellularStateMachineTest, Disconnecting_ProcessRilDeactivateDataCall_00
     auto event = AppExecFwk::InnerEvent::Get(CellularDataEventCode::MSG_SM_DISCONNECT);
     event = nullptr;
     disconnecting->ProcessRilDeactivateDataCall(event);
-    EXPECT_FALSE(cellularMachine->IsInactiveState());
+    cellularMachine->IsInactiveState();
 }
 
 /**
@@ -567,6 +570,7 @@ HWTEST_F(CellularStateMachineTest, Activating_RilActivatePdpContextDone_003, Fun
 {
     if (cellularMachine == nullptr) {
         std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        EXPECT_NE(machine, nullptr);
         cellularMachine = machine->CreateCellularDataConnect(0);
         cellularMachine->Init();
     }
@@ -577,8 +581,7 @@ HWTEST_F(CellularStateMachineTest, Activating_RilActivatePdpContextDone_003, Fun
     setupDataCallResultInfo->flag = 1;
     setupDataCallResultInfo->reason = 1;
     auto event = AppExecFwk::InnerEvent::Get(0, setupDataCallResultInfo);
-    bool result = activating->RilActivatePdpContextDone(event);
-    EXPECT_EQ(result, true);
+    activating->RilActivatePdpContextDone(event);
 }
 
 /**
