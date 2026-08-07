@@ -16,6 +16,7 @@
 #include "napi_cellular_data.h"
 
 #include "cellular_data_client.h"
+#include "cellular_data_error.h"
 #include "napi/native_common.h"
 #include "napi_parameter_util.h"
 #include "napi_util.h"
@@ -154,7 +155,9 @@ static void GetCellularDataStateCallback(napi_env env, napi_status status, void 
     std::unique_ptr<AsyncContext> asyncContext(context);
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {
-        NAPI_CALL_RETURN_VOID(env, napi_create_int32(env, asyncContext->result, &callbackValue));
+        if (napi_create_int32(env, asyncContext->result, &callbackValue) != napi_ok) {
+            TELEPHONY_LOGE("GetCellularDataStateCallback napi_create_int32 failed");
+        }
     } else {
         if (asyncContext->errorCode == ERROR_SERVICE_UNAVAILABLE) {
             callbackValue =
@@ -194,7 +197,6 @@ static void NativeIsCellularDataEnabled(napi_env env, void *data)
 {
     auto asyncContext = static_cast<AsyncContext *>(data);
     if (asyncContext == nullptr) {
-        NapiUtil::ThrowParameterError(env);
         return;
     }
     if (IsCellularDataManagerInited()) {
@@ -221,7 +223,9 @@ static void IsCellularDataEnabledCallback(napi_env env, napi_status status, void
     if (asyncContext->resolved) {
         napi_status status = napi_get_boolean(env,
             asyncContext->result == static_cast<int32_t>(DataSwitchCode::CELLULAR_DATA_ENABLED), &callbackValue);
-        NAPI_CALL_RETURN_VOID(env, status);
+        if (status != napi_ok) {
+            callbackValue = NapiUtil::CreateErrorMessage(env, "IsCellularDataEnabled", ERROR_DEFAULT);
+        }
     } else {
         JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
             asyncContext->errorCode, "IsCellularDataEnabled", GET_NETWORK_INFO);
@@ -583,7 +587,9 @@ static void IsCellularDataRoamingEnabledCallback(napi_env env, napi_status statu
         napi_status status = napi_get_boolean(env,
             asyncContext->result == static_cast<int32_t>(RoamingSwitchCode::CELLULAR_DATA_ROAMING_ENABLED),
             &callbackValue);
-        NAPI_CALL_RETURN_VOID(env, status);
+        if (status != napi_ok) {
+            callbackValue = NapiUtil::CreateErrorMessage(env, "isCellularDataRoamingEnabled", ERROR_DEFAULT);
+        }
     } else {
         JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
             asyncContext->errorCode, "isCellularDataRoamingEnabled", GET_NETWORK_INFO);
@@ -688,7 +694,9 @@ static void GetDefaultCellularDataSlotIdCallback(napi_env env, napi_status statu
     }
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {
-        NAPI_CALL_RETURN_VOID(env, napi_create_int32(env, asyncContext->slotId, &callbackValue));
+        if (napi_create_int32(env, asyncContext->slotId, &callbackValue) != napi_ok) {
+            TELEPHONY_LOGE("GetDefaultCellularDataSlotIdCallback napi_create_int32 failed");
+        }
     } else {
         if (asyncContext->errorCode == ERROR_NATIVE_API_EXECUTE_FAIL) {
             callbackValue = NapiUtil::CreateErrorMessage(
@@ -747,7 +755,10 @@ static napi_value GetDefaultCellularDataSimId(napi_env env, napi_callback_info i
     int32_t simId = 0;
     napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
     if (parameterCount == 0) {
-        CellularDataClient::GetInstance().GetDefaultCellularDataSimId(simId);
+        int32_t errorCode = CellularDataClient::GetInstance().GetDefaultCellularDataSimId(simId);
+        if (errorCode != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("GetDefaultCellularDataSimId failed, errorCode = %{public}d", errorCode);
+        }
     }
     napi_value value = nullptr;
     NAPI_CALL(env, napi_create_int32(env, simId, &value));
@@ -852,7 +863,9 @@ void GetCellularDataFlowTypeCallback(napi_env env, napi_status status, void *dat
     std::unique_ptr<AsyncContext> asyncContext(context);
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {
-        NAPI_CALL_RETURN_VOID(env, napi_create_int32(env, asyncContext->result, &callbackValue));
+        if (napi_create_int32(env, asyncContext->result, &callbackValue) != napi_ok) {
+            TELEPHONY_LOGE("GetCellularDataFlowTypeCallback napi_create_int32 failed");
+        }
     } else {
         if (asyncContext->errorCode == ERROR_SERVICE_UNAVAILABLE) {
             callbackValue =
@@ -894,8 +907,6 @@ static napi_value CreateEnumConstructor(napi_env env, napi_callback_info info)
     napi_value thisArg = nullptr;
     void *data = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisArg, &data);
-    napi_value global = nullptr;
-    napi_get_global(env, &global);
     return thisArg;
 }
 
@@ -933,9 +944,9 @@ static napi_value CreateDataConnectState(napi_env env, napi_value exports)
 
     };
     napi_value result = nullptr;
-    napi_define_class(env, "DataConnectState", NAPI_AUTO_LENGTH, CreateEnumConstructor, nullptr,
-        sizeof(desc) / sizeof(*desc), desc, &result);
-    napi_set_named_property(env, exports, "DataConnectState", result);
+    NAPI_CALL(env, napi_define_class(env, "DataConnectState", NAPI_AUTO_LENGTH, CreateEnumConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result));
+    NAPI_CALL(env, napi_set_named_property(env, exports, "DataConnectState", result));
     return exports;
 }
 
@@ -972,9 +983,9 @@ static napi_value CreateDataFlowType(napi_env env, napi_value exports)
             NapiUtil::ToInt32Value(env, static_cast<int32_t>(CellDataFlowType::DATA_FLOW_TYPE_DORMANT))),
     };
     napi_value result = nullptr;
-    napi_define_class(env, "DataFlowType", NAPI_AUTO_LENGTH, CreateEnumConstructor, nullptr,
-        sizeof(desc) / sizeof(*desc), desc, &result);
-    napi_set_named_property(env, exports, "DataFlowType", result);
+    NAPI_CALL(env, napi_define_class(env, "DataFlowType", NAPI_AUTO_LENGTH, CreateEnumConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result));
+    NAPI_CALL(env, napi_set_named_property(env, exports, "DataFlowType", result));
     return exports;
 }
 
@@ -985,10 +996,10 @@ static napi_value EnableIntelligenceSwitch(napi_env env, napi_callback_info info
     napi_value thisVar = nullptr;
     void *data = nullptr;
     bool enable = false;
-    napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
+    NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     int32_t result = -1;
-    napi_get_value_bool(env, parameters[0], &enable);
     if (parameterCount == 1) {
+        NAPI_CALL(env, napi_get_value_bool(env, parameters[0], &enable));
         result = CellularDataClient::GetInstance().EnableIntelligenceSwitch(enable);
     }
     napi_value value = nullptr;
@@ -1013,27 +1024,44 @@ static napi_value GetIntelligenceSwitchState(napi_env env, napi_callback_info in
 }
 
 template<typename T>
+static bool HandleDeferredResult(
+    napi_env env, const AsyncContext1<T> &asyncContext, JsError error, bool funcIgnoreReturnVal)
+{
+    const BaseContext &context = asyncContext.context;
+    if (context.deferred == nullptr) {
+        return false;
+    }
+    if (!context.resolved) {
+        napi_value errorMessage = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
+        if (napi_reject_deferred(env, context.deferred, errorMessage) != napi_ok) {
+            TELEPHONY_LOGE("napi_reject_deferred failed");
+        }
+        if (context.work != nullptr) {
+            napi_delete_async_work(env, context.work);
+        }
+        TELEPHONY_LOGE("NapiAsyncBaseCompleteCallback deferred error and resolved is false");
+        return true;
+    }
+    napi_value res =
+        (funcIgnoreReturnVal ? NapiUtil::CreateUndefined(env) : GetNapiValue(env, asyncContext.callbackVal));
+    if (napi_resolve_deferred(env, context.deferred, res) != napi_ok) {
+        TELEPHONY_LOGE("napi_resolve_deferred failed");
+    }
+    if (context.work != nullptr) {
+        napi_delete_async_work(env, context.work);
+    }
+    TELEPHONY_LOGI("NapiAsyncBaseCompleteCallback deferred resolved is true");
+    return true;
+}
+
+template<typename T>
 void NapiAsyncBaseCompleteCallback(
     napi_env env, const AsyncContext1<T> &asyncContext, JsError error, bool funcIgnoreReturnVal = false)
 {
     const BaseContext &context = asyncContext.context;
-    if (context.deferred != nullptr && !context.resolved) {
-        napi_value errorMessage = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
-        NAPI_CALL_RETURN_VOID(env, napi_reject_deferred(env, context.deferred, errorMessage));
-        NAPI_CALL_RETURN_VOID(env, napi_delete_async_work(env, context.work));
-        TELEPHONY_LOGE("NapiAsyncBaseCompleteCallback deferred error and resolved is false");
+    if (HandleDeferredResult(env, asyncContext, error, funcIgnoreReturnVal)) {
         return;
     }
-
-    if (context.deferred != nullptr && context.resolved) {
-        napi_value res =
-            (funcIgnoreReturnVal ? NapiUtil::CreateUndefined(env) : GetNapiValue(env, asyncContext.callbackVal));
-        NAPI_CALL_RETURN_VOID(env, napi_resolve_deferred(env, context.deferred, res));
-        NAPI_CALL_RETURN_VOID(env, napi_delete_async_work(env, context.work));
-        TELEPHONY_LOGE("NapiAsyncBaseCompleteCallback deferred error and resolved is true");
-        return;
-    }
-
     napi_value res =
         (funcIgnoreReturnVal ? NapiUtil::CreateUndefined(env) : GetNapiValue(env, asyncContext.callbackVal));
     napi_value callbackValue[] { NapiUtil::CreateUndefined(env), res };
@@ -1044,12 +1072,26 @@ void NapiAsyncBaseCompleteCallback(
     napi_value undefined = nullptr;
     napi_value callback = nullptr;
     napi_value result = nullptr;
-    NAPI_CALL_RETURN_VOID(env, napi_get_undefined(env, &undefined));
-    NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, context.callbackRef, &callback));
-    NAPI_CALL_RETURN_VOID(
-        env, napi_call_function(env, undefined, callback, std::size(callbackValue), callbackValue, &result));
-    NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, context.callbackRef));
-    NAPI_CALL_RETURN_VOID(env, napi_delete_async_work(env, context.work));
+    if (napi_get_undefined(env, &undefined) != napi_ok) {
+        TELEPHONY_LOGE("napi_get_undefined failed");
+        goto cleanup;
+    }
+    if (napi_get_reference_value(env, context.callbackRef, &callback) != napi_ok) {
+        TELEPHONY_LOGE("napi_get_reference_value failed");
+        goto cleanup;
+    }
+    if (napi_call_function(env, undefined, callback, std::size(callbackValue), callbackValue, &result) != napi_ok) {
+        TELEPHONY_LOGE("napi_call_function failed");
+        goto cleanup;
+    }
+
+cleanup:
+    if (context.callbackRef != nullptr) {
+        napi_delete_reference(env, context.callbackRef);
+    }
+    if (context.work != nullptr) {
+        napi_delete_async_work(env, context.work);
+    }
 }
 
 template<typename T>
@@ -1057,7 +1099,19 @@ void NapiAsyncPermissionCompleteCallback(napi_env env, napi_status status, const
     bool funcIgnoreReturnVal, PermissionPara permissionPara)
 {
     if (status != napi_ok) {
-        napi_throw_type_error(env, nullptr, "excute failed");
+        TELEPHONY_LOGE("NapiAsyncPermissionCompleteCallback async work status != napi_ok");
+        const BaseContext &context = asyncContext.context;
+        if (context.deferred != nullptr) {
+            napi_value errorMessage = NapiUtil::CreateErrorMessage(env, "async work failed", ERROR_DEFAULT);
+
+            napi_reject_deferred(env, context.deferred, errorMessage);
+        }
+        if (context.callbackRef != nullptr) {
+            napi_delete_reference(env, context.callbackRef);
+        }
+        if (context.work != nullptr) {
+            napi_delete_async_work(env, context.work);
+        }
         return;
     }
 
@@ -1149,8 +1203,6 @@ napi_value NapiCreateAsyncWork2(const AsyncPara &para, AsyncContextType *asyncCo
     if (errCode.has_value()) {
         JsError error = NapiUtil::ConverErrorMessageForJs(errCode.value());
         NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
-        delete asyncContext;
-        asyncContext = nullptr;
         return nullptr;
     }
 
@@ -1177,6 +1229,9 @@ napi_value NapiCreateAsyncWork2(const AsyncPara &para, AsyncContextType *asyncCo
     ApnInfo apnInfoStru;
     if (queryApnInfoContext->queryApnPara.apn.length() == 0) {
         TELEPHONY_LOGE("NativeQueryApnIds apn is null.");
+        queryApnInfoContext->asyncContext.context.resolved = false;
+        queryApnInfoContext->asyncContext.context.errorCode = CELLULAR_DATA_INVALID_PARAM;
+        return;
     }
     apnInfoStru.apnName = queryApnInfoContext->queryApnPara.apnName;
     apnInfoStru.apn = queryApnInfoContext->queryApnPara.apn;
@@ -1205,7 +1260,9 @@ void QueryApnIdsCallback(napi_env env, napi_status status, void *data)
     std::unique_ptr<AsyncQueryApnInfo> info(static_cast<AsyncQueryApnInfo *>(data));
     AsyncContext1<napi_value> &asyncContext = info->asyncContext;
     asyncContext.callbackVal = nullptr;
-    napi_create_array(env, &asyncContext.callbackVal);
+    if (napi_create_array(env, &asyncContext.callbackVal) != napi_ok) {
+        TELEPHONY_LOGE("QueryApnCallback napi_create_array failed");
+    }
     TELEPHONY_LOGI("QueryApnCallback info->apnIdList.size = %{public}zu", info->apnIdList.size());
     for (size_t i = 0; i < info->apnIdList.size(); i++) {
         napi_value val;
@@ -1243,6 +1300,10 @@ static napi_value QueryApnIds(napi_env env, napi_callback_info info)
     ApnInfoAnalyze(env, object, queryApnInfo->queryApnPara);
     if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
         queryApnInfo.release();
+    } else {
+        TELEPHONY_LOGE("napi_queue_async_work_with_qos failed");
+        napi_delete_async_work(env, context.work);
+        context.work = nullptr;
     }
     return result;
 }
@@ -1281,7 +1342,9 @@ static void SetPreferApnCallback(napi_env env, napi_status status, void *data)
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {
         napi_status status = napi_get_boolean(env, asyncContext->result, &callbackValue);
-        NAPI_CALL_RETURN_VOID(env, status);
+        if (status != napi_ok) {
+            callbackValue = NapiUtil::CreateErrorMessage(env, "SetPreferredApn", ERROR_DEFAULT);
+        }
     } else {
         JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
             asyncContext->errorCode, "SetPreferredApn", MANAGE_APN_SETTING);
@@ -1356,7 +1419,9 @@ void QueryAllApnCallback(napi_env env, napi_status status, void *data)
     std::unique_ptr<AsyncQueryAllApnInfo> info(static_cast<AsyncQueryAllApnInfo *>(data));
     AsyncContext1<napi_value> &asyncContext = info->asyncContext;
     asyncContext.callbackVal = nullptr;
-    napi_create_array(env, &asyncContext.callbackVal);
+    if (napi_create_array(env, &asyncContext.callbackVal) != napi_ok) {
+        TELEPHONY_LOGE("QueryAllApnCallback napi_create_array failed");
+    }
     TELEPHONY_LOGI("QueryAllApnCallback info->allApnInfoList.size = %{public}zu", info->allApnInfoList.size());
     for (size_t i = 0; i < info->allApnInfoList.size(); i++) {
         napi_value val = ApnInfoConversion(env, info->allApnInfoList.at(i));
@@ -1401,6 +1466,10 @@ static napi_value QueryAllApns(napi_env env, napi_callback_info info)
     }
     if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
         queryAllApnInfo.release();
+    } else {
+        TELEPHONY_LOGE("napi_queue_async_work_with_qos failed");
+        napi_delete_async_work(env, context.work);
+        context.work = nullptr;
     }
     return result;
 }
@@ -1433,7 +1502,9 @@ void GetActiveApnNameCallback(napi_env env, napi_status status, void *data)
     asyncContext.callbackVal = nullptr;
 
     std::string apnName = info->apnName;
-    napi_create_string_utf8(env, apnName.c_str(), apnName.length(), &asyncContext.callbackVal);
+    if (napi_create_string_utf8(env, apnName.c_str(), apnName.length(), &asyncContext.callbackVal) != napi_ok) {
+        TELEPHONY_LOGE("GetActiveApnNameCallback napi_create_string_utf8 failed");
+    }
     TELEPHONY_LOGI("GetActiveApnNameCallback apnName = %{public}s", apnName.c_str());
     NapiAsyncPermissionCompleteCallback(
         env, status, asyncContext, false, { "GetActiveApnName", GET_NETWORK_INFO });
@@ -1474,6 +1545,10 @@ static napi_value GetActiveApnName(napi_env env, napi_callback_info info)
     }
     if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
         asyncGetActiveApnName.release();
+    } else {
+        TELEPHONY_LOGE("napi_queue_async_work_with_qos failed");
+        napi_delete_async_work(env, context.work);
+        context.work = nullptr;
     }
     return result;
 }
