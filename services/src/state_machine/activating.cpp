@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace Telephony {
-static const int32_t MAX_RIL_ERR_RETRY_COUNT = 3;
+static const int32_t MAX_ERR_SET_CHDATA_CNT = 5;
 
 void Activating::StateBegin()
 {
@@ -58,7 +58,7 @@ bool Activating::RilActivatePdpContextDone(const AppExecFwk::InnerEvent::Pointer
         TELEPHONY_LOGI("resultInfo null, goto RilErrorResponse");
         return RilErrorResponse(event);
     }
-    rilErrTryCount_ = 0;
+    rilSetChdataErrCnt_ = 0;
     TELEPHONY_LOGI("callDone active: %{public}d flag: %{public}d, cid: %{public}d, reason: %{public}d",
         resultInfo->active, resultInfo->flag, resultInfo->cid, resultInfo->reason);
     if (stateMachine->connectId_ != resultInfo->flag) {
@@ -110,13 +110,14 @@ bool Activating::RilErrorResponse(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGE("Inactive is null");
         return false;
     }
-    ++rilErrTryCount_;
-    if (rilErrTryCount_ > MAX_RIL_ERR_RETRY_COUNT) {
-        rilErrTryCount_ = 0;
-        inActive->SetPdpErrorReason(PdpErrorReason::PDP_ERR_TO_CLEAR_CONNECTION);
-    } else {
-        inActive->SetPdpErrorReason(PdpErrorReason::PDP_ERR_RETRY);
+    if (rilInfo->error == ErrType::ERR_SET_CHDATA_FAIL) {
+        ++rilSetChdataErrCnt_;
+        if (rilSetChdataErrCnt_ >= MAX_ERR_SET_CHDATA_CNT) {
+            rilSetChdataErrCnt_ = 0;
+            stateMachine->RestartRadio();
+        }
     }
+    inActive->SetPdpErrorReason(PdpErrorReason::PDP_ERR_RETRY);
     CellularDataHiSysEvent::WriteDataActivateFaultEvent(INVALID_PARAMETER, SWITCH_ON,
         CellularDataErrorCode::DATA_ERROR_RADIO_RESPONSEINFO_ERROR,
         "ErrType " + std::to_string(static_cast<int32_t>(rilInfo->error)));

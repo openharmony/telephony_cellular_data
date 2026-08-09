@@ -80,6 +80,7 @@ public:
     void SetIfReuseSupplierId(bool isReused);
     int32_t OnInterfaceLinkStateChanged(const std::string &ifName, bool up);
     void UnregisterNetInterfaceCallback();
+    void RestartRadio();
 
 protected:
     std::shared_ptr<State> activeState_;
