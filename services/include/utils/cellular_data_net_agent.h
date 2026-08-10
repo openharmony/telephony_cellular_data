@@ -108,6 +108,8 @@ public:
     bool GetSupplierRegState(uint32_t supplierId, int32_t &regState);
 
     int32_t GetSlotId(int32_t simId);
+    int32_t GetCellNetId(int32_t slotId);
+    void NetDetection(int32_t netId);
 
 private:
     std::shared_mutex netSupplierMutex_;

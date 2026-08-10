@@ -384,6 +384,12 @@ void CellularDataHandler::RadioPsConnectionAttached(const InnerEvent::Pointer &e
         TELEPHONY_LOGE("Slot%{public}d: event or apnManager_ is null", slotId_);
         return;
     }
+    int32_t netId = CellularDataNetAgent::GetInstance().GetCellNetId(slotId_);
+    // LCOV_EXCL_START
+    if (netId > 0) {
+        CellularDataNetAgent::GetInstance().NetDetection(netId);
+    }
+    // LCOV_EXCL_STOP
     isMccChanged_ = false;
     EstablishAllApnsIfConnectable();
 }

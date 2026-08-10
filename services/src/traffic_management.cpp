@@ -16,9 +16,10 @@
 #include "traffic_management.h"
 
 #include <cinttypes>
-#include "core_manager_inner.h"
+#include "cellular_data_net_agent.h"
 #include "data_flow_statistics.h"
 #include "net_conn_client.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -49,32 +50,17 @@ void TrafficManagement::UpdatePacketData()
 std::string TrafficManagement::GetIfaceName()
 {
     std::string ifaceName = "";
-    int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId_);
-    std::list<int32_t> netIdList;
-    int32_t ret = NetConnClient::GetInstance().GetNetIdByIdentifier(IDENT_PREFIX + std::to_string(simId), netIdList);
-    if (ret != NETMANAGER_SUCCESS) {
-        TELEPHONY_LOGE("Slot%{public}d: get netIdList by identifier failed, ret = %{public}d", slotId_, ret);
+    int32_t netId = CellularDataNetAgent::GetInstance().GetCellNetId(slotId_);
+    // LCOV_EXCL_START
+    if (netId < 0) {
         return ifaceName;
     }
-    std::list<sptr<NetManagerStandard::NetHandle>> netList;
-    int32_t result = NetConnClient::GetInstance().GetAllNets(netList);
-    if (result != NETMANAGER_SUCCESS) {
-        TELEPHONY_LOGE("Slot%{public}d: get all nets failed, ret = %{public}d", slotId_, result);
-        return ifaceName;
-    }
-    for (sptr<NetManagerStandard::NetHandle> netHandle : netList) {
-        for (auto netId : netIdList) {
-            TELEPHONY_LOGD("Slot%{public}d: netId = %{public}d, netHandle->GetNetId() = %{public}d", slotId_, netId,
-                netHandle->GetNetId());
-            if (netId == netHandle->GetNetId()) {
-                NetLinkInfo info;
-                NetConnClient::GetInstance().GetConnectionProperties(*netHandle, info);
-                ifaceName = info.ifaceName_;
-                TELEPHONY_LOGD("Slot%{public}d: data is connected ifaceName = %{public}s", slotId_, ifaceName.c_str());
-                return ifaceName;
-            }
-        }
-    }
+    // LCOV_EXCL_STOP
+    NetManagerStandard::NetHandle netHandle(netId);
+    NetLinkInfo info;
+    NetConnClient::GetInstance().GetConnectionProperties(netHandle, info);
+    ifaceName = info.ifaceName_;
+    TELEPHONY_LOGD("Slot%{public}d: data is connected ifaceName = %{public}s", slotId_, ifaceName.c_str());
     return ifaceName;
 }
 } // namespace Telephony
