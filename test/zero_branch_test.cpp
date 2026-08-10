@@ -1700,10 +1700,6 @@ HWTEST_F(BranchTest, Activating_Test_02, Function | MediumTest | Level3)
     auto rsp = std::make_shared<RadioResponseInfo>();
     auto event2 = AppExecFwk::InnerEvent::Get<RadioResponseInfo>(0, rsp);
     EXPECT_FALSE(activating->RilErrorResponse(event2));
-    activating->rilErrTryCount_ = 5;
-    EXPECT_FALSE(activating->RilErrorResponse(event2));
-    activating->rilErrTryCount_ = 0;
-    EXPECT_FALSE(activating->RilErrorResponse(event2));
 }
 
 /**

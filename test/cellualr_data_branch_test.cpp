@@ -778,5 +778,81 @@ HWTEST_F(CellularStateMachineTest, Active_CellularDataStateMachine_001, Function
     result = active->ProcessDataConnectionVoiceCallStartedOrEnded(event);
     EXPECT_EQ(result, false);
 }
+
+/**
+ * @tc.number   Activating_RilErrorResponse_006
+ * @tc.name     test rilSetChdataErrCnt_ branch to trigger RestartRadio
+ * @tc.desc     Function test - test RestartRadio is called when rilSetChdataErrCnt_ reaches 5 with error = 100
+ */
+HWTEST_F(CellularStateMachineTest, Activating_RilErrorResponse_006, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    auto activating = std::static_pointer_cast<Activating>(cellularMachine->activatingState_);
+    cellularMachine->connectId_ = 1;
+    activating->stateMachine_ = cellularMachine;
+    activating->rilSetChdataErrCnt_ = 4;
+    std::shared_ptr<RadioResponseInfo> radioResponseInfo = std::make_shared<RadioResponseInfo>();
+    radioResponseInfo->flag = 1;
+    radioResponseInfo->error = ErrType::ERR_SET_CHDATA_FAIL;
+    auto event = AppExecFwk::InnerEvent::Get(0, radioResponseInfo);
+    bool result = activating->RilErrorResponse(event);
+    EXPECT_EQ(result, true);
+    EXPECT_EQ(activating->rilSetChdataErrCnt_, 0);
+}
+ 
+/**
+ * @tc.number   Activating_RilErrorResponse_007
+ * @tc.name     test rilSetChdataErrCnt_ does not trigger RestartRadio when less than 5
+ * @tc.desc     Function test - test RestartRadio is not called when rilSetChdataErrCnt_ is less than 5 with error=100
+ */
+HWTEST_F(CellularStateMachineTest, Activating_RilErrorResponse_007, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    auto activating = std::static_pointer_cast<Activating>(cellularMachine->activatingState_);
+    cellularMachine->connectId_ = 1;
+    activating->stateMachine_ = cellularMachine;
+    activating->rilSetChdataErrCnt_ = 3;
+    std::shared_ptr<RadioResponseInfo> radioResponseInfo = std::make_shared<RadioResponseInfo>();
+    radioResponseInfo->flag = 1;
+    radioResponseInfo->error = ErrType::ERR_SET_CHDATA_FAIL;
+    auto event = AppExecFwk::InnerEvent::Get(0, radioResponseInfo);
+    bool result = activating->RilErrorResponse(event);
+    EXPECT_EQ(result, true);
+    EXPECT_EQ(activating->rilSetChdataErrCnt_, 4);
+}
+ 
+/**
+ * @tc.number   Activating_RilErrorResponse_008
+ * @tc.name     test non-RIL_ERR_SET_CHDATA error goes to else branch
+ * @tc.desc     Function test - test non-100 error does not increment rilSetChdataErrCnt_
+ */
+HWTEST_F(CellularStateMachineTest, Activating_RilErrorResponse_008, Function | MediumTest | Level1)
+{
+    if (cellularMachine == nullptr) {
+        std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+        cellularMachine = machine->CreateCellularDataConnect(0);
+        cellularMachine->Init();
+    }
+    auto activating = std::static_pointer_cast<Activating>(cellularMachine->activatingState_);
+    cellularMachine->connectId_ = 1;
+    activating->stateMachine_ = cellularMachine;
+    activating->rilSetChdataErrCnt_ = 3;
+    std::shared_ptr<RadioResponseInfo> radioResponseInfo = std::make_shared<RadioResponseInfo>();
+    radioResponseInfo->flag = 1;
+    radioResponseInfo->error = ErrType::ERR_GENERIC_FAILURE;
+    auto event = AppExecFwk::InnerEvent::Get(0, radioResponseInfo);
+    bool result = activating->RilErrorResponse(event);
+    EXPECT_EQ(result, true);
+    EXPECT_EQ(activating->rilSetChdataErrCnt_, 3);
+}
+
 } // namespace Telephony
 } // namespace OHOS

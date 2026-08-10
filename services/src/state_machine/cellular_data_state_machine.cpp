@@ -631,5 +631,12 @@ void CellularDataStateMachine::FillRSDFromNetCap(
         networkSliceParas["snssai"].c_str(), networkSliceParas["sscmode"].c_str(), networkSliceParas["dnn"].c_str(),
         networkSliceParas["pdusessiontype"].c_str());
 }
+
+void CellularDataStateMachine::RestartRadio()
+{
+    TELEPHONY_LOGI("RestartRadio");
+    CoreManagerInner::GetInstance().SetRadioState(GetSlotId(), RadioEvent::RADIO_OFF, CORE_SERVICE_POWER_OFF, 0,
+        nullptr);
+}
 } // namespace Telephony
 } // namespace OHOS
