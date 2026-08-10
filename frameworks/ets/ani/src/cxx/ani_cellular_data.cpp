@@ -18,6 +18,7 @@
 #include "napi_util.h"
 #include "telephony_types.h"
 #include "wrapper.rs.h"
+#include "core_service_client.h"
 
 namespace OHOS {
 using namespace Telephony;
@@ -33,6 +34,10 @@ static bool IsCellularDataManagerInited()
 
 static inline bool IsValidSlotId(int32_t slotId)
 {
+    if (SIM_SLOT_COUNT == CELLDATA_SLOT_ID_3) {
+        return slotId != CELLDATA_SLOT_ID_3 ? ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT - 1)) :
+               DelayedRefSingleton<CoreServiceClient>::GetInstance().IsMultiSimsCapabilitySupported(slotId);
+    }
     return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT));
 }
 
