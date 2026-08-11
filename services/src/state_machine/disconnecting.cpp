@@ -50,7 +50,7 @@ void Disconnecting::ProcessDisconnectTimeout(const AppExecFwk::InnerEvent::Point
         TELEPHONY_LOGE("stateMachine is null");
         return;
     }
-    if (connectId != stateMachine->connectId_) {
+    if (connectId != stateMachine->connectId_.load()) {
         return;
     }
     auto inActive = std::static_pointer_cast<Inactive>(stateMachine->inActiveState_);
@@ -106,8 +106,8 @@ void Disconnecting::ProcessRilDeactivateDataCall(const AppExecFwk::InnerEvent::P
         stateMachine->TransitionTo(stateMachine->inActiveState_);
         return;
     }
-    if (stateMachine->connectId_ != rilInfo->flag) {
-        TELEPHONY_LOGE("connectId is %{public}d, flag is %{public}d", stateMachine->connectId_, rilInfo->flag);
+    if (stateMachine->connectId_.load() != rilInfo->flag) {
+        TELEPHONY_LOGE("connectId is %{public}d, flag is %{public}d", stateMachine->connectId_.load(), rilInfo->flag);
         return;
     }
     TELEPHONY_LOGI("RadioResponseInfo error is %{public}d", static_cast<int32_t>(rilInfo->error));

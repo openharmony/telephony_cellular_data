@@ -61,8 +61,9 @@ bool Activating::RilActivatePdpContextDone(const AppExecFwk::InnerEvent::Pointer
     rilErrTryCount_ = 0;
     TELEPHONY_LOGI("callDone active: %{public}d flag: %{public}d, cid: %{public}d, reason: %{public}d",
         resultInfo->active, resultInfo->flag, resultInfo->cid, resultInfo->reason);
-    if (stateMachine->connectId_ != resultInfo->flag) {
-        TELEPHONY_LOGE("connectId is %{public}d, flag is %{public}d", stateMachine->connectId_, resultInfo->flag);
+    if (stateMachine->connectId_.load() != resultInfo->flag) {
+        TELEPHONY_LOGE("connectId is %{public}d, flag is %{public}d",
+            stateMachine->connectId_.load(), resultInfo->flag);
         return false;
     }
     auto inActive = std::static_pointer_cast<Inactive>(stateMachine->inActiveState_);
@@ -100,8 +101,8 @@ bool Activating::RilErrorResponse(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGE("SetupDataCallResultInfo and RadioResponseInfo is null");
         return false;
     }
-    if (stateMachine->connectId_ != rilInfo->flag) {
-        TELEPHONY_LOGE("connectId is %{public}d, flag is %{public}d", stateMachine->connectId_, rilInfo->flag);
+    if (stateMachine->connectId_.load() != rilInfo->flag) {
+        TELEPHONY_LOGE("connectId is %{public}d, flag is %{public}d", stateMachine->connectId_.load(), rilInfo->flag);
         return false;
     }
     TELEPHONY_LOGI("RadioResponseInfo flag:%{public}d error:%{public}d", rilInfo->flag, rilInfo->error);
@@ -137,7 +138,7 @@ void Activating::ProcessConnectTimeout(const AppExecFwk::InnerEvent::Pointer &ev
         TELEPHONY_LOGE("stateMachine is null");
         return;
     }
-    if (connectId != stateMachine->connectId_) {
+    if (connectId != stateMachine->connectId_.load()) {
         return;
     }
     int64_t currentTime =

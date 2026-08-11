@@ -25,7 +25,7 @@ void Inactive::StateBegin()
         TELEPHONY_LOGE("stateMachine is null");
         return;
     }
-    stateMachine->connectId_++;
+    stateMachine->connectId_.fetch_add(1);
     isActive_ = true;
     if (deActiveApnTypeId_ != ERROR_APN_ID) {
         // set net manager connection false
