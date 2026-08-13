@@ -16,6 +16,7 @@
 #ifndef CELLULAR_DATA_HISYSEVENT_H
 #define CELLULAR_DATA_HISYSEVENT_H
 
+#include <atomic>
 #include "apn_item.h"
 #include "telephony_hisysevent.h"
 
@@ -49,7 +50,7 @@ public:
     void JudgingDataActivateTimeOut(const int32_t slotId, const int32_t switchState);
 
 private:
-    int64_t dataActivateStartTime_ = 0L;
+    std::atomic<int64_t> dataActivateStartTime_ {0};
 };
 } // namespace Telephony
 } // namespace OHOS

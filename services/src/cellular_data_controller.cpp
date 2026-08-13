@@ -310,8 +310,7 @@ bool CellularDataController::ChangeConnectionForDsds(bool enable) const
         TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler is null", slotId_);
         return false;
     }
-    cellularDataHandler_->ChangeConnectionForDsds(enable);
-    return true;
+    return cellularDataHandler_->ChangeConnectionForDsds(enable);
 }
 
 bool CellularDataController::ClearAllConnections(DisConnectionReason reason) const
@@ -425,7 +424,7 @@ int32_t CellularDataController::GetDataRecoveryState()
 {
     if (cellularDataHandler_ == nullptr) {
         TELEPHONY_LOGE("Slot%{public}d: cellularDataHandler is null", slotId_);
-        return false;
+        return -1;
     }
     return cellularDataHandler_->GetDataRecoveryState();
 }

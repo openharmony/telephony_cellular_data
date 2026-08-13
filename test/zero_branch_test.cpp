@@ -2457,10 +2457,10 @@ HWTEST_F(BranchTest, JudgingDataActivateTimeOut_001, Function | MediumTest | Lev
     auto cellularDataHiSysEvent = DelayedSingleton<CellularDataHiSysEvent>::GetInstance();
     int32_t slotId = 1;
     int32_t switchState = 1;
-    cellularDataHiSysEvent->dataActivateStartTime_ = -1000;
+    cellularDataHiSysEvent->dataActivateStartTime_.store(-1000);
     cellularDataHiSysEvent->JudgingDataActivateTimeOut(slotId, switchState);
     cellularDataHiSysEvent->SetCellularDataActivateStartTime();
-    EXPECT_NE(cellularDataHiSysEvent->dataActivateStartTime_, -1000);
+    EXPECT_NE(cellularDataHiSysEvent->dataActivateStartTime_.load(), -1000);
 }
 
 /**
