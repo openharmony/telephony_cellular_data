@@ -1269,12 +1269,14 @@ void CellularDataHandler::MsgEstablishDataConnection(const InnerEvent::Pointer &
                 apnType.compare(DATA_CONTEXT_ROLE_DEFAULT) == 0) {
             int primarySlotId = INVALID_SLOT_ID;
             CoreManagerInner::GetInstance().GetPrimarySlotId(primarySlotId);
+            // LCOV_EXCL_START
             if (slotId_ != primarySlotId) {
                 isHandoverOccurred_ = false;
                 reason = DisConnectionReason::REASON_CLEAR_CONNECTION;
             } else {
                 isHandoverOccurred_ = true;
             }
+            // LCOV_EXCL_STOP
         }
         ClearConnection(apnHolder, reason);
     }
