@@ -1267,7 +1267,14 @@ void CellularDataHandler::MsgEstablishDataConnection(const InnerEvent::Pointer &
         FindDisConnectionReason(reason, disconnectBearType, apnType);
         if (reason == DisConnectionReason::REASON_HANDOVER_CONNECTION &&
                 apnType.compare(DATA_CONTEXT_ROLE_DEFAULT) == 0) {
-            isHandoverOccurred_ = true;
+            int primarySlotId = INVALID_SLOT_ID;
+            CoreManagerInner::GetInstance().GetPrimarySlotId(primarySlotId);
+            if (slotId_ != primarySlotId) {
+                isHandoverOccurred_ = false;
+                reason = DisConnectionReason::REASON_CLEAR_CONNECTION;
+            } else {
+                isHandoverOccurred_ = true;
+            }
         }
         ClearConnection(apnHolder, reason);
     }
