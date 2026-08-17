@@ -480,7 +480,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_008, Function | MediumTest | 
     std::cout << "SetCellularDataRoamingEnabled result: " << result << std::endl;
     ASSERT_NE(result, TELEPHONY_ERR_SUCCESS);
     ASSERT_FALSE(controller.cellularDataHandler_->dataSwitchSettings_->IsUserDataRoamingOn());
-
     controller.cellularDataHandler_->dataSwitchSettings_->SetUserDataOn(false);
     controller.cellularDataHandler_->dataSwitchSettings_->IsUserDataOn();
     controller.cellularDataHandler_->ResetDataFlowType();
