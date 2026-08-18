@@ -557,5 +557,43 @@ HWTEST_F(CellularDataServiceTest, GetApnState_PermissionTest_002, TestSize.Level
     int32_t state = 0;
     EXPECT_NE(service->GetApnState(DEFAULT_SIM_SLOT_ID, std::string(), state), TELEPHONY_ERR_FAIL);
 }
+
+/**
+ * @tc.number   SetDefaultCellularDataSlotId_CallerInfoTest_001
+ * @tc.name     test SetDefaultCellularDataSlotId callerInfo logic when bundleName is empty
+ * @tc.desc     Function test - verify function can be called without crash
+ */
+HWTEST_F(CellularDataServiceTest, SetDefaultCellularDataSlotId_CallerInfoTest_001, TestSize.Level0)
+{
+    DataAccessToken token;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
+    int32_t ret = service->SetDefaultCellularDataSlotId(slotId);
+    EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   SetDefaultCellularDataSlotId_CallerInfoTest_002
+ * @tc.name     test SetDefaultCellularDataSlotId with invalid slotId
+ * @tc.desc     Function test - verify error handling for invalid slotId
+ */
+HWTEST_F(CellularDataServiceTest, SetDefaultCellularDataSlotId_CallerInfoTest_002, TestSize.Level0)
+{
+    DataAccessToken token;
+    int32_t invalidSlotId = -1;
+    int32_t ret = service->SetDefaultCellularDataSlotId(invalidSlotId);
+    EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   SetDefaultCellularDataSlotId_CallerInfoTest_003
+ * @tc.name     test SetDefaultCellularDataSlotId without permission
+ * @tc.desc     Function test - verify function can be called without crash
+ */
+HWTEST_F(CellularDataServiceTest, SetDefaultCellularDataSlotId_CallerInfoTest_003, TestSize.Level0)
+{
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
+    int32_t ret = service->SetDefaultCellularDataSlotId(slotId);
+    EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
+}
 } // namespace Telephony
 } // namespace OHOS

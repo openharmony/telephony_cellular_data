@@ -74,6 +74,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCellularData()
     InitIsDcCellularDataAllowed();
     InitIsVirtualModemSlot();
     InitReportEventToChr();
+    InitSendCellularDataSlotChangeInfo();
 }
 
 void TelephonyExtWrapper::InitDataEndSelfCure()
@@ -279,6 +280,17 @@ void TelephonyExtWrapper::InitReportEventToChr()
         return;
     }
     TELEPHONY_LOGD("telephony ext wrapper init ReportEventToChr success");
+}
+
+void TelephonyExtWrapper::InitSendCellularDataSlotChangeInfo()
+{
+    sendCellularDataSlotChangeInfo_ =
+        (SEND_CELLULAR_DATA_SLOT_CHANGE_INFO)dlsym(telephonyExtWrapperHandle_, "SendCellularDataSlotChangeInfo");
+    if (sendCellularDataSlotChangeInfo_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol SendCellularDataSlotChangeInfo failed, error: %{public}s", dlerror());
+        return;
+    }
+    TELEPHONY_LOGD("telephony ext wrapper init SendCellularDataSlotChangeInfo success");
 }
 } // namespace Telephony
 } // namespace OHOS

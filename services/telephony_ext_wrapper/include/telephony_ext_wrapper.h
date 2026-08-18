@@ -50,6 +50,7 @@ public:
     typedef void (*NotifyReqCellularData)(bool isReqCellularData);
     typedef bool (*CREATE_DC_APN_ITEM_EXT)(int32_t slotId, sptr<ApnItem> &apnItem);
     typedef int32_t (*REPORT_EVENT_TO_CHR)(int32_t, const char*, int32_t);
+    typedef int32_t (*SEND_CELLULAR_DATA_SLOT_CHANGE_INFO)(const char*, int32_t, int32_t);
     using IsVirtualModemConnectedType = bool(*)();
     using IsDcCellularDataAllowedType = bool(*)();
     using IsVirtualModemSlotType = bool(*)(int32_t);
@@ -76,6 +77,7 @@ public:
     IsDcCellularDataAllowedType isDcCellularDataAllowed_ = nullptr;
     IsVirtualModemSlotType isVirtualModemSlot_ = nullptr;
     REPORT_EVENT_TO_CHR reportEventToChr_ = nullptr;
+    SEND_CELLULAR_DATA_SLOT_CHANGE_INFO sendCellularDataSlotChangeInfo_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
@@ -99,6 +101,7 @@ private:
     void InitIsDcCellularDataAllowed();
     void InitIsVirtualModemSlot();
     void InitReportEventToChr();
+    void InitSendCellularDataSlotChangeInfo();
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()

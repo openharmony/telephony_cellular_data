@@ -511,6 +511,19 @@ int32_t CellularDataService::SetDefaultCellularDataSlotId(const int32_t slotId)
     if (formerSlotId < 0) {
         TELEPHONY_LOGI("No old card slot id.");
     }
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (TELEPHONY_EXT_WRAPPER.sendCellularDataSlotChangeInfo_) {
+        int32_t callingUid = IPCSkeleton::GetCallingUid();
+        int32_t callingPid = IPCSkeleton::GetCallingPid();
+        std::string bundleName = "";
+        TelephonyPermission::GetBundleNameByUid(callingUid, bundleName);
+        if (bundleName.empty()) {
+            bundleName.append(std::to_string(callingPid));
+            bundleName.append(std::to_string(callingUid));
+        }
+        TELEPHONY_EXT_WRAPPER.sendCellularDataSlotChangeInfo_(bundleName.c_str(), callingPid, slotId);
+    }
+#endif
     int32_t result = CoreManagerInner::GetInstance().SetDefaultCellularDataSlotId(slotId);
     if (result != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("set slot id fail");
