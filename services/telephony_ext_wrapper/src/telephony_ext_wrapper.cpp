@@ -287,7 +287,8 @@ void TelephonyExtWrapper::InitSendCellularDataSlotChangeInfo()
     sendCellularDataSlotChangeInfo_ =
         (SEND_CELLULAR_DATA_SLOT_CHANGE_INFO)dlsym(telephonyExtWrapperHandle_, "SendCellularDataSlotChangeInfo");
     if (sendCellularDataSlotChangeInfo_ == nullptr) {
-        TELEPHONY_LOGE("telephony ext wrapper symbol SendCellularDataSlotChangeInfo failed, error: %{public}s", dlerror());
+        TELEPHONY_LOGE("telephony ext wrapper symbol InitSendCellularDataSlotChangeInfo failed,\
+            error: %{public}s", dlerror());
         return;
     }
     TELEPHONY_LOGD("telephony ext wrapper init SendCellularDataSlotChangeInfo success");
