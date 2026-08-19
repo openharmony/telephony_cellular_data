@@ -511,7 +511,7 @@ int32_t CellularDataService::SetDefaultCellularDataSlotId(const int32_t slotId)
     if (formerSlotId < 0) {
         TELEPHONY_LOGI("No old card slot id.");
     }
-    SendSlotChangeInfoToChr(internalSlotId);
+    SendSlotChangeInfoToChr(slotId);
     int32_t result = CoreManagerInner::GetInstance().SetDefaultCellularDataSlotId(slotId);
     if (result != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("set slot id fail");
