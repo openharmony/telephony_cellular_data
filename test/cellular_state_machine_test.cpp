@@ -99,6 +99,9 @@ int32_t IncallDataStateMachineTest::Init(int32_t callState, int32_t slotId)
     if (apnManager == nullptr) {
         return -1;
     }
+    if (incallStateMachine_ == nullptr) {
+        return -1;
+    }
     incallStateMachine_->Init(callState, slotId, std::weak_ptr<TelEventHandler>(
         std::static_pointer_cast<TelEventHandler>(shared_from_this())), apnManager);
     return 0;

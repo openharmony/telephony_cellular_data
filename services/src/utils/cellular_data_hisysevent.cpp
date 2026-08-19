@@ -94,9 +94,9 @@ void CellularDataHiSysEvent::WriteRoamingConnectStateBehaviorEvent(const int32_t
 void CellularDataHiSysEvent::WriteCellularRequestBehaviorEvent(
     const uint32_t uid, const std::string name, const uint64_t type, const int32_t state)
 {
-    HiWriteBehaviorEvent(CELLULAR_REQUEST_EVENT, CALL_UID_KEY, static_cast<int32_t>(uid),
+    HiWriteBehaviorEvent(CELLULAR_REQUEST_EVENT, CALL_UID_KEY, uid,
         CALL_PID_KEY, NUMBER_MINUS_ONE, NAME_KEY, name, REQUEST_ID_KEY, NUMBER_MINUS_ONE,
-        TYPE_KEY, static_cast<int32_t>(type), STATE_KEY, state);
+        TYPE_KEY, type, STATE_KEY, state);
 }
 
 void CellularDataHiSysEvent::WriteDataActivateFaultEvent(
@@ -110,7 +110,7 @@ void CellularDataHiSysEvent::WriteDataActivateFaultEvent(
 void CellularDataHiSysEvent::WriteApnInfoBehaviorEvent(const int32_t slotId, struct PdpProfile &apnData)
 {
     std::string numeric = apnData.mcc + apnData.mnc;
-    int32_t apnHasPsd = apnData.authPwd.empty() ? 1 : 0;
+    int32_t apnHasPsd = apnData.authPwd.empty() ? 0 : 1;
     HiWriteBehaviorEvent(APN_INFO_EVENT,
         CARDID_KEY, slotId,
         CARRIER_KEY, apnData.profileName,
@@ -157,9 +157,9 @@ void CellularDataHiSysEvent::WriteApnInfoBehaviorEvent(const int32_t slotId, spt
 
 void CellularDataHiSysEvent::SetCellularDataActivateStartTime()
 {
-    dataActivateStartTime_ =
+    dataActivateStartTime_.store(
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
-            .count();
+            .count());
 }
 
 void CellularDataHiSysEvent::JudgingDataActivateTimeOut(const int32_t slotId, const int32_t switchState)
@@ -167,9 +167,9 @@ void CellularDataHiSysEvent::JudgingDataActivateTimeOut(const int32_t slotId, co
     int64_t dataActivateEndTime =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
             .count();
-    if (dataActivateEndTime - dataActivateStartTime_ > DATA_ACTIVATE_TIME) {
+    if (dataActivateEndTime - dataActivateStartTime_.load() > DATA_ACTIVATE_TIME) {
         WriteDataActivateFaultEvent(slotId, switchState, CellularDataErrorCode::DATA_ERROR_DATA_ACTIVATE_TIME_OUT,
-            "data activate time out " + std::to_string(dataActivateEndTime - dataActivateStartTime_));
+            "data activate time out " + std::to_string(dataActivateEndTime - dataActivateStartTime_.load()));
     }
 }
 } // namespace Telephony

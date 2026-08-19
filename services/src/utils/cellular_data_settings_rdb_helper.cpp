@@ -114,8 +114,9 @@ int32_t CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &col
     result->GoToFirstRow();
     int32_t columnIndex;
     std::string resultValue;
-    result->GetColumnIndex(CELLULAR_DATA_COLUMN_VALUE, columnIndex);
-    result->GetString(columnIndex, resultValue);
+    if (result->GetColumnIndex(CELLULAR_DATA_COLUMN_VALUE, columnIndex) == DataShare::E_OK) {
+        result->GetString(columnIndex, resultValue);
+    }
     result->Close();
     settingHelper->Release();
     TELEPHONY_LOGD("Query end resultValue is %{public}s", resultValue.c_str());
