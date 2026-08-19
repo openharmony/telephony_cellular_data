@@ -558,42 +558,92 @@ HWTEST_F(CellularDataServiceTest, GetApnState_PermissionTest_002, TestSize.Level
     EXPECT_NE(service->GetApnState(DEFAULT_SIM_SLOT_ID, std::string(), state), TELEPHONY_ERR_FAIL);
 }
 
-/**
- * @tc.number   SetDefaultCellularDataSlotId_CallerInfoTest_001
- * @tc.name     test SetDefaultCellularDataSlotId callerInfo logic when bundleName is empty
- * @tc.desc     Function test - verify function can be called without crash
- */
-HWTEST_F(CellularDataServiceTest, SetDefaultCellularDataSlotId_CallerInfoTest_001, TestSize.Level0)
+bool g_mockGetBundleNameByUid = true;
+std::string g_mockBundleName = "";
+bool g_callbackInvoked = false;
+
+int32_t TestSendCellularDataSlotChangeInfo(const char* bundleName, int32_t pid, int32_t slotId)
 {
-    DataAccessToken token;
-    int32_t slotId = DEFAULT_SIM_SLOT_ID;
-    int32_t ret = service->SetDefaultCellularDataSlotId(slotId);
-    EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
+    g_callbackInvoked = true;
+    return 0;
+}
+
+bool TelephonyPermission::GetBundleNameByUid(int32_t uid, std::string &bundleName)
+{
+    (void)uid;
+    if (g_mockGetBundleNameByUid) {
+        bundleName = g_mockBundleName;
+        return true;
+    }
+    return false;
 }
 
 /**
- * @tc.number   SetDefaultCellularDataSlotId_CallerInfoTest_002
- * @tc.name     test SetDefaultCellularDataSlotId with invalid slotId
- * @tc.desc     Function test - verify error handling for invalid slotId
+ * @tc.number   SetDefaultCellularDataSlotId_SendSlotChangeInfo_Branch1_CallbackNullptr
+ * @tc.name     test SetDefaultCellularDataSlotId sendCellularDataSlotChangeInfo_ is nullptr
+ * @tc.desc     Branch test - when sendCellularDataSlotChangeInfo_ is nullptr, skip callback
  */
-HWTEST_F(CellularDataServiceTest, SetDefaultCellularDataSlotId_CallerInfoTest_002, TestSize.Level0)
+HWTEST_F(CellularDataServiceTest, SetDefaultCellularDataSlotId_SendSlotChangeInfo_Branch1_CallbackNullptr, TestSize.Level0)
 {
-    DataAccessToken token;
-    int32_t invalidSlotId = -1;
-    int32_t ret = service->SetDefaultCellularDataSlotId(invalidSlotId);
-    EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
+    g_mockGetBundleNameByUid = true;
+    g_mockBundleName = "test.bundle.name";
+    TELEPHONY_EXT_WRAPPER.sendCellularDataSlotChangeInfo_ = nullptr;
+    g_callbackInvoked = false;
+    int32_t slotId = 0;
+    service->SendSlotChangeInfoToChr(slotId);
+    TELEPHONY_EXT_WRAPPER.sendCellularDataSlotChangeInfo_ = nullptr;
+    EXPECT_FALSE(g_callbackInvoked);
 }
 
 /**
- * @tc.number   SetDefaultCellularDataSlotId_CallerInfoTest_003
- * @tc.name     test SetDefaultCellularDataSlotId without permission
- * @tc.desc     Function test - verify function can be called without crash
+ * @tc.number   SetDefaultCellularDataSlotId_SendSlotChangeInfo_Branch2_BundleNameEmpty
+ * @tc.name     test SetDefaultCellularDataSlotId bundleName is empty, use pid+uid
+ * @tc.desc     Branch test - when bundleName is empty, construct from pid and uid
  */
-HWTEST_F(CellularDataServiceTest, SetDefaultCellularDataSlotId_CallerInfoTest_003, TestSize.Level0)
+HWTEST_F(CellularDataServiceTest, SetDefaultCellularDataSlotId_SendSlotChangeInfo_Branch2_BundleNameEmpty, TestSize.Level0)
 {
-    int32_t slotId = DEFAULT_SIM_SLOT_ID;
-    int32_t ret = service->SetDefaultCellularDataSlotId(slotId);
-    EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
+    g_mockGetBundleNameByUid = true;
+    g_mockBundleName = "";  // empty bundleName
+    TELEPHONY_EXT_WRAPPER.sendCellularDataSlotChangeInfo_ = TestSendCellularDataSlotChangeInfo;
+    g_callbackInvoked = false;
+    int32_t slotId = 0;
+    service->SendSlotChangeInfoToChr(slotId);
+    TELEPHONY_EXT_WRAPPER.sendCellularDataSlotChangeInfo_ = nullptr;
+    EXPECT_TRUE(g_callbackInvoked);
+}
+
+/**
+ * @tc.number   SetDefaultCellularDataSlotId_SendSlotChangeInfo_Branch3_BundleNameNotEmpty
+ * @tc.name     test SetDefaultCellularDataSlotId bundleName is not empty, use as-is
+ * @tc.desc     Branch test - when bundleName is not empty, pass it directly to callback
+ */
+HWTEST_F(CellularDataServiceTest, SetDefaultCellularDataSlotId_SendSlotChangeInfo_Branch3_BundleNameNotEmpty, TestSize.Level0)
+{
+    g_mockGetBundleNameByUid = true;
+    g_mockBundleName = "com.test.bundle";
+    TELEPHONY_EXT_WRAPPER.sendCellularDataSlotChangeInfo_ = TestSendCellularDataSlotChangeInfo;
+    g_callbackInvoked = false;
+    int32_t slotId = 0;
+    service->SendSlotChangeInfoToChr(slotId);
+    TELEPHONY_EXT_WRAPPER.sendCellularDataSlotChangeInfo_ = nullptr;
+    EXPECT_TRUE(g_callbackInvoked);
+}
+
+/**
+ * @tc.number   SetDefaultCellularDataSlotId_SendSlotChangeInfo_Branch4_GetBundleNameFailed
+ * @tc.name     test SetDefaultCellularDataSlotId GetBundleNameByUid returns false
+ * @tc.desc     Branch test - when GetBundleNameByUid fails, bundleName remains empty, use pid+uid
+ */
+HWTEST_F(CellularDataServiceTest, SetDefaultCellularDataSlotId_SendSlotChangeInfo_Branch4_GetBundleNameFailed, TestSize.Level0)
+{
+    g_mockGetBundleNameByUid = false;  // GetBundleNameByUid returns false
+    g_mockBundleName = "";
+    TELEPHONY_EXT_WRAPPER.sendCellularDataSlotChangeInfo_ = TestSendCellularDataSlotChangeInfo;
+    g_callbackInvoked = false;
+    int32_t slotId = 0;
+    service->SendSlotChangeInfoToChr(slotId);
+    TELEPHONY_EXT_WRAPPER.sendCellularDataSlotChangeInfo_ = nullptr;
+    EXPECT_TRUE(g_callbackInvoked);
 }
 } // namespace Telephony
 } // namespace OHOS

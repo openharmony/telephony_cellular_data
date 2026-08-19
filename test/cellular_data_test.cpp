@@ -2101,5 +2101,23 @@ HWTEST_F(CellularDataTest, InitSendCellularDataSlotChangeInfo_WhenSymbolNotFound
     delete mockDlsym;
     mockDlsym = nullptr;
 }
+
+/**
+ * @tc.number   InitSendCellularDataSlotChangeInfo_WhenSymbolFound
+ * @tc.name     Init SendCellularDataSlotChangeInfo when symbol is found.
+ * @tc.desc     Function test - verify function pointer is set when dlsym succeeds
+ */
+HWTEST_F(CellularDataTest, InitSendCellularDataSlotChangeInfo_WhenSymbolFound, Function | MediumTest | Level1)
+{
+    mockDlsym = new NiceMock<MockDlsym>();
+    EXPECT_CALL(*mockDlsym, dlopen(_, _)).WillRepeatedly(Return(reinterpret_cast<void*>(0x1234)));
+    EXPECT_CALL(*mockDlsym, dlsym(_, StrEq("SendCellularDataSlotChangeInfo")))
+        .WillRepeatedly(Return(reinterpret_cast<void*>(0x5678)));
+    TELEPHONY_EXT_WRAPPER.sendCellularDataSlotChangeInfo_ = nullptr;
+    TELEPHONY_EXT_WRAPPER.InitSendCellularDataSlotChangeInfo();
+    ASSERT_NE(TELEPHONY_EXT_WRAPPER.sendCellularDataSlotChangeInfo_, nullptr);
+    delete mockDlsym;
+    mockDlsym = nullptr;
+}
 } // namespace Telephony
 } // namespace OHOS
