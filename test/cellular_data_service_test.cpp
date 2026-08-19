@@ -583,7 +583,7 @@ bool TelephonyPermission::GetBundleNameByUid(int32_t uid, std::string &bundleNam
  * @tc.name     test SetDefaultCellularDataSlotId sendCellularDataSlotChangeInfo_ is nullptr
  * @tc.desc     Branch test - when sendCellularDataSlotChangeInfo_ is nullptr, skip callback
  */
-HWTEST_F(CellularDataServiceTest, SetDefaultCellularDataSlotId_SendSlotChangeInfo_Branch1_CallbackNullptr, TestSize.Level0)
+HWTEST_F(CellularDataServiceTest, SetDefaultCellularDataSlotId_SendSlotChangeInfo_CallbackNullptr, TestSize.Level0)
 {
     g_mockGetBundleNameByUid = true;
     g_mockBundleName = "test.bundle.name";
@@ -600,7 +600,7 @@ HWTEST_F(CellularDataServiceTest, SetDefaultCellularDataSlotId_SendSlotChangeInf
  * @tc.name     test SetDefaultCellularDataSlotId bundleName is empty, use pid+uid
  * @tc.desc     Branch test - when bundleName is empty, construct from pid and uid
  */
-HWTEST_F(CellularDataServiceTest, SetDefaultCellularDataSlotId_SendSlotChangeInfo_Branch2_BundleNameEmpty, TestSize.Level0)
+HWTEST_F(CellularDataServiceTest, SetDefaultCellularDataSlotId_SendSlotChangeInfo_BundleNameEmpty, TestSize.Level0)
 {
     g_mockGetBundleNameByUid = true;
     g_mockBundleName = "";  // empty bundleName
@@ -617,7 +617,7 @@ HWTEST_F(CellularDataServiceTest, SetDefaultCellularDataSlotId_SendSlotChangeInf
  * @tc.name     test SetDefaultCellularDataSlotId bundleName is not empty, use as-is
  * @tc.desc     Branch test - when bundleName is not empty, pass it directly to callback
  */
-HWTEST_F(CellularDataServiceTest, SetDefaultCellularDataSlotId_SendSlotChangeInfo_Branch3_BundleNameNotEmpty, TestSize.Level0)
+HWTEST_F(CellularDataServiceTest, SetDefaultCellularDataSlotId_SendSlotChangeInfo_BundleNameNotEmpty, TestSize.Level0)
 {
     g_mockGetBundleNameByUid = true;
     g_mockBundleName = "com.test.bundle";
@@ -634,7 +634,7 @@ HWTEST_F(CellularDataServiceTest, SetDefaultCellularDataSlotId_SendSlotChangeInf
  * @tc.name     test SetDefaultCellularDataSlotId GetBundleNameByUid returns false
  * @tc.desc     Branch test - when GetBundleNameByUid fails, bundleName remains empty, use pid+uid
  */
-HWTEST_F(CellularDataServiceTest, SetDefaultCellularDataSlotId_SendSlotChangeInfo_Branch4_GetBundleNameFailed, TestSize.Level0)
+HWTEST_F(CellularDataServiceTest, SetDefaultCellularDataSlotId_SendSlotChangeInfo_GetBundleNameFailed, TestSize.Level0)
 {
     g_mockGetBundleNameByUid = false;  // GetBundleNameByUid returns false
     g_mockBundleName = "";
