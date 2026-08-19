@@ -27,6 +27,8 @@
 #include "traffic_management.h"
 #include "apn_attribute.h"
 #include "mock/mock_network_search.h"
+#include "telephony_permission.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
