@@ -1008,7 +1008,6 @@ void CellularDataService::SendSlotChangeInfoToChr(int32_t slotId)
             bundleName.append(std::to_string(callingPid));
             bundleName.append(std::to_string(callingUid));
         }
-        TELEPHONY_LOGI("test yss SetDefaultCellularDataSlotId bundleName:%{public}s, internalSlotId:%{public}d", bundleName.c_str(), slotId);
         TELEPHONY_EXT_WRAPPER.sendCellularDataSlotChangeInfo_(bundleName.c_str(), callingPid, slotId);
     }
     #else
