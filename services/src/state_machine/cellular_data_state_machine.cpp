@@ -135,7 +135,7 @@ void CellularDataStateMachine::DoConnect(const DataConnectionParams &connectionP
     int32_t radioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     CoreManagerInner::GetInstance().GetPsRadioTech(slotId, radioTech);
     ActivateDataParam activeDataParam;
-    activeDataParam.param = connectId_;
+    activeDataParam.param = connectId_.load();
     activeDataParam.radioTechnology = radioTech;
     activeDataParam.allowRoaming = connectionParams.GetRoamingState();
     activeDataParam.isRoaming = connectionParams.GetUserDataRoaming();
@@ -167,7 +167,7 @@ void CellularDataStateMachine::DoConnect(const DataConnectionParams &connectionP
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
             .count();
     stateMachineEventHandler_->SendEvent(
-        CellularDataEventCode::MSG_CONNECT_TIMEOUT_CHECK, connectId_, CONNECTION_TIMEOUT);
+        CellularDataEventCode::MSG_CONNECT_TIMEOUT_CHECK, connectId_.load(), CONNECTION_TIMEOUT);
 }
 
 void CellularDataStateMachine::FreeConnection(const DataDisconnectParams &params)
@@ -178,7 +178,7 @@ void CellularDataStateMachine::FreeConnection(const DataDisconnectParams &params
         "Slot%{public}d: Deactivate PDP context cid:%{public}d type:%{public}s id:%{public}d",
         slotId, cid_, params.GetApnType().c_str(), apnId);
     DeactivateDataParam deactivateDataParam;
-    deactivateDataParam.param = connectId_;
+    deactivateDataParam.param = connectId_.load();
     deactivateDataParam.cid = cid_;
     deactivateDataParam.reason = static_cast<int32_t>(params.GetReason());
     int32_t result = CoreManagerInner::GetInstance().DeactivatePdpContext(slotId,
@@ -193,7 +193,7 @@ void CellularDataStateMachine::FreeConnection(const DataDisconnectParams &params
         return;
     }
     stateMachineEventHandler_->SendEvent(
-        CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK, connectId_, DISCONNECTION_TIMEOUT);
+        CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK, connectId_.load(), DISCONNECTION_TIMEOUT);
 }
 
 int32_t CellularDataStateMachine::NetInterfaceCallback::OnInterfaceLinkStateChanged(const std::string &ifName, bool up)
@@ -220,10 +220,10 @@ int32_t CellularDataStateMachine::OnInterfaceLinkStateChanged(const std::string 
             return 0;
         }
         if (stateMachineEventHandler_->HasInnerEvent(CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK)) {
-            TELEPHONY_LOGI("connectId_:%{public}d", connectId_);
+            TELEPHONY_LOGI("connectId_:%{public}d", connectId_.load());
             stateMachineEventHandler_->RemoveEvent(CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK);
             stateMachineEventHandler_->SendEvent(
-                CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK, connectId_, INTERFACE_DOWN_TIMEOUT);
+                CellularDataEventCode::MSG_DISCONNECT_TIMEOUT_CHECK, connectId_.load(), INTERFACE_DOWN_TIMEOUT);
         }
     }
     return 0;
