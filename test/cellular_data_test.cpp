@@ -2068,5 +2068,56 @@ HWTEST_F(CellularDataTest, CellularDataNetAgentGetSlotId001, TestSize.Level3)
     slotId = agent->GetSlotId(101);
     EXPECT_EQ(slotId, 0);
 }
+
+/**
+ * @tc.number   InitSendCellularDataSlotChangeInfo
+ * @tc.name     Init SendCellularDataSlotChangeInfo function.
+ * @tc.desc     Function test
+ */
+HWTEST_F(CellularDataTest, InitSendCellularDataSlotChangeInfo, Function | MediumTest | Level1)
+{
+    TELEPHONY_EXT_WRAPPER.InitSendCellularDataSlotChangeInfo();
+    if (TELEPHONY_EXT_WRAPPER.sendCellularDataSlotChangeInfo_ == nullptr) {
+        TELEPHONY_LOGI("sendCellularDataSlotChangeInfo_ null");
+    } else {
+        TELEPHONY_LOGI("sendCellularDataSlotChangeInfo_ not null");
+        EXPECT_EQ(TELEPHONY_EXT_WRAPPER.sendCellularDataSlotChangeInfo_ != nullptr, true);
+    }
+}
+
+/**
+ * @tc.number   InitSendCellularDataSlotChangeInfo_WhenSymbolNotFound
+ * @tc.name     Init SendCellularDataSlotChangeInfo when symbol not found.
+ * @tc.desc     Function test - verify nullptr handling when dlsym fails
+ */
+HWTEST_F(CellularDataTest, InitSendCellularDataSlotChangeInfo_WhenSymbolNotFound, Function | MediumTest | Level1)
+{
+    mockDlsym = new NiceMock<MockDlsym>();
+    EXPECT_CALL(*mockDlsym, dlopen(_, _)).WillRepeatedly(Return(reinterpret_cast<void*>(0x1234)));
+    EXPECT_CALL(*mockDlsym, dlsym(_, StrEq("SendCellularDataSlotChangeInfo"))).WillRepeatedly(Return(nullptr));
+    TELEPHONY_EXT_WRAPPER.sendCellularDataSlotChangeInfo_ = nullptr;
+    TELEPHONY_EXT_WRAPPER.InitSendCellularDataSlotChangeInfo();
+    ASSERT_EQ(TELEPHONY_EXT_WRAPPER.sendCellularDataSlotChangeInfo_, nullptr);
+    delete mockDlsym;
+    mockDlsym = nullptr;
+}
+
+/**
+ * @tc.number   InitSendCellularDataSlotChangeInfo_WhenSymbolFound
+ * @tc.name     Init SendCellularDataSlotChangeInfo when symbol is found.
+ * @tc.desc     Function test - verify function pointer is set when dlsym succeeds
+ */
+HWTEST_F(CellularDataTest, InitSendCellularDataSlotChangeInfo_WhenSymbolFound, Function | MediumTest | Level1)
+{
+    mockDlsym = new NiceMock<MockDlsym>();
+    EXPECT_CALL(*mockDlsym, dlopen(_, _)).WillRepeatedly(Return(reinterpret_cast<void*>(0x1234)));
+    EXPECT_CALL(*mockDlsym, dlsym(_, StrEq("SendCellularDataSlotChangeInfo")))
+        .WillRepeatedly(Return(reinterpret_cast<void*>(0x5678)));
+    TELEPHONY_EXT_WRAPPER.sendCellularDataSlotChangeInfo_ = nullptr;
+    TELEPHONY_EXT_WRAPPER.InitSendCellularDataSlotChangeInfo();
+    ASSERT_NE(TELEPHONY_EXT_WRAPPER.sendCellularDataSlotChangeInfo_, nullptr);
+    delete mockDlsym;
+    mockDlsym = nullptr;
+}
 } // namespace Telephony
 } // namespace OHOS

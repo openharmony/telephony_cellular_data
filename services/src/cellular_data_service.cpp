@@ -511,6 +511,7 @@ int32_t CellularDataService::SetDefaultCellularDataSlotId(const int32_t slotId)
     if (formerSlotId < 0) {
         TELEPHONY_LOGI("No old card slot id.");
     }
+    SendSlotChangeInfoToChr(slotId);
     int32_t result = CoreManagerInner::GetInstance().SetDefaultCellularDataSlotId(slotId);
     if (result != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("set slot id fail");
@@ -992,6 +993,26 @@ int32_t CellularDataService::GetActiveApnName(std::string &apnName)
         apnName = apnAttr.apn_;
     }
     return 0;
+}
+
+__attribute__((no_sanitize("cfi")))
+void CellularDataService::SendSlotChangeInfoToChr(int32_t slotId)
+{
+    #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (TELEPHONY_EXT_WRAPPER.sendCellularDataSlotChangeInfo_) {
+        int32_t callingUid = IPCSkeleton::GetCallingUid();
+        int32_t callingPid = IPCSkeleton::GetCallingPid();
+        std::string bundleName = "";
+        TelephonyPermission::GetBundleNameByUid(callingUid, bundleName);
+        if (bundleName.empty()) {
+            bundleName.append(std::to_string(callingPid));
+            bundleName.append(std::to_string(callingUid));
+        }
+        TELEPHONY_EXT_WRAPPER.sendCellularDataSlotChangeInfo_(bundleName.c_str(), callingPid, slotId);
+    }
+    #else
+        TELEPHONY_LOGE("not support telephony ext");
+    #endif
 }
 } // namespace Telephony
 } // namespace OHOS

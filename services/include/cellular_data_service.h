@@ -102,6 +102,7 @@ private:
     void ClearCellularDataControllers();
     void AddCellularDataControllers(int32_t slotId, std::shared_ptr<CellularDataController> cellularDataController);
     std::shared_ptr<CellularDataController> GetCellularDataController(int32_t slotId);
+    void SendSlotChangeInfoToChr(int32_t slotId);
 
 private:
     std::map<int32_t, std::shared_ptr<CellularDataController>> cellularDataControllers_;
