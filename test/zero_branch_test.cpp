@@ -595,52 +595,6 @@ HWTEST_F(BranchTest, Telephony_CellularDataHandler_011, Function | MediumTest | 
 }
 
 /**
- * @tc.number   Telephony_CellularDataHandler_HandleMmsRequestOnVsimEnabled
- * @tc.name     test branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_CellularDataHandler_HandleMmsRequestOnVsimEnabled, Function | MediumTest | Level1)
-{
-    CellularDataController controller { 0 };
-    controller.Init();
-    controller.cellularDataHandler_->SendEstablishDataConnectionEvent(0, NetBearType::BEARER_DEFAULT);
-#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
-    int32_t reqType = TYPE_REQUEST_NET;
-    bool isMmsType = false;
-    controller.cellularDataHandler_->HandleMmsRequestOnVsimEnabled(reqType, isMmsType);
-    isMmsType = true;
-    controller.cellularDataHandler_->slotId_ = 2;
-    controller.cellularDataHandler_->HandleMmsRequestOnVsimEnabled(reqType, isMmsType);
-    isMmsType = true;
-    controller.cellularDataHandler_->slotId_ = 1;
-    controller.cellularDataHandler_->HandleMmsRequestOnVsimEnabled(reqType, isMmsType);
-    auto isVSimEnabled = TELEPHONY_EXT_WRAPPER.isVSimEnabled_;
-    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = nullptr;
-    controller.cellularDataHandler_->HandleMmsRequestOnVsimEnabled(reqType, isMmsType);
-    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = isVSimEnabled;
-    controller.cellularDataHandler_->HandleMmsRequestOnVsimEnabled(reqType, isMmsType);
-    reqType = 0;
-    EXPECT_EQ(controller.cellularDataHandler_->slotId_, 1);
-#endif
-}
-
-/**
- * @tc.number   Telephony_CellularDataHandler_SetDataPermittedForSlotId
- * @tc.name     test branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_CellularDataHandler_SetDataPermittedForSlotId, Function | MediumTest | Level1)
-{
-    CellularDataController controller { 0 };
-    controller.Init();
-    controller.cellularDataHandler_->SendEstablishDataConnectionEvent(0, NetBearType::BEARER_DEFAULT);
-#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
-    controller.cellularDataHandler_->SetDataPermittedForSlotId(1);
-    EXPECT_NE(controller.cellularDataHandler_->slotId_, 3);
-#endif
-}
-
-/**
  * @tc.number   Telephony_CellularDataHandler_012
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -2973,28 +2927,6 @@ HWTEST_F(BranchTest, CheckDataPermittedByDsds_TSTS_002, Function | MediumTest | 
     ASSERT_FALSE(result);
 }
 
-HWTEST_F(BranchTest, SetDataPermittedForSlotId_TSTS_001, Function | MediumTest | Level3)
-{
-    system::SetParameter(PERSIST_TSTS_MODE, "0");
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLDATA_SLOT_ID_0);
-    cellularDataHandler->Init();
-#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
-    cellularDataHandler->SetDataPermittedForSlotId(CELLDATA_SLOT_ID_3);
-    EXPECT_NE(controller.cellularDataHandler_->slotId_, 1);
-#endif
-}
-
-HWTEST_F(BranchTest, SetDataPermittedForSlotId_TSTS_002, Function | MediumTest | Level3)
-{
-    system::SetParameter(PERSIST_TSTS_MODE, "1");
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLDATA_SLOT_ID_0);
-    cellularDataHandler->Init();
-#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
-    cellularDataHandler->SetDataPermittedForSlotId(CELLDATA_SLOT_ID_3);
-    EXPECT_NE(controller.cellularDataHandler_->slotId_, 1);
-#endif
-}
-
 HWTEST_F(BranchTest, HandleDsdsModeChanged_TSTS_001, Function | MediumTest | Level3)
 {
     system::SetParameter(PERSIST_TSTS_MODE, "0");
@@ -3099,6 +3031,52 @@ HWTEST_F(BranchTest, HandleDefaultDataSubscriptionChanged_TSTS_003, Function | M
     cellularDataHandler->Init();
     cellularDataHandler->HandleDefaultDataSubscriptionChanged();
     EXPECT_EQ(cellularDataHandler->slotId_, CELLDATA_SLOT_ID_0);
+}
+
+bool MockIsVSimEnabled()
+{
+    return true;
+}
+
+HWTEST_F(BranchTest, CheckDataPermittedByDsds_VSim_001, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLULAR_DATA_VSIM_SLOT_ID);
+    cellularDataHandler->Init();
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    auto original = TELEPHONY_EXT_WRAPPER.isVSimEnabled_;
+    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = MockIsVSimEnabled;
+    bool result = cellularDataHandler->CheckDataPermittedByDsds();
+    ASSERT_TRUE(result);
+    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = original;
+#endif
+}
+
+HWTEST_F(BranchTest, CheckDataPermittedByDsds_VSim_002, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLDATA_SLOT_ID_0);
+    cellularDataHandler->Init();
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    auto original = TELEPHONY_EXT_WRAPPER.isVSimEnabled_;
+    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = MockIsVSimEnabled;
+    bool result = cellularDataHandler->CheckDataPermittedByDsds();
+    ASSERT_FALSE(result);
+    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = original;
+#endif
+}
+
+HWTEST_F(BranchTest, SetDataPermittedForMms_VSim_001, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLDATA_SLOT_ID_0);
+    cellularDataHandler->Init();
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    auto original = TELEPHONY_EXT_WRAPPER.isVSimEnabled_;
+    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = MockIsVSimEnabled;
+    bool result = cellularDataHandler->SetDataPermittedForMms(true);
+    ASSERT_TRUE(result);
+    result = cellularDataHandler->SetDataPermittedForMms(false);
+    ASSERT_TRUE(result);
+    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = original;
+#endif
 }
 } // namespace Telephony
 } // namespace OHOS
