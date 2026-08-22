@@ -2474,7 +2474,7 @@ void CellularDataHandler::HandleDBSettingEnableChanged(const AppExecFwk::InnerEv
         TELEPHONY_LOGE("Slot%{public}d: dataSwitchSettings_ is null.", slotId_);
         return;
     }
-    if (TELEPHONY_EXT_WRAPPER.IsVirtualModemSlot_ && TELEPHONY_EXT_WRAPPER.IsVirtualModemSlot_(slotId_)) {
+    if (TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_ && TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_(slotId_)) {
         TELEPHONY_LOGI("Slot%{public}d: dc is connected, do nothing", slotId_);
         return;
     }
