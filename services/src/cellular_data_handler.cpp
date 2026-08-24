@@ -490,6 +490,7 @@ void CellularDataHandler::EstablishAllApnsIfConnectable()
 
 bool CellularDataHandler::SetDataPermittedForMms(bool dataPermittedForMms)
 {
+    TELEPHONY_LOGI("SetDataPermittedForMms:%{public}d", dataPermittedForMms);
     if (incallDataStateMachine_ != nullptr) {
         TELEPHONY_LOGI("Slot%{public}d: incall data active", slotId_);
         return false;
@@ -504,27 +505,36 @@ bool CellularDataHandler::SetDataPermittedForMms(bool dataPermittedForMms)
         return false;
     }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
-    const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
-    SetDataPermitted(defSlotId, !dataPermittedForMms);
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     if (TELEPHONY_EXT_WRAPPER.isVSimEnabled_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_()) {
-        SetDataPermitted(CELLULAR_DATA_VSIM_SLOT_ID, !dataPermittedForMms);
+        int32_t count = coreInner.GetMaxSimCount();
+        for (auto slotId = 0; slotId < count; slotId++) {
+            if (slotId != slotId_ && slotId != CELLULAR_DATA_VSIM_SLOT_ID) {
+                SetDataPermitted(slotId, false);
+            } else if (slotId == CELLULAR_DATA_VSIM_SLOT_ID) {
+                SetDataPermitted(slotId, !dataPermittedForMms);
+            }
+        }
+    } else {
+#endif
+        int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
+        SetDataPermitted(defSlotId, !dataPermittedForMms);
+        SetDataPermitted(slotId_, dataPermittedForMms);
+        DelayedRefSingleton<CellularDataService>::GetInstance().ChangeConnectionForDsds(defSlotId,
+            !dataPermittedForMms);
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     }
 #endif
-    SetDataPermitted(slotId_, dataPermittedForMms);
-    DelayedRefSingleton<CellularDataService>::GetInstance().ChangeConnectionForDsds(defSlotId, !dataPermittedForMms);
     return true;
 }
 
 bool CellularDataHandler::CheckDataPermittedByDsds()
 {
-    if (TELEPHONY_EXT_WRAPPER.getVSimSlotId_) {
-        int vSimSlotId = INVALID_SLOT_ID;
-        TELEPHONY_EXT_WRAPPER.getVSimSlotId_(vSimSlotId);
-        if (vSimSlotId == CELLULAR_DATA_VSIM_SLOT_ID && slotId_ == CELLULAR_DATA_VSIM_SLOT_ID) {
-            return true;
-        }
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (TELEPHONY_EXT_WRAPPER.isVSimEnabled_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_()) {
+        return (slotId_ == CELLULAR_DATA_VSIM_SLOT_ID);
     }
+#endif
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     int32_t dsdsModeValue = DSDS_MODE_V2;
@@ -589,13 +599,15 @@ bool CellularDataHandler::CheckAttachAndSimState(sptr<ApnHolder> &apnHolder)
     bool isSimStateReadyOrLoaded = IsSimStateReadyOrLoaded();
     TELEPHONY_LOGD("Slot%{public}d: attached: %{public}d simState: %{public}d isRilApnAttached: %{public}d",
         slotId_, attached, isSimStateReadyOrLoaded, isRilApnAttached_);
-    if (apnHolder->IsMmsType() && isSimStateReadyOrLoaded && !attached) {
+    if (apnHolder->IsMmsType() && isSimStateReadyOrLoaded) {
         if (!HasInnerEvent(CellularDataEventCode::MSG_RESUME_DATA_PERMITTED_TIMEOUT)) {
             SendEvent(CellularDataEventCode::MSG_RESUME_DATA_PERMITTED_TIMEOUT,
                 apnHolder->IsMmsType(), RESUME_DATA_PERMITTED_TIMEOUT);
         }
         SetDataPermittedForMms(true);
-        return false;
+        if (!attached) {
+            return false;
+        }
     }
     bool isEmergencyApn = apnHolder->IsEmergencyType();
     if (!isEmergencyApn && !attached) {
@@ -1294,41 +1306,6 @@ bool CellularDataHandler::IsSimRequestNetOnVSimEnabled(int32_t reqType, bool isM
         }
     }
     return false;
-}
-
-void CellularDataHandler::HandleMmsRequestOnVsimEnabled(int32_t reqType, bool isMmsType)
-{
-    if (!isMmsType || slotId_ == CELLULAR_DATA_VSIM_SLOT_ID) {
-        return;
-    }
-    if (TELEPHONY_EXT_WRAPPER.isVSimEnabled_ == nullptr || !TELEPHONY_EXT_WRAPPER.isVSimEnabled_() ||
-        TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_ == nullptr || TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_()) {
-        return;
-    }
-    if (reqType == TYPE_REQUEST_NET) {
-        SetDataPermittedForSlotId(slotId_);
-    } else {
-        SetDataPermittedForSlotId(CELLULAR_DATA_VSIM_SLOT_ID);
-    }
-}
- 
-void CellularDataHandler::SetDataPermittedForSlotId(const int32_t slotId)
-{
-    TELEPHONY_LOGI("SetDataPermittedForSlotId slotId %{public}d", slotId);
-    // For slotId=3 in TSTS mode, do not send SetDataPermitted to any slot
-    if (slotId == CELLDATA_SLOT_ID_3 && CellularDataUtils::IsTstsModeEnabled()) {
-        TELEPHONY_LOGI("TSTS mode, skip SetDataPermitted for slotId=3");
-        return;
-    }
-    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
-    int32_t count = coreInner.GetMaxSimCount();
-    for (auto id = 0; id < count; id++) {
-        if (id == CELLULAR_DATA_VSIM_SLOT_ID) {
-            continue;
-        }
-        SetDataPermitted(id, id == slotId);
-    }
-    SetDataPermitted(CELLULAR_DATA_VSIM_SLOT_ID, slotId == CELLULAR_DATA_VSIM_SLOT_ID);
 }
 
 // LCOV_EXCL_START
