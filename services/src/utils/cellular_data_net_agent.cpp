@@ -246,40 +246,5 @@ int32_t CellularDataNetAgent::GetSlotId(int32_t simId)
     }
     return -1;
 }
-
-int32_t CellularDataNetAgent::GetCellNetId(int32_t slotId)
-{
-    int32_t netId = -1;
-    int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
-    std::list<int32_t> netIdList;
-    // LCOV_EXCL_START
-    int32_t ret = NetConnClient::GetInstance().GetNetIdByIdentifier(IDENT_PREFIX + std::to_string(simId), netIdList);
-    if (ret != NETMANAGER_SUCCESS || netIdList.empty()) {
-        TELEPHONY_LOGE("Slot%{public}d GetNetIdByIdentifier err %{public}d", slotId, ret);
-        return netId;
-    }
-    std::list<sptr<NetManagerStandard::NetHandle>> netList;
-    ret = NetConnClient::GetInstance().GetAllNets(netList);
-    if (ret != NETMANAGER_SUCCESS) {
-        TELEPHONY_LOGE("Slot%{public}d GetAllNets err %{public}d", slotId, ret);
-        return netId;
-    }
-    for (sptr<NetManagerStandard::NetHandle> handle : netList) {
-        for (auto id : netIdList) {
-            if (id == handle->GetNetId()) {
-                netId = id;
-                return netId;
-            }
-        }
-    }
-    // LCOV_EXCL_STOP
-    return netId;
-}
- 
-void CellularDataNetAgent::NetDetection(int32_t netId)
-{
-    NetManagerStandard::NetHandle netHandle(netId);
-    (void)NetConnClient::GetInstance().NetDetection(netHandle);
-}
 } // namespace Telephony
 } // namespace OHOS
