@@ -1618,9 +1618,14 @@ void CellularDataHandler::HandleDefaultDataSubscriptionChanged()
     }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
+    bool isVirtualModemSlot = false;
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    isVirtualModemSlot =
+        TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_ && TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_(slotId_);
+#endif
     if (defSlotId == slotId_) {
         SendEvent(CellularDataEventCode::MSG_ESTABLISH_ALL_APNS_IF_CONNECTABLE);
-    } else {
+    } else if (!isVirtualModemSlot) {
         ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
     }
 }
@@ -2103,12 +2108,6 @@ void CellularDataHandler::SetDataPermitted(int32_t slotId, bool dataPermitted)
         TELEPHONY_LOGE("Slot%{public}d: maxSimCount is: %{public}d", slotId_, maxSimCount);
         return;
     }
-#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
-    if (TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_ && TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_(slotId)) {
-        TELEPHONY_LOGD("Slot%{public}d: dc slot dont need set", slotId);
-        return;
-    }
-#endif
     bool hasSimCard = false;
     CoreManagerInner::GetInstance().HasSimCard(slotId, hasSimCard);
     if (!hasSimCard && !IsVSimSlotId(slotId)) {
