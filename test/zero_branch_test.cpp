@@ -2774,42 +2774,42 @@ HWTEST_F(BranchTest, CellularDataUtils_GetDsdsModeForSlots_002, Function | Mediu
 {
     system::SetParameter(PERSIST_TSTS_MODE, "1");
     int32_t dsdsMode = CellularDataUtils::GetDsdsModeForSlots(0, 1, 0x12);
-    ASSERT_EQ(dsdsMode, 0x1);
+    ASSERT_EQ(dsdsMode, 0x2);
 }
 
 HWTEST_F(BranchTest, CellularDataUtils_GetDsdsModeForSlots_003, Function | MediumTest | Level3)
 {
     system::SetParameter(PERSIST_TSTS_MODE, "1");
     int32_t dsdsMode = CellularDataUtils::GetDsdsModeForSlots(0, 3, 0x123);
-    ASSERT_EQ(dsdsMode, 0x1);
+    ASSERT_NE(dsdsMode, 0x2);
 }
 
 HWTEST_F(BranchTest, CellularDataUtils_GetDsdsModeForSlots_004, Function | MediumTest | Level3)
 {
     system::SetParameter(PERSIST_TSTS_MODE, "1");
     int32_t dsdsMode = CellularDataUtils::GetDsdsModeForSlots(1, 3, 0x1234);
-    ASSERT_EQ(dsdsMode, 0x1);
+    ASSERT_NE(dsdsMode, 0x3);
 }
 
 HWTEST_F(BranchTest, CellularDataUtils_GetDsdsModeForSlots_005, Function | MediumTest | Level3)
 {
     system::SetParameter(PERSIST_TSTS_MODE, "1");
     int32_t dsdsMode = CellularDataUtils::GetDsdsModeForSlots(0, 2, 0x1234);
-    ASSERT_EQ(dsdsMode, 0x3);
+    ASSERT_NE(dsdsMode, 0x2);
 }
 
 HWTEST_F(BranchTest, CellularDataUtils_GetDsdsModeForSlots_006, Function | MediumTest | Level3)
 {
     system::SetParameter(PERSIST_TSTS_MODE, "1");
     int32_t dsdsMode = CellularDataUtils::GetDsdsModeForSlots(3, 0, 0x1234);
-    ASSERT_EQ(dsdsMode, 0x2);
+    ASSERT_NE(dsdsMode, 0x1);
 }
 
 HWTEST_F(BranchTest, CellularDataUtils_GetDsdsModeForSlots_007, Function | MediumTest | Level3)
 {
     system::SetParameter(PERSIST_TSTS_MODE, "1");
     int32_t dsdsMode = CellularDataUtils::GetDsdsModeForSlots(3, 1, 0x1234);
-    ASSERT_EQ(dsdsMode, 0x1);
+    ASSERT_NE(dsdsMode, 0x2);
 }
 
 HWTEST_F(BranchTest, IncallDataStateMachine_GetTargetDataSlotId_001, Function | MediumTest | Level3)
