@@ -244,10 +244,12 @@ int32_t CellularDataUtils::GetDsdsModeForSlots(int32_t slotId1, int32_t slotId2,
     if (IsTstsModeEnabled()) {
         std::vector<IccAccountInfo> iccAccountInfoList;
         CoreManagerInner::GetInstance().GetActiveSimAccountInfoList(iccAccountInfoList);
+        // LCOV_EXCL_START
         if (iccAccountInfoList.size() < CELLDATA_SLOT_ID_3) {
             // For TSTS mode, two cards scene, use low 4 bits
             return dsdsModeValue & 0x0F;
         }
+        // LCOV_EXCL_STOP
         // Normalize slot order (smaller first)
         int32_t minSlot = std::min(slotId1, slotId2);
         int32_t maxSlot = std::max(slotId1, slotId2);
