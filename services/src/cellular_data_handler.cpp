@@ -2103,6 +2103,12 @@ void CellularDataHandler::SetDataPermitted(int32_t slotId, bool dataPermitted)
         TELEPHONY_LOGE("Slot%{public}d: maxSimCount is: %{public}d", slotId_, maxSimCount);
         return;
     }
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    if (TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_ && TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_(slotId)) {
+        TELEPHONY_LOGD("Slot%{public}d: dc slot dont need set", slotId);
+        return;
+    }
+#endif
     bool hasSimCard = false;
     CoreManagerInner::GetInstance().HasSimCard(slotId, hasSimCard);
     if (!hasSimCard && !IsVSimSlotId(slotId)) {
