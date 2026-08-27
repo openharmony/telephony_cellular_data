@@ -1618,9 +1618,14 @@ void CellularDataHandler::HandleDefaultDataSubscriptionChanged()
     }
     CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
+    bool isVirtualModemSlot = false;
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    isVirtualModemSlot =
+        TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_ && TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_(slotId_);
+#endif
     if (defSlotId == slotId_) {
         SendEvent(CellularDataEventCode::MSG_ESTABLISH_ALL_APNS_IF_CONNECTABLE);
-    } else {
+    } else if (!isVirtualModemSlot) {
         ClearAllConnections(DisConnectionReason::REASON_CLEAR_CONNECTION);
     }
 }
