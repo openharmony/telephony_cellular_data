@@ -3079,7 +3079,8 @@ HWTEST_F(BranchTest, SetDataPermittedForMms_VSim_001, Function | MediumTest | Le
 #endif
 }
 
-bool MockIsVirtualModemSlot(int32_t slotId) {
+bool MockIsVirtualModemSlot(int32_t slotId)
+{
     return true;
 }
 
