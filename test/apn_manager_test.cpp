@@ -1700,5 +1700,44 @@ HWTEST_F(ApnManagerTest, ApnItem_GetPreferId_001, TestSize.Level0)
     bool ret = apnManager->GetPreferId(slotId, errMsg);
     EXPECT_FALSE(ret);
 }
+
+/**
+ * @tc.number   IsPreferIdChangedByMerge_001
+ * @tc.name     test preferIdChangedByMerge_ is false by default and true after merge matches preferId
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, IsPreferIdChangedByMerge_001, Function | MediumTest | Level1)
+{
+    EXPECT_FALSE(apnManager->IsPreferIdChangedByMerge());
+    apnManager->preferId_ = 100;
+    PdpProfile newProfile;
+    newProfile.profileId = 200;
+    newProfile.apnTypes = "default";
+    PdpProfile oldProfile;
+    oldProfile.profileId = 100;
+    oldProfile.apnTypes = "mms";
+    apnManager->MergePdpProfile(newProfile, oldProfile);
+    EXPECT_TRUE(apnManager->IsPreferIdChangedByMerge());
+    EXPECT_EQ(apnManager->preferId_, 200);
+}
+
+/**
+ * @tc.number   IsPreferIdChangedByMerge_002
+ * @tc.name     test preferIdChangedByMerge_ remains false when preferId does not match oldProfile
+ * @tc.desc     Function test
+ */
+HWTEST_F(ApnManagerTest, IsPreferIdChangedByMerge_002, Function | MediumTest | Level1)
+{
+    apnManager->preferId_ = 100;
+    PdpProfile newProfile;
+    newProfile.profileId = 200;
+    newProfile.apnTypes = "default";
+    PdpProfile oldProfile;
+    oldProfile.profileId = 300;
+    oldProfile.apnTypes = "mms";
+    apnManager->MergePdpProfile(newProfile, oldProfile);
+    EXPECT_FALSE(apnManager->IsPreferIdChangedByMerge());
+    EXPECT_EQ(apnManager->preferId_, 100);
+}
 } // namespace Telephony
 } // namespace OHOS

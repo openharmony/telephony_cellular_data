@@ -49,6 +49,7 @@ public:
     static int32_t FindApnTypeByApnName(const std::string &apnName);
     void ClearAllApnBad();
     static uint64_t FindCapabilityByApnId(int32_t apnId);
+    bool IsPreferIdChangedByMerge() const;
 
 private:
     void ReportApnInfo(int32_t slotId, PdpProfile &apnData);
@@ -71,6 +72,7 @@ private:
     std::vector<sptr<ApnHolder>> sortedApnHolders_;
     std::shared_mutex mutex_;
     int32_t preferId_ = -1;
+    bool preferIdChangedByMerge_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

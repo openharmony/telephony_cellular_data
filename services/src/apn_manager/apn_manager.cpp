@@ -329,6 +329,7 @@ int32_t ApnManager::CreateAllApnItemByDatabase(int32_t slotId, std::string &errM
     // LCOV_EXCL_STOP
     TELEPHONY_LOGI("current slotId = %{public}d, numeric = %{public}s", slotId, numeric.c_str());
     preferId_ = INVALID_PROFILE_ID;
+    preferIdChangedByMerge_ = false;
     if (!GetPreferId(slotId, errMsg)) {
         return count;
     }
@@ -692,6 +693,11 @@ void ApnManager::ClearAllApnBad()
     }
 }
 
+bool ApnManager::IsPreferIdChangedByMerge() const
+{
+    return preferIdChangedByMerge_;
+}
+
 void ApnManager::TryMergeSimilarPdpProfile(std::vector<PdpProfile> &apnVec)
 {
     // coalesce similar APNs to prevent bringing up two data calls with same interface
@@ -728,6 +734,7 @@ void ApnManager::MergePdpProfile(PdpProfile &newProfile, PdpProfile &oldProfile)
     if (preferId_ == oldProfile.profileId) {
         TELEPHONY_LOGI("preferId change from %{public}d to %{public}d", oldProfile.profileId, newProfile.profileId);
         preferId_ = newProfile.profileId;
+        preferIdChangedByMerge_ = true;
     }
     TELEPHONY_LOGI("merge %{public}d and %{public}d: apn[%{public}s], apnTypes[%{public}s]",
         newProfile.profileId, oldProfile.profileId, newProfile.apn.c_str(), newProfile.apnTypes.c_str());
