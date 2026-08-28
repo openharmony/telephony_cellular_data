@@ -1025,6 +1025,13 @@ void CellularDataHandler::UpdateApnInfo(const int32_t profileId)
         return;
     }
     if (profileIdValue != profileId) {
+        // LCOV_EXCL_START
+        if (apnManager_ != nullptr && !apnManager_->IsPreferIdChangedByMerge()) {
+            TELEPHONY_LOGI("preferId not changed by merge, skip UpdateApnInfo");
+            dataShareHelper->Release();
+            return;
+        }
+        // LCOV_EXCL_STOP
         DataShare::DataSharePredicates predicates;
         DataShare::DataShareValuesBucket values;
         double profileIdAsDouble = static_cast<double>(profileId);
