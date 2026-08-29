@@ -622,5 +622,17 @@ HWTEST_F(CellularDataHandlerBranchTest, CheckAttachAndSimState_001, Function | M
     cellularDataHandler_->CheckAttachAndSimState(apnHolder);
     EXPECT_FALSE(cellularDataHandler_->HasInnerEvent(CellularDataEventCode::MSG_RESUME_DATA_PERMITTED_TIMEOUT));
 }
+
+HWTEST_F(CellularDataHandlerBranchTest, IsCellularDataAllowedByExt_001, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
+    cellularDataHandler->Init();
+    EXPECT_FALSE(cellularDataHandler->IsCellularDataAllowedByExt());
+ 
+    cellularDataHandler.reset();
+    cellularDataHandler = std::make_shared<CellularDataHandler>(2);
+    cellularDataHandler->Init();
+    EXPECT_FALSE(cellularDataHandler->IsCellularDataAllowedByExt());
+}
 }  // namespace Telephony
 }  // namespace OHOS
