@@ -64,6 +64,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCellularData()
     InitTelephonyExtForCustomization();
     InitSendDataSwitchChangeInfo();
     InitIsDualCellularCardAllowed();
+    InitIsDistributedCellularAllowedForSlot();
     InitHandleDendFailcause();
     InitConvertPdpError();
     InitRestartRadioIfRequired();
@@ -153,6 +154,18 @@ void TelephonyExtWrapper::InitIsDualCellularCardAllowed()
         return;
     }
     TELEPHONY_LOGD("telephony ext wrapper init IsDualCellularCardAllowed success");
+}
+
+void TelephonyExtWrapper::InitIsDistributedCellularAllowedForSlot()
+{
+    isDistributedCellularAllowedForSlot_ = (IS_DISTRIBUTED_CELLULAR_ALLOWED_FOR_SLOT)dlsym(
+        telephonyExtWrapperHandle_, "IsDistributedCellularAllowedForSlot");
+    if (isDistributedCellularAllowedForSlot_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol IsDistributedCellularAllowedForSlot failed,\
+            error: %{public}s", dlerror());
+        return;
+    }
+    TELEPHONY_LOGD("telephony ext wrapper init IsDistributedCellularAllowedForSlot success");
 }
 
 void TelephonyExtWrapper::InitHandleDendFailcause()
