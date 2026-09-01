@@ -12,9 +12,12 @@
 // limitations under the License.
 
 use ani_rs::business_error::BusinessError;
+use ani_rs::objects::{AniObject, AniRef};
+use ani_rs::AniEnv;
 
 use crate::bridge;
 use crate::wrapper;
+use crate::context::Context;
 
 impl From<i32> for bridge::DataConnectState {
     fn from(value: i32) -> Self {
@@ -183,4 +186,18 @@ pub fn get_active_apn_name_sync() -> Result<String, BusinessError> {
         return Err(BusinessError::from(arkts_error));
     }
     Ok(ret)
+}
+
+#[ani_rs::native]
+pub fn show_system_apn_settings_sync(
+    env: &AniEnv,
+    context: AniRef,
+) -> Result<(), BusinessError> {
+    let context_obj = AniObject::from(context);
+    let context_wrapper = Context::new(env, &context_obj);
+    let arkts_error = wrapper::ffi::showSystemApnSettingsSync(context_wrapper.inner);
+    if arkts_error.is_error() {
+        return Err(BusinessError::from(arkts_error));
+    }
+    Ok(())
 }

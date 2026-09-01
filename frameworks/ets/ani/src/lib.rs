@@ -13,6 +13,7 @@
 
 mod bridge;
 mod cellulardata;
+mod context;
 mod wrapper;
 
 use ani_rs::ani_constructor;
@@ -35,5 +36,6 @@ ani_constructor!(
         "nativeQueryApnIds": cellulardata::query_apn_ids_sync,
         "nativeQueryAllApns": cellulardata::query_all_apns_sync,
         "nativeGetActiveApnName": cellulardata::get_active_apn_name_sync,
+        "nativeShowSystemApnSettings": cellulardata::show_system_apn_settings_sync,
     ]
 );

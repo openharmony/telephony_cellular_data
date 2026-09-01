@@ -15,6 +15,16 @@ use crate::bridge;
 use ani_rs::business_error::BusinessError;
 use ffi::ArktsError;
 
+#[repr(transparent)]
+pub struct AniEnv {
+    pub inner: ani_rs::AniEnv<'static>,
+}
+
+#[repr(transparent)]
+pub struct AniObject {
+    pub inner: ani_rs::objects::AniObject<'static>,
+}
+
 pub const TELEPHONY_SUCCESS: i32 = 8300000;
 
 impl From<ffi::ApnInfo> for bridge::ApnInfo {
@@ -83,6 +93,18 @@ pub mod ffi {
         fn queryApnIdsSync(info: &ApnInfo, ret: &mut Vec<u32>) -> ArktsError;
         fn queryAllApnsSync(ret: &mut Vec<ApnInfo>) -> ArktsError;
         fn getActiveApnNameSync(ret: &mut String) -> ArktsError;
+        fn showSystemApnSettingsSync(context: SharedPtr<Context>) -> ArktsError;
+
+        unsafe fn IsStageContext(env: *mut AniEnv, ani_object: *mut AniObject) -> bool;
+        unsafe fn GetStageModeContext(env: *mut *mut AniEnv, ani_object: *mut AniObject) -> SharedPtr<Context>;
+
+        #[namespace = "OHOS::AbilityRuntime"]
+        type Context;
+    }
+
+    extern "Rust" {
+        type AniEnv;
+        type AniObject;
     }
 }
 

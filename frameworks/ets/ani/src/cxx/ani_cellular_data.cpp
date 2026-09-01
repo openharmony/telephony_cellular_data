@@ -13,12 +13,18 @@
  * limitations under the License.
  */
 #include "ani_cellular_data.h"
+#include "ability_context.h"
+#include "ani_base_context.h"
 #include "cellular_data_client.h"
+#include "core_service_client.h"
 #include "cxx.h"
+#include "modal_ui_extension_config.h"
 #include "napi_util.h"
 #include "telephony_types.h"
+#include "ui_content.h"
+#include "ui_extension_context.h"
+#include "want.h"
 #include "wrapper.rs.h"
-#include "core_service_client.h"
 
 namespace OHOS {
 using namespace Telephony;
@@ -26,6 +32,17 @@ namespace CellularDataAni {
 static constexpr const char *SET_TELEPHONY_STATE = "ohos.permission.SET_TELEPHONY_STATE";
 static constexpr const char *GET_NETWORK_INFO = "ohos.permission.GET_NETWORK_INFO";
 static constexpr const char *MANAGE_APN_SETTING = "ohos.permission.MANAGE_APN_SETTING";
+
+static constexpr const char *SETTINGS_PACKAGE_NAME = "com.huawei.hmos.callsetting";
+static constexpr const char *SETTINGS_ABILITY_NAME = "GeneralCallSettingDialogAbility";
+static constexpr const char *UIEXTENSION_TYPE_KEY = "ability.want.params.uiExtensionType";
+static constexpr const char *UIEXTENSION_TYPE_VALUE = "sysDialog/common";
+static constexpr const char *DIALOG_REASON_KEY = "dialogReason";
+static constexpr const char *DIALOG_REASON_VALUE = "SYSTEM_APN_SETTINGS";
+static constexpr const char *SLOT_ID_KEY = "slotId";
+static constexpr const char *CONTEXT_TYPE_KEY = "storeKit.ability.contextType";
+static constexpr const char *UI_ABILITY_CONTEXT_VALUE = "uiAbility";
+static constexpr const char *UI_EXTENSION_CONTEXT_VALUE = "uiExtension";
 
 static bool IsCellularDataManagerInited()
 {
@@ -288,6 +305,134 @@ ArktsError getActiveApnNameSync(rust::String &apnName)
     }
     apnName = rust::string(apnNameStr);
     return ConvertArktsErrorWithPermission(errorCode, "GetActiveApnName", GET_NETWORK_INFO);
+}
+
+ModalUICallback::ModalUICallback(std::shared_ptr<AppBaseContext> baseContext)
+{
+    baseContext_ = baseContext;
+}
+
+OHOS::Ace::UIContent *GetUIContent(std::shared_ptr<AppBaseContext> &asyncContext)
+{
+    if (!asyncContext) {
+        return nullptr;
+    }
+    OHOS::Ace::UIContent *uiContent = nullptr;
+    if (asyncContext->abilityContext != nullptr) {
+        uiContent = asyncContext->abilityContext->GetUIContent();
+    } else if (asyncContext->uiExtensionContext != nullptr) {
+        uiContent = asyncContext->uiExtensionContext->GetUIContent();
+    }
+    return uiContent;
+}
+
+void ModalUICallback::CloseModalUI()
+{
+    auto uiContent = GetUIContent(baseContext_);
+    if (uiContent == nullptr) {
+        return;
+    }
+    uiContent->CloseModalUIExtension(sessionId_);
+}
+
+void ModalUICallback::OnRelease(int32_t releaseCode)
+{
+    CloseModalUI();
+}
+
+void ModalUICallback::SetSessionId(int32_t sessionId)
+{
+    sessionId_ = sessionId;
+}
+
+bool StartUiExtensionAbility(OHOS::AAFwk::Want &request, std::shared_ptr<AppBaseContext> &asyncContext)
+{
+    auto uiContent = GetUIContent(asyncContext);
+    if (uiContent == nullptr) {
+        return false;
+    }
+    auto callback = std::make_shared<ModalUICallback>(asyncContext);
+    OHOS::Ace::ModalUIExtensionCallbacks extensionCallbacks = {
+        std::bind(&ModalUICallback::OnRelease, callback, std::placeholders::_1)
+    };
+    OHOS::Ace::ModalUIExtensionConfig config;
+    config.isProhibitBack = false;
+    int32_t sessionId = uiContent->CreateModalUIExtension(request, extensionCallbacks, config);
+    if (sessionId == 0) {
+        return false;
+    }
+    callback->SetSessionId(sessionId);
+    return true;
+}
+
+bool ParseAbilityContext(std::shared_ptr<AbilityRuntime::Context> context,
+    std::shared_ptr<AbilityRuntime::AbilityContext> &abilityContext,
+    std::shared_ptr<AbilityRuntime::UIExtensionContext> &uiExtensionContext)
+{
+    if (context == nullptr) {
+        return false;
+    }
+    abilityContext = AbilityRuntime::Context::ConvertTo<AbilityRuntime::AbilityContext>(context);
+    if (abilityContext != nullptr) {
+        return true;
+    }
+    uiExtensionContext = AbilityRuntime::Context::ConvertTo<AbilityRuntime::UIExtensionContext>(context);
+    if (uiExtensionContext == nullptr) {
+        return false;
+    }
+    return true;
+}
+
+ArktsError showSystemApnSettingsSync(std::shared_ptr<AbilityRuntime::Context> context)
+{
+    auto loadProductContext = std::make_shared<AppBaseContext>();
+    if (!ParseAbilityContext(context, loadProductContext->abilityContext,
+                             loadProductContext->uiExtensionContext)) {
+        return ConvertArktsErrorWithPermission(
+            ERROR_PARAMETER_TYPE_INVALID, "ShowSystemApnSettings", MANAGE_APN_SETTING);
+    }
+    int32_t slotId = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
+    bool isSimActive = DelayedRefSingleton<CoreServiceClient>::GetInstance().IsSimActive(slotId);
+    if (!isSimActive) {
+        return ConvertArktsErrorWithPermission(TELEPHONY_ERR_NO_SIM_CARD, "ShowSystemApnSettings", MANAGE_APN_SETTING);
+    }
+    OHOS::AAFwk::Want want;
+    want.SetElementName(std::string(SETTINGS_PACKAGE_NAME), std::string(SETTINGS_ABILITY_NAME));
+    want.SetParam(std::string(UIEXTENSION_TYPE_KEY), std::string(UIEXTENSION_TYPE_VALUE));
+    want.SetParam(std::string(DIALOG_REASON_KEY), std::string(DIALOG_REASON_VALUE));
+    want.SetParam(std::string(SLOT_ID_KEY), slotId);
+    want.SetParam(std::string(CONTEXT_TYPE_KEY),
+        loadProductContext->uiExtensionContext != nullptr ?
+        std::string(UI_EXTENSION_CONTEXT_VALUE) : std::string(UI_ABILITY_CONTEXT_VALUE));
+
+    if (!StartUiExtensionAbility(want, loadProductContext)) {
+        return ConvertArktsErrorWithPermission(ERROR_SERVICE_UNAVAILABLE, "ShowSystemApnSettings", MANAGE_APN_SETTING);
+    }
+    return ConvertArktsErrorWithPermission(TELEPHONY_ERR_SUCCESS, "ShowSystemApnSettings", MANAGE_APN_SETTING);
+}
+
+bool IsStageContext(AniEnv *env, AniObject *obj)
+{
+    if (env == nullptr || obj == nullptr) {
+        return false;
+    }
+    ani_env *aniEnv = *reinterpret_cast<ani_env **>(env);
+    ani_boolean stageMode;
+    ani_status status = AbilityRuntime::IsStageContext(aniEnv,
+        *reinterpret_cast<ani_object *>(obj), stageMode);
+    if (status != ANI_OK) {
+        return false;
+    }
+    return stageMode == 1;
+}
+
+std::shared_ptr<AbilityRuntime::Context> GetStageModeContext(AniEnv **env, AniObject *obj)
+{
+    if (env == nullptr || *env == nullptr || obj == nullptr) {
+        return nullptr;
+    }
+    return AbilityRuntime::GetStageModeContext(reinterpret_cast<ani_env *>(*env),
+                                               *reinterpret_cast<ani_object *>(obj));
 }
 } // namespace CellularDataAni
 } // namespace OHOS
