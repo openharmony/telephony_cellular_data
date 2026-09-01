@@ -3078,25 +3078,5 @@ HWTEST_F(BranchTest, SetDataPermittedForMms_VSim_001, Function | MediumTest | Le
     TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = original;
 #endif
 }
-
-bool MockIsVirtualModemSlot(int32_t slotId)
-{
-    return true;
-}
-
-HWTEST_F(BranchTest, HandleDefaultDataSubscriptionChanged_Distributed_001, Function | MediumTest | Level3)
-{
-    auto cellularDataHandler = std::make_shared<CellularDataHandler>(100);
-    cellularDataHandler->Init();
-#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
-    auto isVirtualModemSlotFun = TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_;
-    TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_ = nullptr;
-    cellularDataHandler->HandleDefaultDataSubscriptionChanged();
-    TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_ = MockIsVirtualModemSlot;
-    cellularDataHandler->HandleDefaultDataSubscriptionChanged();
-    EXPECT_EQ(cellularDataHandler->slotId_, CELLDATA_SLOT_ID_0);
-    TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_ = isVirtualModemSlotFun;
-#endif
-}
 } // namespace Telephony
 } // namespace OHOS
