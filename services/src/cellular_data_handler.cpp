@@ -544,11 +544,12 @@ bool CellularDataHandler::CheckDataPermittedByDsds()
 
 bool CellularDataHandler::IsCellularDataAllowedByExt()
 {
+    // LCOV_EXCL_START
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     if (TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_ &&
         TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_(slotId_)) {
-        if (TELEPHONY_EXT_WRAPPER.isDistributedCellularAllowedForSlot_ &&
-            TELEPHONY_EXT_WRAPPER.isDistributedCellularAllowedForSlot_(slotId_)) {
+        if (TELEPHONY_EXT_WRAPPER.isDistributedCellularEnabledForSlot_ &&
+            TELEPHONY_EXT_WRAPPER.isDistributedCellularEnabledForSlot_(slotId_)) {
             return true;
         }
     } else {
@@ -560,6 +561,7 @@ bool CellularDataHandler::IsCellularDataAllowedByExt()
     }
 #endif
     return false;
+    // LCOV_EXCL_STOP
 }
 
 bool CellularDataHandler::CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder)
@@ -585,9 +587,11 @@ bool CellularDataHandler::CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder)
         TELEPHONY_LOGE("slot%{public}d, VSimEnabled & not mms type, ret false", slotId_);
         return false;
     }
+    // LCOV_EXCL_START
     if (IsCellularDataAllowedByExt()) {
         return true;
     }
+    // LCOV_EXCL_STOP
 #endif
 
     if (defSlotId != slotId_ && !apnType.compare(DATA_CONTEXT_ROLE_DEFAULT)) {
