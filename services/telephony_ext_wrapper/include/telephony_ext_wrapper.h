@@ -41,6 +41,7 @@ public:
     /* add for vsim end */
     typedef void (*SEND_DATA_SWITCH_CHANGE_INFO)(const char*, int32_t, bool);
     typedef bool (*IS_DUAL_CELLULAR_CARD_ALLOWED)();
+    typedef bool (*IS_DISTRIBUTED_CELLULAR_ENABLED_FOR_SLOT)(int32_t);
     typedef int64_t (*HANDLE_DEND_FAILCAUSE)(int32_t, int64_t);
     typedef int32_t (*CONVERT_PDP_ERROR)(int32_t);
     typedef void (*RESTART_RADIO_IF_RQUIRED)(int32_t, int32_t);
@@ -65,6 +66,7 @@ public:
     IS_VSIM_IN_DISABLE_PROCESS isVSimInDisableProcess_ = nullptr;
     SEND_DATA_SWITCH_CHANGE_INFO sendDataSwitchChangeInfo_ = nullptr;
     IS_DUAL_CELLULAR_CARD_ALLOWED isDualCellularCardAllowed_ = nullptr;
+    IS_DISTRIBUTED_CELLULAR_ENABLED_FOR_SLOT isDistributedCellularEnabledForSlot_ = nullptr;
     GET_USER_DATA_ROAMING_EXPEND getUserDataRoamingExpend_ = nullptr;
     SEND_APN_NEED_RETRY_INFO sendApnNeedRetryInfo_ = nullptr;
     HANDLE_DEND_FAILCAUSE handleDendFailcause_ = nullptr;
@@ -91,6 +93,7 @@ private:
     void InitTelephonyExtWrapperForVSim();
     void InitSendDataSwitchChangeInfo();
     void InitIsDualCellularCardAllowed();
+    void InitIsDistributedCellularEnabledForSlot();
     void InitHandleDendFailcause();
     void InitConvertPdpError();
     void InitRestartRadioIfRequired();
