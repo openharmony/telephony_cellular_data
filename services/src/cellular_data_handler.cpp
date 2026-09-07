@@ -1611,7 +1611,11 @@ void CellularDataHandler::HandleDefaultDataSubscriptionChanged()
 {
     TELEPHONY_LOGI("Slot%{public}d", slotId_);
     // For slotId=3 in TSTS mode, do not send SetDataPermitted
-    if (slotId_ == CELLDATA_SLOT_ID_3 && CellularDataUtils::IsTstsModeEnabled()) {
+    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
+    const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
+    if (defSlotId >= DISTRIBUTED_MULTI_DEVICE_SLOTID_START) {
+        TELEPHONY_LOGI("default slot is distributed, skip SetDataPermitted");
+    } else if (slotId_ == CELLDATA_SLOT_ID_3 && CellularDataUtils::IsTstsModeEnabled()) {
         TELEPHONY_LOGI("TSTS mode, skip SetDataPermitted for slotId=3");
     } else {
         if (CheckDataPermittedByDsds()) {
@@ -1623,8 +1627,6 @@ void CellularDataHandler::HandleDefaultDataSubscriptionChanged()
     if (dataSwitchSettings_ != nullptr) {
         dataSwitchSettings_->LoadSwitchValue();
     }
-    CoreManagerInner &coreInner = CoreManagerInner::GetInstance();
-    const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     bool isVirtualModemSlot = false;
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     isVirtualModemSlot =

@@ -367,6 +367,7 @@ static const int32_t APN_CREATE_RETRY_TIMES = 30;
 static const int32_t RETRY_DELAY_TIME = 5 * 1000;
 static const int32_t LOAD_RETRY_DELAY_TIME = 10 * 1000;
 static const int8_t LOAD_RETRY_TIMES = 3;
+static const int32_t DISTRIBUTED_MULTI_DEVICE_SLOTID_START = 4;
 } // namespace Telephony
 } // namespace OHOS
 #endif // CELLULAR_DATA_CONSTANT_H
