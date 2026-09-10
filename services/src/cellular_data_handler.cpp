@@ -1637,7 +1637,8 @@ void CellularDataHandler::HandleDefaultDataSubscriptionChanged()
     const int32_t defSlotId = coreInner.GetDefaultCellularDataSlotId();
     if (defSlotId >= DISTRIBUTED_MULTI_DEVICE_SLOTID_START) {
         TELEPHONY_LOGI("default slot is distributed, skip SetDataPermitted");
-    } else if (slotId_ == CELLDATA_SLOT_ID_3 && CellularDataUtils::IsTstsModeEnabled()) {
+    } else if ((slotId_ == CELLDATA_SLOT_ID_3 && CellularDataUtils::IsTstsModeEnabled()) ||
+        (slotId_ == CELLDATA_SLOT_ID_2)) {
         TELEPHONY_LOGI("TSTS mode, skip SetDataPermitted for slotId=3");
     } else {
         if (CheckDataPermittedByDsds()) {
