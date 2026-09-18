@@ -45,6 +45,14 @@ ohos_static_library("cellular_data_ani_cxx") {
     "$SUBSYSTEM_DIR/cellular_data/frameworks/native:tel_cellular_data_api",
   ]
   external_deps = [
+    "ability_base:want",
+    "ability_runtime:ability_manager",
+    "ability_runtime:ability_context_native",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:ani_base_context",
+    "ability_runtime:ani_common",
+    "ability_runtime:ui_extension",
+    "ace_engine:ace_uicontent",
     "c_utils:utils",
     "core_service:libtel_common",
     "core_service:tel_core_service_api",

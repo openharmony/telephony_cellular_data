@@ -15,6 +15,7 @@
 
 import { BusinessError } from '@ohos.base'
 import type { AsyncCallback } from '@ohos.base';
+import type Context from 'application.Context';
 
 export default namespace data {
   loadLibrary("cellular_data_ani")
@@ -382,5 +383,18 @@ export default namespace data {
   export native function nativeGetDefaultCellularDataSimId(): int;
   export function getDefaultCellularDataSimId(): int {
     return nativeGetDefaultCellularDataSimId();
+  }
+
+  export native function nativeShowSystemApnSettings(context: Context): void;
+  export function showSystemApnSettings(context: Context): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        taskpool.execute((): void => {
+        return nativeShowSystemApnSettings(context);
+      }).then(() => {
+        resolve(undefined);
+      }, (err: Error): void => {
+        reject(err as BusinessError);
+      });
+    });
   }
 }
