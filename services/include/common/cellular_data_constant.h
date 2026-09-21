@@ -264,6 +264,8 @@ static constexpr const char *CELLULAR_DATA_SETTING_INTELLIGENCE_SWITCH_URI =
 static constexpr const char *CELLULAR_DATA_SETTING_INTELLIGENCE_NETWORK_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?"
     "Proxy=true&key=intelligence_network_switching";
+static constexpr const char *CELLULAR_DATA_SETTING_BACKUP_SIM_LIST_URI =
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=backup_sim_list";
 static constexpr const char *CELLULAR_DATA_AIRPLANE_MODE_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=airplane_mode";
 static const int32_t DEFAULT_NET_STATISTICS_PERIOD = 3 * 1000;
@@ -350,6 +352,8 @@ static constexpr const char *INTELLIGENCE_NETWORK_COLUMN_ENABLE = "intelligence_
 static constexpr const char *CELLULAR_DATA_COLUMN_AIRPLANE = "settings.telephony.airplanemode";
 static constexpr const char *CELLULAR_DATA_COLUMN_KEYWORD = "KEYWORD";
 static constexpr const char *CELLULAR_DATA_COLUMN_VALUE = "VALUE";
+static constexpr const char *BACKUP_SIM_LIST_COLUMN_ENABLE = "backup_sim_list";
+static const int32_t VALID_MIN_BACKUP_NUM = 2;
 static const int32_t INVALID_SIM_ID = 0;
 static const int32_t INVALID_SLOT_ID = -1;
 static const int32_t CELLDATA_SLOT_ID_0 = 0;

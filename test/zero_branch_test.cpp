@@ -2867,6 +2867,29 @@ HWTEST_F(BranchTest, IncallDataStateMachine_GetTargetDataSlotId_005, Function | 
     ASSERT_EQ(targetSlotId, CELLDATA_SLOT_ID_0);
 }
 
+HWTEST_F(BranchTest, IncallDataStateMachine_SetPrimarySlot_001, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "1");
+    auto handler = std::make_shared<StateMachineTest>();
+    auto stateMachine = std::make_shared<IncallDataStateMachine>();
+    sptr<ApnManager> apnManager = nullptr;
+    stateMachine->Init(0, CELLDATA_SLOT_ID_3, handler, apnManager);
+    int32_t targetSlotId = stateMachine->GetTargetDataSlotId(CELLDATA_SLOT_ID_0);
+    stateMachine->SetPrimarySlot(targetSlotId);
+    ASSERT_TRUE(true);
+}
+
+HWTEST_F(BranchTest, IncallDataStateMachine_SetPrimarySlot_002, Function | MediumTest | Level3)
+{
+    system::SetParameter(PERSIST_TSTS_MODE, "0");
+    auto handler = std::make_shared<StateMachineTest>();
+    auto stateMachine = std::make_shared<IncallDataStateMachine>();
+    sptr<ApnManager> apnManager = nullptr;
+    stateMachine->Init(0, CELLDATA_SLOT_ID_0, handler, apnManager);
+    stateMachine->SetPrimarySlot(CELLDATA_SLOT_ID_1);
+    ASSERT_TRUE(true);
+}
+
 HWTEST_F(BranchTest, CellularDataUtils_GetDsdsModeForSlots_008, Function | MediumTest | Level3)
 {
     system::SetParameter(PERSIST_TSTS_MODE, "1");

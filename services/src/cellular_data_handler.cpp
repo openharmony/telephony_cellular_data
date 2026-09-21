@@ -967,6 +967,7 @@ void CellularDataHandler::DataConnCompleteUpdateState(const sptr<ApnHolder> &apn
     if (connectionManager_ != nullptr) {
         connectionManager_->StartStallDetectionTimer();
         connectionManager_->BeginNetStatistics();
+        TELEPHONY_LOGI("BeginNetStatistics");
     }
     if (!physicalConnectionActiveState_) {
         physicalConnectionActiveState_ = true;

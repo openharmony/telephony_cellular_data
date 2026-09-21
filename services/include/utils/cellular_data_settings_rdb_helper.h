@@ -50,6 +50,7 @@ public:
      */
     void NotifyChange(const Uri &uri);
     int32_t GetValue(Uri &uri, const std::string &column, int32_t &value);
+    int32_t GetValue(Uri &uri, const std::string &column, std::string &value);
     int32_t PutValue(Uri &uri, const std::string &column, int value);
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper();
 };
