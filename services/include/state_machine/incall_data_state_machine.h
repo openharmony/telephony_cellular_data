@@ -51,6 +51,8 @@ private:
     bool IsSecondaryCanActiveData();
     bool CanActiveDataByRadioTech();
     int32_t GetTargetDataSlotId(int32_t defSlotId);
+    void SetPrimarySlot(int32_t targetSlotId);
+    bool CheckBackupNetworkIfAllow(int32_t targetSlotId);
 
 private:
     friend class IdleState;

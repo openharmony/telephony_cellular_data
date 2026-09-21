@@ -19,9 +19,78 @@
 #include "cellular_data_settings_rdb_helper.h"
 #include "cellular_data_utils.h"
 #include "core_manager_inner.h"
+#include "radio_event.h"
+#include "sim_state_type.h"
+
+#include <sstream>
+#include <vector>
 
 namespace OHOS {
 namespace Telephony {
+
+namespace {
+struct BackupCardInfo {
+    uint32_t slotId;
+    uint32_t simLabelIndex;
+    bool isEsim;
+};
+
+void ParseSingleBackupCardInfo(const std::string &cardInfoStr, std::vector<BackupCardInfo> &cardInfos)
+{
+    std::istringstream iss(cardInfoStr);
+    std::string token;
+    BackupCardInfo card = {};
+    int32_t value = 0;
+    if (!std::getline(iss, token, ',')) {
+        return;
+    }
+    if (!CellularDataUtils::ConvertStrToInt(token, value) || value < 0) {
+        return;
+    }
+    card.slotId = static_cast<uint32_t>(value);
+    if (!std::getline(iss, token, ',')) {
+        return;
+    }
+    if (!CellularDataUtils::ConvertStrToInt(token, value) || value < 0) {
+        return;
+    }
+    card.simLabelIndex = static_cast<uint32_t>(value);
+    if (!std::getline(iss, token, ',')) {
+        return;
+    }
+    card.isEsim = (token == "1");
+    cardInfos.push_back(card);
+}
+
+void ParseBackupCardInfos(const std::string &cardString, std::vector<BackupCardInfo> &cardInfos)
+{
+    size_t start = 0;
+    size_t end = cardString.find(';');
+    while (end != std::string::npos) {
+        std::string cardInfoStr = cardString.substr(start, end - start);
+        ParseSingleBackupCardInfo(cardInfoStr, cardInfos);
+        start = end + 1;
+        end = cardString.find(';', start);
+    }
+    if (start < cardString.size()) {
+        std::string cardInfoStr = cardString.substr(start);
+        ParseSingleBackupCardInfo(cardInfoStr, cardInfos);
+    }
+}
+
+bool CheckIfBackupNetwork(int32_t slotId, const std::vector<BackupCardInfo> &cardInfos)
+{
+    SimLabel simLabel;
+    CoreManagerInner::GetInstance().GetSimLabel(slotId, simLabel);
+    for (const auto &cardInfo : cardInfos) {
+        if (static_cast<int32_t>(cardInfo.simLabelIndex) == simLabel.index &&
+            cardInfo.isEsim == (simLabel.simType == SimType::ESIM)) {
+            return true;
+        }
+    }
+    return false;
+}
+}
 
 int32_t IncallDataStateMachine::GetTargetDataSlotId(int32_t defSlotId)
 {
@@ -32,6 +101,37 @@ int32_t IncallDataStateMachine::GetTargetDataSlotId(int32_t defSlotId)
     }
     // 其他副卡，保持原有逻辑，激活自己的数据
     return slotId_;
+}
+
+void IncallDataStateMachine::SetPrimarySlot(int32_t targetSlotId)
+{
+    if (slotId_ == CELLDATA_SLOT_ID_3 && CellularDataUtils::IsTstsModeEnabled()) {
+        TELEPHONY_LOGI("Slot%{public}d: TSTS mode, set primary slot to %{public}d", slotId_, targetSlotId);
+        CoreManagerInner::GetInstance().SetPrimarySlot(targetSlotId, RADIO_SIM_SET_PRIMARY_SLOT, nullptr);
+    }
+}
+
+bool IncallDataStateMachine::CheckBackupNetworkIfAllow(int32_t targetSlotId)
+{
+    std::string backupNetworkResult;
+    Uri backupSimListUri(CELLULAR_DATA_SETTING_BACKUP_SIM_LIST_URI);
+    std::shared_ptr<CellularDataSettingsRdbHelper> settingHelper = CellularDataSettingsRdbHelper::GetInstance();
+    if (settingHelper == nullptr ||
+        settingHelper->GetValue(
+            backupSimListUri, BACKUP_SIM_LIST_COLUMN_ENABLE, backupNetworkResult) != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Slot%{public}d: backup sim list not configured", slotId_);
+        return true;
+    }
+    std::vector<BackupCardInfo> cardInfos;
+    ParseBackupCardInfos(backupNetworkResult, cardInfos);
+    if (cardInfos.size() < static_cast<size_t>(VALID_MIN_BACKUP_NUM)) {
+        TELEPHONY_LOGE("Slot%{public}d: invalid backup network num", slotId_);
+        return true;
+    }
+    bool result = CheckIfBackupNetwork(targetSlotId, cardInfos);
+    TELEPHONY_LOGI("Slot%{public}d: target slot %{public}d backup network if allow %{public}d",
+        slotId_, targetSlotId, result);
+    return result;
 }
 
 void IncallDataStateMachine::UpdateCallState(int32_t state)
@@ -260,9 +360,15 @@ bool IdleState::ProcessCallStarted(const AppExecFwk::InnerEvent::Pointer &event)
         int32_t defaultSlotId = CoreManagerInner::GetInstance().GetDefaultCellularDataSlotId();
         // LCOV_EXCL_START
         int32_t targetSlotId = stateMachine->GetTargetDataSlotId(defaultSlotId);
+        if (defaultSlotId != targetSlotId && !stateMachine->CheckBackupNetworkIfAllow(targetSlotId)) {
+            TELEPHONY_LOGI("Slot%{public}d: target slot %{public}d not allowed to switch",
+                stateMachine->GetSlotId(), targetSlotId);
+            return PROCESSED;
+        }
         if (defaultSlotId != targetSlotId) {
             stateMachine->TransitionTo(stateMachine->activatingSecondaryState_);
             CoreManagerInner::GetInstance().SetDefaultCellularDataSlotId(targetSlotId);
+            stateMachine->SetPrimarySlot(targetSlotId);
         }
         // LCOV_EXCL_STOP
     }
@@ -307,6 +413,7 @@ bool IdleState::ProcessSettingsOn(const AppExecFwk::InnerEvent::Pointer &event)
         if (defaultSlotId != targetSlotId) {
             stateMachine->TransitionTo(stateMachine->activatingSecondaryState_);
             CoreManagerInner::GetInstance().SetDefaultCellularDataSlotId(targetSlotId);
+            stateMachine->SetPrimarySlot(targetSlotId);
         }
         // LCOV_EXCL_STOP
     }
@@ -328,6 +435,7 @@ bool IdleState::ProcessDsdsChanged(const AppExecFwk::InnerEvent::Pointer &event)
         if (defaultSlotId != targetSlotId) {
             stateMachine->TransitionTo(stateMachine->activatingSecondaryState_);
             CoreManagerInner::GetInstance().SetDefaultCellularDataSlotId(targetSlotId);
+            stateMachine->SetPrimarySlot(targetSlotId);
         }
         // LCOV_EXCL_STOP
     }
@@ -495,6 +603,7 @@ void DeactivatingSecondaryState::StateBegin()
     CoreManagerInner::GetInstance().GetPrimarySlotId(primarySlotId);
     if (defaultSlotId != primarySlotId) {
         CoreManagerInner::GetInstance().SetDefaultCellularDataSlotId(primarySlotId);
+        stateMachine->SetPrimarySlot(primarySlotId);
     } else {
         stateMachine->TransitionTo(stateMachine->idleState_);
     }

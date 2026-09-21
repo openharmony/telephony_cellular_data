@@ -127,6 +127,33 @@ int32_t CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &col
     return TELEPHONY_ERR_SUCCESS;
 }
 
+int32_t CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &column, std::string &value)
+{
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
+    if (settingHelper == nullptr) {
+        TELEPHONY_LOGE("helper_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    DataShare::DataSharePredicates predicates;
+    std::vector<std::string> columns;
+    predicates.EqualTo(CELLULAR_DATA_COLUMN_KEYWORD, column);
+    auto result = settingHelper->Query(uri, predicates, columns);
+    if (result == nullptr) {
+        TELEPHONY_LOGE("setting DB: query error");
+        settingHelper->Release();
+        return TELEPHONY_ERR_DATABASE_READ_FAIL;
+    }
+    result->GoToFirstRow();
+    int32_t columnIndex;
+    if (result->GetColumnIndex(CELLULAR_DATA_COLUMN_VALUE, columnIndex) == DataShare::E_OK) {
+        result->GetString(columnIndex, value);
+    }
+    result->Close();
+    settingHelper->Release();
+    TELEPHONY_LOGD("Query end resultValue is %{public}s", value.c_str());
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 int32_t CellularDataSettingsRdbHelper::PutValue(Uri &uri, const std::string &column, int value)
 {
     std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
