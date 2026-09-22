@@ -525,7 +525,8 @@ bool CellularDataHandler::SetDataPermittedForMms(bool dataPermittedForMms)
 bool CellularDataHandler::CheckDataPermittedByDsds()
 {
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
-    if (TELEPHONY_EXT_WRAPPER.isVSimEnabled_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_()) {
+    if (TELEPHONY_EXT_WRAPPER.isVSimEnabled_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_() &&
+        TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_ && !TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_()) {
         return (slotId_ == CELLULAR_DATA_VSIM_SLOT_ID);
     }
 #endif

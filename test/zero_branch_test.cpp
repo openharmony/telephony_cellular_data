@@ -3061,16 +3061,29 @@ bool MockIsVSimEnabled()
     return true;
 }
 
+bool MockIsVSimInDisableProcessFalse()
+{
+    return false;
+}
+
+bool MockIsVSimInDisableProcessTrue()
+{
+    return true;
+}
+
 HWTEST_F(BranchTest, CheckDataPermittedByDsds_VSim_001, Function | MediumTest | Level3)
 {
     auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLULAR_DATA_VSIM_SLOT_ID);
     cellularDataHandler->Init();
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
-    auto original = TELEPHONY_EXT_WRAPPER.isVSimEnabled_;
+    auto originalEnabled = TELEPHONY_EXT_WRAPPER.isVSimEnabled_;
+    auto originalDisable = TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_;
     TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = MockIsVSimEnabled;
+    TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_ = MockIsVSimInDisableProcessFalse;
     bool result = cellularDataHandler->CheckDataPermittedByDsds();
     ASSERT_TRUE(result);
-    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = original;
+    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = originalEnabled;
+    TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_ = originalDisable;
 #endif
 }
 
@@ -3079,11 +3092,46 @@ HWTEST_F(BranchTest, CheckDataPermittedByDsds_VSim_002, Function | MediumTest | 
     auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLDATA_SLOT_ID_0);
     cellularDataHandler->Init();
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
-    auto original = TELEPHONY_EXT_WRAPPER.isVSimEnabled_;
+    auto originalEnabled = TELEPHONY_EXT_WRAPPER.isVSimEnabled_;
+    auto originalDisable = TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_;
     TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = MockIsVSimEnabled;
+    TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_ = MockIsVSimInDisableProcessFalse;
     bool result = cellularDataHandler->CheckDataPermittedByDsds();
     ASSERT_FALSE(result);
-    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = original;
+    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = originalEnabled;
+    TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_ = originalDisable;
+#endif
+}
+
+HWTEST_F(BranchTest, CheckDataPermittedByDsds_VSim_003, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLDATA_SLOT_ID_0);
+    cellularDataHandler->Init();
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    auto originalEnabled = TELEPHONY_EXT_WRAPPER.isVSimEnabled_;
+    auto originalDisable = TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_;
+    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = MockIsVSimEnabled;
+    TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_ = MockIsVSimInDisableProcessTrue;
+    bool result = cellularDataHandler->CheckDataPermittedByDsds();
+    ASSERT_TRUE(result);
+    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = originalEnabled;
+    TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_ = originalDisable;
+#endif
+}
+
+HWTEST_F(BranchTest, CheckDataPermittedByDsds_VSim_004, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLULAR_DATA_VSIM_SLOT_ID);
+    cellularDataHandler->Init();
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    auto originalEnabled = TELEPHONY_EXT_WRAPPER.isVSimEnabled_;
+    auto originalDisable = TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_;
+    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = MockIsVSimEnabled;
+    TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_ = MockIsVSimInDisableProcessTrue;
+    bool result = cellularDataHandler->CheckDataPermittedByDsds();
+    ASSERT_FALSE(result);
+    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = originalEnabled;
+    TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_ = originalDisable;
 #endif
 }
 
@@ -3092,13 +3140,16 @@ HWTEST_F(BranchTest, SetDataPermittedForMms_VSim_001, Function | MediumTest | Le
     auto cellularDataHandler = std::make_shared<CellularDataHandler>(CELLDATA_SLOT_ID_0);
     cellularDataHandler->Init();
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
-    auto original = TELEPHONY_EXT_WRAPPER.isVSimEnabled_;
+    auto originalEnabled = TELEPHONY_EXT_WRAPPER.isVSimEnabled_;
+    auto originalDisable = TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_;
     TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = MockIsVSimEnabled;
+    TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_ = MockIsVSimInDisableProcessFalse;
     bool result = cellularDataHandler->SetDataPermittedForMms(true);
     ASSERT_TRUE(result);
     result = cellularDataHandler->SetDataPermittedForMms(false);
     ASSERT_TRUE(result);
-    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = original;
+    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = originalEnabled;
+    TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_ = originalDisable;
 #endif
 }
 
