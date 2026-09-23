@@ -164,6 +164,26 @@ int32_t CellularDataClient::GetDefaultCellularDataSlotId()
     return defaultCellularDataSlotId_;
 }
 
+int32_t CellularDataClient::GetDefaultCellularDataSlotIdFromProxy()
+{
+    sptr<ICellularDataManager> proxy = GetProxy();
+    // LCOV_EXCL_START
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return -1;
+    }
+    // LCOV_EXCL_STOP
+    int32_t slotId;
+    int32_t ret = proxy->GetDefaultCellularDataSlotId(slotId);
+    // LCOV_EXCL_START
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("GetDefaultCellularDataSlotId IPC error, %{public}d", ret);
+        return -1;
+    }
+    // LCOV_EXCL_STOP
+    return slotId;
+}
+
 int32_t CellularDataClient::GetDefaultCellularDataSimId(int32_t &simId)
 {
     RegisterSimAccountCallback();

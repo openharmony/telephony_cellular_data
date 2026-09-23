@@ -111,6 +111,13 @@ public:
     int32_t GetDefaultCellularDataSlotId();
 
     /**
+     * @brief Get the slotId that uses the data traffic by default
+     *
+     * @return Returns the default traffic card from proxy
+     */
+    int32_t GetDefaultCellularDataSlotIdFromProxy();
+
+    /**
      * Get the simId that uses the data traffic by default
      *
      * @param simId Returns default settings data sim id
