@@ -19,6 +19,7 @@
 #include <singleton.h>
 
 #include "datashare_helper.h"
+#include "ffrt.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
@@ -53,6 +54,11 @@ public:
     int32_t GetValue(Uri &uri, const std::string &column, std::string &value);
     int32_t PutValue(Uri &uri, const std::string &column, int value);
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper();
+    void ReleaseSettingsHelper();
+ 
+private:
+    std::shared_ptr<DataShare::DataShareHelper> settingsHelper_ = nullptr;
+    ffrt::mutex settingsHelperMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

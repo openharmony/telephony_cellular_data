@@ -2146,6 +2146,73 @@ HWTEST_F(BranchTest, CellularDataSettingsRdbHelper_Test_01, Function | MediumTes
 }
 
 /**
+ * @tc.number   CellularDataSettingsRdbHelper_Test_02
+ * @tc.name     test dataShareHelper cache hit and release branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, CellularDataSettingsRdbHelper_Test_02, Function | MediumTest | Level3)
+{
+    auto settingHelper = CellularDataSettingsRdbHelper::GetInstance();
+    if (settingHelper == nullptr) {
+        TELEPHONY_LOGE("settingHelper is null");
+        return;
+    }
+    // create success then cache hit: the second call returns the same instance
+    std::shared_ptr<DataShare::DataShareHelper> helper = nullptr;
+    helper = settingHelper->CreateDataShareHelper();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("CreateDataShareHelper fail on device");
+        return;
+    }
+    EXPECT_EQ(settingHelper->CreateDataShareHelper(), helper);
+    EXPECT_NE(settingHelper->settingsHelper_, nullptr);
+    // release cached helper: release path and nullptr early-return path
+    settingHelper->ReleaseSettingsHelper();
+    EXPECT_EQ(settingHelper->settingsHelper_, nullptr);
+    settingHelper->ReleaseSettingsHelper();
+    EXPECT_EQ(settingHelper->settingsHelper_, nullptr);
+    // cache is empty, create again through the E_OK path
+    EXPECT_NE(settingHelper->CreateDataShareHelper(), nullptr);
+    EXPECT_NE(settingHelper->settingsHelper_, nullptr);
+    settingHelper->ReleaseSettingsHelper();
+}
+ 
+/**
+ * @tc.number   CellularDataSettingsRdbHelper_Test_03
+ * @tc.name     test destructor release branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, CellularDataSettingsRdbHelper_Test_03, Function | MediumTest | Level3)
+{
+    auto settingHelper = CellularDataSettingsRdbHelper::GetInstance();
+    EXPECT_NE(settingHelper, nullptr);
+    // trigger destructor, which releases the cached helper
+    CellularDataSettingsRdbHelper::DestroyInstance();
+    settingHelper = CellularDataSettingsRdbHelper::GetInstance();
+    EXPECT_NE(settingHelper, nullptr);
+    settingHelper->ReleaseSettingsHelper();
+}
+ 
+/**
+ * @tc.number   CreatorDataShareHelper_Test_01
+ * @tc.name     test CreatorDataShareHelper with new Create interface
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, CreatorDataShareHelper_Test_01, Function | MediumTest | Level3)
+{
+    auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
+    EXPECT_NE(cellularDataHandler, nullptr);
+    std::shared_ptr<DataShare::DataShareHelper> helper = nullptr;
+    helper = cellularDataHandler->CreatorDataShareHelper();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("CreatorDataShareHelper fail on device");
+        return;
+    }
+    EXPECT_NE(helper, nullptr);
+    helper->Release();
+}
+
+/**
  * @tc.number   FindBestCapability_Test_01
  * @tc.name     test branch
  * @tc.desc     Function test

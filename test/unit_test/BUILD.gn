@@ -39,6 +39,7 @@ ohos_executable("tel_cellular_data_ui_test") {
     "core_service:libtel_common",
     "core_service:tel_core_service_api",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
