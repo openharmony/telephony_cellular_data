@@ -26,10 +26,18 @@ static constexpr const int32_t E_ERROR = -1;
 
 CellularDataSettingsRdbHelper::CellularDataSettingsRdbHelper() {}
 
-CellularDataSettingsRdbHelper::~CellularDataSettingsRdbHelper() {}
+CellularDataSettingsRdbHelper::~CellularDataSettingsRdbHelper()
+{
+    ReleaseSettingsHelper();
+}
 
 std::shared_ptr<DataShare::DataShareHelper> CellularDataSettingsRdbHelper::CreateDataShareHelper()
 {
+    std::lock_guard<ffrt::mutex> lockGuard(settingsHelperMutex_);
+    if (settingsHelper_ != nullptr) {
+        return settingsHelper_;
+    }
+    // LCOV_EXCL_START
     sptr<ISystemAbilityManager> saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (saManager == nullptr) {
         TELEPHONY_LOGE("CellularDataRdbHelper GetSystemAbilityManager failed.");
@@ -48,7 +56,8 @@ std::shared_ptr<DataShare::DataShareHelper> CellularDataSettingsRdbHelper::Creat
     auto [ret, helper] =
         DataShare::DataShareHelper::Create(remoteObj, CELLULAR_DATA_SETTING_URI, CELLULAR_DATA_SETTING_EXT_URI);
     if (ret == DataShare::E_OK) {
-        return helper;
+        settingsHelper_ = helper;
+        return settingsHelper_;
     } else if (ret == DataShare::E_DATA_SHARE_NOT_READY) {
         TELEPHONY_LOGE("CellularDataRdbHelper: datashare not ready.");
         return nullptr;
@@ -56,6 +65,17 @@ std::shared_ptr<DataShare::DataShareHelper> CellularDataSettingsRdbHelper::Creat
         TELEPHONY_LOGE("CellularDataRdbHelper: create datashare fail, ret = %{public}d.", ret);
         return nullptr;
     }
+    // LCOV_EXCL_STOP
+}
+
+void CellularDataSettingsRdbHelper::ReleaseSettingsHelper()
+{
+    std::lock_guard<ffrt::mutex> lockGuard(settingsHelperMutex_);
+    if (settingsHelper_ == nullptr) {
+        return;
+    }
+    settingsHelper_->Release();
+    settingsHelper_ = nullptr;
 }
 
 void CellularDataSettingsRdbHelper::UnRegisterSettingsObserver(
@@ -67,7 +87,6 @@ void CellularDataSettingsRdbHelper::UnRegisterSettingsObserver(
         return;
     }
     settingHelper->UnregisterObserver(uri, dataObserver);
-    settingHelper->Release();
     TELEPHONY_LOGE("UnRegisterSettingsObserver success");
 }
 
@@ -80,7 +99,6 @@ void CellularDataSettingsRdbHelper::RegisterSettingsObserver(
         return;
     }
     settingHelper->RegisterObserver(uri, dataObserver);
-    settingHelper->Release();
     TELEPHONY_LOGE("RegisterSettingsObserver success");
 }
 
@@ -92,7 +110,6 @@ void CellularDataSettingsRdbHelper::NotifyChange(const Uri &uri)
         return;
     }
     settingHelper->NotifyChange(uri);
-    settingHelper->Release();
 }
 
 int32_t CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &column, int32_t &value)
@@ -108,7 +125,6 @@ int32_t CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &col
     auto result = settingHelper->Query(uri, predicates, columns);
     if (result == nullptr) {
         TELEPHONY_LOGE("setting DB: query error");
-        settingHelper->Release();
         return TELEPHONY_ERR_DATABASE_READ_FAIL;
     }
     result->GoToFirstRow();
@@ -118,7 +134,6 @@ int32_t CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &col
         result->GetString(columnIndex, resultValue);
     }
     result->Close();
-    settingHelper->Release();
     TELEPHONY_LOGD("Query end resultValue is %{public}s", resultValue.c_str());
     if (!CellularDataUtils::ConvertStrToInt(resultValue, value)) {
         TELEPHONY_LOGD("ConvertStrToInt fail");
@@ -140,7 +155,6 @@ int32_t CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &col
     auto result = settingHelper->Query(uri, predicates, columns);
     if (result == nullptr) {
         TELEPHONY_LOGE("setting DB: query error");
-        settingHelper->Release();
         return TELEPHONY_ERR_DATABASE_READ_FAIL;
     }
     result->GoToFirstRow();
@@ -149,7 +163,6 @@ int32_t CellularDataSettingsRdbHelper::GetValue(Uri &uri, const std::string &col
         result->GetString(columnIndex, value);
     }
     result->Close();
-    settingHelper->Release();
     TELEPHONY_LOGD("Query end resultValue is %{public}s", value.c_str());
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -191,11 +204,9 @@ int32_t CellularDataSettingsRdbHelper::PutValue(Uri &uri, const std::string &col
         } else {
             TELEPHONY_LOGI("result is %{public}d, do not handle.", result);
         }
-        settingHelper->Release();
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
     settingHelper->NotifyChange(uri);
-    settingHelper->Release();
     return TELEPHONY_ERR_SUCCESS;
 }
 } // namespace Telephony

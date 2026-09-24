@@ -15,6 +15,7 @@
 
 #include "cellular_data_controller.h"
 
+#include "cellular_data_settings_rdb_helper.h"
 #include "core_manager_inner.h"
 #include "network_search_callback.h"
 static constexpr int32_t SIM_ACCOUNT_LOADED_REGISTER = 0;
@@ -395,6 +396,7 @@ void CellularDataController::SystemAbilityStatusChangeListener::OnRemoveSystemAb
             break;
         case DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID:
             TELEPHONY_LOGE("DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID stopped");
+            CellularDataSettingsRdbHelper::GetInstance()->ReleaseSettingsHelper();
             break;
         default:
             TELEPHONY_LOGE("systemAbilityId is invalid");

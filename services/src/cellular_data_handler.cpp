@@ -1000,7 +1000,14 @@ std::shared_ptr<DataShare::DataShareHelper> CellularDataHandler::CreatorDataShar
         TELEPHONY_LOGE("remoteObj is nullptr.");
         return nullptr;
     }
-    return DataShare::DataShareHelper::Creator(remoteObj, CELLULAR_DATA_RDB_URI);
+    auto [ret, dataShareHelper] = DataShare::DataShareHelper::Create(remoteObj, CELLULAR_DATA_RDB_URI, "");
+    // LCOV_EXCL_START
+    if (ret != DataShare::E_OK) {
+        TELEPHONY_LOGE("CreatorDataShareHelper fail %{public}d.", ret);
+        return nullptr;
+    }
+    // LCOV_EXCL_STOP
+    return dataShareHelper;
 }
 
 bool CellularDataHandler::GetCurrentDataShareApnInfo(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,
