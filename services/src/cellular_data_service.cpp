@@ -410,7 +410,10 @@ int32_t CellularDataService::ReleaseNet(const NetRequest &request)
     if (!IsValidDecValue(requestIdent)) {
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    int32_t simId = std::stoi(requestIdent);
+    int32_t simId = 0;
+    if (!CellularDataUtils::ConvertStrToInt(requestIdent, simId)) {
+        return CELLULAR_DATA_INVALID_PARAM;
+    }
     int32_t slotId = CellularDataNetAgent::GetInstance().GetSlotId(simId);
     std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
     if (cellularDataController == nullptr) {
@@ -433,7 +436,11 @@ int32_t CellularDataService::RequestNet(const NetRequest &request)
         TELEPHONY_LOGE("ident: %{public}s.IsValidDecValue failed", requestIdent.c_str());
         return CELLULAR_DATA_INVALID_PARAM;
     }
-    int32_t simId = std::stoi(requestIdent);
+    int32_t simId = 0;
+    if (!CellularDataUtils::ConvertStrToInt(requestIdent, simId)) {
+        TELEPHONY_LOGE("ident: %{public}s.ConvertStrToInt failed", requestIdent.c_str());
+        return CELLULAR_DATA_INVALID_PARAM;
+    }
     int32_t slotId = CellularDataNetAgent::GetInstance().GetSlotId(simId);
     std::shared_ptr<CellularDataController> cellularDataController = GetCellularDataController(slotId);
     if (cellularDataController == nullptr) {
