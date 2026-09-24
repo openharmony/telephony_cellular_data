@@ -1813,6 +1813,22 @@ HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_SplitProxyIpAddress_
 }
 
 /**
+ * @tc.number   CellularDataStateMachine_SplitProxyIpAddress_004
+ * @tc.name     reject overflowing proxy port
+ * @tc.desc     Overflowing ports should leave the caller's default unchanged.
+ */
+HWTEST_F(CellularStateMachineTest, CellularDataStateMachine_SplitProxyIpAddress_004, TestSize.Level0)
+{
+    std::shared_ptr<CellularMachineTest> machine = std::make_shared<CellularMachineTest>();
+    std::shared_ptr<CellularDataStateMachine> cellularMachine = machine->CreateCellularDataConnect(0);
+    std::string host;
+    uint16_t port = 3128;
+    cellularMachine->SplitProxyIpAddress("192.168.1.1:65536", host, port);
+    ASSERT_EQ(host, "192.168.1.1");
+    ASSERT_EQ(port, 3128);
+}
+
+/**
  * @tc.number   IncallDataStateMachine_IsSecondaryCanActiveData_001
  * @tc.name     test function branch
  * @tc.desc     Function test
