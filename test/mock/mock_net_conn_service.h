@@ -66,7 +66,6 @@ public:
     MOCK_METHOD(int32_t, GetSpecificNetByIdent,
         (NetBearType bearerType, const std::string &ident, std::list<int32_t> &netIdList));
     MOCK_METHOD(int32_t, GetAllNets, (std::list<int32_t> & netIdList));
-    MOCK_METHOD(int32_t, GetSpecificUidNet, (int32_t uid, int32_t &netId));
     MOCK_METHOD(int32_t, GetConnectionProperties, (int32_t netId, NetLinkInfo &info));
     MOCK_METHOD(int32_t, GetNetCapabilities, (int32_t netId, NetManagerStandard::NetAllCapabilities &netAllCap));
     MOCK_METHOD(int32_t, BindSocket, (int32_t socketFd, int32_t netId));
