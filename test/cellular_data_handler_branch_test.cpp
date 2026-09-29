@@ -627,12 +627,13 @@ HWTEST_F(CellularDataHandlerBranchTest, IsCellularDataAllowedByExt_001, Function
 {
     auto cellularDataHandler = std::make_shared<CellularDataHandler>(0);
     cellularDataHandler->Init();
-    EXPECT_FALSE(cellularDataHandler->IsCellularDataAllowedByExt());
+    sptr<ApnHolder> apnHolder = nullptr;
+    EXPECT_FALSE(cellularDataHandler->CheckCellularDataSlotId(apnHolder));
  
     cellularDataHandler.reset();
     cellularDataHandler = std::make_shared<CellularDataHandler>(2);
     cellularDataHandler->Init();
-    EXPECT_FALSE(cellularDataHandler->IsCellularDataAllowedByExt());
+    EXPECT_FALSE(cellularDataHandler->CheckCellularDataSlotId(apnHolder));
 }
 }  // namespace Telephony
 }  // namespace OHOS

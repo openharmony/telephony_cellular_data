@@ -543,28 +543,6 @@ bool CellularDataHandler::CheckDataPermittedByDsds()
     return true;
 }
 
-bool CellularDataHandler::IsCellularDataAllowedByExt()
-{
-    // LCOV_EXCL_START
-#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
-    if (TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_ &&
-        TELEPHONY_EXT_WRAPPER.isVirtualModemSlot_(slotId_)) {
-        if (TELEPHONY_EXT_WRAPPER.isDistributedCellularEnabledForSlot_ &&
-            TELEPHONY_EXT_WRAPPER.isDistributedCellularEnabledForSlot_(slotId_)) {
-            return true;
-        }
-    } else {
-        if (TELEPHONY_EXT_WRAPPER.isDualCellularCardAllowed_) {
-            if (TELEPHONY_EXT_WRAPPER.isDualCellularCardAllowed_()) {
-                return true;
-            }
-        }
-    }
-#endif
-    return false;
-    // LCOV_EXCL_STOP
-}
-
 bool CellularDataHandler::CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder)
 {
     if (apnHolder == nullptr) {
@@ -589,7 +567,15 @@ bool CellularDataHandler::CheckCellularDataSlotId(sptr<ApnHolder> &apnHolder)
         return false;
     }
     // LCOV_EXCL_START
-    if (IsCellularDataAllowedByExt()) {
+    if (slotId_ >= DISTRIBUTED_MULTI_DEVICE_SLOTID_START) {
+        if (TELEPHONY_EXT_WRAPPER.isDistributedCellularEnabledForSlot_ &&
+            TELEPHONY_EXT_WRAPPER.isDistributedCellularEnabledForSlot_(slotId_)) {
+            return true;
+        }
+        return false;
+    }
+    if (TELEPHONY_EXT_WRAPPER.isDualCellularCardAllowed_ &&
+        TELEPHONY_EXT_WRAPPER.isDualCellularCardAllowed_()) {
         return true;
     }
     // LCOV_EXCL_STOP
