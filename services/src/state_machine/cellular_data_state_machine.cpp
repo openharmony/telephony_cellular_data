@@ -358,7 +358,13 @@ void CellularDataStateMachine::SplitProxyIpAddress(const std::string &proxyIpAdd
     if (address.size() == HOST_PORT_SIZE) {
         host = address[0];
         if (!address[1].empty() && IsValidDecValue(address[1])) {
-            port = static_cast<uint16_t>(std::stoi(address[1]));
+            uint32_t parsedPort = 0;
+            const char *first = address[1].data();
+            const char *last = first + address[1].size();
+            auto result = std::from_chars(first, last, parsedPort);
+            if (result.ec == std::errc{} && result.ptr == last && parsedPort <= UINT16_MAX) {
+                port = static_cast<uint16_t>(parsedPort);
+            }
         }
     }
 }
